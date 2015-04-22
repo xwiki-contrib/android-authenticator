@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">XWiki Authenticator</string>
+    <string name="label">XWiki</string>
+    <string name="login_label">Log in</string>
+</resources>
