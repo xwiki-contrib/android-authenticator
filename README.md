@@ -1,6 +1,6 @@
 # android-authenticator
 
-An Android authenticator to be used by other andoid application and with integrated synchronisation of contacts
+An Android authenticator (i.e. listed in the Android Accounts Manager in the android settings) to be used by other andoid application and with integrated synchronisation of contacts
 
 # TODO
 
