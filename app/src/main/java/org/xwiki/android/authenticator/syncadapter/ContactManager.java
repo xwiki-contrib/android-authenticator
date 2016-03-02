@@ -112,13 +112,13 @@ public class ContactManager {
                     currentSyncDate = xwikiUser.getDate();
                 }
 
-                if (exist(xwikiUser.getId())) {
+                /*if (exist(xwikiUser.getId())) {
                     Log.d(TAG, "Update contact");
                     updateContact(context, resolver, xwikiUser, updateServerId, true, true, true, rawContactId, batchOperation);
                 } else {
                     Log.d(TAG, "Add contact");
                     addContact(context, account, xwikiUser, groupId, true, batchOperation);
-                }
+                }*/
                 // A sync adapter should batch operations on multiple contacts,
                 // because it will make a dramatic performance difference.
                 // (UI updates, etc)
@@ -161,14 +161,14 @@ public class ContactManager {
                 .addPhone(rawContact.getCellPhone(), Phone.TYPE_MOBILE)
                 .addPhone(rawContact.getHomePhone(), Phone.TYPE_HOME)
                 .addPhone(rawContact.getOfficePhone(), Phone.TYPE_WORK)
-                .addGroupMembership(groupId)
+                //.addGroupMembership(groupId)
                 .addAvatar(rawContact.getAvatarUrl());
 
         // If we have a serverId, then go ahead and create our status profile.
         // Otherwise skip it - and we'll create it after we sync-up to the
         // server later on.
         if (rawContact.getServerContactId() > 0) {
-            contactOp.addProfileAction(rawContact.getServerContactId());
+            //contactOp.addProfileAction(rawContact.getServerContactId());
         }
     }
 
@@ -199,7 +199,7 @@ public class ContactManager {
     public static void updateContact(Context context, ContentResolver resolver,
         RawContact rawContact, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
         boolean inSync, long rawContactId, BatchOperation batchOperation) {
-
+/*
         boolean existingCellPhone = false;
         boolean existingHomePhone = false;
         boolean existingWorkPhone = false;
@@ -295,6 +295,7 @@ public class ContactManager {
         if (profileId <= 0) {
             contactOp.addProfileAction(serverId);
         }
+        */
     }
 
     /**

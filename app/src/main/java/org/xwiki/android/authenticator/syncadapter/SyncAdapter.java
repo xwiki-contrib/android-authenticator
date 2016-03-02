@@ -60,7 +60,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
-
+/*
         try {
             // see if we already have a sync-state attached to this account. By handing
             // This value to the server, we can just get the contacts that have
@@ -142,7 +142,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (final JSONException e) {
             Log.e(TAG, "JSONException", e);
             syncResult.stats.numParseExceptions++;
-        }
+        }*/
     }
 
     /**

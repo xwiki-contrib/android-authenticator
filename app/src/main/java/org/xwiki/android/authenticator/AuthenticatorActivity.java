@@ -30,7 +30,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static org.xwiki.android.authenticator.AccountGeneral.sServerAuthenticate;
+import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 /**
  * @version $Id: $
@@ -107,7 +107,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 Bundle data = new Bundle();
                 try {
-                    String authtoken = sServerAuthenticate.userSignIn(userServer, userName, userPass, mAuthTokenType);
+                    String authtoken = XWikiConnector.userSignIn(userServer, userName, userPass, mAuthTokenType);
 
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
