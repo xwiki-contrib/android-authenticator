@@ -23,6 +23,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +31,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.xwiki.android.authenticator.activities.SignUpActivity;
+import org.xwiki.android.authenticator.activities.StatusBarCompat;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 /**
@@ -61,6 +64,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_login);
+
+        StatusBarCompat.compat(this, Color.parseColor("#0077D9"));
+
         mAccountManager = AccountManager.get(getBaseContext());
 
         String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
@@ -78,6 +84,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 submit();
             }
         });
+    }
+
+    public void handleSignUp(View view){
+        Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
     }
 
     @Override

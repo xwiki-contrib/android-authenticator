@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_layout" />
+
+    <ScrollView android:id="@+id/login_form" android:layout_width="fill_parent"
+        android:layout_height="match_parent" android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" android:layout_marginTop="10dp"
+        android:background="@android:color/white"
+        android:fillViewport="false">
+
+        <LinearLayout android:id="@+id/email_login_form"
+            android:paddingTop="5dip"
+            android:paddingBottom="13dip"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+
+                <TextView
+                    android:text="@string/full_name"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginBottom="5dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText android:id="@+id/fullname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black"
+                    android:singleLine="true" />
+
+
+
+                <TextView
+                    android:text="@string/cell_phone"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginBottom="5dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText android:id="@+id/cellphone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="phone"
+                    android:textColor="@android:color/black"
+                    android:singleLine="true" />
+
+
+
+                <TextView
+                    android:text="@string/work_phone"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginBottom="5dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText android:id="@+id/workphone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="phone"
+                    android:textColor="@android:color/black"
+                    android:singleLine="true" />
+
+
+
+                <TextView
+                    android:text="@string/email"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginBottom="5dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@android:color/black"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true" />
+
+
+            <TextView
+                android:id="@+id/contactinfo"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

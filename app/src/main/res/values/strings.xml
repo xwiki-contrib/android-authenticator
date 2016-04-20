@@ -2,4 +2,36 @@
     <string name="app_name">XWiki Authenticator</string>
     <string name="label">XWiki</string>
     <string name="login_label">Log in</string>
+
+    <!-- edit -->
+    <string name="full_name">Full Name</string>
+    <string name="cell_phone">Cell Phone</string>
+    <string name="work_phone">Office Phone</string>
+    <string name="email">Email</string>
+
+    <!-- login Label username password server-->
+    <string name="login_activity_username_label">Username</string>
+    <string name="login_activity_password_label">Password</string>
+    <string name="login_activity_server_label">Server</string>
+    <string name="login_activity_ok_button">Sign in</string>
+    <string name="login_activity_register_button">Sign up</string>
+
+    <!-- menu -->
+    <string name="menu_save">Save</string>
+    <string name="menu_ok">OK</string>
+
+    <!--Activity label-->
+    <string name="title_activity_edit_contact">Edit Contact</string>
+    <string name="title_activity_sign_up">Sign Up</string>
+
+    <!--error msg-->
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
+    <!--contacts.xml-->
+    <string name="view_group_action_label">Show sample group details</string>
+    <string name="invite_action_label">Add to Sample SyncAdaper</string>
+
 </resources>

@@ -126,6 +126,8 @@ final public class RawContact {
         return mSyncState;
     }
 
+
+
     public String getBestName() {
         if (!TextUtils.isEmpty(mFullName)) {
             return mFullName;

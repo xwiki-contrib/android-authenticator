@@ -4,7 +4,35 @@
     <application android:allowBackup="true" android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
 
-        <activity android:name=".AuthenticatorActivity" android:label="@string/login_label"/>
+        <activity android:name=".AuthenticatorActivity"
+            android:label="@string/login_label"
+            android:theme="@style/ActivityTheme" />
+
+
+        <activity
+            android:theme="@style/AppTheme"
+            android:name=".activities.EditContactActivity"
+            android:label="@string/title_activity_edit_contact">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <data android:mimeType="vnd.android.cursor.item/vnd.samplesyncadapter.profile" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:theme="@style/AppTheme"
+            android:name=".activities.SignUpActivity"
+            android:label="@string/title_activity_sign_up">
+        </activity>
+
 
         <service android:name=".XWikiAuthenticatorService">
             <intent-filter>
