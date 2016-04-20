@@ -10,41 +10,35 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 /**
- * Created by zhy on 15/9/21.
+ * Created by fitz on 16/4/16.
  */
-public class StatusBarCompat
+public class StatusBarColorCompat
 {
     private static final int INVALID_VAL = -1;
     private static final int COLOR_DEFAULT = Color.parseColor("#20000000");
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void compat(Activity activity, int statusColor)
-    {
+    public static void compat(Activity activity, int statusColor){
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            if (statusColor != INVALID_VAL)
-            {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (statusColor != INVALID_VAL) {
                 activity.getWindow().setStatusBarColor(statusColor);
             }
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
             int color = COLOR_DEFAULT;
             ViewGroup contentView = (ViewGroup) activity.findViewById(android.R.id.content);
-            if (statusColor != INVALID_VAL)
-            {
+            if (statusColor != INVALID_VAL) {
                 color = statusColor;
             }
             View statusBarView = contentView.getChildAt(0);
-            //改变颜色时避免重复添加statusBarView
-            if (statusBarView != null && statusBarView.getMeasuredHeight() == getStatusBarHeight(activity))
-            {
+            //avoid duplication of statusBarView when changing color
+            if (statusBarView != null && statusBarView.getMeasuredHeight() == getStatusBarHeight(activity)) {
                 statusBarView.setBackgroundColor(color);
                 return;
             }
@@ -57,18 +51,14 @@ public class StatusBarCompat
 
     }
 
-    public static void compat(Activity activity)
-    {
+    public static void compat(Activity activity){
         compat(activity, INVALID_VAL);
     }
 
-
-    public static int getStatusBarHeight(Context context)
-    {
+    private static int getStatusBarHeight(Context context) {
         int result = 0;
         int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0)
-        {
+        if (resourceId > 0) {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;

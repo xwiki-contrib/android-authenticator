@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xwiki.android.authenticator.activities.SignUpActivity;
-import org.xwiki.android.authenticator.activities.StatusBarCompat;
+import org.xwiki.android.authenticator.activities.StatusBarColorCompat;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 /**
@@ -65,7 +65,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_login);
 
-        StatusBarCompat.compat(this, Color.parseColor("#0077D9"));
+        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         mAccountManager = AccountManager.get(getBaseContext());
 
