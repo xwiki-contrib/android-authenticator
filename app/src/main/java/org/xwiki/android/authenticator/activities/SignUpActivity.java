@@ -4,13 +4,16 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.utils.StringUtils;
 
 
 /**
@@ -75,6 +78,53 @@ public class SignUpActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Attempts to check input TODO check server permission or save priority in local preference
+     * If there are form errors (invalid email, missing fields, etc.), the
+     * errors are presented and no server checking is made.
+     */
+    private void checkInputAndPermission() {
+
+        // Reset errors.
+        mEmailView.setError(null);
+        mCellPhoneView.setError(null);
+
+        // Store values at the time of the login attempt.
+        String email = mEmailView.getText().toString();
+        String password = mCellPhoneView.getText().toString();
+        String cellphone = mCellPhoneView.getText().toString();
+        String workphone = mWorkPhoneView.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password) && !StringUtils.isPhone(password)) {
+            mCellPhoneView.setError(getString(R.string.error_invalid_password));
+            focusView = mCellPhoneView;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!StringUtils.isEmail(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+        }
+    }
 
 }
 
