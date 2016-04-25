@@ -1,5 +1,6 @@
 package org.xwiki.android.authenticator.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -166,6 +167,17 @@ public class StringUtils {
         return sb.toString().toUpperCase(Locale.getDefault());
     }
 
+    public static final String byteArrayToUtf8String(byte[] bytes){
+        String result = null;
+        try {
+            result = new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     /**
      * Hex String to byte[].
      * 
@@ -213,6 +225,33 @@ public class StringUtils {
         } catch (ParseException e) {
             return null;
         }
+    }
+
+    /**
+     * Iso8601 String To Date
+     * 2011-09-24T19:45:31+02:00
+     */
+    public static Date iso8601ToDate(String iso8601){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            return sdf.parse(iso8601);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Date to Iso8601 String
+     * 2011-09-24T19:45:31+02:00
+     * @param date
+     * @return String
+     */
+    public static String dateToIso8601String(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return sdf.format(date);
     }
 
     /**

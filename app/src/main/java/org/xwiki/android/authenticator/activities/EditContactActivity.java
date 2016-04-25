@@ -9,6 +9,7 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +20,16 @@ import android.widget.Toast;
 
 
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.rest.RestTest;
+import org.xwiki.android.authenticator.rest.HttpCallback;
+import org.xwiki.android.authenticator.rest.Test;
+import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
 import org.xwiki.android.authenticator.utils.SystemTools;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 /**
@@ -58,7 +66,38 @@ public class EditContactActivity extends AppCompatActivity {
         mContactInfoTextView = (TextView) findViewById(R.id.contactinfo);
 
         if(SystemTools.checkNet(this)) {
-            RestTest.testGetAllUsers(mContactInfoTextView);
+//            RestTest.testLogin(mContactInfoTextView);
+//            RestTest.testGetAllUsers(mContactInfoTextView);
+            Test.testLogin(new HttpCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    super.onSuccess(obj);
+//                    byte[] bytes = (byte[]) obj;
+                    mContactInfoTextView.append(StringUtils.byteArrayToUtf8String((byte[]) obj));
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    super.onFailure(msg);
+                    mContactInfoTextView.append(msg);
+                }
+            });
+
+            Test.testGetAllUser(new HttpCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    super.onSuccess(obj);
+                    if(obj != null) {
+                        mContactInfoTextView.append(obj.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    super.onFailure(msg);
+                    mContactInfoTextView.append(msg);
+                }
+            });
         }
     }
 

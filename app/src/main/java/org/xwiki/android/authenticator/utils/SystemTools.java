@@ -15,6 +15,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.State;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 
 import java.io.File;
@@ -72,7 +74,20 @@ public final class SystemTools {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        return info != null;
+        if(info!=null && info.isAvailable()) return true;
+        return false;
+    }
+
+    public static boolean checkWifi(Context context) {
+        WifiManager mWifiManager = (WifiManager) context
+                .getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
+        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

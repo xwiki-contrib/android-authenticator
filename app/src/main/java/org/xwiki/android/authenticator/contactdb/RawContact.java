@@ -17,15 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.syncadapter;
+package org.xwiki.android.authenticator.contactdb;
 
 import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONObject;
 import org.json.JSONException;
-
-import java.lang.StringBuilder;
 
 /**
  * Represents a low-level contacts RawContact - or at least

@@ -23,7 +23,6 @@ import org.apache.http.ParseException;
 import org.apache.http.auth.AuthenticationException;
 import org.json.JSONException;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
-import org.xwiki.android.authenticator.rest.XWikiUser;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;

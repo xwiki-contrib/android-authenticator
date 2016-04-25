@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.text.TextUtils;
 
+import org.xwiki.android.authenticator.activities.AuthenticatorActivity;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;

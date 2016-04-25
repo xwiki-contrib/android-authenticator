@@ -1,4 +1,4 @@
-package org.xwiki.android.authenticator.activities;
+package org.xwiki.android.authenticator.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

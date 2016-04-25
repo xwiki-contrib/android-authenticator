@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.syncadapter;
+package org.xwiki.android.authenticator.contactdb;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
@@ -26,10 +26,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Groups;
@@ -37,7 +36,8 @@ import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Settings;
 import android.util.Log;
 
-import org.xwiki.android.authenticator.rest.XWikiUser;
+import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.syncadapter.Constants;
 
 import java.util.List;
 
@@ -107,31 +107,37 @@ public class ContactManager {
 
         Log.d(TAG, "Synchronizing XWiki contacts");
         for (final XWikiUser xwikiUser : rawContacts) {
-            if (xwikiUser.getDate() > lastSyncDate) {
-                if (xwikiUser.getDate() > currentSyncDate) {
-                    currentSyncDate = xwikiUser.getDate();
-                }
+            //TODO update Comment xwikiUser.getDate
+//            if (xwikiUser.getDate() > lastSyncDate) {
+//                if (xwikiUser.getDate() > currentSyncDate) {
+//                    currentSyncDate = xwikiUser.getDate();
+//                }
 
-                /*if (exist(xwikiUser.getId())) {
+               //TODO UpdateContact AddContact
+                if (exist(xwikiUser.getId())) {
                     Log.d(TAG, "Update contact");
-                    updateContact(context, resolver, xwikiUser, updateServerId, true, true, true, rawContactId, batchOperation);
+                    updateContact(context, resolver, xwikiUser, false, true, true, true, 111, batchOperation);
                 } else {
                     Log.d(TAG, "Add contact");
                     addContact(context, account, xwikiUser, groupId, true, batchOperation);
-                }*/
+                }
                 // A sync adapter should batch operations on multiple contacts,
                 // because it will make a dramatic performance difference.
                 // (UI updates, etc)
                 if (batchOperation.size() >= 50) {
                     batchOperation.execute();
                 }
-            }
+//            }
         }
         batchOperation.execute();
 
         // TODO: Remove contacts that don't exist anymore
 
         return currentSyncDate;
+    }
+
+    private static boolean exist(String id){
+        return true;
     }
 
     /**
@@ -148,12 +154,13 @@ public class ContactManager {
      * @param batchOperation allow us to batch together multiple operations
      *        into a single provider call
      */
-    public static void addContact(Context context, String accountName, RawContact rawContact,
+    public static void addContact(Context context, String accountName, XWikiUser rawContact,
             long groupId, boolean inSync, BatchOperation batchOperation) {
-
+        //TODO AddContact
+        /*
         // Put the data in the contacts provider
         final ContactOperations contactOp = ContactOperations.createNewContact(
-                context, rawContact.getServerContactId(), accountName, inSync, batchOperation);
+                context, rawContact.getServerId(), accountName, inSync, batchOperation);
 
         contactOp.addName(rawContact.getFullName(), rawContact.getFirstName(),
                 rawContact.getLastName())
@@ -170,6 +177,7 @@ public class ContactManager {
         if (rawContact.getServerContactId() > 0) {
             //contactOp.addProfileAction(rawContact.getServerContactId());
         }
+    */
     }
 
     /**
@@ -197,13 +205,15 @@ public class ContactManager {
      *        into a single provider call
      */
     public static void updateContact(Context context, ContentResolver resolver,
-        RawContact rawContact, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
+        XWikiUser rawContact, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
         boolean inSync, long rawContactId, BatchOperation batchOperation) {
-/*
+
+        //TODO check again
         boolean existingCellPhone = false;
         boolean existingHomePhone = false;
         boolean existingWorkPhone = false;
         boolean existingEmail = false;
+        boolean existingAvatar = false;
 
         final Cursor c =
                 resolver.query(DataQuery.CONTENT_URI, DataQuery.PROJECTION, DataQuery.SELECTION,
@@ -223,29 +233,29 @@ public class ContactManager {
                             c.getString(DataQuery.COLUMN_GIVEN_NAME),
                             c.getString(DataQuery.COLUMN_FAMILY_NAME),
                             c.getString(DataQuery.COLUMN_FULL_NAME),
-                            rawContact.getFirstName(),
-                            rawContact.getLastName(),
+                            rawContact.getFirst_name(),
+                            rawContact.getLast_name(),
                             rawContact.getFullName());
                 } else if (mimeType.equals(Phone.CONTENT_ITEM_TYPE)) {
                     final int type = c.getInt(DataQuery.COLUMN_PHONE_TYPE);
                     if (type == Phone.TYPE_MOBILE) {
                         existingCellPhone = true;
                         contactOp.updatePhone(c.getString(DataQuery.COLUMN_PHONE_NUMBER),
-                                rawContact.getCellPhone(), uri);
+                                rawContact.getPhone(), uri);
                     } else if (type == Phone.TYPE_HOME) {
                         existingHomePhone = true;
                         contactOp.updatePhone(c.getString(DataQuery.COLUMN_PHONE_NUMBER),
-                                rawContact.getHomePhone(), uri);
+                                rawContact.getPhone(), uri);
                     } else if (type == Phone.TYPE_WORK) {
                         existingWorkPhone = true;
                         contactOp.updatePhone(c.getString(DataQuery.COLUMN_PHONE_NUMBER),
-                                rawContact.getOfficePhone(), uri);
+                                rawContact.getPhone(), uri);
                     }
-                } else if (mimeType.equals(Email.CONTENT_ITEM_TYPE)) {
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
                     existingEmail = true;
                     contactOp.updateEmail(rawContact.getEmail(),
                             c.getString(DataQuery.COLUMN_EMAIL_ADDRESS), uri);
-                } else if (mimeType.equals(Photo.CONTENT_ITEM_TYPE)) {
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
                     existingAvatar = true;
                     contactOp.updateAvatar(rawContact.getAvatarUrl(), uri);
                 }
@@ -256,16 +266,16 @@ public class ContactManager {
 
         // Add the cell phone, if present and not updated above
         if (!existingCellPhone) {
-            contactOp.addPhone(rawContact.getCellPhone(), Phone.TYPE_MOBILE);
+            contactOp.addPhone(rawContact.getPhone(), Phone.TYPE_MOBILE);
         }
         // Add the home phone, if present and not updated above
         if (!existingHomePhone) {
-            contactOp.addPhone(rawContact.getHomePhone(), Phone.TYPE_HOME);
+            contactOp.addPhone(rawContact.getPhone(), Phone.TYPE_HOME);
         }
 
         // Add the work phone, if present and not updated above
         if (!existingWorkPhone) {
-            contactOp.addPhone(rawContact.getOfficePhone(), Phone.TYPE_WORK);
+            contactOp.addPhone(rawContact.getPhone(), Phone.TYPE_WORK);
         }
         // Add the email address, if present and not updated above
         if (!existingEmail) {
@@ -284,18 +294,17 @@ public class ContactManager {
         // the serverId.
         if (updateServerId) {
             Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
-            contactOp.updateServerId(rawContact.getServerContactId(), uri);
+            contactOp.updateServerId(rawContact.getServerId(), uri);
         }
 
         // If we don't have a status profile, then create one.  This could
         // happen for contacts that were created on the client - we don't
         // create the status profile until after the first sync...
-        final long serverId = rawContact.getServerContactId();
+        final String serverId = rawContact.getServerId();
         final long profileId = lookupProfile(resolver, serverId);
         if (profileId <= 0) {
             contactOp.addProfileAction(serverId);
         }
-        */
     }
 
     /**
@@ -373,7 +382,7 @@ public class ContactManager {
      * @param userId the sample SyncAdapter user ID to lookup
      * @return the profile Data row id, or 0 if not found
      */
-    private static long lookupProfile(ContentResolver resolver, long userId) {
+    private static long lookupProfile(ContentResolver resolver, String userId) {
 
         long profileId = 0;
         final Cursor c =

@@ -1,23 +1,4 @@
-/*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.android.authenticator.syncadapter;
+package org.xwiki.android.authenticator.contactdb;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -33,6 +14,8 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 
+import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 /**
@@ -91,7 +74,7 @@ public class ContactOperations {
     }
 
     public ContactOperations(Context context, boolean isSyncOperation,
-            BatchOperation batchOperation) {
+                             BatchOperation batchOperation) {
         mValues = new ContentValues();
         mIsYieldAllowed = true;
         mIsSyncOperation = isSyncOperation;
@@ -100,12 +83,12 @@ public class ContactOperations {
     }
 
     public ContactOperations(Context context, long userId, String accountName,
-            boolean isSyncOperation, BatchOperation batchOperation) {
+                             boolean isSyncOperation, BatchOperation batchOperation) {
         this(context, isSyncOperation, batchOperation);
         mBackReference = mBatchOperation.size();
         mIsNewContact = true;
         mValues.put(RawContacts.SOURCE_ID, userId);
-        mValues.put(RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+        mValues.put(RawContacts.ACCOUNT_TYPE, AccountGeneral.ACCOUNT_TYPE);
         mValues.put(RawContacts.ACCOUNT_NAME, accountName);
         ContentProviderOperation.Builder builder =
                 newInsertCpo(RawContacts.CONTENT_URI, mIsSyncOperation, true).withValues(mValues);
@@ -113,7 +96,7 @@ public class ContactOperations {
     }
 
     public ContactOperations(Context context, long rawContactId, boolean isSyncOperation,
-            BatchOperation batchOperation) {
+                             BatchOperation batchOperation) {
         this(context, isSyncOperation, batchOperation);
         mIsNewContact = false;
         mRawContactId = rawContactId;
@@ -156,7 +139,7 @@ public class ContactOperations {
     /**
      * Adds an email
      *
-     * @param email the email address we're adding
+     * @param email address we're adding
      * @return instance of ContactOperations
      */
     public ContactOperations addEmail(String email) {
@@ -188,6 +171,20 @@ public class ContactOperations {
         return this;
     }
 
+    /**
+     * Adds a group membership
+     *
+     * @param groupId The id of the group to assign
+     * @return instance of ContactOperations
+     */
+    public ContactOperations addGroupMembership(long groupId) {
+        mValues.clear();
+        mValues.put(GroupMembership.GROUP_ROW_ID, groupId);
+        mValues.put(GroupMembership.MIMETYPE, GroupMembership.CONTENT_ITEM_TYPE);
+        addInsertOp();
+        return this;
+    }
+
     public ContactOperations addAvatar(String avatarUrl) {
         if (avatarUrl != null) {
             byte[] avatarBuffer = XWikiConnector.downloadAvatar(avatarUrl);
@@ -204,15 +201,20 @@ public class ContactOperations {
     /**
      * Adds a profile action
      *
-     * @param userId the userId of the XWiki user
+     * @param userId the userId of the sample SyncAdapter user object
      * @return instance of ContactOperations
      */
     public ContactOperations addProfileAction(String userId) {
         mValues.clear();
-        mValues.put(SampleSyncAdapterColumns.DATA_PID, userId);
-        mValues.put(Data.MIMETYPE, SampleSyncAdapterColumns.MIME_PROFILE);
-        addInsertOp();
-
+        if (userId != null) {
+            mValues.put(SampleSyncAdapterColumns.DATA_PID, userId);
+//            mValues.put(SampleSyncAdapterColumns.DATA_SUMMARY, mContext
+//                .getString(R.string.profile_action));
+//            mValues.put(SampleSyncAdapterColumns.DATA_DETAIL, mContext
+//                .getString(R.string.view_profile));
+            mValues.put(Data.MIMETYPE, SampleSyncAdapterColumns.MIME_PROFILE);
+            addInsertOp();
+        }
         return this;
     }
 
@@ -223,7 +225,7 @@ public class ContactOperations {
      * @param uri Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
-    public ContactOperations updateServerId(long serverId, Uri uri) {
+    public ContactOperations updateServerId(String serverId, Uri uri) {
         mValues.clear();
         mValues.put(RawContacts.SOURCE_ID, serverId);
         addUpdateOp(uri);
@@ -253,22 +255,32 @@ public class ContactOperations {
      * @param uri Uri for the existing raw contact to be updated
      * @param existingFirstName the first name stored in provider
      * @param existingLastName the last name stored in provider
+     * @param existingFullName the full name stored in provider
      * @param firstName the new first name to store
      * @param lastName the new last name to store
+     * @param fullName the new full name to store
      * @return instance of ContactOperations
      */
     public ContactOperations updateName(Uri uri,
         String existingFirstName,
         String existingLastName,
+        String existingFullName,
         String firstName,
-        String lastName) {
+        String lastName,
+        String fullName) {
 
         mValues.clear();
-        if (!TextUtils.equals(existingFirstName, firstName)) {
-            mValues.put(StructuredName.GIVEN_NAME, firstName);
-        }
-        if (!TextUtils.equals(existingLastName, lastName)) {
-            mValues.put(StructuredName.FAMILY_NAME, lastName);
+        if (TextUtils.isEmpty(fullName)) {
+            if (!TextUtils.equals(existingFirstName, firstName)) {
+                mValues.put(StructuredName.GIVEN_NAME, firstName);
+            }
+            if (!TextUtils.equals(existingLastName, lastName)) {
+                mValues.put(StructuredName.FAMILY_NAME, lastName);
+            }
+        } else {
+            if (!TextUtils.equals(existingFullName, fullName)) {
+                mValues.put(StructuredName.DISPLAY_NAME, fullName);
+            }
         }
         if (mValues.size() > 0) {
             addUpdateOp(uri);

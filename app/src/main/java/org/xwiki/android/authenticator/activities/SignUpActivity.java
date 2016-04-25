@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 

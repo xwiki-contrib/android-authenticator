@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator;
+package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -31,8 +31,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.activities.SignUpActivity;
-import org.xwiki.android.authenticator.activities.StatusBarColorCompat;
+import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
 /**

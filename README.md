@@ -32,14 +32,19 @@ http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers&number=100
 for example XWiki.LudovicDubost    
 http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/LudovicDubost   
 http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/LudovicDubost/objects/XWiki.XWikiUsers/0/properties   
-* Get Groups(TODO)   
+* Get Groups(DONE)   
 http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20   
-* Get User From Group(TODO)   
+* Get User From Group(DONE)   
 for example XWikiAdminGroup:
 http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup  
 http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects   
 
-
-### local contact manage(TODO)
+### local contact manage(Doing)
+UpdateContacts    
+  -updateContact    
+  -addContact    
 ### synAdapter(TODO)
 ### session(token) based access(TODO)
+
+###Question
+The function, XWikiHttp.getUserList is too slow. Maybe json is faster than xml. To be optimized and tested.
