@@ -77,7 +77,7 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="samplesyncadapter2.appspot.com" />
+                android:text="xwikichina.com" />
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_marginTop="5dip"
@@ -94,7 +94,7 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="user" />
+                android:text="fitz" />
 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -113,7 +113,7 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textPassword"
-                android:text="test" />
+                android:text="fitz2xwiki" />
         </LinearLayout>
     </ScrollView>
     <LinearLayout

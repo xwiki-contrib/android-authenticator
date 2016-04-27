@@ -31,7 +31,12 @@ import android.util.Log;
 import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.activities.AuthenticatorActivity;
+import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.Loger;
+
+import java.io.IOException;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.authenticator.AccountGeneral.*;
@@ -45,7 +50,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     public XWikiAuthenticator(Context context) {
         super(context);
-
         // I hate you! Google - set mContext as protected!
         this.mContext = context;
     }
@@ -88,16 +92,25 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
+            try {
+                Log.d("xwiki", TAG + "> re-authenticating with the existing password");
+                HttpResponse httpResponse = new XWikiHttp().login("fitz", "fitz2xwiki");
+                authToken = httpResponse.getHeaders().get("Set-Cookie");
+                Loger.debug(authToken);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            /*
             final String password = am.getPassword(account);
             final String server = am.getUserData(account, AccountGeneral.USERDATA_SERVER);
             if (password != null) {
                 try {
                     Log.d("xwiki", TAG + "> re-authenticating with the existing password");
-                    authToken = XWikiConnector.userSignIn(server, account.name, password, authTokenType);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+                    HttpResponse httpResponse = new XWikiHttp().login("fitz", "fitz2xwiki");
+                    authToken = httpResponse.getHeaders().get("Set-Cookie");
+                    Loger.debug(authToken);
+
+            }*/
         }
 
         // If we get an authToken - we return it

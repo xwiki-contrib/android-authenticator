@@ -27,10 +27,19 @@ import android.os.IBinder;
  * @version $Id: $
  */
 public class XWikiAuthenticatorService extends Service {
+
+    private XWikiAuthenticator authenticator = null;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-
-        XWikiAuthenticator authenticator = new XWikiAuthenticator(this);
+        if(authenticator == null) {
+            authenticator = new XWikiAuthenticator(this);
+        }
         return authenticator.getIBinder();
     }
 }

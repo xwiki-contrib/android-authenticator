@@ -19,15 +19,24 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
-public class Constants {
+import android.provider.ContactsContract.Data;
+
+/*
+ * The standard columns representing contact's info from social apps.
+ */
+public final class SyncAdapterColumns {
+
+    private SyncAdapterColumns() {
+    }
 
     /**
-     * Account type string.
+     * MIME-type used when storing a profile {@link android.provider.ContactsContract.Data} entry.
      */
-    public static final String ACCOUNT_TYPE = "com.example.android.samplesync";
+    public static final String MIME_PROFILE = "vnd.android.cursor.item/vnd.xwikiauth.profile";
 
-    /**
-     * Authtoken type string.
-     */
-    public static final String AUTHTOKEN_TYPE = "com.example.android.samplesync";
+    public static final String DATA_PID = Data.DATA1;
+
+    public static final String DATA_SUMMARY = Data.DATA2;
+
+    public static final String DATA_DETAIL = Data.DATA3;
 }

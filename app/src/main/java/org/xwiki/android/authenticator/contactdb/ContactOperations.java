@@ -15,8 +15,8 @@ import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.AccountGeneral;
-import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
+import org.xwiki.android.authenticator.syncadapter.SyncAdapterColumns;
 
 /**
  * Helper class for storing data in the platform content providers.
@@ -54,7 +54,7 @@ public class ContactOperations {
      * @param isSyncOperation are we executing this as part of a sync operation?
      * @return instance of ContactOperations
      */
-    public static ContactOperations createNewContact(Context context, long userId,
+    public static ContactOperations createNewContact(Context context, String userId,
             String accountName, boolean isSyncOperation, BatchOperation batchOperation) {
         return new ContactOperations(context, userId, accountName, isSyncOperation, batchOperation);
     }
@@ -82,7 +82,7 @@ public class ContactOperations {
         mBatchOperation = batchOperation;
     }
 
-    public ContactOperations(Context context, long userId, String accountName,
+    public ContactOperations(Context context, String userId, String accountName,
                              boolean isSyncOperation, BatchOperation batchOperation) {
         this(context, isSyncOperation, batchOperation);
         mBackReference = mBatchOperation.size();
@@ -207,12 +207,12 @@ public class ContactOperations {
     public ContactOperations addProfileAction(String userId) {
         mValues.clear();
         if (userId != null) {
-            mValues.put(SampleSyncAdapterColumns.DATA_PID, userId);
+            mValues.put(SyncAdapterColumns.DATA_PID, userId);
 //            mValues.put(SampleSyncAdapterColumns.DATA_SUMMARY, mContext
 //                .getString(R.string.profile_action));
 //            mValues.put(SampleSyncAdapterColumns.DATA_DETAIL, mContext
 //                .getString(R.string.view_profile));
-            mValues.put(Data.MIMETYPE, SampleSyncAdapterColumns.MIME_PROFILE);
+            mValues.put(Data.MIMETYPE, SyncAdapterColumns.MIME_PROFILE);
             addInsertOp();
         }
         return this;
@@ -333,9 +333,9 @@ public class ContactOperations {
      * @param uri Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
-    public ContactOperations updateProfileAction(Integer userId, Uri uri) {
+    public ContactOperations updateProfileAction(String userId, Uri uri) {
         mValues.clear();
-        mValues.put(SampleSyncAdapterColumns.DATA_PID, userId);
+        mValues.put(SyncAdapterColumns.DATA_PID, userId);
         addUpdateOp(uri);
         return this;
     }

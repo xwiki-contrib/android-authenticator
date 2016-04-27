@@ -23,7 +23,7 @@ public class Test {
             @Override
             public void run() {
                 try {
-                    byte[] result = new XWikiHttp().login("fitz", "fitz2xwiki");
+                    HttpResponse result = new XWikiHttp().login("fitz", "fitz2xwiki");
                     callback.postSuccess(result);
                 } catch (IOException e) {
                     e.printStackTrace();

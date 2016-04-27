@@ -1,47 +1,78 @@
 package org.xwiki.android.authenticator.bean;
 
 public class XWikiUser {
-    public String id;
+    public String id;  //pageId xwiki:XWiki.LudovicDubost (wiki:space.pageName)
 
-    public String serverId;
+    public String wiki;
 
-    public String fullName;
+    public String space;
 
-    public String first_name;
+    public String pageName;  //LudovicDubost
 
-    public String last_name;
+    public String firstName;
+
+    public String lastName;
 
     public String email;
 
     public String phone;
 
-    public String date;
+    public String lastModifiedDate;
 
-    public String avatarUrl;
+    public String avatar;
+
+    public String company;
+
+    public String blog;
+
+    public String blogFeed;
+
+    public long rawId;
 
     @Override
     public String toString() {
-        return "XWikiUsers{" +
+        return "XWikiUser{" +
                 "id='" + id + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
+                ", wiki='" + wiki + '\'' +
+                ", space='" + space + '\'' +
+                ", pageName='" + pageName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", date='" + date + '\'' +
+                ", lastModifiedDate='" + lastModifiedDate + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", company='" + company + '\'' +
+                ", blog='" + blog + '\'' +
+                ", blogFeed='" + blogFeed + '\'' +
                 '}';
     }
-
 
     public String getId() {
         return id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getWiki() {
+        return wiki;
     }
 
-    public String getMail() {
+    public String getSpace() {
+        return space;
+    }
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
         return email;
     }
 
@@ -49,27 +80,43 @@ public class XWikiUser {
         return phone;
     }
 
-    public String getDate() {
-        return date;
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getCompany() {
+        return company;
     }
 
-    public String getEmail() {
-        return email;
+    public String getBlog() {
+        return blog;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getBlogFeed() {
+        return blogFeed;
     }
 
-    public String getServerId() {
-        return serverId;
+    /**
+     * id(curriki:XWiki.Luisafan)->[wiki,space,pageName]
+     * @param id
+     * @return 0:wiki 1:space 2:pageName
+     */
+    public static String[] splitId(String id){
+        String[] result = new String[3];
+        String[] strs = id.split(":");
+        if(strs.length == 2){
+            result[0] = strs[0];
+            String[] strs2 = strs[1].split("\\.");
+            if(strs2.length == 2){
+                result[1] = strs2[0];
+                result[2] = strs2[1];
+                return result;
+            }
+        }
+        return null;
     }
 }

@@ -73,6 +73,11 @@ public class XmlUtils {
         return null;
     }
 
+    /**
+     * xml to XWikiUser
+     * @param inStream
+     * @return
+     */
     public static XWikiUser getXWikiUser(InputStream inStream) {
         XmlPullParser parser = Xml.newPullParser();
         try {
@@ -86,8 +91,14 @@ public class XmlUtils {
                     continue;
                 }
                 String tag = parser.getName();
-                if(tag.equalsIgnoreCase("pageName")){
+                if(tag.equalsIgnoreCase("pageId")){
                     user.id = parser.nextText();
+                }else if(tag.equalsIgnoreCase("wiki")){
+                    user.wiki = parser.nextText();
+                }else if(tag.equalsIgnoreCase("space")){
+                    user.space = parser.nextText();
+                }else if(tag.equalsIgnoreCase("pageName")){
+                    user.pageName = parser.nextText();
                 }else if(tag.equalsIgnoreCase("property")){
                     name = parser.getAttributeValue(null, "name");
                 }else if(tag.equalsIgnoreCase("value")){
@@ -96,14 +107,21 @@ public class XmlUtils {
                     }else if(name.equalsIgnoreCase("email")){
                         user.email = parser.nextText();
                     }else if(name.equalsIgnoreCase("last_name")){
-                        user.last_name = parser.nextText();
+                        user.lastName = parser.nextText();
                     }else if(name.equalsIgnoreCase("first_name")){
-                        user.first_name = parser.nextText();
+                        user.firstName = parser.nextText();
+                    }else if(name.equalsIgnoreCase("company")){
+                        user.company = parser.nextText();
+                    }else if(name.equalsIgnoreCase("blog")){
+                        user.blog = parser.nextText();
+                    }else if(name.equalsIgnoreCase("blogfeed")){
+                        user.blogFeed = parser.nextText();
+                    }else if(name.equalsIgnoreCase("avatar")){
+                        user.avatar = parser.nextText();
                     }
                 }
                 eventType = parser.next();
             }
-            user.fullName = user.first_name + user.last_name;
             return user;
         } catch (Exception e) {
             e.printStackTrace();

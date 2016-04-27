@@ -22,10 +22,12 @@ package org.xwiki.android.authenticator.activities;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -34,6 +36,9 @@ import android.widget.Toast;
 import org.xwiki.android.authenticator.AccountGeneral;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.activities.SignUpActivity;
+import org.xwiki.android.authenticator.rest.HttpResponse;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
 
@@ -41,6 +46,8 @@ import org.xwiki.android.authenticator.rest.XWikiConnector;
  * @version $Id: $
  */
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
+
+    public static final String AUTHORITY = "org.xwiki.android.authenticator";
 
     public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
@@ -120,7 +127,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 Bundle data = new Bundle();
                 try {
-                    String authtoken = XWikiConnector.userSignIn(userServer, userName, userPass, mAuthTokenType);
+                    HttpResponse response = new XWikiHttp().login("fitz", "fitz2xwiki");
+                    String authtoken = response.getHeaders().get("Set-Cookie");
 
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
@@ -157,7 +165,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
-            Log.d("xwiki", TAG + "> finishLogin > addAccountExplicitly");
+            Log.d("xwiki", TAG + "> finishLogin > addAccountExplicitly"+ " "+ intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
             String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             String authtokenType = mAuthTokenType;
 
@@ -169,6 +177,20 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, accountPassword, data);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
+//            ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+//            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+            ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+//            Bundle params = new Bundle();
+//            params.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, false);
+//            params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);
+//            params.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, false);
+//            ContentResolver.addPeriodicSync(account, ContactsContract.AUTHORITY, params, 150);
+//            Account account1 = new Account(accountName, AccountGeneral.ACCOUNT_TYPE);
+            Loger.debug(account.toString());
+            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+//            ContentResolver.requestSync(account,ContactsContract.AUTHORITY,params);
+
+
         } else {
             Log.d("xwiki", TAG + "> finishLogin > setPassword");
             mAccountManager.setPassword(account, accountPassword);
@@ -176,6 +198,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
+        Log.d("xwiki", TAG + ">" + "finish return");
         finish();
     }
 

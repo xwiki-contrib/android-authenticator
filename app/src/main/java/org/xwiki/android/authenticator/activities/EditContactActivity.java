@@ -20,8 +20,11 @@ import android.widget.Toast;
 
 
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.HttpCallback;
+import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.Test;
+import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
 import org.xwiki.android.authenticator.utils.SystemTools;
@@ -65,6 +68,10 @@ public class EditContactActivity extends AppCompatActivity {
         mUri = getIntent().getData();
         mContactInfoTextView = (TextView) findViewById(R.id.contactinfo);
 
+        /*
+        String[] strs = XWikiUser.splitId("xwiki:XWiki.Admin");
+        Loger.debug(strs.toString());
+
         if(SystemTools.checkNet(this)) {
 //            RestTest.testLogin(mContactInfoTextView);
 //            RestTest.testGetAllUsers(mContactInfoTextView);
@@ -73,7 +80,9 @@ public class EditContactActivity extends AppCompatActivity {
                 public void onSuccess(Object obj) {
                     super.onSuccess(obj);
 //                    byte[] bytes = (byte[]) obj;
-                    mContactInfoTextView.append(StringUtils.byteArrayToUtf8String((byte[]) obj));
+                    HttpResponse response = (HttpResponse) obj;
+//                    mContactInfoTextView.append(StringUtils.byteArrayToUtf8String(response.getContentData()));
+                    mContactInfoTextView.append(response.getHeaders().get("Set-Cookie"));
                 }
 
                 @Override
@@ -95,10 +104,11 @@ public class EditContactActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(String msg) {
                     super.onFailure(msg);
-                    mContactInfoTextView.append(msg);
+                    mContactInfoTextView.append(msg!=null?msg:"null");
                 }
             });
         }
+        */
     }
 
     @Override

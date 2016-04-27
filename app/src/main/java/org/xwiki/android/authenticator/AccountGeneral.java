@@ -27,7 +27,7 @@ public class AccountGeneral {
     /**
      * Account type id
      */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.xwikiaccount";
+    public static final String ACCOUNT_TYPE = "org.xwiki.android.authenticator";
 
     /**
      * Account name
