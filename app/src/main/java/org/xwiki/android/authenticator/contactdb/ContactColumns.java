@@ -17,22 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.syncadapter;
+package org.xwiki.android.authenticator.contactdb;
 
 import android.provider.ContactsContract.Data;
 
 /*
  * The standard columns representing contact's info from social apps.
  */
-public final class SyncAdapterColumns {
+public final class ContactColumns {
 
-    private SyncAdapterColumns() {
+    private ContactColumns() {
     }
 
     /**
      * MIME-type used when storing a profile {@link android.provider.ContactsContract.Data} entry.
      */
-    public static final String MIME_PROFILE = "vnd.android.cursor.item/vnd.xwikiauth.profile";
+    public static final String MIME_PROFILE = "vnd.android.cursor.item/vnd.xwikiedit.profile";
 
     public static final String DATA_PID = Data.DATA1;
 

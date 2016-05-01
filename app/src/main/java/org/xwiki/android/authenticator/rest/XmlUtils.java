@@ -16,6 +16,12 @@ import java.util.List;
  * Created by fitz on 2016/4/16.
  */
 public class XmlUtils {
+
+    /**
+     * Get SearchResults from XML
+     * @param inStream from XML (byte->inStream)
+     * @return List<SearchResult>
+     */
     public static List<SearchResult> getSearchResults(InputStream inStream) {
         XmlPullParser parser = Xml.newPullParser();
         try {
@@ -74,9 +80,9 @@ public class XmlUtils {
     }
 
     /**
-     * xml to XWikiUser
-     * @param inStream
-     * @return
+     * get XWikiUser from server's response xml.
+     * @param inStream xml byte->InputStream
+     * @return XWikiUser
      */
     public static XWikiUser getXWikiUser(InputStream inStream) {
         XmlPullParser parser = Xml.newPullParser();
@@ -129,7 +135,13 @@ public class XmlUtils {
         return null;
     }
 
-    //http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects/XWiki.XWikiGroups
+
+    /**
+     * get List<ObjectSummary> from xml
+     * @param inStream
+     * @return List<ObjectSummary>
+     * http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects/XWiki.XWikiGroups
+     */
     public static List<ObjectSummary> getObjectSummarys(InputStream inStream){
         XmlPullParser parser = Xml.newPullParser();
         try {
@@ -189,6 +201,11 @@ public class XmlUtils {
         return null;
     }
 
+    /**
+     * get Page from xml
+     * @param inStream
+     * @return Page
+     */
     public static Page getPage(InputStream inStream){
         XmlPullParser parser = Xml.newPullParser();
         try {

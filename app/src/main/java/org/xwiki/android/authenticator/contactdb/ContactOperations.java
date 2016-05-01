@@ -15,8 +15,8 @@ import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.XWikiConnector;
-import org.xwiki.android.authenticator.syncadapter.SyncAdapterColumns;
 
 /**
  * Helper class for storing data in the platform content providers.
@@ -146,7 +146,7 @@ public class ContactOperations {
         mValues.clear();
         if (!TextUtils.isEmpty(email)) {
             mValues.put(Email.DATA, email);
-            mValues.put(Email.TYPE, Email.TYPE_OTHER);
+            mValues.put(Email.TYPE, Email.TYPE_WORK);
             mValues.put(Email.MIMETYPE, Email.CONTENT_ITEM_TYPE);
             addInsertOp();
         }
@@ -207,12 +207,12 @@ public class ContactOperations {
     public ContactOperations addProfileAction(String userId) {
         mValues.clear();
         if (userId != null) {
-            mValues.put(SyncAdapterColumns.DATA_PID, userId);
-//            mValues.put(SampleSyncAdapterColumns.DATA_SUMMARY, mContext
-//                .getString(R.string.profile_action));
-//            mValues.put(SampleSyncAdapterColumns.DATA_DETAIL, mContext
-//                .getString(R.string.view_profile));
-            mValues.put(Data.MIMETYPE, SyncAdapterColumns.MIME_PROFILE);
+            mValues.put(ContactColumns.DATA_PID, userId);
+            mValues.put(ContactColumns.DATA_SUMMARY, mContext
+                .getString(R.string.profile_action));
+            mValues.put(ContactColumns.DATA_DETAIL, mContext
+                .getString(R.string.view_profile));
+            mValues.put(Data.MIMETYPE, ContactColumns.MIME_PROFILE);
             addInsertOp();
         }
         return this;
@@ -335,7 +335,7 @@ public class ContactOperations {
      */
     public ContactOperations updateProfileAction(String userId, Uri uri) {
         mValues.clear();
-        mValues.put(SyncAdapterColumns.DATA_PID, userId);
+        mValues.put(ContactColumns.DATA_PID, userId);
         addUpdateOp(uri);
         return this;
     }

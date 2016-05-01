@@ -44,4 +44,7 @@ public class AccountGeneral {
 
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access";
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+
+    //limit the number of users synchronizing from server.
+    public static final int LIMIT_MAX_SYNC_USERS = 100;
 }

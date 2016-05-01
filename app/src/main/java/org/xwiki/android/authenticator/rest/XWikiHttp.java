@@ -7,7 +7,8 @@ import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.utils.Loger;
+import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -22,8 +23,10 @@ import java.util.List;
  */
 public class XWikiHttp {
     //http://xwiki.org/xwiki/rest
-    private final String serverRestPreUrl = "http://xwikichina.com/xwiki/rest";
-//    private final String serverRestPreUrl = "http://210.76.195.251:8080/xwiki/rest";
+    //private static String serverRestPreUrl = "http://xwikichina.com/xwiki/rest"
+    private static String serverRestPreUrl = null; //"http://210.76.192.145:8080/xwiki/rest";
+    //private static String serverRestPreUrl = "http://192.168.201.2:8080/xwiki/rest";
+
 
     /**
      * login
@@ -31,10 +34,13 @@ public class XWikiHttp {
      * @param password
      * @return Body byte[]
      * @throws IOException
+     * http://localhost:8080/xwiki/bin/login/XWiki/XWikiLogin
      */
-    public HttpResponse login(String username, String password) throws IOException {
+    public static HttpResponse login(String requestUrl, String username, String password) throws IOException {
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "Cookie", null);
         HttpConnector httpConnector = new HttpConnector();
-        String url = serverRestPreUrl;
+        String url = "http://" + requestUrl + "/xwiki/bin/login/XWiki/XWikiLogin";
+        serverRestPreUrl = url;
         HttpRequest request = new HttpRequest(url);
         String basicAuth = username + ":" + password;
         basicAuth = "Basic " + new String(Base64.encodeToString(basicAuth.getBytes(), Base64.NO_WRAP));
@@ -42,8 +48,14 @@ public class XWikiHttp {
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
+            return response;
+            //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
         }
+        //global value setting for http
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "Cookie", response.getHeaders().get("Set-Cookie"));
+        serverRestPreUrl = "http://" + requestUrl + "/xwiki/rest";
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "requestUrl", requestUrl);
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "ServerUrl", serverRestPreUrl);
         return response;
     }
 
@@ -56,14 +68,21 @@ public class XWikiHttp {
      * @param email
      * @return
      */
-    public Boolean signUp(String userId, String password, String firstName, String lastName, String email){
+    public static Boolean signUp(String userId, String password, String firstName, String lastName, String email){
 
         return true;
     }
 
-
-    public HashMap<String, SearchResult> getAllUserMap(String wiki, int number) throws IOException{
-        String url = serverRestPreUrl + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
+    /**
+     * get All user Map <serverId, SearchResult> for getting deleting users
+     * that have been delete.
+     * @param wiki
+     * @param number
+     * @return HashMap<String, SearchResult>
+     * @throws IOException
+     */
+    public static HashMap<String, SearchResult> getAllUserMap(String wiki, int number) throws IOException{
+        String url = getServerUrl() + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
         HttpResponse response = new HttpConnector().performRequest(new HttpRequest(url));
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
@@ -86,10 +105,10 @@ public class XWikiHttp {
      * @param number
      * @return List<XWikiUser>
      * @throws IOException
-     * //http://xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=10
+     * http://xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=10
      */
-    public List<XWikiUser> getUserList(String wiki, int number) throws IOException{
-        String url = serverRestPreUrl + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
+    public static List<XWikiUser> getUserList(String wiki, int number) throws IOException{
+        String url = getServerUrl() + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
         HttpResponse response = new HttpConnector().performRequest(new HttpRequest(url));
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
@@ -114,8 +133,8 @@ public class XWikiHttp {
      * @return List<XWikiUser>
      * @throws IOException
      */
-    public List<XWikiUser> getUserList(String wiki, int number, String lastSyncTime) throws IOException{
-        String url = serverRestPreUrl + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
+    public static List<XWikiUser> getUserList(String wiki, int number, String lastSyncTime) throws IOException{
+        String url = getServerUrl() + "/wikis/query?q=wiki:"+wiki+"%20and%20object:XWiki.XWikiUsers&number="+number;
         HttpResponse response = new HttpConnector().performRequest(new HttpRequest(url));
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
@@ -128,7 +147,6 @@ public class XWikiHttp {
         Date itemDate = null;
         for(SearchResult item : searchlist){
             itemDate = StringUtils.iso8601ToDate(item.modified);
-            Loger.debug(item.toString());
             if(itemDate.before(lastSynDate)) continue;
             XWikiUser user = getUserDetail(item.id);
             if(user == null) continue;
@@ -138,17 +156,17 @@ public class XWikiHttp {
         return userList;
     }
 
+
     /**
      * get user information
      * @param id  curriki:XWiki.Luisafan
      * @return XWikiUser  Without Getting LastModifiedDate
      * @throws IOException
      */
-    public XWikiUser getUserDetail(String id) throws IOException{
+    public static XWikiUser getUserDetail(String id) throws IOException{
         String[] split = XWikiUser.splitId(id);
         if(split == null) return null;
-        String url = serverRestPreUrl + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2]+"/objects/XWiki.XWikiUsers/0";
-        Loger.debug(url);
+        String url = getServerUrl() + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2]+"/objects/XWiki.XWikiUsers/0";
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
@@ -165,21 +183,25 @@ public class XWikiHttp {
      * @param user
      * @return true:update success, false:update fail
      * @throws IOException
+     * curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
      */
-    public Boolean updateUser(XWikiUser user) throws IOException{
-        String url = serverRestPreUrl + "/wikis/+"+user.wiki+"+/spaces/"+user.space+"/pages/"+user.pageName+"/objects/XWiki.XWikiUsers/0";
+    public static boolean updateUser(XWikiUser user) throws IOException{
+        String url = getServerUrl() + "/wikis/"+user.wiki+"/spaces/"+user.space+"/pages/"+user.pageName+"/objects/XWiki.XWikiUsers/0";
         HttpRequest request = new HttpRequest(url, HttpRequest.HttpMethod.PUT, null);
-        request.httpParams.putHeaders("first_name", user.firstName);
-        request.httpParams.putHeaders("last_name", user.lastName);
-        request.httpParams.putHeaders("email", user.email);
-        request.httpParams.putHeaders("company", user.company);
-        request.httpParams.putHeaders("blog", user.blog);
-        request.httpParams.putHeaders("blogfeed", user.blogFeed);
+        request.httpParams.putBodyParams("className", "XWiki.XWikiUsers");
+        request.httpParams.putBodyParams("property#first_name", user.firstName);
+        request.httpParams.putBodyParams("property#last_name", user.lastName);
+        request.httpParams.putBodyParams("property#email", user.email);
+        request.httpParams.putBodyParams("property#phone", user.phone);
+        //request.httpParams.putHeaders("company", user.company);
+        //request.httpParams.putHeaders("blog", user.blog);
+        //request.httpParams.putHeaders("blogfeed", user.blogFeed);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
+            //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
+            return false;
         }
         return true;
     }
@@ -190,10 +212,10 @@ public class XWikiHttp {
      * @param number
      * @return List<XWikiGroup>
      * @throws IOException
-     * //http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
+     * http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
      */
-    public List<XWikiGroup> getGroupList(String wiki, int number) throws IOException{
-        String url = serverRestPreUrl + "/wikis/query?q=wiki:"+ wiki +
+    public static List<XWikiGroup> getGroupList(String wiki, int number) throws IOException{
+        String url = getServerUrl() + "/wikis/query?q=wiki:"+ wiki +
                 "%20and%20object:XWiki.XWikiGroups&number="+ number;
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
@@ -223,12 +245,12 @@ public class XWikiHttp {
      * @param number
      * @return LIst<XWikiUser>
      * @throws IOException
-     * //http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects
+     * http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects
      */
-    public List<XWikiUser> getUserListFromGroup(String groupId, int number) throws IOException{
+    public static List<XWikiUser> getUserListFromGroup(String groupId, int number) throws IOException{
         String[] split = XWikiUser.splitId(groupId);
         if(split == null) return null;
-        String url = serverRestPreUrl + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2] +"/objects/XWiki.XWikiGroups";
+        String url = getServerUrl() + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2] +"/objects/XWiki.XWikiGroups";
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
@@ -255,11 +277,11 @@ public class XWikiHttp {
      * @throws IOException
      * http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/XWikiAdminGroup/objects/XWiki.XWikiGroups
      */
-    public List<XWikiUser> getUserListFromGroup(String groupId, int number, String lastSyncTime) throws IOException{
+    public static List<XWikiUser> getUserListFromGroup(String groupId, int number, String lastSyncTime) throws IOException{
         //TODO Maybe have another way !
         String[] split = XWikiUser.splitId(groupId);
         if(split == null) return null;
-        String url = serverRestPreUrl + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2] +"/objects/XWiki.XWikiGroups";
+        String url = getServerUrl() + "/wikis/"+split[0]+"/spaces/"+split[1]+"/pages/"+split[2] +"/objects/XWiki.XWikiGroups";
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
@@ -284,17 +306,17 @@ public class XWikiHttp {
 
     /**
      * get User Lass Modified Time
-     * @param
+     * @param id
      * @return Date
      * @throws IOException
-     * //http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/zhouwenhai
-     * //http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers%20and%20name:fitz
+     * http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/zhouwenhai
+     * http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers%20and%20name:fitz
      */
-    private Date getUserLastModified(String id) throws IOException{
+    private static Date getUserLastModified(String id) throws IOException{
         //TODO getUserLastModified. Maybe have another better way to query lastModifiedDate
         String[] split = XWikiUser.splitId(id);
         if(split == null) return null;
-        String url = serverRestPreUrl + "/wikis/" + split[0] + "/spaces/" + split[1] +"/pages/" + split[2];
+        String url = getServerUrl() + "/wikis/" + split[0] + "/spaces/" + split[1] +"/pages/" + split[2];
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
@@ -306,6 +328,18 @@ public class XWikiHttp {
         if(page == null) return null;
         Date date = StringUtils.iso8601ToDate(page.lastModified);
         return date;
+    }
+
+    /**
+     * get serverRestPreUrl from preference.
+     * Maybe don't need because just update in the sign-in activity .
+     * @return url
+     */
+    public static String getServerUrl(){
+        if(serverRestPreUrl == null) {
+            serverRestPreUrl = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), "ServerUrl", null);
+        };
+        return serverRestPreUrl;
     }
 
 }

@@ -1,5 +1,9 @@
 package org.xwiki.android.authenticator.rest;
 
+import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.utils.Loger;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -19,7 +23,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class HttpConnector {
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private final SSLSocketFactory mSslSocketFactory;
-
+    private static String COOKIE = null;
     public HttpConnector() {
         mSslSocketFactory = null;
     }
@@ -33,8 +37,16 @@ public class HttpConnector {
         for (String headerName : map.keySet()) {
             connection.addRequestProperty(headerName, map.get(headerName));
         }
+        COOKIE = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), "Cookie", null);
+        if(COOKIE != null) {
+            //connection.addRequestProperty("Cookie", COOKIE);
+            connection.setRequestProperty("Cookie", COOKIE);
+        }
+        Loger.debug("url="+url+", header="+map.toString()+", Cookie="+(COOKIE!=null?COOKIE:""));
+        //{Authorization=Basic Zml0OmZpdHoyeHdpa2k=}
         setConnectionParametersForRequest(connection, request);
         HttpResponse response = responseFromConnection(connection);
+        Loger.debug("response: code="+response.getResponseCode() + response.getResponseMessage()+", header="+response.getHeaders().toString());
         return response;
     }
 
@@ -134,6 +146,10 @@ public class HttpConnector {
         response.setHeaders(headerMap);
         return response;
     }
+
+//    public static void setCookie(String authorization){
+//        COOKIE = authorization ;
+//    }
 
 //    private byte[] entityToBytes(HttpResponse kjHttpResponse) throws IOException,
 //            IOException {

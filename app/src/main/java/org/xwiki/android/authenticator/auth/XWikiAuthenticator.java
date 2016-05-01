@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator;
+package org.xwiki.android.authenticator.auth;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -30,13 +30,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.text.TextUtils;
 
-import org.xwiki.android.authenticator.activities.AuthenticatorActivity;
+import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
-import org.xwiki.android.authenticator.rest.XWikiConnector;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.Loger;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.authenticator.AccountGeneral.*;
@@ -58,11 +62,16 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
         Log.d("xwiki", TAG + "> addAccount");
 
+        int uid = options.getInt(AccountManager.KEY_CALLER_UID);
+        String packageName = mContext.getPackageManager().getNameForUid(uid);
+
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, accountType);
         intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, authTokenType);
         intent.putExtra(AuthenticatorActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
+        intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -74,47 +83,63 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         Log.d("xwiki", TAG + "> getAuthToken");
 
+        // Extract the username and password from the Account Manager, and ask
+        // the server for an appropriate AuthToken.
+        final AccountManager am = AccountManager.get(mContext);
+        String accountName = am.getUserData(account, AccountManager.KEY_USERDATA);
+        String accountPassword = am.getUserData(account, AccountManager.KEY_PASSWORD);
+        String accountServer = am.getUserData(account, AuthenticatorActivity.PARAM_USER_SERVER);
+
+        int uid = options.getInt(AccountManager.KEY_CALLER_UID);
+        String packageName = mContext.getPackageManager().getNameForUid(uid);
+
         // If the caller requested an authToken type we don't support, then
-        // return an error
-        if (!authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY) && !authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS)) {
+        // return an error  if checking validity tokenType != TYPE+PackegeName
+        if (!authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS+packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
             return result;
         }
 
-        // Extract the username and password from the Account Manager, and ask
-        // the server for an appropriate AuthToken.
-        final AccountManager am = AccountManager.get(mContext);
 
+        if(!AppContext.isAuthorizedApp(uid)){
+            final Intent intent = new Intent(AppContext.getInstance().getApplicationContext(), GrantPermissionActivity.class);
+            intent.putExtra("uid",uid);
+            intent.putExtra("packageName", packageName);
+            intent.putExtra("accountName",account.name);
+            intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+            //Bundle bundle = new Bundle();
+            //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+            //return bundle;
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            AppContext.getInstance().getApplicationContext().startActivity(intent);
+            return null;
+        }
+
+        //authTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
         String authToken = am.peekAuthToken(account, authTokenType);
-
         Log.d("xwiki", TAG + "> peekAuthToken returned - " + authToken);
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
             try {
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
-                HttpResponse httpResponse = new XWikiHttp().login("fitz", "fitz2xwiki");
+                HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
                 authToken = httpResponse.getHeaders().get("Set-Cookie");
-                Loger.debug(authToken);
+                Loger.debug("XWikiAuthenticator, authtoken="+authToken);
             } catch (IOException e) {
                 e.printStackTrace();
+                final Bundle result = new Bundle();
+                result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken network error!!!");
+                return result;
             }
-            /*
-            final String password = am.getPassword(account);
-            final String server = am.getUserData(account, AccountGeneral.USERDATA_SERVER);
-            if (password != null) {
-                try {
-                    Log.d("xwiki", TAG + "> re-authenticating with the existing password");
-                    HttpResponse httpResponse = new XWikiHttp().login("fitz", "fitz2xwiki");
-                    authToken = httpResponse.getHeaders().get("Set-Cookie");
-                    Loger.debug(authToken);
-
-            }*/
         }
 
         // If we get an authToken - we return it
         if (!TextUtils.isEmpty(authToken)) {
+            //refresh all tokentype for all apps' package
+            refreshAllAuthTokenType(am, account, authToken);
+
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
@@ -138,6 +163,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
+        Log.d(TAG, "getAuthTokenLabel,"+ authTokenType);
         if (AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
             return AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
         else if (AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
@@ -160,6 +186,14 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) throws NetworkErrorException {
+        //final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
+        //intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        //intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, account.type);
+        //intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, AccountGeneral.ACCOUNT_TYPE);
+        //intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_NAME, account.name);
+        //final Bundle bundle = new Bundle();
+        //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+        //return bundle;
         return null;
     }
 
@@ -167,4 +201,15 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
         return null;
     }
+
+    public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken){
+        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
+        if(packageList == null || packageList.size()==0 ) return;
+        Loger.debug("packageList="+packageList.toString());
+        for(String item : packageList){
+            String tokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS + item;
+            am.setAuthToken(account, tokenType, authToken);
+        }
+    }
+
 }

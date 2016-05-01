@@ -29,7 +29,7 @@
   uploading, so the contacts on SDK 11 and greater are editable.
 
   android:userVisible="true"
-    android:isAlwaysSyncable="true"
+  android:isAlwaysSyncable="true"
 -->
 
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"

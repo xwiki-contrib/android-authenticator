@@ -1,10 +1,5 @@
 package org.xwiki.android.authenticator.rest;
 
-import org.xwiki.android.authenticator.utils.Loger;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -20,7 +15,7 @@ public class HttpResponse implements Serializable{
 
     private String responseMessage;
 
-//    private InputStream contentStream;
+    //private InputStream contentStream;
 
     private String contentEncoding;
 

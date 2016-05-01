@@ -40,8 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-
-        </android.support.v7.widget.Toolbar>
+    </android.support.v7.widget.Toolbar>
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -56,18 +55,21 @@
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
             android:paddingRight="20dip">
+
             <TextView
                 android:id="@+id/message"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dip" />
+
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_activity_server_label" />
+
             <EditText
                 android:id="@+id/accountServer"
                 android:singleLine="true"
@@ -77,7 +79,8 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="xwikichina.com" />
+                android:text="210.76.192.145:8080" />
+
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_marginTop="5dip"
@@ -85,6 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_activity_username_label" />
+
             <EditText
                 android:id="@+id/accountName"
                 android:singleLine="true"
@@ -104,6 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_activity_password_label" />
+
             <EditText
                 android:id="@+id/accountPassword"
                 android:singleLine="true"
@@ -114,8 +119,10 @@
                 android:textColor="@android:color/black"
                 android:inputType="textPassword"
                 android:text="fitz2xwiki" />
+
         </LinearLayout>
     </ScrollView>
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -124,6 +131,7 @@
         android:paddingTop="4dip"
         android:paddingLeft="20dip"
         android:paddingRight="20dip">
+
         <Button
             android:id="@+id/submit"
             android:layout_weight="1"
@@ -135,6 +143,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/login_activity_ok_button"
             android:onClick="handleLogin" />
+
         <Button
             android:id="@+id/register_button"
             android:layout_weight="1"
@@ -146,5 +155,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/login_activity_register_button"
             android:onClick="handleSignUp" />
+
     </LinearLayout>
 </LinearLayout>

@@ -39,8 +39,6 @@ package org.xwiki.android.authenticator.bean;
  */
 public class SearchResult
 {
-    //public String link;
-
     public String type;
 
     public String id;

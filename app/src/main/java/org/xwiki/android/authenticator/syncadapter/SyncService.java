@@ -33,16 +33,13 @@ import org.xwiki.android.authenticator.utils.Loger;
 public class SyncService extends Service {
 
     private static final Object sSyncAdapterLock = new Object();
-
     private static SyncAdapter sSyncAdapter = null;
 
     @Override
     public void onCreate() {
-        Loger.debug("Sync Service created.");
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
                 sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
-                Loger.debug("Sync Adapter created.");
             }
         }
     }

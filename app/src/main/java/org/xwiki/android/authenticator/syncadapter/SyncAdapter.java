@@ -19,10 +19,10 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
+import org.xwiki.android.authenticator.AccountGeneral;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import android.accounts.Account;
@@ -40,65 +40,49 @@ import java.util.Date;
 import java.util.List;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-
     private static final String TAG = "SyncAdapter";
     private static final String SYNC_MARKER_KEY = "org.xwiki.android.sync.marker";
     private static final boolean NOTIFY_AUTH_FAILURE = true;
 
     private final AccountManager mAccountManager;
-
     private final Context mContext;
 
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
         mAccountManager = AccountManager.get(context);
-        Loger.debug("SyncAdapter created.");
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
-
-        Loger.debug("SyncAdapter onPerformSync start");
-
+        Log.i(TAG, "onPerformSync start");
         try {
-            // see if we already have a sync-state attached to this account. By handing
-            // This value to the server, we can just get the contacts that have
-            // been updated on the server-side since our last sync-up
+            // get last sync date. return new Date(0) if first onPerformSync
             String lastSyncMarker = getServerSyncMarker(account);
 
             // By default, contacts from a 3rd party provider are hidden in the contacts
             // list. So let's set the flag that causes them to be visible, so that users
-            // can actually see these contacts.
-            //"1980-09-24T19:45:31+02:00"
+            // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
             if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0))) ) {
                 ContactManager.setAccountContactsVisibility(getContext(), account, true);
             }
 
-            // Use the account manager to request the AuthToken we'll need
-            // to talk to our sample server.  If we don't have an AuthToken
-            // yet, this could involve a round-trip to the server to request
-            // and AuthToken.
-
+            //TODO may need to check authToken, or block other's getAuthToken.
             //final String authtoken = mAccountManager.blockingGetAuthToken(account,
             //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
 
             // Make sure that the XWiki group exists
             final long groupId = ContactManager.ensureXWikiGroupExists(mContext, account);
 
-            // Get XWiki users
-            List<XWikiUser>  updatedContacts = new XWikiHttp().getUserList("xwiki", 10, lastSyncMarker);
-            Loger.debug(updatedContacts.toString());
-            // Update the local contacts database with the changes. updateContacts()
-            // returns a syncState value that indicates the high-water-mark for
-            // the changes we received.
-            Log.d(TAG, "Calling contactManager's sync contacts");
+            // Get XWiki users from XWiki server , which should be modified after lastSyncMarker.
+            List<XWikiUser>  updatedContacts = XWikiHttp.getUserList("xwiki", AccountGeneral.LIMIT_MAX_SYNC_USERS, lastSyncMarker);
+            Log.i(TAG, updatedContacts!=null?updatedContacts.toString():"updatedCotacts null");
 
+            // Update the local contacts database with the changes. updateContacts()
             ContactManager.updateContacts(mContext, account.name, updatedContacts, groupId);
 
-
-            // Save off the new sync marker. On our next sync, we only want to receive
+            // Save off the new sync date. On our next sync, we only want to receive
             // contacts that have changed since this sync...
             setServerSyncMarker(account, StringUtils.dateToIso8601String(new Date()));
 
@@ -106,20 +90,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Log.e(TAG, "IOException", e);
             syncResult.stats.numIoExceptions++;
         }
-//        catch (final AuthenticatorException e) {
-//            Log.e(TAG, "AuthenticatorException", e);
-//            syncResult.stats.numParseExceptions++;
-//        } catch (final OperationCanceledException e) {
-//            Log.e(TAG, "OperationCanceledExcetpion", e);
-//        }
-//        catch (final JSONException e) {
-//            Log.e(TAG, "JSONException", e);
-//            syncResult.stats.numParseExceptions++;
-//        }catch (final AuthenticationException e) {
-//            Log.e(TAG, "AuthenticationException", e);
-//            syncResult.stats.numAuthExceptions++;
-//        }
-
     }
 
     /**
@@ -130,6 +100,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private String getServerSyncMarker(Account account) {
         String lastSyncIso = mAccountManager.getUserData(account, SYNC_MARKER_KEY);
+        //if empty, just return new Date(0) so that we can get all users from server.
         if (TextUtils.isEmpty(lastSyncIso)) {
             return StringUtils.dateToIso8601String(new Date(0));
         }

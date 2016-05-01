@@ -1,53 +1,48 @@
 package org.xwiki.android.authenticator.activities;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.rest.HttpCallback;
-import org.xwiki.android.authenticator.rest.HttpResponse;
-import org.xwiki.android.authenticator.rest.Test;
+import org.xwiki.android.authenticator.contactdb.BatchOperation;
+import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
-import org.xwiki.android.authenticator.utils.SystemTools;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.io.IOException;
 
 
 /**
- * A login screen that offers login via email/password.
+ * A Edit Contact Activity. You can modify your own information and
+ * the administrator can modify all the users according the http response.
  */
 public class EditContactActivity extends AppCompatActivity {
 
     // UI references.
-    private EditText mFullNameView;
+    private EditText mFirstNameView;
     private EditText mEmailView;
     private EditText mCellPhoneView;
-    private EditText mWorkPhoneView;
+    private EditText mLastNameView;
 
-    private TextView mContactInfoTextView;
-    private Uri mUri;
+    XWikiUser wikiUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,59 +56,51 @@ public class EditContactActivity extends AppCompatActivity {
 
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
-        mFullNameView = (EditText) findViewById(R.id.fullname);
-        mCellPhoneView = (EditText) findViewById(R.id.cellphone);
-        mWorkPhoneView = (EditText) findViewById(R.id.workphone);
+        mFirstNameView = (EditText) findViewById(R.id.first_name);
+        mCellPhoneView = (EditText) findViewById(R.id.cell_phone);
+        mLastNameView = (EditText) findViewById(R.id.last_name);
 
-        mUri = getIntent().getData();
-        mContactInfoTextView = (TextView) findViewById(R.id.contactinfo);
+        //TODO here can do some permission check and if no permission, just finish() and return;
 
-        /*
-        String[] strs = XWikiUser.splitId("xwiki:XWiki.Admin");
-        Loger.debug(strs.toString());
-
-        if(SystemTools.checkNet(this)) {
-//            RestTest.testLogin(mContactInfoTextView);
-//            RestTest.testGetAllUsers(mContactInfoTextView);
-            Test.testLogin(new HttpCallback() {
-                @Override
-                public void onSuccess(Object obj) {
-                    super.onSuccess(obj);
-//                    byte[] bytes = (byte[]) obj;
-                    HttpResponse response = (HttpResponse) obj;
-//                    mContactInfoTextView.append(StringUtils.byteArrayToUtf8String(response.getContentData()));
-                    mContactInfoTextView.append(response.getHeaders().get("Set-Cookie"));
-                }
-
-                @Override
-                public void onFailure(String msg) {
-                    super.onFailure(msg);
-                    mContactInfoTextView.append(msg);
-                }
-            });
-
-            Test.testGetAllUser(new HttpCallback() {
-                @Override
-                public void onSuccess(Object obj) {
-                    super.onSuccess(obj);
-                    if(obj != null) {
-                        mContactInfoTextView.append(obj.toString());
-                    }
-                }
-
-                @Override
-                public void onFailure(String msg) {
-                    super.onFailure(msg);
-                    mContactInfoTextView.append(msg!=null?msg:"null");
-                }
-            });
+        Uri mUri = getIntent().getData();
+        wikiUser = getXWikiUser(this, mUri);
+        if(wikiUser == null){
+            Loger.debug("wikiUser in EditContactActivity null error!!! it's impossible");
+            finish();
+            return;
         }
-        */
+        Loger.debug(mUri.toString()+"  "+ wikiUser.toString());
+        if(wikiUser != null){
+            mEmailView.setText(wikiUser.getEmail());
+            mFirstNameView.setText(wikiUser.getFirstName());
+            mCellPhoneView.setText(wikiUser.getPhone());
+            mLastNameView.setText(wikiUser.getLastName());
+        }
+    }
+
+
+    public static XWikiUser getXWikiUser(Context context, Uri uri){
+        ContentResolver cr = context.getContentResolver();
+        Cursor cursor = cr.query(uri, null, null, null, null);
+        //getRawContactId
+        long rawContactId = 0;
+        if (cursor!=null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                rawContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts.Data.RAW_CONTACT_ID));
+                break;
+            }
+        }
+        cursor.close();
+        //getXWikiUser
+        if(rawContactId > 0){
+            //first, lastName, email, phone, serverId=id.
+            return ContactManager.getXWikiUser(context, rawContactId);
+        }
+        return null;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.edit_contact, menu);
         return true;
     }
@@ -123,79 +110,95 @@ public class EditContactActivity extends AppCompatActivity {
         if(item.getItemId()==android.R.id.home){
             finish();
         }else if(item.getItemId()==R.id.action_save){
-            boolean flag=save();
-            if(flag==true) {
-                finish();
-            }else{
-                Toast.makeText(EditContactActivity.this,"Please Check Again",Toast.LENGTH_SHORT).show();
-            }
+            updataContact();
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    public void updataCotact(Uri uri) {
-        long  rawContactId = 0 ;
-        ContentResolver cr = getContentResolver();
-        Cursor people = cr.query(uri, new String[]{ContactsContract.Contacts.Data.RAW_CONTACT_ID}, null, null, null);
-        if(people.getCount()>0){
-            while (people.moveToNext()) {
-                rawContactId = people.getLong(people.getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID));
-            }
+    public void updataContact() {
+        //check input valid  set input value (firstName, lastName, email, cellPhone)
+        if(checkInput() == false){
+            return;
         }
 
-        Log.i("rawContactId", rawContactId+"");
-//        RawContact rawContact = ContactManager.getRawContact(getApplicationContext(), rawContactId);
-//        BatchOperation batchOperation = new BatchOperation(getApplicationContext(), getContentResolver());
-//        rawContact.mFirstName = mFullNameView.getText().toString();
-//        rawContact.mFullName = mFullNameView.getText().toString();
-//        rawContact.mCellPhone = mCellPhoneView.getText().toString();
-//        rawContact.mEmail = mEmailView.getText().toString();
-//        Log.i("edit",rawContact.toString());
-//        ContactManager.updateContactLocal(this, getContentResolver(), rawContact, rawContactId);
+        //update server at first and check if the user has permission to modify
+        // according the response.
+        new AsyncTask<String, String, Boolean>() {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                try {
+                    XWikiUser oldUser = XWikiHttp.getUserDetail(wikiUser.getId());
+                    oldUser.firstName = wikiUser.firstName;
+                    oldUser.lastName = wikiUser.lastName;
+                    oldUser.email = wikiUser.email;
+                    oldUser.phone = wikiUser.phone;
+                    boolean response = XWikiHttp.updateUser(oldUser);
+                    return response;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Loger.debug(e.toString());
+                    return null;
+                }
+            }
 
-//        ContactManager.updateContact(getApplicationContext(),getContentResolver(),rawContact,false,false,false,true,rawContactId,batchOperation);
+            @Override
+            protected void onPostExecute(Boolean response) {
+                if(response == null){
+                    Toast.makeText(EditContactActivity.this,"Network Error !!!",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //500:no permission,  200:success
+                if (!response) {
+                    Toast.makeText(EditContactActivity.this,"You have no permission !!!",Toast.LENGTH_SHORT).show();
+                }else{
+                    //update local
+                    BatchOperation batchOperation = new BatchOperation(EditContactActivity.this, getContentResolver());
+                    ContactManager.updateContact(EditContactActivity.this, getContentResolver(), wikiUser, false, false, false, true, wikiUser.rawId, batchOperation);
+                    batchOperation.execute();
+                    Toast.makeText(EditContactActivity.this,"Update Successfully.",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        }.execute();
 
     }
-
-    private boolean save(){
-        updataCotact(mUri);
-        return true;
-    }
-
 
     /**
-     * Attempts to check input TODO check server permission or save priority in local preference
+     * Attempts to check input
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no server checking is made.
      */
-    private void checkInputAndPermission() {
+    private boolean checkInput() {
         // Reset errors.
         mEmailView.setError(null);
         mCellPhoneView.setError(null);
+        mLastNameView.setError(null);
+        mFirstNameView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mCellPhoneView.getText().toString();
-        String cellphone = mCellPhoneView.getText().toString();
-        String workphone = mWorkPhoneView.getText().toString();
+        wikiUser.email = mEmailView.getText().toString();
+        wikiUser.phone = mCellPhoneView.getText().toString();
+        wikiUser.firstName = mFirstNameView.getText().toString();
+        wikiUser.lastName = mLastNameView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !StringUtils.isPhone(password)) {
-            mCellPhoneView.setError(getString(R.string.error_invalid_password));
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(wikiUser.firstName)) {
+            mFirstNameView.setError(getString(R.string.error_field_required));
+            focusView = mFirstNameView;
+            cancel = true;
+        }else if (TextUtils.isEmpty(wikiUser.lastName)){
+            mLastNameView.setError(getString(R.string.error_field_required));
+            focusView = mLastNameView;
+            cancel = true;
+        }else if (TextUtils.isEmpty(wikiUser.phone)){
+            mCellPhoneView.setError(getString(R.string.error_field_required));
             focusView = mCellPhoneView;
             cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!StringUtils.isEmail(email)) {
+        }else if (!StringUtils.isEmail(wikiUser.email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -205,9 +208,11 @@ public class EditContactActivity extends AppCompatActivity {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
+            return false;
         } else {
-            // Show a progress spinner, and kick off a background task to
+            //TODO Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            return true;
         }
     }
 

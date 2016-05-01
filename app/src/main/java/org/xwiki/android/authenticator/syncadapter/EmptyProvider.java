@@ -7,11 +7,13 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 /**
- * Created by lf on 2016/4/26.
+ * Created by fitz on 2016/4/26.
  */
 /*
- * Define an implementation of ContentProvider that stubs out
- * all methods
+ * Define an empty implementation of ContentProvider.
+ * If the sync adapter framework tries to run your sync adapter,
+ * and your app doesn't have a content provider, your sync adapter crashes.
+ * reference: http://developer.android.com/training/sync-adapters/creating-stub-provider.html
  */
 public class EmptyProvider extends ContentProvider {
     /*

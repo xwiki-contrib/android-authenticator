@@ -40,11 +40,9 @@ import org.xwiki.android.authenticator.AccountGeneral;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.syncadapter.SyncAdapterColumns;
 import org.xwiki.android.authenticator.utils.Loger;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -109,15 +107,10 @@ public class ContactManager {
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
 
         // Add new contact and update changed ones
-
         Log.d(TAG, "Synchronizing XWiki contacts");
         if(wikiUsers !=null && wikiUsers.size()>0) {
             for (final XWikiUser xwikiUser : wikiUsers) {
-                //TODO update Comment xwikiUser.getDate
-
                 long rawContactId = lookupRawContact(resolver, xwikiUser.getId());
-
-                //TODO UpdateContact AddContact
                 if (rawContactId != 0) {
                     Log.d(TAG, "Update contact");
                     updateContact(context, resolver, xwikiUser, false, true, true, true, rawContactId, batchOperation);
@@ -131,14 +124,13 @@ public class ContactManager {
                 if (batchOperation.size() >= 50) {
                     batchOperation.execute();
                 }
-//            }
             }
         }
 
-        // TODO: Remove contacts that don't exist anymore
-        HashMap<String, Long> localUserMaps = getAllContacts(context, account);
+        // Remove contacts that don't exist anymore
+        HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
         try {
-            HashMap<String, SearchResult> serverUserMaps = new XWikiHttp().getAllUserMap("xwiki", 10000);
+            HashMap<String, SearchResult> serverUserMaps = XWikiHttp.getAllUserMap("xwiki", AccountGeneral.LIMIT_MAX_SYNC_USERS);
             Iterator iter = localUserMaps.entrySet().iterator();
             while(iter.hasNext()){
                 HashMap.Entry entry = (HashMap.Entry) iter.next();
@@ -174,18 +166,16 @@ public class ContactManager {
      */
     public static void addContact(Context context, String accountName, XWikiUser user,
             long groupId, boolean inSync, BatchOperation batchOperation) {
-        //TODO AddContact
-
         // Put the data in the contacts provider
         final ContactOperations contactOp = ContactOperations.createNewContact(
                 context, user.getId(), accountName, inSync, batchOperation);
 
-        contactOp.addName(user.getLastName()+user.getFirstName(), user.getFirstName(),
+        contactOp.addName(null, user.getFirstName(),
                 user.getLastName())
                 .addEmail(user.getEmail())
                 .addPhone(user.getPhone(), Phone.TYPE_MOBILE)
-                .addPhone(user.getPhone(), Phone.TYPE_HOME)
-                .addPhone(user.getPhone(), Phone.TYPE_WORK)
+                //.addPhone(user.getPhone(), Phone.TYPE_HOME)
+                //.addPhone(user.getPhone(), Phone.TYPE_WORK)
                 //.addGroupMembership(groupId)
                 .addAvatar(user.getAvatar());
 
@@ -193,7 +183,7 @@ public class ContactManager {
         // Otherwise skip it - and we'll create it after we sync-up to the
         // server later on.
         if (user.getId() != null) {
-            //contactOp.addProfileAction(user.getServerContactId());
+            contactOp.addProfileAction(user.getId());
         }
 
     }
@@ -226,7 +216,6 @@ public class ContactManager {
         XWikiUser user, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
         boolean inSync, long rawContactId, BatchOperation batchOperation) {
 
-        //TODO check again
         boolean existingCellPhone = false;
         boolean existingHomePhone = false;
         boolean existingWorkPhone = false;
@@ -253,7 +242,7 @@ public class ContactManager {
                             c.getString(DataQuery.COLUMN_FULL_NAME),
                             user.getFirstName(),
                             user.getLastName(),
-                            user.getLastName()+user.getFirstName());
+                            null);
                 } else if (mimeType.equals(Phone.CONTENT_ITEM_TYPE)) {
                     final int type = c.getInt(DataQuery.COLUMN_PHONE_TYPE);
                     if (type == Phone.TYPE_MOBILE) {
@@ -271,8 +260,11 @@ public class ContactManager {
                     }
                 } else if (mimeType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
                     existingEmail = true;
-                    contactOp.updateEmail(user.getEmail(),
-                            c.getString(DataQuery.COLUMN_EMAIL_ADDRESS), uri);
+                    int type = c.getInt(DataQuery.COLUMN_EMAIL_TYPE);
+                    if(type == ContactsContract.CommonDataKinds.Email.TYPE_WORK) {
+                        contactOp.updateEmail(user.getEmail(),
+                                c.getString(DataQuery.COLUMN_EMAIL_ADDRESS), uri);
+                    }
                 } else if (mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
                     existingAvatar = true;
                     contactOp.updateAvatar(user.getAvatar(), uri);
@@ -331,7 +323,7 @@ public class ContactManager {
      * @param accountName
      * @return hashmap
      */
-    public static HashMap<String, Long> getAllContacts(Context context, String accountName){
+    public static HashMap<String, Long> getAllContactsIdMap(Context context, String accountName){
         HashMap<String, Long> allMaps = new HashMap<>();
         final ContentResolver resolver = context.getContentResolver();
         final Cursor c = resolver.query(AllQuery.CONTENT_URI,
@@ -341,7 +333,6 @@ public class ContactManager {
                 null);
         try {
             while (c.moveToNext()) {
-                XWikiUser rawContact = new XWikiUser();
                 final String serverId = c.getString(AllQuery.COLUMN_SERVER_ID);;
                 final long rawId = c.getLong(AllQuery.COLUMN_RAW_CONTACT_ID);;
                 allMaps.put(serverId, rawId);
@@ -352,6 +343,72 @@ public class ContactManager {
             }
         }
         return allMaps;
+    }
+
+
+    /**
+     * Return a User object with data extracted from a contact stored
+     * in the local contacts database.
+     *
+     * Because a contact is actually stored over several rows in the
+     * database, our query will return those multiple rows of information.
+     * We then iterate over the rows and build the User structure from
+     * what we find.
+     *
+     * @param context the Authenticator Activity context
+     * @param rawContactId the unique ID for the local contact
+     * @return a User object containing info on that contact
+     */
+    public static XWikiUser getXWikiUser(Context context, long rawContactId) {
+        String firstName = null;
+        String lastName = null;
+        String fullName = null;
+        String cellPhone = null;
+        String homePhone = null;
+        String workPhone = null;
+        String email = null;
+        String serverId = null;
+
+        final ContentResolver resolver = context.getContentResolver();
+        final Cursor c =
+                resolver.query(DataQuery.CONTENT_URI, DataQuery.PROJECTION, DataQuery.SELECTION,
+                        new String[] {String.valueOf(rawContactId)}, null);
+        try {
+            while (c.moveToNext()) {
+                final long id = c.getLong(DataQuery.COLUMN_ID);
+                final String mimeType = c.getString(DataQuery.COLUMN_MIMETYPE);
+                final String tempServerId = c.getString(DataQuery.COLUMN_SERVER_ID);
+                if (tempServerId != null) {
+                    serverId = tempServerId;
+                }
+                final Uri uri = ContentUris.withAppendedId(Data.CONTENT_URI, id);
+                if (mimeType.equals(StructuredName.CONTENT_ITEM_TYPE)) {
+                    lastName = c.getString(DataQuery.COLUMN_FAMILY_NAME);
+                    firstName = c.getString(DataQuery.COLUMN_GIVEN_NAME);
+                    //fullName = c.getString(DataQuery.COLUMN_FULL_NAME);
+                } else if (mimeType.equals(Phone.CONTENT_ITEM_TYPE)) {
+                    final int type = c.getInt(DataQuery.COLUMN_PHONE_TYPE);
+                    if (type == Phone.TYPE_MOBILE) {
+                        cellPhone = c.getString(DataQuery.COLUMN_PHONE_NUMBER);
+                    } else if (type == Phone.TYPE_HOME) {
+                        homePhone = c.getString(DataQuery.COLUMN_PHONE_NUMBER);
+                    } else if (type == Phone.TYPE_WORK) {
+                        workPhone = c.getString(DataQuery.COLUMN_PHONE_NUMBER);
+                    }
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
+                    email = c.getString(DataQuery.COLUMN_EMAIL_ADDRESS);
+                }
+            } // while
+        } finally {
+            c.close();
+        }
+
+        // Now that we've extracted all the information we care about,
+        // create the actual User object.
+        XWikiUser wikiUser = new XWikiUser(serverId, null, firstName, lastName, email, cellPhone, null,
+                                         rawContactId, null, null, null, null, null, null);
+
+        return wikiUser;
     }
 
 
@@ -461,8 +518,8 @@ public class ContactManager {
         public final static int COLUMN_ID = 0;
 
         public static final String SELECTION =
-            Data.MIMETYPE + "='" + SyncAdapterColumns.MIME_PROFILE + "' AND "
-                + SyncAdapterColumns.DATA_PID + "=?";
+            Data.MIMETYPE + "='" + ContactColumns.MIME_PROFILE + "' AND "
+                + ContactColumns.DATA_PID + "=?";
     }
 
     /**

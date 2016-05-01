@@ -15,16 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-     viewContactNotifyService="com.teamboid.twitter.contactsync.ContactViewNotifyService"
 -->
 
 <ContactsSource
     xmlns:android="http://schemas.android.com/apk/res/android">
     <ContactsDataKind
-        android:mimeType="vnd.android.cursor.item/vnd.xwikiauth.profile"
+        android:mimeType="vnd.android.cursor.item/vnd.xwikiedit.profile"
         android:icon="@drawable/logo"
         android:summaryColumn="data2"
         android:detailColumn="data3"
         android:detailSocialSummary="true" />
-
 </ContactsSource>

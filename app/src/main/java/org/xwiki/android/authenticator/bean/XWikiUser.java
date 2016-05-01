@@ -29,6 +29,28 @@ public class XWikiUser {
 
     public long rawId;
 
+
+    public XWikiUser(){
+
+    }
+
+    public XWikiUser(String id, String pageName, String firstName, String lastName, String email, String phone, String avatar, long rawId, String company, String blog, String wiki, String space, String lastModifiedDate, String blogFeed) {
+        this.id = id;
+        this.pageName = pageName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.avatar = avatar;
+        this.rawId = rawId;
+        this.company = company;
+        this.blog = blog;
+        this.wiki = wiki;
+        this.space = space;
+        this.lastModifiedDate = lastModifiedDate;
+        this.blogFeed = blogFeed;
+    }
+
     @Override
     public String toString() {
         return "XWikiUser{" +

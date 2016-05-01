@@ -1,0 +1,146 @@
+$ curl -u Admin:admin http://localhost:8080/xwiki/rest/wikis/query?q=object:XWiki.XWikiGroups > a.xml
+http://localhost:8080/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers
+
+http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/
+
+http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/objects/XWiki.XWikiUsers/0
+/wikis/{wikiName}/spaces/{spaceName}[/spaces/{nestedSpaceName}]*/pages/{pageName}/objects/{className}/{objectNumber}
+
+HTTP Method: GET
+Media types:
+application/xml (Object元素)
+Description: 一个页面给定{className}的{objectNumber}对象。
+Status codes:
+200: 如果请求是成功的。
+401: 如果用户没有被授权。
+
+curl http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/objects/XWiki.XWikiUsers/0
+
+HTTP Method: PUT
+Accepted media types:
+application/xml (Object元素)
+application/x-www-form-urlencoded (a set of property#name=value pairs representing properties)
+Media types:
+application/xml (Object元素)
+Description: 修改object属性。
+Status codes:
+202: 如果对象被更新。
+401: 如果用户没有被授权。
+
+
+curl -u Admin:admin -X PUT -H "Content-type: text/plain" -H "Accept: application/xml" 
+       --data-binary "@content.xml" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page xmlns="http://www.xwiki.org">
+  ...
+  <title>New title</title>
+  <content>New content</content>
+</page>  
+
+curl -u FitzLee:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" --data-urlencode "company=iie" --data-urlencode "address=minzhuang" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/objects/XWiki.XWikiUsers/0
+
+curl  -X PUT -H "Cookie: JSESSIONID=1lcpy48cm1dadf1bhfrvlfvpr;Path=/xwiki;" -H "Content-type: application/x-www-form-urlencoded" --data-urlencode "company=iie" --data-urlencode "address=minzhuang" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
+
+curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" --data-urlencode "company=iie" --data-urlencode "address=minzhuang road" http://xwikichina.com/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
+
+
+HTTP Method: DELETE
+Media types: 
+Description: 删除对象。
+Status codes:
+204: 如果对象被删除。
+401: 如果用户没有被授权。
+/wikis/{wikiName}/spaces/{spaceName}[/spaces/{nestedSpaceName}]*/pages/{pageName}/objects/{className}/{objectNumber}/properties
+HTTP Method: GET
+Media types:
+application/xml (Properties元素)
+Description: 给定页面的{className}类{objectNumber}对象的属性。
+Status codes:
+200: 如果请求是成功的。
+401: 如果用户没有被授权。
+
+ curl -v -u Admin:admin 
+       -X DELETE http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome
+
+
+http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/objects/XWiki.XWikiUsers/0/properties
+
+
+
+
+
+create page
+curl -u Admin:admin -X PUT --data-binary "@newpage.xml" -H "Content-Type: application/xml" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main/pages/NewPage
+newpage.xml:
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page xmlns="http://www.xwiki.org">     
+        <title>Hello world</title>
+        <syntax>xwiki/2.0</syntax>
+        <content>This is a new page</content>
+</page>
+
+
+curl -u FitzLee:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -H "Accept: application/xml" -d "className=XWiki.XWikiUsers" -d "property#company=iie" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/FitzLee/objects/XWiki.XWikiUsers/0
+
+
+
+
+curl -u Admin:admin 
+       -X POST -H "Content-type: application/x-www-form-urlencoded"
+       -H "Accept: application/xml"
+       -d "className=XWiki.TestClass"
+       -d "property#test=Whatever you want"
+       http://localhost/xwiki/rest/wikis/xwiki/spaces/Test/pages/Test/objects
+
+
+
+EditUser:
+curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -H "Accept: application/xml" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
+curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
+
+
+使用RESTful API基础教程
+请参阅Fabio Mancinelli博客写的教程。
+
+创建一个XWiki对象
+在这个例子中，我们将使用curl作为HTTP客户端。
+
+想象一下，你要创建Test.Test页面的一个XWiki.TestClass类对象，假设类有一个名为text的属性。
+
+因此，在命令行中，你可以按照以下来操作：
+
+$ curl -u Admin:admin 
+       -X POST 
+       -H "Content-type: application/xml" 
+       -H "Accept: application/xml" 
+       -d "@test.xml"  
+       http://localhost/xwiki/rest/wikis/xwiki/spaces/Test/pages/Test/objects
+test.xml内容：
+
+<object xmlns="http://www.xwiki.org">
+ <className>XWiki.TestClass</className>
+ <property name="text">
+   <value>Whatever you want to put here</value>
+</property>
+</object>
+另外，你可以使用更简洁application/x-www-form-urlencoded格式：
+
+$ curl -u Admin:admin 
+       -X POST 
+       -H "Content-type: application/x-www-form-urlencoded"
+       -H "Accept: application/xml"
+       -d "@test.txt" 
+       http://localhost/xwiki/rest/wikis/xwiki/spaces/Test/pages/Test/objects
+test.txt包含如下内容：
+
+className=XWiki.TestClass&property#test=Whatever+you+want
+或者，更好的，你可以直接使用curl指定这些参数
+使用多个-d参数：
+
+$ curl -u Admin:admin 
+       -X POST -H "Content-type: application/x-www-form-urlencoded"
+       -H "Accept: application/xml"
+       -d "className=XWiki.TestClass"
+       -d "property#test=Whatever you want"
+       http://localhost/xwiki/rest/wikis/xwiki/spaces/Test/pages/Test/objects
+

@@ -22,16 +22,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-
                 <TextView
-                    android:text="@string/full_name"
+                    android:text="@string/first_name"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_marginBottom="5dip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-                <EditText android:id="@+id/fullname"
+                <EditText android:id="@+id/first_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
@@ -42,16 +40,32 @@
                     android:textColor="@android:color/black"
                     android:singleLine="true" />
 
-
-
                 <TextView
-                    android:text="@string/cell_phone"
+                    android:text="@string/last_name"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_marginBottom="5dip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-                <EditText android:id="@+id/cellphone"
+                <EditText android:id="@+id/last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="text"
+                    android:textColor="@android:color/black"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:text="@string/phone"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginBottom="5dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText android:id="@+id/cell_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
@@ -61,28 +75,6 @@
                     android:inputType="phone"
                     android:textColor="@android:color/black"
                     android:singleLine="true" />
-
-
-
-                <TextView
-                    android:text="@string/work_phone"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_marginBottom="5dip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <EditText android:id="@+id/workphone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:minWidth="250dip"
-                    android:scrollHorizontally="true"
-                    android:layout_marginBottom="10dp"
-                    android:inputType="phone"
-                    android:textColor="@android:color/black"
-                    android:singleLine="true" />
-
-
 
                 <TextView
                     android:text="@string/email"
@@ -101,13 +93,6 @@
                     android:textColor="@android:color/black"
                     android:inputType="textEmailAddress"
                     android:singleLine="true" />
-
-
-            <TextView
-                android:id="@+id/contactinfo"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>
