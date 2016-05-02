@@ -96,6 +96,12 @@ AddNewContact/confirmCredentials
 What's left and things to improve:
 * android permission request and check 6.0 (TODO)
 * Test automation. (TODO)
+```
+http://evgenii.com/blog/testing-activity-in-android-studio-tutorial-part-1/
+http://evgenii.com/blog/testing-activity-in-android-studio-tutorial-part-2/
+Espresso library Test
+http://www.jianshu.com/p/03118c11c199  
+```
 * Maven or Gradle in Jenkins (TODO)
 
 ```
@@ -103,7 +109,10 @@ try to master Maven, JUnit, Selenium, component driven development
 Continue fixing a few small issues, chosen so that they are related to
 your project. 
 Pick from the (non-comprehensive) list of easy issues 
+https://jenkins.io/solutions/android/
+http://ainoya.io/docker-android-walter
 https://www.digitalocean.com/community/tutorials/how-to-build-android-apps-with-jenkins
+http://blog.saymagic.cn/2016/01/25/docker-image-for-android.html?utm_source=tuicool&utm_medium=referral
 ```
 
 * sign up (TODO)

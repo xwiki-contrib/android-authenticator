@@ -122,6 +122,22 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
+            //if other AuthTokenTypes have a cached token, just return this consistent token.
+            //mainly used when a new app being installed. and at this time, there're no cached
+            //authToken corresponding to its authTokenType, but other AuthTokenTypes may have a
+            //cached token.
+            String consistentToken = getTheSameAuthToken(am, account);
+            if(consistentToken!=null){
+                am.setAuthToken(account, authTokenType, consistentToken);
+                final Bundle result = new Bundle();
+                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+                result.putString(AccountManager.KEY_AUTHTOKEN, consistentToken);
+                return result;
+            }
+
+            //if  having no cached token, request server for new token and refreshAllAuthTokenType
+            //make all cached authTokenType-tokens consistent.
             try {
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
@@ -205,11 +221,19 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken){
         List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
         if(packageList == null || packageList.size()==0 ) return;
-        Loger.debug("packageList="+packageList.toString());
         for(String item : packageList){
             String tokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
     }
+
+    public static String getTheSameAuthToken(AccountManager am, Account account){
+        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
+        if(packageList == null || packageList.size()==0 ) return null;
+        String tokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
+        String authToken = am.peekAuthToken(account, tokenType);
+        return authToken;
+    }
+
 
 }

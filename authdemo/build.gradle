@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "org.xwiki.android.authdemo"
-        minSdkVersion 23
-        targetSdkVersion 23
+        minSdkVersion 16
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
