@@ -20,7 +20,18 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="XWiki Authenticator Preferences" />
-    <SwitchPreference android:title="Debug Logs" android:key="logsVerbose" android:summary="Show debug logs on LogCat"/>
+    <PreferenceCategory
+        android:title="XWiki Authenticator Preferences">
+        <SwitchPreference android:title="Debug Logs" android:key="logsVerbose" android:summary="Show debug logs on LogCat"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Select groups" > </PreferenceCategory>
+    <PreferenceScreen android:key="account_settings"
+        android:title="Select Groups"
+        android:summary="Click to Select Groups to Synchronize">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="org.xwiki.android.authenticator"
+            android:targetClass="org.xwiki.android.authenticator.activities.SelectGroupsActivity" />
+    </PreferenceScreen>
 </PreferenceScreen>

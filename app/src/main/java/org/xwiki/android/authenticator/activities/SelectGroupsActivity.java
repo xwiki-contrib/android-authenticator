@@ -1,0 +1,62 @@
+package org.xwiki.android.authenticator.activities;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
+
+import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
+
+
+/**
+ * A sign up screen that offers email/password/username/lastname/firstname/
+ * or maybe need captcha.
+ */
+public class SelectGroupsActivity extends AppCompatActivity {
+
+    // UI references.
+    private EditText mFirstNameView;
+    private EditText mEmailView;
+    private EditText mCellPhoneView;
+    private EditText mLastNameView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.act_sign_up);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+
+        // init view
+        mEmailView = (EditText) findViewById(R.id.email);
+        mFirstNameView = (EditText) findViewById(R.id.first_name);
+        mCellPhoneView = (EditText) findViewById(R.id.cell_phone);
+        mLastNameView = (EditText) findViewById(R.id.last_name);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sign_up, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }else if(item.getItemId()==R.id.action_save){
+            //Toast.makeText(SignUpActivity.this,"please check again",Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+}
+

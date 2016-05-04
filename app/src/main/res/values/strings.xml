@@ -44,4 +44,19 @@
     <string name="authorize_activity_package_label">Package Name</string>
     <string name="authorize_activity_note">Please input a passwd to authorize the app to access your account.</string>
 
+
+    <string-array name="auto_logout_time_key">
+        <item>10 mins.</item>
+        <item>20 mins.</item>
+        <item>30 mins.</item>
+        <item>60 mins.</item>
+    </string-array>
+
+    <string-array name="auto_logout_time_value">
+        <item>600000</item>
+        <item>1200000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
+
 </resources>

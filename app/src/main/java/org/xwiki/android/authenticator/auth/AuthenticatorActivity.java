@@ -76,6 +76,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.act_login);
+        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+
+        //check if there'is already a user, finish and return, keep only one user.
         mAccountManager = AccountManager.get(getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
         if (availableAccounts.length > 0) {
@@ -83,8 +87,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             finish();
             return;
         }
-        setContentView(R.layout.act_login);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
         mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
