@@ -25,7 +25,7 @@
     <string name="title_activity_sign_up">Sign Up</string>
     <string name="title_activity_authorize">Authorize</string>
     <string name="title_activity_select_groups">Select Groups</string>
-    <string name="title_activity_setting">XWiki Setting</string>
+    <string name="title_activity_setting">Settings</string>
 
     <!--error msg-->
     <string name="error_invalid_email">This email address is invalid</string>

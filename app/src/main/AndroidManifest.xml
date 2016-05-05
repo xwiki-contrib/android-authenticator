@@ -44,17 +44,6 @@
 
         <activity
             android:theme="@style/AppTheme"
-            android:name=".activities.SelectGroupsActivity"
-            android:label="@string/title_activity_select_groups">
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:theme="@style/ActivityTheme"
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_setting">
 

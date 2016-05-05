@@ -92,6 +92,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    //TODO
+    private void SyncSelectedGroups(){
+
+    }
+
+    //TODO
+    private void SyncAllUsers(){
+
+    }
+
     /**
      * This helper function fetches the last known high-water-mark
      * we received from the server - or 0 if we've never synced.
