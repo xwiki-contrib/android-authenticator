@@ -21,13 +21,31 @@
 -->
 
 
+<!--
+<PreferenceCategory android:title="XWiki Authenticator Preferences" > </PreferenceCategory>
+<PreferenceCategory android:title="Select groups" > </PreferenceCategory>
+<PreferenceCategory
+        android:title="XWiki Authenticator Preferences">
+        <SwitchPreference android:title="Debug Logs" android:key="logsVerbose" android:summary="Show debug logs on LogCat"/>
+</PreferenceCategory>
+-->
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="XWiki Authenticator Preferences" > </PreferenceCategory>
+    <PreferenceCategory
+        android:title="XWiki Authenticator Preferences">
+        <ListPreference
+            android:title="Synchronize Type"
+            android:key="sync_type"
+            android:summary="Synchronize All Users"
+            android:entries="@array/opts"
+            android:entryValues="@array/opts_values"/>
+    </PreferenceCategory>
+
     <PreferenceScreen android:key="account_settings"
-        android:title="Settings"
-        android:summary="Configure the synchronization of your account">
+        android:title="Select Groups"
+        android:summary="Click to Select Groups">
         <intent android:action="android.intent.action.VIEW"
             android:targetPackage="org.xwiki.android.authenticator"
-            android:targetClass="org.xwiki.android.authenticator.activities.SettingsActivity" />
+            android:targetClass="org.xwiki.android.authenticator.activities.SelectGroupsActivity" />
     </PreferenceScreen>
 </PreferenceScreen>

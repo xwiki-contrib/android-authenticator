@@ -208,15 +208,15 @@ public class XWikiHttp {
 
     /**
      * get all groups
-     * @param wiki
      * @param number
      * @return List<XWikiGroup>
      * @throws IOException
      * http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
      */
-    public static List<XWikiGroup> getGroupList(String wiki, int number) throws IOException{
-        String url = getServerUrl() + "/wikis/query?q=wiki:"+ wiki +
-                "%20and%20object:XWiki.XWikiGroups&number="+ number;
+    public static List<XWikiGroup> getGroupList(int number) throws IOException{
+        String url = getServerUrl() + "/wikis/query?q=" +
+                "object:XWiki.XWikiGroups&number="+ number;
+        //String wiki,  wiki:"+ wiki
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
@@ -234,6 +234,7 @@ public class XWikiHttp {
             group.space = item.space;
             group.pageName = item.pageName;
             group.lastModifiedDate = item.modified;
+            group.version = item.version;
             groupList.add(group);
         }
         return groupList;

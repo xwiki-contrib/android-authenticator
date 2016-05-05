@@ -24,6 +24,8 @@
     <string name="title_activity_edit_contact">Edit Contact</string>
     <string name="title_activity_sign_up">Sign Up</string>
     <string name="title_activity_authorize">Authorize</string>
+    <string name="title_activity_select_groups">Select Groups</string>
+    <string name="title_activity_setting">XWiki Setting</string>
 
     <!--error msg-->
     <string name="error_invalid_email">This email address is invalid</string>
@@ -44,19 +46,19 @@
     <string name="authorize_activity_package_label">Package Name</string>
     <string name="authorize_activity_note">Please input a passwd to authorize the app to access your account.</string>
 
-
-    <string-array name="auto_logout_time_key">
-        <item>10 mins.</item>
-        <item>20 mins.</item>
-        <item>30 mins.</item>
-        <item>60 mins.</item>
+    <!--prefs arrays-->
+    <string-array name="opts">
+        <item>Synchronize all users</item>
+        <item>Synchronize the selected groups</item>
     </string-array>
 
-    <string-array name="auto_logout_time_value">
-        <item>600000</item>
-        <item>1200000</item>
-        <item>1800000</item>
-        <item>3600000</item>
+    <string-array name="opts_values">
+        <item>1</item>
+        <item>2</item>
     </string-array>
+
+    <!--select setting-->
+    <string name="sync_all_users">Sync all users</string>
+    <string name="sync_selected_groups">Sync selected groups</string>
 
 </resources>

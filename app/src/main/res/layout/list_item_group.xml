@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contact_content"
+    android:layout_width="fill_parent"
+    android:layout_height="60dip"
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/list_item_selector">
+
+    <TextView
+        android:id="@+id/groupName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="10dip"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Admin"
+        android:textSize="20sp" />
+
+    <TextView android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="creator:xwiki"
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="5dp"
+        android:layout_alignLeft="@id/groupName"
+        android:layout_below="@id/groupName"/>
+
+    <TextView android:id="@+id/lastModifiedTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last update:2015.06.03"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="60dp"
+        android:layout_alignTop="@id/version"/>
+
+    <CheckBox
+        android:id="@+id/checkbox"
+        android:focusable="false"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

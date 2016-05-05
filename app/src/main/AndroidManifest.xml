@@ -28,7 +28,7 @@
     <application
         android:name=".AppContext"
         android:allowBackup="true" android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
+        android:icon="@mipmap/ic_launcher">
 
         <activity android:name=".auth.AuthenticatorActivity"
             android:label="@string/login_label"
@@ -45,7 +45,18 @@
         <activity
             android:theme="@style/AppTheme"
             android:name=".activities.SelectGroupsActivity"
-            android:label="@string/title_activity_sign_up">
+            android:label="@string/title_activity_select_groups">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:theme="@style/ActivityTheme"
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_setting">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
