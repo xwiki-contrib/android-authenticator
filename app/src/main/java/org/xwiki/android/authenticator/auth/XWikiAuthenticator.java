@@ -30,7 +30,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.text.TextUtils;
 
-import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
@@ -39,11 +39,10 @@ import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static org.xwiki.android.authenticator.AccountGeneral.*;
+import static org.xwiki.android.authenticator.Constants.*;
 
 /**
  * @version $Id: $
@@ -95,7 +94,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         // If the caller requested an authToken type we don't support, then
         // return an error  if checking validity tokenType != TYPE+PackegeName
-        if (!authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS+packageName)) {
+        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS+packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
             return result;
@@ -222,7 +221,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
         if(packageList == null || packageList.size()==0 ) return;
         for(String item : packageList){
-            String tokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS + item;
+            String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
     }
@@ -230,7 +229,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     public static String getTheSameAuthToken(AccountManager am, Account account){
         List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
         if(packageList == null || packageList.size()==0 ) return null;
-        String tokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
+        String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
         String authToken = am.peekAuthToken(account, tokenType);
         return authToken;
     }

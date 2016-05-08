@@ -22,7 +22,7 @@ package org.xwiki.android.authenticator;
 /**
  * @version $Id: $
  */
-public class AccountGeneral {
+public class Constants {
 
     /**
      * Account type id
@@ -33,7 +33,6 @@ public class AccountGeneral {
      * Account name
      */
     public static final String ACCOUNT_NAME = "XWiki";
-
     public static final String USERDATA_SERVER = "XWIKI_SERVER";
 
     /**
@@ -41,10 +40,19 @@ public class AccountGeneral {
      */
     public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
     public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
-
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access";
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
 
     //limit the number of users synchronizing from server.
     public static final int LIMIT_MAX_SYNC_USERS = 100;
+
+    //SyncType
+    //0: no sync, 1: all users, 2: sync groups
+    public static final int SYNC_TYPE_NO_NEED_SYNC = 0;
+    public static final int SYNC_TYPE_ALL_USERS = 1;
+    public static final int SYNC_TYPE_SELECTED_GROUPS = 2;
+
+    //sync maker
+    public static final String SYNC_MARKER_KEY = "org.xwiki.android.sync.marker";
+
 }

@@ -33,7 +33,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.activities.SignUpActivity;
@@ -64,6 +64,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public final static String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
 
     private final int REQ_SIGNUP = 1;
+    private final int REQ_SETTINGS = 2;
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -81,7 +82,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         //check if there'is already a user, finish and return, keep only one user.
         mAccountManager = AccountManager.get(getApplicationContext());
-        Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         if (availableAccounts.length > 0) {
             Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
             finish();
@@ -91,7 +92,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
         mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
         if (mAuthTokenType == null)
-            mAuthTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
+            mAuthTokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
 
         if (accountName != null) {
             ((TextView) findViewById(R.id.accountName)).setText(accountName);
@@ -114,6 +115,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         // The sign up activity returned that the user has successfully created an account
         if (requestCode == REQ_SIGNUP && resultCode == RESULT_OK) {
             finishLogin(data);
+        } else if(requestCode == REQ_SETTINGS && resultCode == RESULT_OK){
+
         } else
             super.onActivityResult(requestCode, resultCode, data);
     }

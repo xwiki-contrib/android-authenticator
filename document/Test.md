@@ -6,6 +6,10 @@ http://developer.android.com/training/testing/unit-testing/index.html
 http://developer.android.com/tools/testing/testing_otheride.html
 ```
 
+* Functions should be test
+iso8601ToDate
+XMLUtils
+
 
 * multi select groups
 http://developer.android.com/guide/topics/ui/settings.html#Overview

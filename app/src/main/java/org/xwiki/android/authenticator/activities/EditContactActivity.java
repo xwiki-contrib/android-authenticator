@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
@@ -136,8 +137,10 @@ public class EditContactActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                     Loger.debug(e.toString());
-                    return null;
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
                 }
+                return null;
             }
 
             @Override
