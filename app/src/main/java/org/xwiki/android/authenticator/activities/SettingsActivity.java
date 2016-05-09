@@ -120,21 +120,20 @@ public class SettingsActivity extends AppCompatActivity {
             if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
                 //TODO AccountManager.setUserData(MAKER, NULL);
                 SharedPrefsUtil.putValue(getApplicationContext(), "SyncType", Constants.SYNC_TYPE_ALL_USERS);
-                resetSyncMaker();
-                return super.onOptionsItemSelected(item);
-            }
-            List<XWikiGroup> list = mAdapter.getSelectGroups();
-            Toast.makeText(SettingsActivity.this, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
-            if(list != null && list.size()>0){
-                List<String> groupIdList = new ArrayList<>();
-                for(XWikiGroup iGroup: list){
-                    groupIdList.add(iGroup.id);
+            }else {
+                List<XWikiGroup> list = mAdapter.getSelectGroups();
+                Toast.makeText(SettingsActivity.this, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
+                if(list != null && list.size()>0){
+                    List<String> groupIdList = new ArrayList<>();
+                    for(XWikiGroup iGroup: list){
+                        groupIdList.add(iGroup.id);
+                    }
+                    SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", groupIdList);
+                }else{
+                    SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", new ArrayList<String>());
                 }
-                SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", groupIdList);
-            }else{
-                SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", new ArrayList<String>());
+                SharedPrefsUtil.putValue(getApplicationContext(), "SyncType", Constants.SYNC_TYPE_SELECTED_GROUPS);
             }
-            SharedPrefsUtil.putValue(getApplicationContext(), "SyncType", Constants.SYNC_TYPE_SELECTED_GROUPS);
             resetSyncMaker();
         }
         return super.onOptionsItemSelected(item);

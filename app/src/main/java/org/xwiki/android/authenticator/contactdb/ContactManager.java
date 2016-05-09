@@ -87,9 +87,6 @@ public class ContactManager {
         return groupId;
     }
 
-    public static synchronized void updateContacts(Context context, String account, List<XWikiUser> updateUsers, HashMap<String, Long> allUserIdMaps){
-
-    }
 
     /**
      * Take a list of updated contacts and apply those changes to the
