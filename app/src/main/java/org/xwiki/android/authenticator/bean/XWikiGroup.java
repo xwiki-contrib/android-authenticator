@@ -14,6 +14,8 @@ public class XWikiGroup {
 
     public String lastModifiedDate;
 
+    public String version;
+
     @Override
     public String toString() {
         return "XWikiGroup{" +

@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
+import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
@@ -65,11 +65,10 @@ public class EditContactActivity extends AppCompatActivity {
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
         if(wikiUser == null){
-            Loger.debug("wikiUser in EditContactActivity null error!!! it's impossible");
             finish();
             return;
         }
-        Loger.debug(mUri.toString()+"  "+ wikiUser.toString());
+
         if(wikiUser != null){
             mEmailView.setText(wikiUser.getEmail());
             mFirstNameView.setText(wikiUser.getFirstName());
@@ -79,7 +78,7 @@ public class EditContactActivity extends AppCompatActivity {
     }
 
 
-    public static XWikiUser getXWikiUser(Context context, Uri uri){
+    private  XWikiUser getXWikiUser(Context context, Uri uri){
         ContentResolver cr = context.getContentResolver();
         Cursor cursor = cr.query(uri, null, null, null, null);
         //getRawContactId
@@ -138,8 +137,10 @@ public class EditContactActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                     Loger.debug(e.toString());
-                    return null;
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
                 }
+                return null;
             }
 
             @Override

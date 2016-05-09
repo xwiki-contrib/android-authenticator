@@ -14,9 +14,9 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 
-import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.rest.XWikiConnector;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 /**
  * Helper class for storing data in the platform content providers.
@@ -88,7 +88,7 @@ public class ContactOperations {
         mBackReference = mBatchOperation.size();
         mIsNewContact = true;
         mValues.put(RawContacts.SOURCE_ID, userId);
-        mValues.put(RawContacts.ACCOUNT_TYPE, AccountGeneral.ACCOUNT_TYPE);
+        mValues.put(RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
         mValues.put(RawContacts.ACCOUNT_NAME, accountName);
         ContentProviderOperation.Builder builder =
                 newInsertCpo(RawContacts.CONTENT_URI, mIsSyncOperation, true).withValues(mValues);
@@ -187,7 +187,7 @@ public class ContactOperations {
 
     public ContactOperations addAvatar(String avatarUrl) {
         if (avatarUrl != null) {
-            byte[] avatarBuffer = XWikiConnector.downloadAvatar(avatarUrl);
+            byte[] avatarBuffer = XWikiHttp.downloadAvatar(avatarUrl);
             if (avatarBuffer != null) {
                 mValues.clear();
                 mValues.put(Photo.PHOTO, avatarBuffer);
@@ -315,7 +315,7 @@ public class ContactOperations {
 
     public ContactOperations updateAvatar(String avatarUrl, Uri uri) {
         if (avatarUrl != null) {
-            byte[] avatarBuffer = XWikiConnector.downloadAvatar(avatarUrl);
+            byte[] avatarBuffer = XWikiHttp.downloadAvatar(avatarUrl);
             if (avatarBuffer != null) {
                 mValues.clear();
                 mValues.put(Photo.PHOTO, avatarBuffer);

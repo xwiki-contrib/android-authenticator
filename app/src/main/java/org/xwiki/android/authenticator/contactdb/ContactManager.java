@@ -36,14 +36,13 @@ import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Settings;
 import android.util.Log;
 
-import org.xwiki.android.authenticator.AccountGeneral;
-import org.xwiki.android.authenticator.bean.SearchResult;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.Loger;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -88,6 +87,10 @@ public class ContactManager {
         return groupId;
     }
 
+    public static synchronized void updateContacts(Context context, String account, List<XWikiUser> updateUsers, HashMap<String, Long> allUserIdMaps){
+
+    }
+
     /**
      * Take a list of updated contacts and apply those changes to the
      * contacts database. Typically this list of contacts would have been
@@ -95,16 +98,17 @@ public class ContactManager {
      *
      * @param context The context of Authenticator Activity
      * @param account The username for the account
-     * @param wikiUsers The list of contacts to update
+     * @param syncData The list of contacts to update
      * @param groupId the id of the sample group
      * @return the server syncState that should be used in our next
      * sync request.
      */
     public static synchronized void updateContacts(Context context, String account,
-            List<XWikiUser> wikiUsers, long groupId) {
+                                                   XWikiHttp.SyncData syncData, long groupId) {
 
         final ContentResolver resolver = context.getContentResolver();
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
+        List<XWikiUser> wikiUsers = syncData.getUpdateUserList();
 
         // Add new contact and update changed ones
         Log.d(TAG, "Synchronizing XWiki contacts");
@@ -129,23 +133,18 @@ public class ContactManager {
 
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
-        try {
-            HashMap<String, SearchResult> serverUserMaps = XWikiHttp.getAllUserMap("xwiki", AccountGeneral.LIMIT_MAX_SYNC_USERS);
-            Iterator iter = localUserMaps.entrySet().iterator();
-            while(iter.hasNext()){
-                HashMap.Entry entry = (HashMap.Entry) iter.next();
-                String key = (String) entry.getKey();
-                long rawId = (Long) entry.getValue();
-                if(!serverUserMaps.containsKey(key)){
-                    deleteContact(context, rawId, batchOperation);
-                    Loger.debug(key+" removed");
-                }
+        HashSet<String> allIdSet = syncData.getAllIdSet();
+        Iterator iterLocalMap = localUserMaps.entrySet().iterator();
+        while(iterLocalMap.hasNext()){
+            HashMap.Entry entry = (HashMap.Entry) iterLocalMap.next();
+            String key = (String) entry.getKey();
+            long rawId = (Long) entry.getValue();
+            if(!allIdSet.contains(key)){
+                deleteContact(context, rawId, batchOperation);
+                Loger.debug(TAG, key+" removed");
             }
-            Loger.debug("Remove contacts success");
-        } catch (IOException e) {
-            e.printStackTrace();
-            Loger.debug("Remove contacts fail");
         }
+        Loger.debug(TAG, "Remove contacts success");
         batchOperation.execute();
     }
 
@@ -426,7 +425,7 @@ public class ContactManager {
             boolean visible) {
         ContentValues values = new ContentValues();
         values.put(RawContacts.ACCOUNT_NAME, account.name);
-        values.put(RawContacts.ACCOUNT_TYPE, AccountGeneral.ACCOUNT_TYPE);
+        values.put(RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
         values.put(Settings.UNGROUPED_VISIBLE, visible ? 1 : 0);
 
         context.getContentResolver().insert(Settings.CONTENT_URI, values);
@@ -542,7 +541,7 @@ public class ContactManager {
         public final static Uri CONTENT_URI = RawContacts.CONTENT_URI;
 
         public static final String SELECTION =
-            RawContacts.ACCOUNT_TYPE + "='" + AccountGeneral.ACCOUNT_TYPE + "' AND "
+            RawContacts.ACCOUNT_TYPE + "='" + Constants.ACCOUNT_TYPE + "' AND "
                 + RawContacts.SOURCE_ID + "=?";
     }
 
@@ -598,7 +597,7 @@ public class ContactManager {
                 .build();
 
         public static final String SELECTION =
-                RawContacts.ACCOUNT_TYPE + "='" + AccountGeneral.ACCOUNT_TYPE + "' AND "
+                RawContacts.ACCOUNT_TYPE + "='" + Constants.ACCOUNT_TYPE + "' AND "
                         + RawContacts.ACCOUNT_NAME + "=?";
     }
 

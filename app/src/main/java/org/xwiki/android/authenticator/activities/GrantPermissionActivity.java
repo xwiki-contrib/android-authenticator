@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.xwiki.android.authenticator.AccountGeneral;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.HttpResponse;
@@ -97,7 +97,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
         //just compare the local passwd with user's input to grant permission
         //TODO maybe have some security issue.
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
-        Account account = new Account(accountName, AccountGeneral.ACCOUNT_TYPE);
+        Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
         String password = mAccountManager.getUserData(account, AccountManager.KEY_PASSWORD);
         if(accountPasswd.equals(password)){
             AppContext.addAuthorizedApp(uid, packageName);

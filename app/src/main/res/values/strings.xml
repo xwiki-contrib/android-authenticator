@@ -24,6 +24,8 @@
     <string name="title_activity_edit_contact">Edit Contact</string>
     <string name="title_activity_sign_up">Sign Up</string>
     <string name="title_activity_authorize">Authorize</string>
+    <string name="title_activity_select_groups">Select Groups</string>
+    <string name="title_activity_setting">Settings</string>
 
     <!--error msg-->
     <string name="error_invalid_email">This email address is invalid</string>
@@ -43,5 +45,20 @@
     <string name="authorize_activity_ok_button">OK</string>
     <string name="authorize_activity_package_label">Package Name</string>
     <string name="authorize_activity_note">Please input a passwd to authorize the app to access your account.</string>
+
+    <!--prefs arrays-->
+    <string-array name="opts">
+        <item>Synchronize all users</item>
+        <item>Synchronize the selected groups</item>
+    </string-array>
+
+    <string-array name="opts_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!--select setting-->
+    <string name="sync_all_users">Sync all users</string>
+    <string name="sync_selected_groups">Sync selected groups</string>
 
 </resources>

@@ -20,7 +20,14 @@
 * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="XWiki Authenticator Preferences" />
-    <SwitchPreference android:title="Debug Logs" android:key="logsVerbose" android:summary="Show debug logs on LogCat"/>
+    <PreferenceCategory android:title="XWiki Authenticator Preferences" > </PreferenceCategory>
+    <PreferenceScreen android:key="account_settings"
+        android:title="Settings"
+        android:summary="Configure the synchronization of your account">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="org.xwiki.android.authenticator"
+            android:targetClass="org.xwiki.android.authenticator.activities.SettingsActivity" />
+    </PreferenceScreen>
 </PreferenceScreen>

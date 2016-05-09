@@ -19,10 +19,12 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
-import org.xwiki.android.authenticator.AccountGeneral;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import android.accounts.Account;
@@ -41,7 +43,6 @@ import java.util.List;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "SyncAdapter";
-    private static final String SYNC_MARKER_KEY = "org.xwiki.android.sync.marker";
     private static final boolean NOTIFY_AUTH_FAILURE = true;
 
     private final AccountManager mAccountManager;
@@ -56,6 +57,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
+        int syncType = SharedPrefsUtil.getValue(getContext(), "SyncType", Constants.SYNC_TYPE_NO_NEED_SYNC);
+        if(syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
         Log.i(TAG, "onPerformSync start");
         try {
             // get last sync date. return new Date(0) if first onPerformSync
@@ -75,12 +78,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             // Make sure that the XWiki group exists
             final long groupId = ContactManager.ensureXWikiGroupExists(mContext, account);
 
-            // Get XWiki users from XWiki server , which should be modified after lastSyncMarker.
-            List<XWikiUser>  updatedContacts = XWikiHttp.getUserList("xwiki", AccountGeneral.LIMIT_MAX_SYNC_USERS, lastSyncMarker);
-            Log.i(TAG, updatedContacts!=null?updatedContacts.toString():"updatedCotacts null");
+            // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
+            XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
+            Log.i(TAG, syncData!=null?syncData.toString():"syncData null");
 
             // Update the local contacts database with the changes. updateContacts()
-            ContactManager.updateContacts(mContext, account.name, updatedContacts, groupId);
+            ContactManager.updateContacts(mContext, account.name, syncData, groupId);
 
             // Save off the new sync date. On our next sync, we only want to receive
             // contacts that have changed since this sync...
@@ -89,8 +92,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (final IOException e) {
             Log.e(TAG, "IOException", e);
             syncResult.stats.numIoExceptions++;
+        } catch (XmlPullParserException e) {
+            Log.e(TAG, "XmlPullParserException", e);
+            syncResult.stats.numParseExceptions++;
         }
     }
+
 
     /**
      * This helper function fetches the last known high-water-mark
@@ -99,7 +106,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @return the change high-water-mark  Iso8601
      */
     private String getServerSyncMarker(Account account) {
-        String lastSyncIso = mAccountManager.getUserData(account, SYNC_MARKER_KEY);
+        String lastSyncIso = mAccountManager.getUserData(account, Constants.SYNC_MARKER_KEY);
         //if empty, just return new Date(0) so that we can get all users from server.
         if (TextUtils.isEmpty(lastSyncIso)) {
             return StringUtils.dateToIso8601String(new Date(0));
@@ -113,7 +120,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @param lastSyncIso The high-water-mark we want to save.
      */
     private void setServerSyncMarker(Account account, String lastSyncIso) {
-        mAccountManager.setUserData(account, SYNC_MARKER_KEY, lastSyncIso);
+        mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, lastSyncIso);
     }
 }
 
