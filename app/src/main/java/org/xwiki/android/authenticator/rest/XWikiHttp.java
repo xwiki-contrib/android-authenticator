@@ -349,7 +349,7 @@ public class XWikiHttp {
             for (ObjectSummary item : objectList) {
                 syncData.allIdSet.add(item.headline);
                 itemDate = getUserLastModified(split[0], item.headline);
-                if (itemDate.before(lastSynDate)) continue;
+                if (itemDate == null || itemDate.before(lastSynDate)) continue;
                 String[] spaceAndName = item.headline.split("\\.");
                 XWikiUser user = getUserDetail(split[0], spaceAndName[0], spaceAndName[1]);
                 syncData.updateUserList.add(user);
@@ -418,7 +418,7 @@ public class XWikiHttp {
         List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
         for(ObjectSummary item : objectList){
             itemDate = getUserLastModified(split[0], item.headline);
-            if(itemDate.before(lastSynDate)) continue;
+            if(itemDate == null || itemDate.before(lastSynDate)) continue;
             XWikiUser user = getUserDetail(item.headline);
             userList.add(user);
         }
@@ -443,6 +443,10 @@ public class XWikiHttp {
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
+        // 404 Not Found return null;
+        if(statusCode == 404){
+            return null;
+        }
         if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
         }
@@ -461,6 +465,19 @@ public class XWikiHttp {
             serverRestPreUrl = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), "ServerUrl", null);
         };
         return serverRestPreUrl;
+    }
+
+
+    /**
+     *
+     * @param user
+     * @param avatarName
+     * @return
+     * http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
+     */
+    public static byte[] downloadAvatar(String user, String avatarName){
+        String url = "http://www.xwiki.org/xwiki/bin/download/XWiki/"+user+"/"+avatarName;
+        return downloadAvatar(url);
     }
 
 

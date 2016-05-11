@@ -173,7 +173,7 @@ public class ContactManager {
                 //.addPhone(user.getPhone(), Phone.TYPE_HOME)
                 //.addPhone(user.getPhone(), Phone.TYPE_WORK)
                 //.addGroupMembership(groupId)
-                .addAvatar(user.getAvatar());
+                .addAvatar(user.pageName, user.getAvatar());
 
         // If we have a serverId, then go ahead and create our status profile.
         // Otherwise skip it - and we'll create it after we sync-up to the
@@ -263,7 +263,7 @@ public class ContactManager {
                     }
                 } else if (mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
                     existingAvatar = true;
-                    contactOp.updateAvatar(user.getAvatar(), uri);
+                    contactOp.updateAvatar(user.pageName, user.getAvatar(), uri);
                 }
             } // while
         } finally {
@@ -289,7 +289,7 @@ public class ContactManager {
         }
         // Add the avatar if we didn't update the existing avatar
         if (!existingAvatar) {
-            contactOp.addAvatar(user.getAvatar());
+            contactOp.addAvatar(user.pageName, user.getAvatar());
         }
 
         // If we need to update the serverId of the contact record, take

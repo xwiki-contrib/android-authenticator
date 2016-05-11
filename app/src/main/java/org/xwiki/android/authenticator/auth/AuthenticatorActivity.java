@@ -200,8 +200,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 AppContext.addAuthorizedApp(uid, packaName);
             }
 
-            ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
-            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+            //ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+            //ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+
+
             //Bundle params = new Bundle();
             //params.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, false);
             //params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);

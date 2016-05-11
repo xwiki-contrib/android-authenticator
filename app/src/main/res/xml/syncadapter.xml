@@ -26,15 +26,16 @@
   the syncadapter does not support uploading (and thus the contacts
   associated with this syncadapter are not editable).  The SDK 11
   version of the file specifies that the adapter DOES support
-  uploading, so the contacts on SDK 11 and greater are editable.
+  uploading, so the contacts on SDK 11 and grea ter are editable.
 
-  android:userVisible="true"
-  android:isAlwaysSyncable="true"
+  android:userVisible="true" defaults to true and controls whether or not this sync adapter shows up in the Sync Settings screen.
+  android:isAlwaysSyncable="true" defaults to false and if true tells the SyncManager to intialize the isSyncable state to 1 for that sync adapter for each account that is added.
 -->
 
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.android.contacts"
     android:accountType="org.xwiki.android.authenticator"
     android:supportsUploading="false"
-    android:isAlwaysSyncable="true"
+    android:userVisible="false"
+    android:isAlwaysSyncable="false"
 />

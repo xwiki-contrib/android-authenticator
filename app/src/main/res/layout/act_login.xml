@@ -79,8 +79,8 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="192.168.130.114:8080" />
-            <!--210.76.192.145:8080-->
+                android:text="210.76.192.175:8080" />
+            <!--210.76.192.175:8080-->
 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"

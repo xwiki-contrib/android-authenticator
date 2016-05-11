@@ -2,9 +2,11 @@ package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -144,6 +146,9 @@ public class SettingsActivity extends AppCompatActivity {
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
         mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
+        ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
+        ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+        ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
     }
 
 }
