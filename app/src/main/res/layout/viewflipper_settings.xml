@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/label"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:text="Synchronization Type"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"/>
+
+    <RadioGroup
+        android:id="@+id/radio_sync_type"
+        android:layout_below="@id/label"
+        android:orientation="horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dip" >
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radio_all_users"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/sync_all_users"
+            android:checked="true" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/radio_selected_groups"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/sync_selected_groups" />
+
+    </RadioGroup>
+
+    <ListView
+        android:layout_below="@id/radio_sync_type"
+        android:layout_above="@+id/bottom_layout"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:id="@+id/list_view"
+        android:divider="#b5b5b5"
+        android:dividerHeight="1dp"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/bottom_layout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:minHeight="54dip"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip">
+
+        <Button
+            android:id="@+id/settings_cancel"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:paddingLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/settings_ok"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:paddingLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/menu_ok" />
+
+    </LinearLayout>
+
+</RelativeLayout>

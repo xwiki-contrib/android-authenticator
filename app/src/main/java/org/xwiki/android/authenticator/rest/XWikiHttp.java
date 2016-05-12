@@ -510,6 +510,7 @@ public class XWikiHttp {
                 // not resizing the avatar - we assume that the image we get from
                 // the server is a reasonable size...
                 Log.i(TAG, "Converting avatar to JPEG");
+                if(avatar == null) return null;
                 ByteArrayOutputStream convertStream = new ByteArrayOutputStream(
                         avatar.getWidth() * avatar.getHeight() * 4);
                 avatar.compress(Bitmap.CompressFormat.JPEG, 95, convertStream);

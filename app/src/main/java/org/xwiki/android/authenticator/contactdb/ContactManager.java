@@ -126,7 +126,9 @@ public class ContactManager {
                     batchOperation.execute();
                 }
             }
+            batchOperation.execute();
         }
+
 
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);

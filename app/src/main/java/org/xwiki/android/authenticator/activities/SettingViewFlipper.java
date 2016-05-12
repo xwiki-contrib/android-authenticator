@@ -3,16 +3,12 @@ package org.xwiki.android.authenticator.activities;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
-import android.graphics.Color;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -20,48 +16,67 @@ import android.widget.Toast;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
-import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * A Select groups screen..
+ * Created by lf on 2016/5/13.
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingViewFlipper {
+    protected AuthenticatorActivity mActivity;
+    protected Context mContext;
+    private View mContentRootView;
+
     ListView mListView = null;
     GroupListAdapter mAdapter;
     private List<XWikiGroup> groupList;
     private List<XWikiGroup> selectList;
     private RadioGroup radioGroup;
-    private boolean requstFromLogin = false;
+    private Button cancelButton;
+    private Button okButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_select_groups);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+    public SettingViewFlipper(AuthenticatorActivity activity, View contentRootView){
+        mActivity = activity;
+        mContext = (Context) mActivity;
+        mContentRootView = contentRootView;
+        initData();
+    }
 
+    public View findViewById(int id) {
+        return mContentRootView.findViewById(id);
+    }
 
-
-        // init view
+    public void initData(){
         mListView = (ListView)findViewById(R.id.list_view);
         groupList = new ArrayList<>();
-        mAdapter = new GroupListAdapter(this, groupList);
+        mAdapter = new GroupListAdapter(mContext, groupList);
         mListView.setAdapter(mAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        cancelButton = (Button) findViewById(R.id.settings_cancel);
+        okButton = (Button) findViewById(R.id.settings_ok);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                settingsOK();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivity.finish();
+            }
+        });
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
-        int syncType = SharedPrefsUtil.getValue(this, "SyncType", Constants.SYNC_TYPE_ALL_USERS);
+        int syncType = SharedPrefsUtil.getValue(mContext, "SyncType", Constants.SYNC_TYPE_ALL_USERS);
         if(syncType == 1) {
             radioGroup.check(R.id.radio_all_users);
             mListView.setVisibility(View.GONE);
@@ -82,10 +97,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        initDate();
-    }
-
-    private void initDate(){
         new AsyncTask<String, String, List<XWikiGroup>>() {
             @Override
             protected List<XWikiGroup> doInBackground(String... params) {
@@ -111,42 +122,31 @@ public class SettingsActivity extends AppCompatActivity {
         }.execute();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sign_up, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
-            finish();
-        }else if(item.getItemId()==R.id.action_save){
-            if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
-                //TODO AccountManager.setUserData(MAKER, NULL);
-                SharedPrefsUtil.putValue(getApplicationContext(), "SyncType", Constants.SYNC_TYPE_ALL_USERS);
-            }else {
-                List<XWikiGroup> list = mAdapter.getSelectGroups();
-                Toast.makeText(SettingsActivity.this, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
-                if(list != null && list.size()>0){
-                    List<String> groupIdList = new ArrayList<>();
-                    for(XWikiGroup iGroup: list){
-                        groupIdList.add(iGroup.id);
-                    }
-                    SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", groupIdList);
-                }else{
-                    SharedPrefsUtil.putArrayList(getApplicationContext(), "SelectGroups", new ArrayList<String>());
+    void settingsOK(){
+        if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
+            //TODO AccountManager.setUserData(MAKER, NULL);
+            SharedPrefsUtil.putValue(mContext.getApplicationContext(), "SyncType", Constants.SYNC_TYPE_ALL_USERS);
+        }else {
+            List<XWikiGroup> list = mAdapter.getSelectGroups();
+            Toast.makeText(mContext, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
+            if(list != null && list.size()>0){
+                List<String> groupIdList = new ArrayList<>();
+                for(XWikiGroup iGroup: list){
+                    groupIdList.add(iGroup.id);
                 }
-                SharedPrefsUtil.putValue(getApplicationContext(), "SyncType", Constants.SYNC_TYPE_SELECTED_GROUPS);
+                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), "SelectGroups", groupIdList);
+            }else{
+                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), "SelectGroups", new ArrayList<String>());
             }
-            resetSyncMaker();
-            finish();
+            SharedPrefsUtil.putValue(mContext.getApplicationContext(), "SyncType", Constants.SYNC_TYPE_SELECTED_GROUPS);
         }
-        return super.onOptionsItemSelected(item);
+        resetSyncMaker();
+        mActivity.finish();
     }
 
     private void resetSyncMaker(){
-        AccountManager mAccountManager = AccountManager.get(getApplicationContext());
+        AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
         mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
@@ -155,5 +155,5 @@ public class SettingsActivity extends AppCompatActivity {
         ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
     }
 
-}
 
+}

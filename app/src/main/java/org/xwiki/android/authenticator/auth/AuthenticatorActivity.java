@@ -29,18 +29,33 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
+import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.activities.GroupListAdapter;
+import org.xwiki.android.authenticator.activities.SettingViewFlipper;
+import org.xwiki.android.authenticator.activities.SettingsActivity;
 import org.xwiki.android.authenticator.activities.SignUpActivity;
+import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.Loger;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -70,6 +85,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     private AccountManager mAccountManager;
     private String mAuthTokenType;
+
+    private ViewFlipper viewFlipper;
 
     /**
      * Called when the activity is first created.
@@ -103,11 +120,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 submit();
             }
         });
+
+        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
     }
 
     public void handleSignUp(View view) {
         Intent intent = new Intent(this, SignUpActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQ_SIGNUP);
     }
 
     @Override
@@ -220,7 +239,19 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
         Log.d("xwiki", TAG + ">" + "finish return");
+        //finish();
+
+        /*
+        Intent settingsIntent = new Intent(AuthenticatorActivity.this, SettingsActivity.class);
+        startActivityForResult(settingsIntent, REQ_SETTINGS);
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         finish();
+        */
+
+        viewFlipper.setInAnimation(AuthenticatorActivity.this, R.anim.push_left_in);
+        viewFlipper.setOutAnimation(AuthenticatorActivity.this, R.anim.push_left_out);
+        SettingViewFlipper settingViewFlipper = new SettingViewFlipper(AuthenticatorActivity.this, viewFlipper.getChildAt(1));
+        viewFlipper.showNext();
     }
 
 }
