@@ -443,7 +443,7 @@ public class XWikiHttp {
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
-        // 404 Not Found return null;
+        // 404 Not Found return null; because the user may not exist.
         if(statusCode == 404){
             return null;
         }

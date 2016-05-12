@@ -140,6 +140,10 @@ public class ContactManager {
                 deleteContact(context, rawId, batchOperation);
                 Loger.debug(TAG, key+" removed");
             }
+            //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
+            if (batchOperation.size() >= 50) {
+                batchOperation.execute();
+            }
         }
         Loger.debug(TAG, "Remove contacts success");
         batchOperation.execute();
