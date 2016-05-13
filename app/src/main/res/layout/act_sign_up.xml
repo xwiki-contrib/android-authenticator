@@ -97,11 +97,11 @@
                 android:inputType="textEmailAddress"
                 android:singleLine="true" />
 
-            <TextView
-                android:id="@+id/contactinfo"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/captcha_image"
+                android:scaleType="centerInside"
+                android:layout_width="60dp"
+                android:layout_height="60dip" />
 
         </LinearLayout>
     </ScrollView>

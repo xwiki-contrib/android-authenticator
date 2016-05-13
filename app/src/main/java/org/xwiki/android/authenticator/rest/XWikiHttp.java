@@ -80,13 +80,22 @@ public class XWikiHttp {
      * sign up  //TODO signUp
      * @param userId
      * @param password
-     * @param firstName
-     * @param lastName
-     * @param email
+     * @param formToken
      * @return
      */
-    public static Boolean signUp(String userId, String password, String firstName, String lastName, String email){
-
+    public static Boolean signUp(String userId, String password, String formToken) throws IOException {
+        String registerUrl = "http://192.168.56.1:8080/xwiki/bin/view/XWiki/Registration";
+        HttpRequest request = new HttpRequest(registerUrl, HttpRequest.HttpMethod.POST, null);
+        HttpConnector httpConnector = new HttpConnector();
+        request.httpParams.putHeaders("form_token", formToken);
+        request.httpParams.putHeaders("xwikiname", userId);
+        request.httpParams.putHeaders("register_password", password);
+        request.httpParams.putHeaders("register2_password", password);
+        HttpResponse response = httpConnector.performRequest(request);
+        int statusCode = response.getResponseCode();
+        if (statusCode < 200 || statusCode > 299) {
+            throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
+        }
         return true;
     }
 
@@ -245,7 +254,6 @@ public class XWikiHttp {
         HttpRequest request = new HttpRequest(url);
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
-        Loger.debug(TAG, response.getContentData());
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());

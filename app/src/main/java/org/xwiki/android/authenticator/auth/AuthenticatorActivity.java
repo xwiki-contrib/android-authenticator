@@ -241,17 +241,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         Log.d("xwiki", TAG + ">" + "finish return");
         //finish();
 
-        /*
+
         Intent settingsIntent = new Intent(AuthenticatorActivity.this, SettingsActivity.class);
         startActivityForResult(settingsIntent, REQ_SETTINGS);
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         finish();
-        */
 
+        /*
         viewFlipper.setInAnimation(AuthenticatorActivity.this, R.anim.push_left_in);
         viewFlipper.setOutAnimation(AuthenticatorActivity.this, R.anim.push_left_out);
         SettingViewFlipper settingViewFlipper = new SettingViewFlipper(AuthenticatorActivity.this, viewFlipper.getChildAt(1));
         viewFlipper.showNext();
+        */
     }
 
 }
