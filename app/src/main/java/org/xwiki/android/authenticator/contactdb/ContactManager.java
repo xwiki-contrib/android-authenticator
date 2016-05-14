@@ -34,12 +34,12 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.Loger;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -126,7 +126,9 @@ public class ContactManager {
                     batchOperation.execute();
                 }
             }
+            batchOperation.execute();
         }
+
 
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
@@ -138,14 +140,14 @@ public class ContactManager {
             long rawId = (Long) entry.getValue();
             if(!allIdSet.contains(key)){
                 deleteContact(context, rawId, batchOperation);
-                Loger.debug(TAG, key+" removed");
+                Log.d(TAG, key+" removed");
             }
             //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
             if (batchOperation.size() >= 50) {
                 batchOperation.execute();
             }
         }
-        Loger.debug(TAG, "Remove contacts success");
+        Log.d(TAG, "Remove contacts end");
         batchOperation.execute();
     }
 
@@ -169,6 +171,11 @@ public class ContactManager {
         // Put the data in the contacts provider
         final ContactOperations contactOp = ContactOperations.createNewContact(
                 context, user.getId(), accountName, inSync, batchOperation);
+
+        //avoid that the contact information is empty in the phone's local address book.
+        if(TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)){
+            user.firstName = user.pageName;
+        }
 
         contactOp.addName(null, user.getFirstName(),
                 user.getLastName())
@@ -228,6 +235,12 @@ public class ContactManager {
         final ContactOperations contactOp =
                 ContactOperations.updateExistingContact(context, rawContactId,
                 inSync, batchOperation);
+
+        //avoid that the contact information is empty in the phone's local address book.
+        if(TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)){
+            user.firstName = user.pageName;
+        }
+
         try {
             // Iterate over the existing rows of data, and update each one
             // with the information we received from the server.

@@ -23,7 +23,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import org.xwiki.android.authenticator.utils.Loger;
 
 /**
  * Service to handle Account sync. This is invoked with an intent with action

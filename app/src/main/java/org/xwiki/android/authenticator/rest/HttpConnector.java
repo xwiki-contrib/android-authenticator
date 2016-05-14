@@ -1,7 +1,8 @@
 package org.xwiki.android.authenticator.rest;
 
+import android.util.Log;
+
 import org.xwiki.android.authenticator.AppContext;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -21,6 +22,7 @@ import javax.net.ssl.SSLSocketFactory;
  * Created by fitz on 2016/4/25.
  */
 public class HttpConnector {
+    private static final String TAG = "HttpConnector";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private final SSLSocketFactory mSslSocketFactory;
     private static String COOKIE = null;
@@ -38,15 +40,15 @@ public class HttpConnector {
             connection.addRequestProperty(headerName, map.get(headerName));
         }
         COOKIE = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), "Cookie", null);
-        if(COOKIE != null) {
+        if(COOKIE != null && COOKIE.length() > 0) {
             //connection.addRequestProperty("Cookie", COOKIE);
             connection.setRequestProperty("Cookie", COOKIE);
         }
-        Loger.debug("url="+url+", header="+map.toString()+", Cookie="+(COOKIE!=null?COOKIE:""));
+        Log.d(TAG, "url="+url+", header="+map.toString()+", Cookie="+(COOKIE!=null?COOKIE:""));
         //{Authorization=Basic Zml0OmZpdHoyeHdpa2k=}
         setConnectionParametersForRequest(connection, request);
         HttpResponse response = responseFromConnection(connection);
-        Loger.debug("response: code="+response.getResponseCode() + response.getResponseMessage()+", header="+response.getHeaders().toString());
+        Log.d(TAG, "response: code="+response.getResponseCode() + response.getResponseMessage()+", header="+response.getHeaders().toString());
         return response;
     }
 

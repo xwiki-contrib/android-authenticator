@@ -3,14 +3,12 @@ package org.xwiki.android.authenticator.rest;
 import android.text.TextUtils;
 import android.util.Xml;
 
-import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.utils.Loger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +47,6 @@ public class XmlUtils {
                             currentSearchResult.type = parser.nextText();
                         } else if (name.equalsIgnoreCase("id")) {
                             currentSearchResult.id = parser.nextText();
-                            Loger.debug(TAG, currentSearchResult.id);
                         } else if (name.equalsIgnoreCase("pageFullName")) {
                             currentSearchResult.pageFullName = parser.nextText();
                         } else if (name.equalsIgnoreCase("wiki")) {
