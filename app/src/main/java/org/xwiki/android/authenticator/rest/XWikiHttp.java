@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
@@ -14,7 +16,6 @@ import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.AppContext;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
@@ -76,27 +77,82 @@ public class XWikiHttp {
         return response;
     }
 
+
+    public static String signUpInitCookieForm() throws IOException {
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "Cookie", null);
+        String registerUrl = "http://"+getServerRequestUrl()+"/xwiki/bin/view/XWiki/Registration";
+        if(registerUrl.contains("www.xwiki.org")){
+            registerUrl = "http://"+getServerRequestUrl()+"/xwiki/bin/view/XWiki/RealRegistration";
+        }
+        HttpRequest request = new HttpRequest(registerUrl);
+        HttpConnector httpConnector = new HttpConnector();
+        HttpResponse response = httpConnector.performRequest(request);
+        int statusCode = response.getResponseCode();
+        if (statusCode < 200 || statusCode > 299) {
+            return null;
+        }
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "Cookie", response.getHeaders().get("Set-Cookie"));
+        byte[] contentData = response.getContentData();
+        Document document = Jsoup.parse(new String(contentData));
+        String formToken = document.select("input[name=form_token]").val();
+        return formToken;
+    }
+
     /**
-     * sign up  //TODO signUp
+     * sign Up
      * @param userId
      * @param password
      * @param formToken
+     * @param captcha
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param cellphone
      * @return
+     * @throws IOException
+     * //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
      */
-    public static Boolean signUp(String userId, String password, String formToken) throws IOException {
-        String registerUrl = "http://192.168.56.1:8080/xwiki/bin/view/XWiki/Registration";
+    public static Boolean signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email, String cellphone) throws IOException {
+        String registerUrl = "http://"+getServerRequestUrl()+"/xwiki/bin/view/XWiki/Registration";
+        if(registerUrl.contains("www.xwiki.org")){
+            registerUrl = "http://"+getServerRequestUrl()+"/xwiki/bin/view/XWiki/RealRegistration";
+        }
         HttpRequest request = new HttpRequest(registerUrl, HttpRequest.HttpMethod.POST, null);
         HttpConnector httpConnector = new HttpConnector();
-        request.httpParams.putHeaders("form_token", formToken);
-        request.httpParams.putHeaders("xwikiname", userId);
-        request.httpParams.putHeaders("register_password", password);
-        request.httpParams.putHeaders("register2_password", password);
+        request.httpParams.putBodyParams("form_token", formToken);
+        request.httpParams.putBodyParams("parent", "xwiki:Main.UserDirectory");
+        request.httpParams.putBodyParams("register_first_name", firstName);
+        request.httpParams.putBodyParams("register_last_name", lastName);
+        request.httpParams.putBodyParams("xwikiname", userId);
+        request.httpParams.putBodyParams("register_password", password);
+        request.httpParams.putBodyParams("register2_password", password);
+        request.httpParams.putBodyParams("register_email", email);
+        request.httpParams.putBodyParams("captcha_answer", captcha);
+        request.httpParams.putBodyParams("template", "XWiki.XWikiUserTemplate");
+        request.httpParams.putBodyParams("xredirect", "/xwiki/bin/view/Main/UserDirectory");
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
         if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
         }
-        return true;
+        byte[] contentData = response.getContentData();
+        Document document = Jsoup.parse(new String(contentData));
+        formToken = document.select("input[name=template]").val();
+        if(TextUtils.isEmpty(formToken)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * sign up
+     * @param userId
+     * @param password
+     * @param formToken
+     * @return
+     */
+    public static Boolean signUp(String userId, String password, String formToken, String captcha) throws IOException {
+        return signUp(userId, password, formToken, captcha, "", "", "", "");
     }
 
     /**
@@ -191,6 +247,10 @@ public class XWikiHttp {
         return getUserDetail(split[0], split[1], split[2]);
     }
 
+
+
+
+
     /**
      * get user information
      * @param wiki
@@ -206,6 +266,9 @@ public class XWikiHttp {
         HttpConnector httpConnector = new HttpConnector();
         HttpResponse response = httpConnector.performRequest(request);
         int statusCode = response.getResponseCode();
+        if(statusCode == 404){
+            return null;
+        }
         if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
         }
@@ -355,7 +418,7 @@ public class XWikiHttp {
             Date itemDate = null;
             List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
             for (ObjectSummary item : objectList) {
-                syncData.allIdSet.add(item.headline);
+                syncData.allIdSet.add(split[0]+":"+item.headline);
                 itemDate = getUserLastModified(split[0], item.headline);
                 if (itemDate == null || itemDate.before(lastSynDate)) continue;
                 String[] spaceAndName = item.headline.split("\\.");
@@ -475,6 +538,11 @@ public class XWikiHttp {
         return serverRestPreUrl;
     }
 
+    public static String getServerRequestUrl(){
+        String requestUrl = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), "requestUrl", null);
+        return requestUrl;
+    }
+
 
     /**
      *
@@ -505,12 +573,16 @@ public class XWikiHttp {
             Log.i(TAG, "Downloading avatar: " + avatarUrl);
             // Request the avatar image from the server, and create a bitmap
             // object from the stream we get back.
-            URL url = new URL(avatarUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
+            //URL url = new URL(avatarUrl);
+            //HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            //connection.connect();
+            HttpRequest request = new HttpRequest(avatarUrl);
+            HttpConnector httpConnector = new HttpConnector();
+            HttpResponse response = httpConnector.performRequest(request);
+            //int statusCode = response.getResponseCode();
             try {
                 final BitmapFactory.Options options = new BitmapFactory.Options();
-                final Bitmap avatar = BitmapFactory.decodeStream(connection.getInputStream(),
+                final Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
                         null, options);
 
                 // Take the image we received from the server, whatever format it
@@ -528,7 +600,7 @@ public class XWikiHttp {
                 avatar.recycle();
                 return convertStream.toByteArray();
             } finally {
-                connection.disconnect();
+                //connection.disconnect();
             }
         } catch (MalformedURLException muex) {
             // A bad URL - nothing we can really do about it here...

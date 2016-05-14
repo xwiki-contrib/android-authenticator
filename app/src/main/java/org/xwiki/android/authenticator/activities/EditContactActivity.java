@@ -11,6 +11,7 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +24,6 @@ import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
@@ -35,6 +35,7 @@ import java.io.IOException;
  * the administrator can modify all the users according the http response.
  */
 public class EditContactActivity extends AppCompatActivity {
+    private static final String TAG = "EditContactActivity";
 
     // UI references.
     private EditText mFirstNameView;
@@ -136,7 +137,7 @@ public class EditContactActivity extends AppCompatActivity {
                     return response;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Loger.debug(e.toString());
+                    Log.d(TAG, e.toString());
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 }

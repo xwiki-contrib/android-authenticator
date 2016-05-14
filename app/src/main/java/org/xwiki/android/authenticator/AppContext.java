@@ -1,8 +1,8 @@
 package org.xwiki.android.authenticator;
 
 import android.app.Application;
+import android.util.Log;
 
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.List;
  * Created by fitz on 2016/4/30.
  */
 public class AppContext extends Application{
+    private static final String TAG = "AppContext";
 
     private static AppContext instance;
 
@@ -23,11 +24,11 @@ public class AppContext extends Application{
     public void onCreate() {
         super.onCreate();
         instance = this;
-        Loger.debug("on create");
+        Log.d(TAG, "on create");
     }
 
     public static void addAuthorizedApp(int uid, String packageName){
-        Loger.debug("Appcontext, packageName="+packageName+", uid="+uid);
+        Log.d(TAG, "packageName="+packageName+", uid="+uid);
         SharedPrefsUtil.putValue(instance.getApplicationContext(), "appuid"+uid, packageName);
         List<String> packageList = SharedPrefsUtil.getArrayList(instance.getApplicationContext(), "packageList");
         if(packageList == null){

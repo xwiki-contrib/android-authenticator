@@ -49,7 +49,6 @@ import org.xwiki.android.authenticator.activities.SignUpActivity;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
@@ -125,6 +124,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     public void handleSignUp(View view) {
+        String userServer = ((TextView) findViewById(R.id.accountServer)).getText().toString();
+        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), "requestUrl", userServer);
         Intent intent = new Intent(this, SignUpActivity.class);
         startActivityForResult(intent, REQ_SIGNUP);
     }
@@ -153,9 +154,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 Log.d("xwiki", TAG + "> Started authenticating");
                 Bundle data = new Bundle();
                 try {
-                    Loger.debug(userName + " " + userPass + " " + userServer);
+                    Log.d(TAG, userName + " " + userPass + " " + userServer);
                     HttpResponse response = XWikiHttp.login(userServer, userName, userPass);
-                    Loger.debug(response.getHeaders().toString() + response.getResponseCode());
+                    Log.d(TAG, response.getHeaders().toString() + response.getResponseCode());
                     int statusCode = response.getResponseCode();
                     if (statusCode < 200 || statusCode > 299) {
                         String msg = "statusCode=" + statusCode + ", response=" + response.getResponseMessage();
@@ -212,6 +213,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword);
             mAccountManager.setUserData(account, AuthenticatorActivity.PARAM_USER_SERVER, accountServer);
 
+            //clear all SharedPreferences
+            //SharedPrefsUtil.clearAll(AuthenticatorActivity.this);
+
             //grant permission if adding user from the third-party app (UID,PackageName);
             String packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME);
             int uid = getIntent().getIntExtra(PARAM_APP_UID, 0);
@@ -243,7 +247,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
 
         Intent settingsIntent = new Intent(AuthenticatorActivity.this, SettingsActivity.class);
-        startActivityForResult(settingsIntent, REQ_SETTINGS);
+        startActivity(settingsIntent);
+        //startActivityForResult(settingsIntent, REQ_SETTINGS);
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         finish();
 

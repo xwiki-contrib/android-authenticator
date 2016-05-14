@@ -35,7 +35,6 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.Loger;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.io.IOException;
@@ -141,7 +140,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
                 authToken = httpResponse.getHeaders().get("Set-Cookie");
-                Loger.debug("XWikiAuthenticator, authtoken="+authToken);
+                Log.d(TAG, "XWikiAuthenticator, authtoken="+authToken);
             } catch (IOException e) {
                 e.printStackTrace();
                 final Bundle result = new Bundle();

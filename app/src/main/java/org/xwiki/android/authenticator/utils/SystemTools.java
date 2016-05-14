@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @SuppressLint("SimpleDateFormat")
 public final class SystemTools {
+    private static final String TAG = "SystemTools";
 
     /**
      * Get IMEI
@@ -288,7 +290,7 @@ public final class SystemTools {
                     // pkgList get packages in this process
                     String[] pkgList = process.pkgList;
                     for (String pkgName : pkgList) {
-                        Loger.debug("======killing：" + pkgName);
+                        Log.d(TAG, "======killing：" + pkgName);
                         try {
                             am.killBackgroundProcesses(pkgName);
                             count++;
@@ -299,7 +301,7 @@ public final class SystemTools {
                     }
                 }
             }
-        Loger.debug("Clean" + (getDeviceUsableMemory(cxt) - i) + "M memory!");
+        Log.d(TAG, "Clean" + (getDeviceUsableMemory(cxt) - i) + "M memory!");
         return count;
     }
 }

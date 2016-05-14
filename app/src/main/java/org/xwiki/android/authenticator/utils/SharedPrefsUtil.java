@@ -60,5 +60,16 @@ public class SharedPrefsUtil {
         ArrayList<String> list = new ArrayList<>(set);
         return list;
     }
+
+	public static void clearAll(Context context){
+		SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
+		sp.edit().clear().commit();
+	}
+
+	public static void removeKeyValue(Context context, String key){
+		SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
+		sp.edit().remove(key).commit();
+	}
+
 }
 

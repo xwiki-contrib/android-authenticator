@@ -64,7 +64,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             // get last sync date. return new Date(0) if first onPerformSync
             String lastSyncMarker = getServerSyncMarker(account);
-
+            Log.d(TAG, lastSyncMarker);
             // By default, contacts from a 3rd party provider are hidden in the contacts
             // list. So let's set the flag that causes them to be visible, so that users
             // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"

@@ -6,8 +6,12 @@
     <!-- edit -->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
+    <string name="user_id">User Id (Required)</string>
     <string name="phone">Cell Phone</string>
     <string name="email">Email</string>
+    <string name="password">Password(Required)</string>
+    <string name="confirm_password">Confirm Password(Required)</string>
+    <string name="captcha_textview">Input the captcha(Required)</string>
 
     <!-- login Label username password server-->
     <string name="login_activity_username_label">Username</string>
@@ -32,6 +36,9 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_confirm_password">The passwords do not match</string>
+    <string name="error_userid_password">This userId is incorrect</string>
+    <string name="error_invalid_captcha">This captcha is invalid</string>
 
     <!--contacts.xml-->
     <string name="view_group_action_label">Show sample group details</string>

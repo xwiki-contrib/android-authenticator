@@ -41,7 +41,7 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="www.xwiki.org" />
+                android:text="210.76.192.253:8080" />
             <!--210.76.192.175:8080-->
 
             <TextView

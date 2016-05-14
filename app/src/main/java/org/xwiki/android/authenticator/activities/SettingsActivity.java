@@ -39,7 +39,6 @@ public class SettingsActivity extends AppCompatActivity {
     private List<XWikiGroup> groupList;
     private List<XWikiGroup> selectList;
     private RadioGroup radioGroup;
-    private boolean requstFromLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +152,11 @@ public class SettingsActivity extends AppCompatActivity {
         ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
         ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
         ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+        //Bundle params = new Bundle();
+        //params.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, false);
+        //params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);
+        //params.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, false);
+        //ContentResolver.requestSync(account, ContactsContract.AUTHORITY, params);
     }
 
 }
