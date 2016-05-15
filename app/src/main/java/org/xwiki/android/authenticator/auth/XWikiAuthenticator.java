@@ -70,6 +70,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
         intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
+        intent.putExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);

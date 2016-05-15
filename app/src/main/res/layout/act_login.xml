@@ -16,37 +16,25 @@
  * limitations under the License.
  */
 -->
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v7.widget.Toolbar
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layoutMode="opticalBounds"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-        android:background="?attr/colorPrimary">
-
-        <TextView
-            android:text="@string/login_activity_ok_button"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </android.support.v7.widget.Toolbar>
-
+    <include layout="@layout/toolbar_layout" />
 
     <ViewFlipper
         android:id="@+id/view_flipper"
+        android:layout_above="@+id/left_right_button"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/viewflipper_setting_ip" />
 
         <include
             android:layout_width="match_parent"
@@ -56,14 +44,57 @@
         <include
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            layout="@layout/viewflipper_settings" />
+            layout="@layout/viewflipper_settings_sync" />
 
         <include
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            layout="@layout/viewflipper_signup" />
+            layout="@layout/viewflipper_signup_step1" />
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/viewflipper_signup_step2" />
 
     </ViewFlipper>
 
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/left_right_button"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:minHeight="54dip"
+        android:paddingBottom="5dip"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip">
+
+        <Button
+            android:id="@+id/left_button"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:paddingRight="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/login_activity_ok_button"
+            android:onClick="doPrevious" />
+
+        <Button
+            android:id="@+id/right_button"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:minWidth="100dip"
+            android:paddingLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/login_activity_register_button"
+            android:onClick="doNext" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

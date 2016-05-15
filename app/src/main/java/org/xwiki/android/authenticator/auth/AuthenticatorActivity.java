@@ -22,39 +22,33 @@ package org.xwiki.android.authenticator.auth;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.content.ContentResolver;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.RadioGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.activities.GroupListAdapter;
-import org.xwiki.android.authenticator.activities.SettingViewFlipper;
+import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SettingsActivity;
+import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
+import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpActivity;
-import org.xwiki.android.authenticator.bean.XWikiGroup;
+import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
+import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -77,6 +71,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public final static String PARAM_APP_UID = "PARAM_APP_UID";
     public final static String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
 
+    public final static String IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE";
+
     private final int REQ_SIGNUP = 1;
     private final int REQ_SETTINGS = 2;
 
@@ -85,7 +81,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private AccountManager mAccountManager;
     private String mAuthTokenType;
 
-    private ViewFlipper viewFlipper;
+    private ViewFlipper mViewFlipper;
+
+    private Toolbar toolbar;
 
     /**
      * Called when the activity is first created.
@@ -96,31 +94,30 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         setContentView(R.layout.act_login);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
-        //check if there'is already a user, finish and return, keep only one user.
-        mAccountManager = AccountManager.get(getApplicationContext());
-        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
-        if (availableAccounts.length > 0) {
-            Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("XWiki Account");
 
-        String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
-        mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
-        if (mAuthTokenType == null)
-            mAuthTokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
-
-        if (accountName != null) {
-            ((TextView) findViewById(R.id.accountName)).setText(accountName);
-        }
-        findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submit();
+        mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
+        if (is_set_sync) {
+            //just set sync
+            showViewFlipper(ViewFlipperLayoutId.SETTING_SYNC);
+        }else{
+            //add new contact
+            //check if there'is already a user, finish and return, keep only one user.
+            mAccountManager = AccountManager.get(getApplicationContext());
+            Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+            if (availableAccounts.length > 0) {
+                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
             }
-        });
 
-        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+            mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
+            if (mAuthTokenType == null) {
+                mAuthTokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
+            }
+        }
     }
 
     public void handleSignUp(View view) {
@@ -188,6 +185,128 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }.execute();
     }
 
+
+    private void doPreviousNext(boolean next){
+        int id = mViewFlipper.getDisplayedChild();
+        switch (id){
+            case ViewFlipperLayoutId.SETTING_IP:
+                if(settingsIpViewFlipper == null){
+                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
+                }
+                if(next) {
+                    settingsIpViewFlipper.doNext();
+                }else{
+                    settingsIpViewFlipper.doPrevious();
+                }
+                break;
+            case ViewFlipperLayoutId.SIGN_IN:
+                if(signInViewFlipper == null){
+                    signInViewFlipper = new SignInViewFlipper(this, mViewFlipper.getChildAt(id));
+                }
+                if(next) {
+                    signInViewFlipper.doNext();
+                    //for test...
+                    Bundle data = new Bundle();
+                    data.putString(AccountManager.KEY_ACCOUNT_NAME, "fitz");
+                    data.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+                    //data.putString(AccountManager.KEY_AUTHTOKEN, "tokentoken");
+                    data.putString(AuthenticatorActivity.PARAM_USER_SERVER, XWikiHttp.getServerRequestUrl());
+                    data.putString(AuthenticatorActivity.PARAM_USER_PASS, "leee");
+                    Intent intent = new Intent();
+                    intent.putExtras(data);
+                    finishLogin(intent);
+                }else{
+                    signInViewFlipper.doPrevious();
+                }
+                break;
+            case ViewFlipperLayoutId.SETTING_SYNC:
+                if(settingSyncViewFlipper == null){
+                    settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
+                }
+                if(next) {
+                    settingSyncViewFlipper.doNext();
+                }else{
+                    settingSyncViewFlipper.doPrevious();
+                }
+                break;
+            case ViewFlipperLayoutId.SIGN_UP_STEP1:
+                if(signUpStep1ViewFlipper == null){
+                    signUpStep1ViewFlipper = new SignUpStep1ViewFlipper(this, mViewFlipper.getChildAt(id));
+                }
+                if(next) {
+                    signUpStep1ViewFlipper.doNext();
+                }else{
+                    signUpStep1ViewFlipper.doPrevious();
+                }
+                break;
+            case ViewFlipperLayoutId.SIGN_UP_STEP2:
+                if(signUpStep2ViewFlipper == null){
+                    signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
+                }
+                if(next) {
+                    signUpStep2ViewFlipper.doNext();
+                }else{
+                    signUpStep2ViewFlipper.doPrevious();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private SettingIpViewFlipper settingsIpViewFlipper;
+    private SignInViewFlipper signInViewFlipper;
+    private SettingSyncViewFlipper settingSyncViewFlipper;
+    private SignUpStep1ViewFlipper signUpStep1ViewFlipper;
+    private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
+
+    public void doPrevious(View view){
+        doPreviousNext(false);
+    }
+
+    public void doNext(View view){
+        doPreviousNext(true);
+    }
+
+    public void setLeftRightButton(String leftButton, String rightButton){
+        ((Button) findViewById(R.id.left_button)).setText(leftButton);
+        ((Button) findViewById(R.id.right_button)).setText(rightButton);
+    }
+
+    public interface ViewFlipperLayoutId{
+        int SETTING_IP = 0;
+        int SIGN_IN = 1;
+        int SETTING_SYNC = 2;
+        int SIGN_UP_STEP1 = 3;
+        int SIGN_UP_STEP2 = 4;
+    }
+
+    public void showViewFlipper(int layoutId){
+        mViewFlipper.setDisplayedChild(layoutId);
+        switch (layoutId){
+            case ViewFlipperLayoutId.SETTING_IP:
+                toolbar.setTitle("XWiki Account");
+                setLeftRightButton("Sign In", "Sign Up");
+                break;
+            case ViewFlipperLayoutId.SIGN_IN:
+                toolbar.setTitle("Sign In");
+                setLeftRightButton("Previous", "Login");
+                break;
+            case ViewFlipperLayoutId.SETTING_SYNC:
+                toolbar.setTitle("Setting Sync");
+                setLeftRightButton("Don't Sync", "Complete");
+                break;
+            case ViewFlipperLayoutId.SIGN_UP_STEP1:
+                toolbar.setTitle("Sign Up Step1");
+                setLeftRightButton("Previous", "Next");
+                break;
+            case ViewFlipperLayoutId.SIGN_UP_STEP2:
+                toolbar.setTitle("Sign Up Step2");
+                setLeftRightButton("Previous", "SignUp");
+                break;
+        }
+    }
+
     private void finishLogin(Intent intent) {
         Log.d("xwiki", TAG + "> finishLogin");
 
@@ -245,18 +364,19 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         Log.d("xwiki", TAG + ">" + "finish return");
         //finish();
 
-
+        /*
         Intent settingsIntent = new Intent(AuthenticatorActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
         //startActivityForResult(settingsIntent, REQ_SETTINGS);
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         finish();
+        */
 
         /*
-        viewFlipper.setInAnimation(AuthenticatorActivity.this, R.anim.push_left_in);
-        viewFlipper.setOutAnimation(AuthenticatorActivity.this, R.anim.push_left_out);
-        SettingViewFlipper settingViewFlipper = new SettingViewFlipper(AuthenticatorActivity.this, viewFlipper.getChildAt(1));
-        viewFlipper.showNext();
+        mViewFlipper.setInAnimation(AuthenticatorActivity.this, R.anim.push_left_in);
+        mViewFlipper.setOutAnimation(AuthenticatorActivity.this, R.anim.push_left_out);
+        SettingViewFlipper settingViewFlipper = new SettingViewFlipper(AuthenticatorActivity.this, mViewFlipper.getChildAt(1));
+        mViewFlipper.showNext();
         */
     }
 

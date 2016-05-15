@@ -28,10 +28,7 @@ import java.util.List;
 /**
  * Created by lf on 2016/5/13.
  */
-public class SettingViewFlipper {
-    protected AuthenticatorActivity mActivity;
-    protected Context mContext;
-    private View mContentRootView;
+public class SettingSyncViewFlipper extends BaseViewFlipper{
 
     ListView mListView = null;
     GroupListAdapter mAdapter;
@@ -41,15 +38,19 @@ public class SettingViewFlipper {
     private Button cancelButton;
     private Button okButton;
 
-    public SettingViewFlipper(AuthenticatorActivity activity, View contentRootView){
-        mActivity = activity;
-        mContext = (Context) mActivity;
-        mContentRootView = contentRootView;
-        initData();
+    public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+        super(activity, contentRootView);
     }
 
-    public View findViewById(int id) {
-        return mContentRootView.findViewById(id);
+    @Override
+    public void doNext() {
+        //settingsOK();
+        mActivity.finish();
+    }
+
+    @Override
+    public void doPrevious() {
+        mActivity.finish();
     }
 
     public void initData(){
@@ -58,22 +59,6 @@ public class SettingViewFlipper {
         mAdapter = new GroupListAdapter(mContext, groupList);
         mListView.setAdapter(mAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        cancelButton = (Button) findViewById(R.id.settings_cancel);
-        okButton = (Button) findViewById(R.id.settings_ok);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                settingsOK();
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mActivity.finish();
-            }
-        });
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
         int syncType = SharedPrefsUtil.getValue(mContext, "SyncType", Constants.SYNC_TYPE_ALL_USERS);
