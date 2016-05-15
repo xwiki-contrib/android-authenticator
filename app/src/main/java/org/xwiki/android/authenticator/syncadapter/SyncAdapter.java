@@ -76,15 +76,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             //final String authtoken = mAccountManager.blockingGetAuthToken(account,
             //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
 
-            // Make sure that the XWiki group exists
-            final long groupId = ContactManager.ensureXWikiGroupExists(mContext, account);
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
             XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
             Log.i(TAG, syncData!=null?syncData.toString():"syncData null");
 
             // Update the local contacts database with the changes. updateContacts()
-            ContactManager.updateContacts(mContext, account.name, syncData, groupId);
+            ContactManager.updateContacts(mContext, account.name, syncData);
 
             // Save off the new sync date. On our next sync, we only want to receive
             // contacts that have changed since this sync...
