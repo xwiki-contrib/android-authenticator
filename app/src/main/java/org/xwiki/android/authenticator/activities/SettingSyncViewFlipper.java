@@ -1,9 +1,27 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -29,27 +47,28 @@ import java.util.List;
  * Created by lf on 2016/5/13.
  */
 public class SettingSyncViewFlipper extends BaseViewFlipper{
+    private static final String TAG = "SettingSyncViewFlipper";
 
     ListView mListView = null;
     GroupListAdapter mAdapter;
     private List<XWikiGroup> groupList;
-    private List<XWikiGroup> selectList;
     private RadioGroup radioGroup;
-    private Button cancelButton;
-    private Button okButton;
 
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
+        initData();
     }
 
     @Override
     public void doNext() {
-        //settingsOK();
+        syncSettingComplete();
         mActivity.finish();
     }
 
     @Override
     public void doPrevious() {
+        SharedPrefsUtil.removeKeyValue(mContext, Constants.SYNC_TYPE);
+        resetSync(false);
         mActivity.finish();
     }
 
@@ -61,8 +80,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
-        int syncType = SharedPrefsUtil.getValue(mContext, "SyncType", Constants.SYNC_TYPE_ALL_USERS);
-        if(syncType == 1) {
+        int syncType = SharedPrefsUtil.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+        if(syncType == Constants.SYNC_TYPE_ALL_USERS) {
             radioGroup.check(R.id.radio_all_users);
             mListView.setVisibility(View.GONE);
         }else{
@@ -86,7 +105,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
             @Override
             protected List<XWikiGroup> doInBackground(String... params) {
                 try {
-                    List<XWikiGroup> groups = XWikiHttp.getGroupList(100);
+                    List<XWikiGroup> groups = XWikiHttp.getGroupList(Constants.LIMIT_MAX_SYNC_USERS);
                     return groups;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -98,8 +117,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
 
             @Override
             protected void onPostExecute(List<XWikiGroup> groups) {
-                if(groups != null && groups.size()>=0){
-                    Log.i("Group", groups.toString());
+                if(groups != null && groups.size() >= 0){
+                    Log.i(TAG, groups.toString());
                     groupList.addAll(groups);
                     mAdapter.refresh(groupList);
                 }
@@ -108,10 +127,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
     }
 
 
-    void settingsOK(){
+    void syncSettingComplete(){
         if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
-            //TODO AccountManager.setUserData(MAKER, NULL);
-            SharedPrefsUtil.putValue(mContext.getApplicationContext(), "SyncType", Constants.SYNC_TYPE_ALL_USERS);
+            SharedPrefsUtil.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         }else {
             List<XWikiGroup> list = mAdapter.getSelectGroups();
             Toast.makeText(mContext, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
@@ -120,25 +138,31 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
                 for(XWikiGroup iGroup: list){
                     groupIdList.add(iGroup.id);
                 }
-                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), "SelectGroups", groupIdList);
+                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, groupIdList);
             }else{
-                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), "SelectGroups", new ArrayList<String>());
+                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
             }
-            SharedPrefsUtil.putValue(mContext.getApplicationContext(), "SyncType", Constants.SYNC_TYPE_SELECTED_GROUPS);
+            SharedPrefsUtil.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
         }
-        resetSyncMaker();
+        resetSync(true);
         mActivity.finish();
     }
 
-    private void resetSyncMaker(){
+    private void resetSync(boolean flag){
         AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
-        mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
-        ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
-        ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+        if(flag) {
+            //reset sync
+            mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
+            ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
+            ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+        }else{
+            //don't sync
+            ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
+            ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 0);
+        }
     }
-
 
 }

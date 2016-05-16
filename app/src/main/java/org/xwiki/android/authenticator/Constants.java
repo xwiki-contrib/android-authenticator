@@ -55,4 +55,15 @@ public class Constants {
     //sync maker
     public static final String SYNC_MARKER_KEY = "org.xwiki.android.sync.marker";
 
+
+    //sharePreference
+    public static final String APP_UID = "appuid";
+    public static final String PACKAGE_LIST = "packageList";
+    public static final String SERVER_ADDRESS = "requestUrl";
+    public static final String SERVER_REST_URL = "ServerUrl";
+    public static final String SELECTED_GROUPS = "SelectGroups";
+    public static final String SYNC_TYPE = "SyncType";
+    public static final String COOKIE = "Cookie";
+
+
 }

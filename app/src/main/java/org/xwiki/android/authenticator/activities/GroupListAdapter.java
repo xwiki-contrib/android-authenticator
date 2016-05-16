@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.activities;
 
 import android.content.Context;
@@ -8,6 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
@@ -83,7 +103,7 @@ public class GroupListAdapter extends BaseAdapter {
 	}
 
     public void initSelectedGroup(){
-        List<String> groupIds = SharedPrefsUtil.getArrayList(mContext, "SelectGroups");
+        List<String> groupIds = SharedPrefsUtil.getArrayList(mContext, Constants.SELECTED_GROUPS);
         if(groupIds == null || groupIds.size()==0) return;
         List<XWikiGroup> selectedGroups = new ArrayList<>();
         for(XWikiGroup item:groupList){

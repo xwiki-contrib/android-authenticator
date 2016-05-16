@@ -58,7 +58,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtil.getValue(mContext, "SyncType", Constants.SYNC_TYPE_NO_NEED_SYNC);
+        int syncType = SharedPrefsUtil.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
         Log.i(TAG, "syncType="+syncType);
         if(syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
         try {

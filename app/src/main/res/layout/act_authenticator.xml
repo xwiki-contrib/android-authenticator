@@ -27,7 +27,7 @@
     <ViewFlipper
         android:id="@+id/view_flipper"
         android:layout_above="@+id/left_right_button"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

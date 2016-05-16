@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
@@ -46,7 +65,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_authorize);
+        setContentView(R.layout.act_grant_permission);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //left back arrow and material design.
@@ -117,7 +136,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
             @Override
             protected Intent doInBackground(String... params) {
                 //get url from server requestUrl=202.176.99.1:8080, xwiki.org and so on.
-                String url = SharedPrefsUtil.getValue(getApplicationContext(), "requestUrl", null);
+                String url = SharedPrefsUtil.getValue(getApplicationContext(), Constants.SERVER_ADDRESS, null);
                 Intent intent = new Intent();
                 HttpResponse response = null;
                 try {

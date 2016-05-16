@@ -43,23 +43,6 @@
 
         <activity
             android:theme="@style/AppTheme"
-            android:name=".activities.SignUpActivity"
-            android:label="@string/title_activity_sign_up">
-        </activity>
-
-        <activity
-            android:theme="@style/AppTheme"
-            android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_setting">
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:theme="@style/AppTheme"
             android:name=".activities.GrantPermissionActivity"
             android:exported="true"
             android:label="@string/title_activity_authorize">

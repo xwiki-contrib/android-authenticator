@@ -60,24 +60,6 @@
                 android:singleLine="true" />
 
             <TextView
-                android:text="@string/phone"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginBottom="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText android:id="@+id/cell_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:layout_marginBottom="10dp"
-                android:inputType="phone"
-                android:textColor="@android:color/black"
-                android:singleLine="true" />
-
-            <TextView
                 android:text="@string/email"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_marginBottom="5dip"
@@ -93,6 +75,26 @@
                 android:layout_marginBottom="10dp"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
+                android:singleLine="true" />
+
+            <TextView
+                android:text="@string/phone"
+                android:visibility="gone"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginBottom="5dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText android:id="@+id/cell_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:maxLines="1"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:layout_marginBottom="10dp"
+                android:inputType="phone"
+                android:textColor="@android:color/black"
                 android:singleLine="true" />
 
         </LinearLayout>
