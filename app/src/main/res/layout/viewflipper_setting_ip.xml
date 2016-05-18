@@ -29,17 +29,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dip" />
 
-
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginTop="5dip"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_username_label" />
+                android:text="@string/login_activity_server_label" />
 
             <EditText
-                android:id="@+id/accountName"
+                android:id="@+id/accountServer"
                 android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,28 +45,26 @@
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="fitz" />
+                android:text="192.168.56.1" />
+            <!--210.76.192.175:8080-->
 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
-                android:singleLine="true"
-                android:layout_marginTop="5dip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_password_label" />
+                android:text="@string/login_activity_port_label" />
 
             <EditText
-                android:id="@+id/accountPassword"
+                android:id="@+id/accountPort"
                 android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
-                android:inputType="textPassword"
-                android:text="fitz2xwiki" />
-
+                android:inputType="textEmailAddress"
+                android:text="8080" />
 
         </LinearLayout>
 

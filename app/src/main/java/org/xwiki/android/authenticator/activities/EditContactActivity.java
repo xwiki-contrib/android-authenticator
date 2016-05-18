@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.activities;
 
 import android.content.ContentResolver;
@@ -61,7 +80,7 @@ public class EditContactActivity extends AppCompatActivity {
         mCellPhoneView = (EditText) findViewById(R.id.cell_phone);
         mLastNameView = (EditText) findViewById(R.id.last_name);
 
-        //TODO here can do some permission check and if no permission, just finish() and return;
+        //TODO here we can do some permission check. If no permission, just finish() and return;
 
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
@@ -110,18 +129,16 @@ public class EditContactActivity extends AppCompatActivity {
         if(item.getItemId()==android.R.id.home){
             finish();
         }else if(item.getItemId()==R.id.action_save){
-            updataContact();
+            //check input valid  set input value (firstName, lastName, email, cellPhone)
+            if(checkInput()){
+                updataContact();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
 
     public void updataContact() {
-        //check input valid  set input value (firstName, lastName, email, cellPhone)
-        if(checkInput() == false){
-            return;
-        }
-
         //update server at first and check if the user has permission to modify
         // according the response.
         new AsyncTask<String, String, Boolean>() {
@@ -163,7 +180,6 @@ public class EditContactActivity extends AppCompatActivity {
                 }
             }
         }.execute();
-
     }
 
     /**

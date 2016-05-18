@@ -17,6 +17,7 @@
     <string name="login_activity_username_label">Username</string>
     <string name="login_activity_password_label">Password</string>
     <string name="login_activity_server_label">Server</string>
+    <string name="login_activity_port_label">Port</string>
     <string name="login_activity_ok_button">Sign in</string>
     <string name="login_activity_register_button">Sign up</string>
 
@@ -32,6 +33,7 @@
     <string name="title_activity_setting">Settings</string>
 
     <!--error msg-->
+    <string name="error_invalid_server">This server address is invalid</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>

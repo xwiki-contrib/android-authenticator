@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.utils;
 
 import java.io.UnsupportedEncodingException;
@@ -6,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -135,6 +155,40 @@ public class StringUtils {
         }
         return false;
     }
+
+
+
+
+    /**
+     * whether a charSequence is a valid ip address.
+     * @param addr
+     * @return
+     */
+    public static boolean isIpAddress(CharSequence addr){
+        if(addr == null) return false;
+        if(addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
+            return false;
+        }
+        String rexp = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
+        Pattern pat = Pattern.compile(rexp);
+        Matcher mat = pat.matcher(addr);
+        return mat.find();
+    }
+
+    /**
+     * whether a charSequence is a valid domain address
+     * @param addr
+     * @return
+     */
+    public static boolean isDomainAddress(CharSequence addr){
+        if(addr == null || addr.length() < 3) return false;
+        String rexp = "^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
+        Pattern pat = Pattern.compile(rexp);
+        Matcher mat = pat.matcher(addr);
+        return mat.find();
+    }
+
+
 
     /**
      * whether a string is a valid integer

@@ -32,7 +32,7 @@ import java.util.Set;
  * SharedPreferences Util
  * @author fitz
  */
-public class SharedPrefsUtil {
+public class SharedPrefsUtils {
 	public final static String SETTING = "Setting";
 
 	public static void putValue(Context context,String key, int value) {

@@ -1,17 +1,31 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,28 +37,18 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.io.IOException;
 
-
 /**
- * A sign up screen that offers email/password/username/lastname/firstname/
- * or maybe need captcha.
+ * Created by fitz on 2016/5/16.
  */
-public class SignUpActivity extends AppCompatActivity {
-
-    // UI references.
-    private EditText mFirstNameView;
-    private EditText mLastNameView;
+public class SignUpStep2ViewFlipper extends BaseViewFlipper{
     private EditText mUserIdEditText;
     private EditText mPasswordEditText;
     private EditText mConfirmPasswordEditText;
-    private EditText mEmailView;
-    private EditText mCellPhoneView;
     private EditText mCaptchaEditText;
     private ImageView mCaptchaImageView;
-
 
     String formToken = null;
     String userId = null;
@@ -52,27 +56,18 @@ public class SignUpActivity extends AppCompatActivity {
     String confirmPassword = null;
     String captcha = null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_sign_up);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+    public SignUpStep2ViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+        super(activity, contentRootView);
+        initData();
+    }
 
+    void initData() {
         // init view
-        mEmailView = (EditText) findViewById(R.id.email);
-        mFirstNameView = (EditText) findViewById(R.id.first_name);
-        mCellPhoneView = (EditText) findViewById(R.id.cell_phone);
-        mLastNameView = (EditText) findViewById(R.id.last_name);
         mUserIdEditText = (EditText) findViewById(R.id.user_id_edit);
         mPasswordEditText = (EditText) findViewById(R.id.password);
         mConfirmPasswordEditText = (EditText) findViewById(R.id.confirm_password);
-        mCaptchaImageView = (ImageView) findViewById(R.id.captcha_image);
         mCaptchaEditText = (EditText) findViewById(R.id.captcha_edit);
-
+        mCaptchaImageView = (ImageView) findViewById(R.id.captcha_image);
         mCaptchaImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,28 +75,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        initData();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sign_up, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        } else if (item.getItemId() == R.id.action_save) {
-            signUp();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
-    void initData() {
+        //init form token and cookie
         new AsyncTask<String, String, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -117,9 +91,9 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean flag) {
                 if (flag == null) {
-                    Toast.makeText(SignUpActivity.this, "init form network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "init form network error", Toast.LENGTH_SHORT).show();
                 } else if (!flag) {
-                    Toast.makeText(SignUpActivity.this, "init form error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "init form error", Toast.LENGTH_SHORT).show();
                 }else{
                     refreshCaptcha();
                 }
@@ -127,11 +101,24 @@ public class SignUpActivity extends AppCompatActivity {
         }.execute();
     }
 
+    @Override
+    public void doNext() {
+        //sign up and next setting sync
+        if (checkInput()) {
+            register();
+            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+        }
+    }
+
+    @Override
+    public void doPrevious() {
+        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_UP_STEP1);
+    }
+
 
     //0:false, 1:true, null:network error, 2:the user exists.
-    public void signUp() {
-        if (!checkInput()) return;
-
+    public void register() {
+        final String[] step1Values = mActivity.getStep1Values();
         new AsyncTask<String, String, Integer>() {
             @Override
             protected Integer doInBackground(String... params) {
@@ -149,7 +136,8 @@ public class SignUpActivity extends AppCompatActivity {
                 if (userFind != null) return 2;
 
                 try {
-                    boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
+                    //boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
+                    boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
                     return signUpFlag ? 1 : 0;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -160,11 +148,11 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Integer status) {
                 if (status == null) {
-                    Toast.makeText(SignUpActivity.this, "network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "network error", Toast.LENGTH_SHORT).show();
                 } else if (status == 2) {
-                    Toast.makeText(SignUpActivity.this, "the user exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "the user exists", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(SignUpActivity.this, status == 1 ? "success!" : "fail!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, status == 1 ? "success!" : "fail!", Toast.LENGTH_SHORT).show();
                     if (status == 0) {
                         refreshCaptcha();
                     } else {
@@ -179,48 +167,12 @@ public class SignUpActivity extends AppCompatActivity {
         Bundle data = new Bundle();
         data.putString(AccountManager.KEY_ACCOUNT_NAME, userId);
         data.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-        //data.putString(AccountManager.KEY_AUTHTOKEN, "tokentoken");
-        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, XWikiHttp.getServerRequestUrl());
+        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, XWikiHttp.getServerAddress());
         data.putString(AuthenticatorActivity.PARAM_USER_PASS, password);
         Intent intent = new Intent();
         intent.putExtras(data);
-        setResult(RESULT_OK, intent);
-        finish();
+        mActivity.finishLogin(intent);
     }
-
-    void refreshCaptcha() {
-        new AsyncTask<String, String, byte[]>() {
-            @Override
-            protected byte[] doInBackground(String... params) {
-                //String captchaUrl = "http://210.76.192.253:8080/xwiki/bin/imagecaptcha/XWiki/Registration";
-                //String url = "http://www.xwiki.org/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
-                String captchaUrl = "http://" + XWikiHttp.getServerRequestUrl() + "/xwiki/bin/imagecaptcha/XWiki/Registration";
-                if (captchaUrl.contains("www.xwiki.org")) {
-                    captchaUrl = "http://" + XWikiHttp.getServerRequestUrl() + "/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
-                }
-                byte[] img = XWikiHttp.downloadAvatar(captchaUrl);
-                return img;
-            }
-
-            @Override
-            protected void onPostExecute(byte[] bytes) {
-                Bitmap captchaBitmap = getPicFromBytes(bytes, null);
-                mCaptchaImageView.setImageBitmap(captchaBitmap);
-            }
-        }.execute();
-    }
-
-    public static Bitmap getPicFromBytes(byte[] bytes,
-                                         BitmapFactory.Options opts) {
-        if (bytes != null)
-            if (opts != null)
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length,
-                        opts);
-            else
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        return null;
-    }
-
 
     /**
      * Attempts to check input
@@ -245,19 +197,19 @@ public class SignUpActivity extends AppCompatActivity {
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(userId)) {
-            mUserIdEditText.setError(getString(R.string.error_field_required));
+            mUserIdEditText.setError(mContext.getString(R.string.error_field_required));
             focusView = mUserIdEditText;
             cancel = true;
         } else if (TextUtils.isEmpty(password) || password.length() < 6) {
-            mPasswordEditText.setError(getString(R.string.error_invalid_password));
+            mPasswordEditText.setError(mContext.getString(R.string.error_invalid_password));
             focusView = mPasswordEditText;
             cancel = true;
         } else if (TextUtils.isEmpty(confirmPassword) || !confirmPassword.equals(password)) {
-            mConfirmPasswordEditText.setError(getString(R.string.error_confirm_password));
+            mConfirmPasswordEditText.setError(mContext.getString(R.string.error_confirm_password));
             focusView = mConfirmPasswordEditText;
             cancel = true;
         } else if (TextUtils.isEmpty(captcha)) {
-            mCaptchaEditText.setError(getString(R.string.error_invalid_captcha));
+            mCaptchaEditText.setError(mContext.getString(R.string.error_invalid_captcha));
             focusView = mCaptchaEditText;
             cancel = true;
         }
@@ -274,5 +226,38 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-}
 
+    void refreshCaptcha() {
+        new AsyncTask<String, String, byte[]>() {
+            @Override
+            protected byte[] doInBackground(String... params) {
+                //String captchaUrl = "http://210.76.192.253:8080/xwiki/bin/imagecaptcha/XWiki/Registration";
+                //String url = "http://www.xwiki.org/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
+                String captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/Registration";
+                if (captchaUrl.contains("www.xwiki.org")) {
+                    captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
+                }
+                byte[] img = XWikiHttp.downloadAvatar(captchaUrl);
+                return img;
+            }
+
+            @Override
+            protected void onPostExecute(byte[] bytes) {
+                Bitmap captchaBitmap = getPicFromBytes(bytes, null);
+                mCaptchaImageView.setImageBitmap(captchaBitmap);
+            }
+        }.execute();
+    }
+
+    public static Bitmap getPicFromBytes(byte[] bytes,
+                                         BitmapFactory.Options opts) {
+        if (bytes != null)
+            if (opts != null)
+                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length,
+                        opts);
+            else
+                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        return null;
+    }
+
+}

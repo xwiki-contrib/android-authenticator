@@ -21,10 +21,9 @@ package org.xwiki.android.authenticator.syncadapter;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
-import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import android.accounts.Account;
@@ -39,7 +38,6 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "SyncAdapter";
@@ -58,7 +56,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtil.getValue(mContext, "SyncType", Constants.SYNC_TYPE_NO_NEED_SYNC);
+        int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
         Log.i(TAG, "syncType="+syncType);
         if(syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
         try {
@@ -76,15 +74,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             //final String authtoken = mAccountManager.blockingGetAuthToken(account,
             //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
 
-            // Make sure that the XWiki group exists
-            final long groupId = ContactManager.ensureXWikiGroupExists(mContext, account);
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
             XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
             Log.i(TAG, syncData!=null?syncData.toString():"syncData null");
 
             // Update the local contacts database with the changes. updateContacts()
-            ContactManager.updateContacts(mContext, account.name, syncData, groupId);
+            ContactManager.updateContacts(mContext, account.name, syncData);
+
+            //Update the contacts' photo.
+            ContactManager.updateAvatars(mContext, syncData);
 
             // Save off the new sync date. On our next sync, we only want to receive
             // contacts that have changed since this sync...

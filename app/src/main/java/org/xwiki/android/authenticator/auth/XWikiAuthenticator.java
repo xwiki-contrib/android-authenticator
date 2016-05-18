@@ -35,7 +35,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,12 +47,11 @@ import static org.xwiki.android.authenticator.Constants.*;
  * @version $Id: $
  */
 public class XWikiAuthenticator extends AbstractAccountAuthenticator {
-    private String TAG = "XWikiAuthenticator";
+    private static final String TAG = "XWikiAuthenticator";
     private final Context mContext;
 
     public XWikiAuthenticator(Context context) {
         super(context);
-        // I hate you! Google - set mContext as protected!
         this.mContext = context;
     }
 
@@ -64,12 +63,15 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         String packageName = mContext.getPackageManager().getNameForUid(uid);
 
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
-        intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, accountType);
-        intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, authTokenType);
-        intent.putExtra(AuthenticatorActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
+        //just for passing some param
+        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        //for granting permission
         intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
         intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
+        //true: if from XWiki Account Preference, false:if from adding account.
+        intent.putExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -164,14 +166,18 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         // If we get here, then we couldn't access the user's password - so we
         // need to re-prompt them for their credentials. We do that by creating
         // an intent to display our AuthenticatorActivity.
-        final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, account.type);
-        intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, authTokenType);
-        intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_NAME, account.name);
-        final Bundle bundle = new Bundle();
-        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        return bundle;
+        //final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
+        //intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        //intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+        //intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+        //final Bundle bundle = new Bundle();
+        //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+        //return bundle;
+
+        //if we get here, error, it's impossible!
+        Bundle result = new Bundle();
+        result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken error impossible !!!");
+        return result;
     }
 
 
@@ -200,14 +206,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) throws NetworkErrorException {
-        //final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
-        //intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        //intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, account.type);
-        //intent.putExtra(AuthenticatorActivity.ARG_AUTH_TYPE, AccountGeneral.ACCOUNT_TYPE);
-        //intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_NAME, account.name);
-        //final Bundle bundle = new Bundle();
-        //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        //return bundle;
         return null;
     }
 
@@ -217,7 +215,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     }
 
     public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken){
-        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
+        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
         if(packageList == null || packageList.size()==0 ) return;
         for(String item : packageList){
             String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
@@ -226,12 +224,11 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     }
 
     public static String getTheSameAuthToken(AccountManager am, Account account){
-        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "packageList");
+        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
         if(packageList == null || packageList.size()==0 ) return null;
         String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
         String authToken = am.peekAuthToken(account, tokenType);
         return authToken;
     }
-
 
 }

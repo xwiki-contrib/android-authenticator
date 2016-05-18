@@ -17,32 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.bean;
+
+package org.xwiki.android.authenticator.activities;
+
+import android.content.Context;
+import android.view.View;
+
+import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 
 /**
- * Created by fitz on 2016/4/20.
+ * Created by lf on 2016/5/16.
  */
-public class XWikiGroup {
-    public String id; // curriki:XWiki.XWikiAdminGroup
+public abstract class BaseViewFlipper{
+    protected AuthenticatorActivity mActivity;
+    protected Context mContext;
+    private View mContentRootView;
 
-    public String wiki;
-
-    public String space;
-
-    public String pageName;
-
-    public String lastModifiedDate;
-
-    public String version;
-
-    @Override
-    public String toString() {
-        return "XWikiGroup{" +
-                "id='" + id + '\'' +
-                ", wiki='" + wiki + '\'' +
-                ", space='" + space + '\'' +
-                ", pageName='" + pageName + '\'' +
-                ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                '}';
+    public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView){
+        mActivity = activity;
+        mContext = (Context) mActivity;
+        mContentRootView = contentRootView;
     }
+
+    public View findViewById(int id) {
+        return mContentRootView.findViewById(id);
+    }
+
+    public abstract void doNext();
+    public abstract void doPrevious();
+
 }
