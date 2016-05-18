@@ -35,7 +35,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -215,7 +215,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     }
 
     public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken){
-        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
+        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
         if(packageList == null || packageList.size()==0 ) return;
         for(String item : packageList){
             String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
@@ -224,7 +224,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     }
 
     public static String getTheSameAuthToken(AccountManager am, Account account){
-        List<String> packageList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
+        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
         if(packageList == null || packageList.size()==0 ) return null;
         String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
         String authToken = am.peekAuthToken(account, tokenType);

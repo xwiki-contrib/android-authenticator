@@ -30,7 +30,7 @@ import android.widget.TextView;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class GroupListAdapter extends BaseAdapter {
 	}
 
     public void initSelectedGroup(){
-        List<String> groupIds = SharedPrefsUtil.getArrayList(mContext, Constants.SELECTED_GROUPS);
+        List<String> groupIds = SharedPrefsUtils.getArrayList(mContext, Constants.SELECTED_GROUPS);
         if(groupIds == null || groupIds.size()==0) return;
         List<XWikiGroup> selectedGroups = new ArrayList<>();
         for(XWikiGroup item:groupList){

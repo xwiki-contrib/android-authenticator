@@ -20,10 +20,9 @@
 package org.xwiki.android.authenticator;
 
 import android.app.Application;
-import android.provider.ContactsContract;
 import android.util.Log;
 
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,17 +48,17 @@ public class AppContext extends Application{
 
     public static void addAuthorizedApp(int uid, String packageName){
         Log.d(TAG, "packageName="+packageName+", uid="+uid);
-        SharedPrefsUtil.putValue(instance.getApplicationContext(), Constants.APP_UID + uid, packageName);
-        List<String> packageList = SharedPrefsUtil.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
+        SharedPrefsUtils.putValue(instance.getApplicationContext(), Constants.APP_UID + uid, packageName);
+        List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
         if(packageList == null){
             packageList = new ArrayList<>();
         }
         packageList.add(packageName);
-        SharedPrefsUtil.putArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST, packageList);
+        SharedPrefsUtils.putArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST, packageList);
     }
 
     public static boolean isAuthorizedApp(int uid){
-        String packageName = SharedPrefsUtil.getValue(instance.getApplicationContext(), Constants.APP_UID + uid, null);
+        String packageName = SharedPrefsUtils.getValue(instance.getApplicationContext(), Constants.APP_UID + uid, null);
         if(packageName == null){
             return false;
         }

@@ -26,7 +26,7 @@ import android.widget.EditText;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 /**
@@ -44,7 +44,7 @@ public class SettingIpViewFlipper extends BaseViewFlipper{
     @Override
     public void doNext() {
         if(checkInput()){
-            SharedPrefsUtil.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
+            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_UP_STEP1);
         }
     }
@@ -52,7 +52,7 @@ public class SettingIpViewFlipper extends BaseViewFlipper{
     @Override
     public void doPrevious() {
         if(checkInput()) {
-            SharedPrefsUtil.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
+            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
         }
     }

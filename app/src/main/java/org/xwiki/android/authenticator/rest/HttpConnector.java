@@ -23,7 +23,7 @@ import android.util.Log;
 
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -59,7 +59,7 @@ public class HttpConnector {
         for (String headerName : map.keySet()) {
             connection.addRequestProperty(headerName, map.get(headerName));
         }
-        COOKIE = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
+        COOKIE = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         if(COOKIE != null && COOKIE.length() > 0) {
             //connection.addRequestProperty("Cookie", COOKIE);
             connection.setRequestProperty("Cookie", COOKIE);

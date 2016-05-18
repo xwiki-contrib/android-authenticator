@@ -20,7 +20,6 @@
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,16 +27,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 /**
  * Created by lf on 2016/5/16.
@@ -91,7 +88,7 @@ public class SignInViewFlipper extends BaseViewFlipper{
     }
 
     public void submit() {
-        final String userServer = SharedPrefsUtil.getValue(mContext, Constants.SERVER_ADDRESS, null);
+        final String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
         final String userName = accountName.toString();
         final String userPass = accountPassword.toString();
 

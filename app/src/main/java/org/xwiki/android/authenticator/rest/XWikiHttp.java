@@ -35,7 +35,8 @@ import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.AppContext;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.ImageUtils;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -69,7 +70,7 @@ public class XWikiHttp {
      * http://localhost:8080/xwiki/bin/login/XWiki/XWikiLogin
      */
     public static HttpResponse login(String requestUrl, String username, String password) throws IOException {
-        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
+        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         HttpConnector httpConnector = new HttpConnector();
         String url = "http://" + requestUrl + "/xwiki/bin/login/XWiki/XWikiLogin";
         HttpRequest request = new HttpRequest(url);
@@ -83,13 +84,13 @@ public class XWikiHttp {
             //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
         }
         //global value setting for http
-        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
+        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
         return response;
     }
 
 
     public static String signUpInitCookieForm() throws IOException {
-        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
+        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         String registerUrl = "http://"+ getServerAddress()+"/xwiki/bin/view/XWiki/Registration";
         if(registerUrl.contains("www.xwiki.org")){
             registerUrl = "http://"+ getServerAddress()+"/xwiki/bin/view/XWiki/RealRegistration";
@@ -101,7 +102,7 @@ public class XWikiHttp {
         if (statusCode < 200 || statusCode > 299) {
             return null;
         }
-        SharedPrefsUtil.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
+        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
         byte[] contentData = response.getContentData();
         Document document = Jsoup.parse(new String(contentData));
         String formToken = document.select("input[name=form_token]").val();
@@ -403,7 +404,7 @@ public class XWikiHttp {
         if(syncType == Constants.SYNC_TYPE_ALL_USERS){
             return getSyncAllUsers(lastSyncTime);
         }else if(syncType == Constants.SYNC_TYPE_SELECTED_GROUPS){
-            List<String> groupIdList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
+            List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
             return getSyncGroups(groupIdList, lastSyncTime);
         }
         throw  new IOException(TAG+ "syncType error, SyncType="+syncType);
@@ -427,6 +428,10 @@ public class XWikiHttp {
             Date itemDate = null;
             List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
             for (ObjectSummary item : objectList) {
+                //TODO ask why this situation occur? <headline>xwiki:XWiki.gdelhumeau</headline>
+                if(item.headline.startsWith(split[0])){
+                    item.headline = item.headline.substring(split[0].length()+1);
+                }
                 syncData.allIdSet.add(split[0]+":"+item.headline);
                 itemDate = getUserLastModified(split[0], item.headline);
                 if (itemDate == null || itemDate.before(lastSynDate)) continue;
@@ -548,7 +553,7 @@ public class XWikiHttp {
     }
 
     public static String getServerAddress(){
-        String requestUrl = SharedPrefsUtil.getValue(AppContext.getInstance().getApplicationContext(), Constants.SERVER_ADDRESS, null);
+        String requestUrl = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SERVER_ADDRESS, null);
         return requestUrl;
     }
 
@@ -595,8 +600,9 @@ public class XWikiHttp {
             //int statusCode = response.getResponseCode();
             try {
                 final BitmapFactory.Options options = new BitmapFactory.Options();
-                final Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
+                Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
                         null, options);
+                avatar = ImageUtils.compressByQuality(avatar, 900);
 
                 // Take the image we received from the server, whatever format it
                 // happens to be in, and convert it to a JPEG image. Note: we're

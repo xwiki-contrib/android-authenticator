@@ -44,7 +44,7 @@ public class Constants {
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
 
     //limit the number of users synchronizing from server.
-    public static final int LIMIT_MAX_SYNC_USERS = 100;
+    public static final int LIMIT_MAX_SYNC_USERS = 10000;
 
     //SyncType
     //0: no sync, 1: all users, 2: sync groups

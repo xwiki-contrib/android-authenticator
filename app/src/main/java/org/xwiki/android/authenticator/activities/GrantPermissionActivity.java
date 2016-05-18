@@ -40,7 +40,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.io.IOException;
@@ -136,7 +136,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
             @Override
             protected Intent doInBackground(String... params) {
                 //get url from server requestUrl=202.176.99.1:8080, xwiki.org and so on.
-                String url = SharedPrefsUtil.getValue(getApplicationContext(), Constants.SERVER_ADDRESS, null);
+                String url = SharedPrefsUtils.getValue(getApplicationContext(), Constants.SERVER_ADDRESS, null);
                 Intent intent = new Intent();
                 HttpResponse response = null;
                 try {

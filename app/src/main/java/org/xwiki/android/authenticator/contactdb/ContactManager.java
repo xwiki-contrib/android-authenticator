@@ -38,11 +38,9 @@ import android.provider.ContactsContract.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -134,13 +132,12 @@ public class ContactManager {
                 // A sync adapter should batch operations on multiple contacts,
                 // because it will make a dramatic performance difference.
                 // (UI updates, etc)
-                if (batchOperation.size() >= 50) {
+                if (batchOperation.size() >= 100) {
                     batchOperation.execute();
                 }
             }
             batchOperation.execute();
         }
-
 
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
@@ -155,12 +152,29 @@ public class ContactManager {
                 Log.d(TAG, key+" removed");
             }
             //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
-            if (batchOperation.size() >= 50) {
+            if (batchOperation.size() >= 100) {
                 batchOperation.execute();
             }
         }
         Log.d(TAG, "Remove contacts end");
         batchOperation.execute();
+    }
+
+
+    //http://stackoverflow.com/questions/14601209/update-contact-image-in-android-contact-provider
+    public static void updateAvatars(Context context, XWikiHttp.SyncData syncData) throws IOException {
+        List<XWikiUser> updateList = syncData.getUpdateUserList();
+        if(updateList == null || updateList.size() == 0) return;
+        final ContentResolver resolver = context.getContentResolver();
+        for(XWikiUser xwikiUser : updateList) {
+            long rawContactId = lookupRawContact(resolver, xwikiUser.getId());
+            if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.avatar)) {
+                byte[] avatarBuffer = XWikiHttp.downloadAvatar(xwikiUser.pageName, xwikiUser.avatar);
+                if (avatarBuffer != null) {
+                    writeDisplayPhoto(context, rawContactId, avatarBuffer);
+                }
+            }
+        }
     }
 
 
@@ -192,11 +206,11 @@ public class ContactManager {
         contactOp.addName(null, user.getFirstName(),
                 user.getLastName())
                 .addEmail(user.getEmail())
-                .addPhone(user.getPhone(), Phone.TYPE_MOBILE)
+                .addPhone(user.getPhone(), Phone.TYPE_MOBILE);
                 //.addPhone(user.getPhone(), Phone.TYPE_HOME)
                 //.addPhone(user.getPhone(), Phone.TYPE_WORK)
                 //.addGroupMembership(groupId)
-                .addAvatar(user.pageName, user.getAvatar());
+                //.addAvatar(user.pageName, user.getAvatar());
 
         // If we have a serverId, then go ahead and create our status profile.
         // Otherwise skip it - and we'll create it after we sync-up to the
@@ -204,7 +218,6 @@ public class ContactManager {
         if (user.getId() != null) {
             contactOp.addProfileAction(user.getId());
         }
-
     }
 
 
@@ -217,19 +230,15 @@ public class ContactManager {
      * https://forums.bitfire.at/topic/342/transactiontoolargeexception-when-syncing-contacts-with-high-res-images/5
      * http://developer.android.com/reference/android/provider/ContactsContract.RawContacts.DisplayPhoto.html
      */
-    public void writeDisplayPhoto(Context context, long rawContactId, byte[] photo) {
+    public static void writeDisplayPhoto(Context context, long rawContactId, byte[] photo) throws IOException {
         Uri rawContactPhotoUri = Uri.withAppendedPath(
                 ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId),
                 RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
-        try {
-            AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(rawContactPhotoUri, "rw");
-            OutputStream os = fd.createOutputStream();
-            os.write(photo);
-            os.close();
-            fd.close();
-        } catch (IOException e) {
-            // Handle error cases.
-        }
+        AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(rawContactPhotoUri, "rw");
+        OutputStream os = fd.createOutputStream();
+        os.write(photo);
+        os.close();
+        fd.close();
     }
 
     /**
@@ -315,10 +324,11 @@ public class ContactManager {
                         contactOp.updateEmail(user.getEmail(),
                                 c.getString(DataQuery.COLUMN_EMAIL_ADDRESS), uri);
                     }
-                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
-                    existingAvatar = true;
-                    contactOp.updateAvatar(user.pageName, user.getAvatar(), uri);
                 }
+                //else if (mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
+                    //existingAvatar = true;
+                    //contactOp.updateAvatar(user.pageName, user.getAvatar(), uri);
+                //}
             } // while
         } finally {
             c.close();
@@ -342,9 +352,9 @@ public class ContactManager {
             contactOp.addEmail(user.getEmail());
         }
         // Add the avatar if we didn't update the existing avatar
-        if (!existingAvatar) {
-            contactOp.addAvatar(user.pageName, user.getAvatar());
-        }
+        //if (!existingAvatar) {
+            //contactOp.addAvatar(user.pageName, user.getAvatar());
+        //}
 
         // If we need to update the serverId of the contact record, take
         // care of that.  This will happen if the contact is created on the

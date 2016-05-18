@@ -26,7 +26,6 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -37,7 +36,7 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtil;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
 
     @Override
     public void doPrevious() {
-        SharedPrefsUtil.removeKeyValue(mContext, Constants.SYNC_TYPE);
+        SharedPrefsUtils.removeKeyValue(mContext, Constants.SYNC_TYPE);
         resetSync(false);
         mActivity.finish();
     }
@@ -80,7 +79,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
-        int syncType = SharedPrefsUtil.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+        int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         if(syncType == Constants.SYNC_TYPE_ALL_USERS) {
             radioGroup.check(R.id.radio_all_users);
             mListView.setVisibility(View.GONE);
@@ -129,7 +128,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
 
     void syncSettingComplete(){
         if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
-            SharedPrefsUtil.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         }else {
             List<XWikiGroup> list = mAdapter.getSelectGroups();
             Toast.makeText(mContext, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
@@ -138,11 +137,11 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
                 for(XWikiGroup iGroup: list){
                     groupIdList.add(iGroup.id);
                 }
-                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, groupIdList);
+                SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, groupIdList);
             }else{
-                SharedPrefsUtil.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
+                SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
             }
-            SharedPrefsUtil.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
+            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
         }
         resetSync(true);
         mActivity.finish();
