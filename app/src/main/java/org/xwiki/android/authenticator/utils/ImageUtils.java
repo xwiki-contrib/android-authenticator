@@ -28,8 +28,9 @@ import java.io.ByteArrayOutputStream;
 
 
 /**
- * ImageCompressUtil
- *
+ * Image Util
+ * Compressing the image by quality
+ * recycle the bitmap
  */
 public class ImageUtils {
     private static final String TAG = "ImageCompressUtil";

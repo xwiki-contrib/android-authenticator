@@ -79,10 +79,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
             Log.i(TAG, syncData!=null?syncData.toString():"syncData null");
 
-            // Update the local contacts database with the changes. updateContacts()
+            // Update the local contacts database with the last modified changes. updateContacts()
             ContactManager.updateContacts(mContext, account.name, syncData);
 
-            //Update the contacts' photo.
+            //Update the contacts' photo. Separately add photos because of TransactionTooLargeException
             ContactManager.updateAvatars(mContext, syncData);
 
             // Save off the new sync date. On our next sync, we only want to receive

@@ -445,7 +445,7 @@ public class XWikiHttp {
 
     //TODO Comment null,size=0: no data need be updated.
     //exception is getData Exception. so the lastSyncTime should not be set to new Date() because of sync error.
-    //NOTE if the network connection is lost in the update and we don't throw exception here and just contine,
+    //NOTE if the network connection is lost in the update and we don't throw exception here and just continue,
     // how to ensure that all users are added and updated in local database from lastSyncTime because lastSyncTime is modified to new Date
     //but the modified data may be bypass and not be updated or added successfully.
     // if we throw exception here, it's ok! but if not, the user lost in the network exception will never be stored in local db.

@@ -222,10 +222,10 @@ public class ContactManager {
 
 
     /**
-     *
+     * writeDisplayPhoto
      * @param context
-     * @param rawContactId
-     * @param photo
+     * @param rawContactId the contact id
+     * @param photo the photo bytes
      * https://code.google.com/p/android/issues/detail?id=73499
      * https://forums.bitfire.at/topic/342/transactiontoolargeexception-when-syncing-contacts-with-high-res-images/5
      * http://developer.android.com/reference/android/provider/ContactsContract.RawContacts.DisplayPhoto.html
