@@ -1,3 +1,5 @@
+// just for installing automatically sdk with com.github.JakeWharton
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 
 android {

@@ -3,9 +3,13 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0'
+        //just for automatically installing sdk in jenkins ci
+        //https://guides.codepath.com/android/Installing-Android-SDK-Tools#installing-the-android-sdk-automated-way
+        classpath 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
