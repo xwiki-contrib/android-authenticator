@@ -37,7 +37,7 @@ public class XWikiAuthenticatorService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(authenticator == null) {
+        if (authenticator == null) {
             authenticator = new XWikiAuthenticator(this);
         }
         return authenticator.getIBinder();

@@ -23,9 +23,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Created by fitz on 2016/4/25.
+ * HttpResponse
  */
-public class HttpResponse implements Serializable{
+public class HttpResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Map<String, String> headers;

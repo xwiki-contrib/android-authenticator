@@ -30,7 +30,7 @@ import org.xwiki.android.authenticator.utils.StringUtils;
 /**
  * Created by fitz on 2016/5/16.
  */
-public class SignUpStep1ViewFlipper extends BaseViewFlipper{
+public class SignUpStep1ViewFlipper extends BaseViewFlipper {
     private EditText mFirstNameView;
     private EditText mLastNameView;
     private EditText mEmailView;
@@ -47,7 +47,7 @@ public class SignUpStep1ViewFlipper extends BaseViewFlipper{
 
     @Override
     public void doNext() {
-        if(checkInput()) {
+        if (checkInput()) {
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_UP_STEP2);
         }
     }
@@ -57,9 +57,9 @@ public class SignUpStep1ViewFlipper extends BaseViewFlipper{
         mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_IP);
     }
 
-    private boolean checkInput(){
+    private boolean checkInput() {
         String email = mEmailView.getText().toString();
-        if(!TextUtils.isEmpty(email) && !StringUtils.isEmail(email)) {
+        if (!TextUtils.isEmpty(email) && !StringUtils.isEmail(email)) {
             mEmailView.setError(mContext.getString(R.string.error_invalid_email));
             mEmailView.requestFocus();
             return false;
@@ -67,12 +67,12 @@ public class SignUpStep1ViewFlipper extends BaseViewFlipper{
         return true;
     }
 
-    public String[] getValues(){
+    public String[] getValues() {
         String[] strings = new String[3];
         strings[0] = mFirstNameView.getText().toString();
-        if(strings[0]==null) strings[0] = "";
+        if (strings[0] == null) strings[0] = "";
         strings[1] = mLastNameView.getText().toString();
-        if(strings[1]==null) strings[1] = "";
+        if (strings[1] == null) strings[1] = "";
         strings[2] = mEmailView.getText().toString();
         //strings[3] = mCellPhoneView.getText().toString();
         //if(strings[3]==null) strings[3] = "";

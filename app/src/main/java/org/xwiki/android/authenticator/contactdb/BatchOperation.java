@@ -67,8 +67,8 @@ final public class BatchOperation {
         try {
             ContentProviderResult[] results = mResolver.applyBatch(ContactsContract.AUTHORITY,
                     mOperations);
-            if ((results != null) && (results.length > 0)){
-                for (int i = 0; i < results.length; i++){
+            if ((results != null) && (results.length > 0)) {
+                for (int i = 0; i < results.length; i++) {
                     resultUris.add(results[i].uri);
                 }
             }

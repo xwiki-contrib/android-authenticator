@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * Created by lf on 2016/5/13.
  */
-public class SettingSyncViewFlipper extends BaseViewFlipper{
+public class SettingSyncViewFlipper extends BaseViewFlipper {
     private static final String TAG = "SettingSyncViewFlipper";
 
     ListView mListView = null;
@@ -71,8 +71,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
         mActivity.finish();
     }
 
-    public void initData(){
-        mListView = (ListView)findViewById(R.id.list_view);
+    public void initData() {
+        mListView = (ListView) findViewById(R.id.list_view);
         groupList = new ArrayList<>();
         mAdapter = new GroupListAdapter(mContext, groupList);
         mListView.setAdapter(mAdapter);
@@ -80,10 +80,10 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
         int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
-        if(syncType == Constants.SYNC_TYPE_ALL_USERS) {
+        if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
             radioGroup.check(R.id.radio_all_users);
             mListView.setVisibility(View.GONE);
-        }else{
+        } else {
             radioGroup.check(R.id.radio_selected_groups);
             mListView.setVisibility(View.VISIBLE);
         }
@@ -92,9 +92,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // find which radio button is selected
-                if(checkedId == R.id.radio_all_users) {
+                if (checkedId == R.id.radio_all_users) {
                     mListView.setVisibility(View.GONE);
-                } else if(checkedId == R.id.radio_selected_groups) {
+                } else if (checkedId == R.id.radio_selected_groups) {
                     mListView.setVisibility(View.VISIBLE);
                 }
             }
@@ -116,7 +116,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
 
             @Override
             protected void onPostExecute(List<XWikiGroup> groups) {
-                if(groups != null && groups.size() >= 0){
+                if (groups != null && groups.size() >= 0) {
                     Log.i(TAG, groups.toString());
                     groupList.addAll(groups);
                     mAdapter.refresh(groupList);
@@ -126,19 +126,19 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
     }
 
 
-    void syncSettingComplete(){
-        if(radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users){
+    void syncSettingComplete() {
+        if (radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users) {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
-        }else {
+        } else {
             List<XWikiGroup> list = mAdapter.getSelectGroups();
-            Toast.makeText(mContext, mAdapter.getSelectGroups().toString() ,Toast.LENGTH_SHORT).show();
-            if(list != null && list.size()>0){
+            Toast.makeText(mContext, mAdapter.getSelectGroups().toString(), Toast.LENGTH_SHORT).show();
+            if (list != null && list.size() > 0) {
                 List<String> groupIdList = new ArrayList<>();
-                for(XWikiGroup iGroup: list){
+                for (XWikiGroup iGroup : list) {
                     groupIdList.add(iGroup.id);
                 }
                 SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, groupIdList);
-            }else{
+            } else {
                 SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
             }
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
@@ -147,17 +147,17 @@ public class SettingSyncViewFlipper extends BaseViewFlipper{
         mActivity.finish();
     }
 
-    private void resetSync(boolean flag){
+    private void resetSync(boolean flag) {
         AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
-        if(flag) {
+        if (flag) {
             //reset sync
             mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
-        }else{
+        } else {
             //don't sync
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 0);

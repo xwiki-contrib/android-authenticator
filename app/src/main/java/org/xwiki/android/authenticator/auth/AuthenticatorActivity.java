@@ -206,7 +206,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
-    public String[] getStep1Values(){
+    public String[] getStep1Values() {
         return signUpStep1ViewFlipper.getValues();
     }
 
@@ -242,12 +242,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         //grant permission if adding user from the third-party app (UID,PackageName);
         String packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME);
         int uid = getIntent().getIntExtra(PARAM_APP_UID, 0);
-        Log.d(TAG, packaName+", "+getPackageName());
+        Log.d(TAG, packaName + ", " + getPackageName());
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
         if (!packaName.contains("android.uid.system")) {
             AppContext.addAuthorizedApp(uid, packaName);
             String authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
-            if(!TextUtils.isEmpty(authToken)) {
+            if (!TextUtils.isEmpty(authToken)) {
                 String authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE);
                 mAccountManager.setAuthToken(account, authTokenType, authToken);
             }

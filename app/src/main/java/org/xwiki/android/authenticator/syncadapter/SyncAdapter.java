@@ -39,6 +39,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * SyncAdapter
+ */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "SyncAdapter";
     private static final boolean NOTIFY_AUTH_FAILURE = true;
@@ -54,11 +57,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
-        ContentProviderClient provider, SyncResult syncResult) {
+                              ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "onPerformSync start");
         int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
-        Log.i(TAG, "syncType="+syncType);
-        if(syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
+        Log.i(TAG, "syncType=" + syncType);
+        if (syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
         try {
             // get last sync date. return new Date(0) if first onPerformSync
             String lastSyncMarker = getServerSyncMarker(account);
@@ -66,7 +69,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             // By default, contacts from a 3rd party provider are hidden in the contacts
             // list. So let's set the flag that causes them to be visible, so that users
             // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
-            if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0))) ) {
+            if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
                 ContactManager.setAccountContactsVisibility(getContext(), account, true);
             }
 
@@ -77,7 +80,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
             XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
-            Log.i(TAG, syncData!=null?syncData.toString():"syncData null");
+            Log.i(TAG, syncData != null ? syncData.toString() : "syncData null");
 
             // Update the local contacts database with the last modified changes. updateContacts()
             ContactManager.updateContacts(mContext, account.name, syncData);
@@ -102,6 +105,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * This helper function fetches the last known high-water-mark
      * we received from the server - or 0 if we've never synced.
+     *
      * @param account the account we're syncing
      * @return the change high-water-mark  Iso8601
      */
@@ -116,7 +120,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Save off the high-water-mark we receive back from the server.
-     * @param account The account we're syncing
+     *
+     * @param account     The account we're syncing
      * @param lastSyncIso The high-water-mark we want to save.
      */
     private void setServerSyncMarker(Account account, String lastSyncIso) {

@@ -29,15 +29,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 /**
- * Created by fitz on 16/4/16.
+ * StatusBarColorCompat.
  */
-public class StatusBarColorCompat
-{
+public class StatusBarColorCompat {
     private static final int INVALID_VAL = -1;
     private static final int COLOR_DEFAULT = Color.parseColor("#20000000");
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void compat(Activity activity, int statusColor){
+    public static void compat(Activity activity, int statusColor) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (statusColor != INVALID_VAL) {
@@ -70,7 +69,7 @@ public class StatusBarColorCompat
 
     }
 
-    public static void compat(Activity activity){
+    public static void compat(Activity activity) {
         compat(activity, INVALID_VAL);
     }
 

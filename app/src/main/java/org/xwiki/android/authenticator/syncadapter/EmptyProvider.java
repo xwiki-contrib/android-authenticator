@@ -25,9 +25,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-/**
- * Created by fitz on 2016/4/26.
- */
 /*
  * Define an empty implementation of ContentProvider.
  * If the sync adapter framework tries to run your sync adapter,
@@ -46,7 +43,6 @@ public class EmptyProvider extends ContentProvider {
 
     /*
      * query() always returns no results
-     *
      */
     @Override
     public Cursor query(
@@ -71,6 +67,7 @@ public class EmptyProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         return null;
     }
+
     /*
      * delete() always returns "no rows affected" (0)
      */
@@ -78,6 +75,7 @@ public class EmptyProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
+
     /*
      * update() always returns "no rows affected" (0)
      */

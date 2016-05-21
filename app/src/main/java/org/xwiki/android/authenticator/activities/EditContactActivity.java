@@ -84,12 +84,12 @@ public class EditContactActivity extends AppCompatActivity {
 
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
-        if(wikiUser == null){
+        if (wikiUser == null) {
             finish();
             return;
         }
 
-        if(wikiUser != null){
+        if (wikiUser != null) {
             mEmailView.setText(wikiUser.getEmail());
             mFirstNameView.setText(wikiUser.getFirstName());
             mCellPhoneView.setText(wikiUser.getPhone());
@@ -98,12 +98,12 @@ public class EditContactActivity extends AppCompatActivity {
     }
 
 
-    private  XWikiUser getXWikiUser(Context context, Uri uri){
+    private XWikiUser getXWikiUser(Context context, Uri uri) {
         ContentResolver cr = context.getContentResolver();
         Cursor cursor = cr.query(uri, null, null, null, null);
         //getRawContactId
         long rawContactId = 0;
-        if (cursor!=null && cursor.getCount() > 0) {
+        if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 rawContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts.Data.RAW_CONTACT_ID));
                 break;
@@ -111,7 +111,7 @@ public class EditContactActivity extends AppCompatActivity {
         }
         cursor.close();
         //getXWikiUser
-        if(rawContactId > 0){
+        if (rawContactId > 0) {
             //first, lastName, email, phone, serverId=id.
             return ContactManager.getXWikiUser(context, rawContactId);
         }
@@ -126,11 +126,11 @@ public class EditContactActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
-        }else if(item.getItemId()==R.id.action_save){
+        } else if (item.getItemId() == R.id.action_save) {
             //check input valid  set input value (firstName, lastName, email, cellPhone)
-            if(checkInput()){
+            if (checkInput()) {
                 updataContact();
             }
         }
@@ -163,19 +163,19 @@ public class EditContactActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Boolean response) {
-                if(response == null){
-                    Toast.makeText(EditContactActivity.this,"Network Error !!!",Toast.LENGTH_SHORT).show();
+                if (response == null) {
+                    Toast.makeText(EditContactActivity.this, "Network Error !!!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //500:no permission,  200:success
                 if (!response) {
-                    Toast.makeText(EditContactActivity.this,"You have no permission !!!",Toast.LENGTH_SHORT).show();
-                }else{
+                    Toast.makeText(EditContactActivity.this, "You have no permission !!!", Toast.LENGTH_SHORT).show();
+                } else {
                     //update local
                     BatchOperation batchOperation = new BatchOperation(EditContactActivity.this, getContentResolver());
                     ContactManager.updateContact(EditContactActivity.this, getContentResolver(), wikiUser, false, false, false, true, wikiUser.rawId, batchOperation);
                     batchOperation.execute();
-                    Toast.makeText(EditContactActivity.this,"Update Successfully.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditContactActivity.this, "Update Successfully.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -208,15 +208,15 @@ public class EditContactActivity extends AppCompatActivity {
             mFirstNameView.setError(getString(R.string.error_field_required));
             focusView = mFirstNameView;
             cancel = true;
-        }else if (TextUtils.isEmpty(wikiUser.lastName)){
+        } else if (TextUtils.isEmpty(wikiUser.lastName)) {
             mLastNameView.setError(getString(R.string.error_field_required));
             focusView = mLastNameView;
             cancel = true;
-        }else if (TextUtils.isEmpty(wikiUser.phone)){
+        } else if (TextUtils.isEmpty(wikiUser.phone)) {
             mCellPhoneView.setError(getString(R.string.error_field_required));
             focusView = mCellPhoneView;
             cancel = true;
-        }else if (!StringUtils.isEmail(wikiUser.email)) {
+        } else if (!StringUtils.isEmail(wikiUser.email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;

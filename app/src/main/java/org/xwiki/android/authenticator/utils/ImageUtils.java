@@ -33,15 +33,13 @@ import java.io.ByteArrayOutputStream;
  * recycle the bitmap
  */
 public class ImageUtils {
-    private static final String TAG = "ImageCompressUtil";
+    private static final String TAG = "ImageUtils";
 
     /**
      * compress bitmap by quality
      *
-     * @param bitmap
-     *            the bitmap
-     * @param maxSize
-     *            the maxsize after compressing, KB
+     * @param bitmap  the bitmap
+     * @param maxSize the maxsize after compressing, KB
      * @return bitmap
      */
     public static Bitmap compressByQuality(Bitmap bitmap, int maxSize) {

@@ -43,7 +43,7 @@ import java.io.IOException;
 /**
  * Created by fitz on 2016/5/16.
  */
-public class SignUpStep2ViewFlipper extends BaseViewFlipper{
+public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     private EditText mUserIdEditText;
     private EditText mPasswordEditText;
     private EditText mConfirmPasswordEditText;
@@ -94,7 +94,7 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper{
                     Toast.makeText(mContext, "init form network error", Toast.LENGTH_SHORT).show();
                 } else if (!flag) {
                     Toast.makeText(mContext, "init form error", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     refreshCaptcha();
                 }
             }

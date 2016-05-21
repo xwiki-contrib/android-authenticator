@@ -20,7 +20,7 @@
 package org.xwiki.android.authenticator.bean;
 
 /**
- * Created by fitz on 2016/4/25.
+ * ObjectSummary
  */
 public class ObjectSummary {
     public String id;

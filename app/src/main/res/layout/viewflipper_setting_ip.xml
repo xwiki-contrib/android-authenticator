@@ -17,54 +17,54 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingTop="5dip"
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
-            android:paddingRight="20dip">
+            android:paddingRight="20dip"
+            android:paddingTop="5dip">
 
             <TextView
                 android:id="@+id/message"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dip" />
+                android:layout_marginBottom="15dip"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_server_label" />
+                android:text="@string/login_activity_server_label"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/accountServer"
-                android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:textColor="@android:color/black"
-                android:inputType="textEmailAddress"
-                android:text="192.168.56.1" />
-            <!--210.76.192.175:8080-->
+                android:text="www.xwiki.org"
+                android:textColor="@android:color/black" />
 
             <TextView
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_port_label" />
+                android:text="@string/login_activity_port_label"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/accountPort"
-                android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:textColor="@android:color/black"
-                android:inputType="textEmailAddress"
-                android:text="8080" />
+                android:text="80"
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
 

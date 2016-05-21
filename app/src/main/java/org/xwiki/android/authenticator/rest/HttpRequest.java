@@ -24,16 +24,17 @@ import java.net.URLEncoder;
 import java.util.Map;
 
 /**
- * Created by fitz on 2016/4/25.
+ * HttpRequest.
  */
 public class HttpRequest {
 
-    public interface HttpMethod{
+    public interface HttpMethod {
         int GET = 0;
         int POST = 1;
         int PUT = 2;
         int DELETE = 3;
     }
+
     public int mMethod = 0;
     public String mUrl;
     public HttpParams httpParams;
@@ -41,11 +42,11 @@ public class HttpRequest {
     private static final String DEFAULT_PARAMS_ENCODING = "UTF-8";
     public static int TIMEOUT = 5000;
 
-    public HttpRequest(String url){
+    public HttpRequest(String url) {
         this(url, HttpMethod.GET, null);
     }
 
-    public HttpRequest(String url, int method, HttpParams params){
+    public HttpRequest(String url, int method, HttpParams params) {
         mUrl = url;
         mMethod = method;
         if (params == null) {
@@ -62,13 +63,13 @@ public class HttpRequest {
         return TIMEOUT;
     }
 
-    public Map<String, String> getHeaders(){
+    public Map<String, String> getHeaders() {
         return httpParams.getHeaders();
     }
 
-    public String getUrl(){
+    public String getUrl() {
         //if(httpParams.getUrlParams()!=null){
-        if(mMethod == HttpMethod.GET){
+        if (mMethod == HttpMethod.GET) {
             mUrl += httpParams.getUrlParams();
         }
         return mUrl;

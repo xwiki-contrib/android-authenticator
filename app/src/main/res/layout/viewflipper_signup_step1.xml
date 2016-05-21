@@ -5,7 +5,8 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <ScrollView android:id="@+id/login_form"
+    <ScrollView
+        android:id="@+id/login_form"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
@@ -14,88 +15,89 @@
         android:background="@android:color/white"
         android:fillViewport="false">
 
-        <LinearLayout android:id="@+id/email_login_form"
-            android:paddingTop="5dip"
+        <LinearLayout
+            android:id="@+id/email_login_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
             android:paddingRight="20dip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:paddingTop="5dip">
 
             <TextView
-                android:text="@string/first_name"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginBottom="5dip"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:text="@string/first_name"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <EditText android:id="@+id/first_name"
+            <EditText
+                android:id="@+id/first_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
                 android:layout_marginBottom="10dp"
                 android:inputType="textPersonName"
-                android:textColor="@android:color/black"
-                android:singleLine="true" />
-
-            <TextView
-                android:text="@string/last_name"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginBottom="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText android:id="@+id/last_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:text="@string/last_name"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:inputType="text"
-                android:textColor="@android:color/black"
-                android:singleLine="true" />
+                android:maxLines="1"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:textColor="@android:color/black" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
                 android:text="@string/email"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginBottom="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <EditText android:id="@+id/email"
+            <EditText
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:inputType="textEmailAddress"
                 android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:layout_marginBottom="10dp"
-                android:textColor="@android:color/black"
-                android:inputType="textEmailAddress"
-                android:singleLine="true" />
+                android:textColor="@android:color/black" />
 
             <TextView
-                android:text="@string/phone"
-                android:visibility="gone"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginBottom="5dip"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:text="@string/phone"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:visibility="gone" />
 
-            <EditText android:id="@+id/cell_phone"
+            <EditText
+                android:id="@+id/cell_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
                 android:layout_marginBottom="10dp"
                 android:inputType="phone"
+                android:minWidth="250dip"
+                android:scrollHorizontally="true"
+                android:maxLines="1"
                 android:textColor="@android:color/black"
-                android:singleLine="true" />
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>

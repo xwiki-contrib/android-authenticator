@@ -20,11 +20,13 @@
 package org.xwiki.android.authenticator.bean;
 
 /**
- * Created by fitz on 2016/4/25.
+ * Page
  */
 public class Page {
     public String id;
+
     public String name;
+
     public String lastModified;
 
     @Override

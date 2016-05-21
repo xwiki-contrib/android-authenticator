@@ -43,20 +43,28 @@ public class Constants {
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access";
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
 
-    //limit the number of users synchronizing from server.
+    /**
+     * limit the number of users synchronizing from server.
+     */
     public static final int LIMIT_MAX_SYNC_USERS = 10000;
 
-    //SyncType
-    //0: no sync, 1: all users, 2: sync groups
+    /**
+     * SyncType
+     * 0: no sync, 1: all users, 2: sync groups
+     */
     public static final int SYNC_TYPE_NO_NEED_SYNC = 0;
     public static final int SYNC_TYPE_ALL_USERS = 1;
     public static final int SYNC_TYPE_SELECTED_GROUPS = 2;
 
-    //sync maker
+    /**
+     * sync maker
+     */
     public static final String SYNC_MARKER_KEY = "org.xwiki.android.sync.marker";
 
 
-    //sharePreference
+    /**
+     * sharePreference
+     */
     public static final String APP_UID = "appuid";
     public static final String PACKAGE_LIST = "packageList";
     public static final String SERVER_ADDRESS = "requestUrl";

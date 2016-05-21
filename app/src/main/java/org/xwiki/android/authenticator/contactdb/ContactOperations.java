@@ -67,14 +67,14 @@ public class ContactOperations {
      * Returns an instance of ContactOperations instance for adding new contact
      * to the platform contacts provider.
      *
-     * @param context the Authenticator Activity context
-     * @param userId the userId of the sample SyncAdapter user object
-     * @param accountName the username for the SyncAdapter account
+     * @param context         the Authenticator Activity context
+     * @param userId          the userId of the sample SyncAdapter user object
+     * @param accountName     the username for the SyncAdapter account
      * @param isSyncOperation are we executing this as part of a sync operation?
      * @return instance of ContactOperations
      */
     public static ContactOperations createNewContact(Context context, String userId,
-            String accountName, boolean isSyncOperation, BatchOperation batchOperation) {
+                                                     String accountName, boolean isSyncOperation, BatchOperation batchOperation) {
         return new ContactOperations(context, userId, accountName, isSyncOperation, batchOperation);
     }
 
@@ -82,13 +82,13 @@ public class ContactOperations {
      * Returns an instance of ContactOperations for updating existing contact in
      * the platform contacts provider.
      *
-     * @param context the Authenticator Activity context
-     * @param rawContactId the unique Id of the existing rawContact
+     * @param context         the Authenticator Activity context
+     * @param rawContactId    the unique Id of the existing rawContact
      * @param isSyncOperation are we executing this as part of a sync operation?
      * @return instance of ContactOperations
      */
     public static ContactOperations updateExistingContact(Context context, long rawContactId,
-            boolean isSyncOperation, BatchOperation batchOperation) {
+                                                          boolean isSyncOperation, BatchOperation batchOperation) {
         return new ContactOperations(context, rawContactId, isSyncOperation, batchOperation);
     }
 
@@ -125,12 +125,12 @@ public class ContactOperations {
      * Adds a contact name. We can take either a full name ("Bob Smith") or separated
      * first-name and last-name ("Bob" and "Smith").
      *
-     * @param fullName The full name of the contact - typically from an edit form
-     *      Can be null if firstName/lastName are specified.
+     * @param fullName  The full name of the contact - typically from an edit form
+     *                  Can be null if firstName/lastName are specified.
      * @param firstName The first name of the contact - can be null if fullName
-     *      is specified.
-     * @param lastName The last name of the contact - can be null if fullName
-     *      is specified.
+     *                  is specified.
+     * @param lastName  The last name of the contact - can be null if fullName
+     *                  is specified.
      * @return instance of ContactOperations
      */
     public ContactOperations addName(String fullName, String firstName, String lastName) {
@@ -175,7 +175,7 @@ public class ContactOperations {
     /**
      * Adds a phone number
      *
-     * @param phone new phone number for the contact
+     * @param phone     new phone number for the contact
      * @param phoneType the type: cell, home, etc.
      * @return instance of ContactOperations
      */
@@ -205,7 +205,7 @@ public class ContactOperations {
     }
 
     public ContactOperations addAvatar(String pageName, String avatarName) {
-        if ( !TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
+        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
             byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
             if (avatarBuffer != null) {
                 mValues.clear();
@@ -228,9 +228,9 @@ public class ContactOperations {
         if (userId != null) {
             mValues.put(ContactColumns.DATA_PID, userId);
             mValues.put(ContactColumns.DATA_SUMMARY, mContext
-                .getString(R.string.profile_action));
+                    .getString(R.string.profile_action));
             mValues.put(ContactColumns.DATA_DETAIL, mContext
-                .getString(R.string.view_profile));
+                    .getString(R.string.view_profile));
             mValues.put(Data.MIMETYPE, ContactColumns.MIME_PROFILE);
             addInsertOp();
         }
@@ -241,7 +241,7 @@ public class ContactOperations {
      * Updates contact's serverId
      *
      * @param serverId the serverId for this contact
-     * @param uri Uri for the existing raw contact to be updated
+     * @param uri      Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
     public ContactOperations updateServerId(String serverId, Uri uri) {
@@ -255,7 +255,7 @@ public class ContactOperations {
      * Updates contact's email
      *
      * @param email email id of the sample SyncAdapter user
-     * @param uri Uri for the existing raw contact to be updated
+     * @param uri   Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
     public ContactOperations updateEmail(String email, String existingEmail, Uri uri) {
@@ -271,22 +271,22 @@ public class ContactOperations {
      * Updates contact's name. The caller can either provide first-name
      * and last-name fields or a full-name field.
      *
-     * @param uri Uri for the existing raw contact to be updated
+     * @param uri               Uri for the existing raw contact to be updated
      * @param existingFirstName the first name stored in provider
-     * @param existingLastName the last name stored in provider
-     * @param existingFullName the full name stored in provider
-     * @param firstName the new first name to store
-     * @param lastName the new last name to store
-     * @param fullName the new full name to store
+     * @param existingLastName  the last name stored in provider
+     * @param existingFullName  the full name stored in provider
+     * @param firstName         the new first name to store
+     * @param lastName          the new last name to store
+     * @param fullName          the new full name to store
      * @return instance of ContactOperations
      */
     public ContactOperations updateName(Uri uri,
-        String existingFirstName,
-        String existingLastName,
-        String existingFullName,
-        String firstName,
-        String lastName,
-        String fullName) {
+                                        String existingFirstName,
+                                        String existingLastName,
+                                        String existingFullName,
+                                        String firstName,
+                                        String lastName,
+                                        String fullName) {
 
         mValues.clear();
         if (TextUtils.isEmpty(fullName)) {
@@ -319,8 +319,8 @@ public class ContactOperations {
      * Updates contact's phone
      *
      * @param existingNumber phone number stored in contacts provider
-     * @param phone new phone number for the contact
-     * @param uri Uri for the existing raw contact to be updated
+     * @param phone          new phone number for the contact
+     * @param uri            Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
     public ContactOperations updatePhone(String existingNumber, String phone, Uri uri) {
@@ -333,7 +333,7 @@ public class ContactOperations {
     }
 
     public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) {
-        if ( !TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
+        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
             byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
             if (avatarBuffer != null) {
                 mValues.clear();
@@ -349,7 +349,7 @@ public class ContactOperations {
      * Updates contact's profile action
      *
      * @param userId sample SyncAdapter user id
-     * @param uri Uri for the existing raw contact to be updated
+     * @param uri    Uri for the existing raw contact to be updated
      * @return instance of ContactOperations
      */
     public ContactOperations updateProfileAction(String userId, Uri uri) {
@@ -388,21 +388,21 @@ public class ContactOperations {
     }
 
     public static ContentProviderOperation.Builder newInsertCpo(Uri uri,
-            boolean isSyncOperation, boolean isYieldAllowed) {
+                                                                boolean isSyncOperation, boolean isYieldAllowed) {
         return ContentProviderOperation
                 .newInsert(addCallerIsSyncAdapterParameter(uri, isSyncOperation))
                 .withYieldAllowed(isYieldAllowed);
     }
 
     public static ContentProviderOperation.Builder newUpdateCpo(Uri uri,
-            boolean isSyncOperation, boolean isYieldAllowed) {
+                                                                boolean isSyncOperation, boolean isYieldAllowed) {
         return ContentProviderOperation
                 .newUpdate(addCallerIsSyncAdapterParameter(uri, isSyncOperation))
                 .withYieldAllowed(isYieldAllowed);
     }
 
     public static ContentProviderOperation.Builder newDeleteCpo(Uri uri,
-            boolean isSyncOperation, boolean isYieldAllowed) {
+                                                                boolean isSyncOperation, boolean isYieldAllowed) {
         return ContentProviderOperation
                 .newDelete(addCallerIsSyncAdapterParameter(uri, isSyncOperation))
                 .withYieldAllowed(isYieldAllowed);

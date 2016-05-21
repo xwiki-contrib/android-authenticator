@@ -19,7 +19,6 @@
  */
 package org.xwiki.android.authenticator.utils;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -32,7 +31,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.NetworkInfo.State;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -45,9 +43,7 @@ import java.util.List;
 
 /**
  * system tools
- *
  */
-@SuppressLint("SimpleDateFormat")
 public final class SystemTools {
     private static final String TAG = "SystemTools";
 
@@ -61,32 +57,14 @@ public final class SystemTools {
     }
 
     /**
-     * get SDK version
-     * 
-     * @return if API 17 return 17
-     */
-    public static int getSDKVersion() {
-        return android.os.Build.VERSION.SDK_INT;
-    }
-
-    /**
      * return System version
-     * 
+     *
      * @return like 2.3.3
      */
     public static String getSystemVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
 
-    /**
-     * send sms
-     */
-    public static void sendSMS(Context cxt, String smsBody) {
-        Uri smsToUri = Uri.parse("smsto:");
-        Intent intent = new Intent(Intent.ACTION_SENDTO, smsToUri);
-        intent.putExtra("sms_body", smsBody);
-        cxt.startActivity(intent);
-    }
 
     /**
      * check whether network is connected
@@ -95,7 +73,7 @@ public final class SystemTools {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        if(info!=null && info.isAvailable()) return true;
+        if (info != null && info.isAvailable()) return true;
         return false;
     }
 
@@ -109,19 +87,6 @@ public final class SystemTools {
         } else {
             return false;
         }
-    }
-
-    /**
-     * check whether wifi is connected
-     */
-    public static boolean isWiFi(Context cxt) {
-        ConnectivityManager cm = (ConnectivityManager) cxt
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        // wifi status：ConnectivityManager.TYPE_WIFI
-        // 3G status：ConnectivityManager.TYPE_MOBILE
-        State state = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-                .getState();
-        return State.CONNECTED == state;
     }
 
 
@@ -218,7 +183,7 @@ public final class SystemTools {
 
     /**
      * get application signature
-     * 
+     *
      * @param context
      * @param pkgName
      */
@@ -237,14 +202,14 @@ public final class SystemTools {
      * transfer signature to 32bit
      */
     private static String hexdigest(byte[] paramArrayOfByte) {
-        final char[] hexDigits = { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97,
-                98, 99, 100, 101, 102 };
+        final char[] hexDigits = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97,
+                98, 99, 100, 101, 102};
         try {
             MessageDigest localMessageDigest = MessageDigest.getInstance("MD5");
             localMessageDigest.update(paramArrayOfByte);
             byte[] arrayOfByte = localMessageDigest.digest();
             char[] arrayOfChar = new char[32];
-            for (int i = 0, j = 0;; i++, j++) {
+            for (int i = 0, j = 0; ; i++, j++) {
                 if (i >= 16) {
                     return new String(arrayOfChar);
                 }
@@ -259,9 +224,8 @@ public final class SystemTools {
 
     /**
      * available memory size
-     * 
-     * @param cxt
-     *            context
+     *
+     * @param cxt context
      * @return memory size
      */
     public static int getDeviceUsableMemory(Context cxt) {
@@ -274,9 +238,8 @@ public final class SystemTools {
 
     /**
      * clean services and background
-     * 
-     * @param cxt
-     *            context
+     *
+     * @param cxt context
      * @return clean app count
      */
     public static int gc(Context cxt) {

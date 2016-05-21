@@ -22,23 +22,21 @@ package org.xwiki.android.authenticator.bean;
 
 /**
  * <p> SearchResult class<p/>
- *
- <searchResult>
- <link href="http://xwikichina.com/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/AileenNian" rel="http://www.xwiki.org/rel/page"/>
- <type>page</type>
- <id>xwiki:XWiki.AileenNian</id>
- <pageFullName>XWiki.AileenNian</pageFullName>
- <wiki>xwiki</wiki>
- <space>XWiki</space>
- <pageName>AileenNian</pageName>
- <modified>2016-01-29T13:09:32+08:00</modified>
- <author>xwiki:XWiki.AileenNian</author>
- <version>2.1</version>
- <score>3.4895625</score>
- </searchResult>
+ * <searchResult>
+ *    <link href="http://xwikichina.com/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/AileenNian" rel="http://www.xwiki.org/rel/page"/>
+ *    <type>page</type>
+ *    <id>xwiki:XWiki.AileenNian</id>
+ *    <pageFullName>XWiki.AileenNian</pageFullName>
+ *    <wiki>xwiki</wiki>
+ *    <space>XWiki</space>
+ *    <pageName>AileenNian</pageName>
+ *    <modified>2016-01-29T13:09:32+08:00</modified>
+ *    <author>xwiki:XWiki.AileenNian</author>
+ *    <version>2.1</version>
+ *    <score>3.4895625</score>
+ * </searchResult>
  */
-public class SearchResult
-{
+public class SearchResult {
     public String type;
 
     public String id;

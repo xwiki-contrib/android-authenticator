@@ -32,7 +32,7 @@ import org.xwiki.android.authenticator.utils.StringUtils;
 /**
  * Created by fitz on 2016/5/16.
  */
-public class SettingIpViewFlipper extends BaseViewFlipper{
+public class SettingIpViewFlipper extends BaseViewFlipper {
 
     CharSequence serverAddr = null;
     CharSequence serverPort = null;
@@ -43,7 +43,7 @@ public class SettingIpViewFlipper extends BaseViewFlipper{
 
     @Override
     public void doNext() {
-        if(checkInput()){
+        if (checkInput()) {
             SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_UP_STEP1);
         }
@@ -51,13 +51,13 @@ public class SettingIpViewFlipper extends BaseViewFlipper{
 
     @Override
     public void doPrevious() {
-        if(checkInput()) {
+        if (checkInput()) {
             SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
         }
     }
 
-    public boolean checkInput(){
+    public boolean checkInput() {
         EditText serverEditText = (EditText) findViewById(R.id.accountServer);
         EditText serverPortEditText = (EditText) findViewById(R.id.accountPort);
         serverEditText.setError(null);
@@ -66,20 +66,20 @@ public class SettingIpViewFlipper extends BaseViewFlipper{
         serverPort = serverPortEditText.getText();
         View focusView = null;
         boolean cancel = false;
-        if(!StringUtils.isIpAddress(serverAddr) && !StringUtils.isDomainAddress(serverAddr)){
+        if (!StringUtils.isIpAddress(serverAddr) && !StringUtils.isDomainAddress(serverAddr)) {
             focusView = serverEditText;
             serverEditText.setError(mContext.getString(R.string.error_invalid_server));
             cancel = true;
-        }else if(TextUtils.isEmpty(serverPort)){
+        } else if (TextUtils.isEmpty(serverPort)) {
             focusView = serverEditText;
             serverEditText.setError(mContext.getString(R.string.error_invalid_server));
             cancel = true;
         }
-        if(cancel) {
+        if (cancel) {
             focusView.requestFocus();
             return false;
-        }else{
-            if(StringUtils.isIpAddress(serverAddr)) {
+        } else {
+            if (StringUtils.isIpAddress(serverAddr)) {
                 serverAddr = serverAddr + ":" + serverPort;
             }
             return true;

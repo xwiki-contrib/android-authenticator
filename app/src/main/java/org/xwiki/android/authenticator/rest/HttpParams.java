@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by fitz on 2016/4/25.
+ * HttpParams
  */
 public class HttpParams {
     private final Map<String, String> urlParams = new ConcurrentHashMap<String, String>(8);
@@ -52,6 +52,7 @@ public class HttpParams {
     public Map<String, String> getHeaders() {
         return mHeaders;
     }
+
     public Map<String, String> getBodyParams() {
         return mBodyParams;
     }
@@ -59,21 +60,24 @@ public class HttpParams {
     public void putHeaders(final String key, final int value) {
         this.putHeaders(key, value + "");
     }
+
     public void putHeaders(final String key, final String value) {
         mHeaders.put(key, value);
     }
 
-    public void putBodyParams(final String key, final int value){
-        mBodyParams.put(key, value+"");
+    public void putBodyParams(final String key, final int value) {
+        mBodyParams.put(key, value + "");
     }
-    public void putBodyParams(final String key, final String value){
+
+    public void putBodyParams(final String key, final String value) {
         mBodyParams.put(key, value);
     }
 
-    public void putUrlParams(final String key, final int value){
-        urlParams.put(key, value+"");
+    public void putUrlParams(final String key, final int value) {
+        urlParams.put(key, value + "");
     }
-    public void putUrlParams(final String key, final String value){
+
+    public void putUrlParams(final String key, final String value) {
         urlParams.put(key, value);
     }
 

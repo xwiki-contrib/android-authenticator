@@ -26,14 +26,14 @@ import android.view.View;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 
 /**
- * Created by lf on 2016/5/16.
+ * BaseViewFlipper
  */
-public abstract class BaseViewFlipper{
+public abstract class BaseViewFlipper {
     protected AuthenticatorActivity mActivity;
     protected Context mContext;
     private View mContentRootView;
 
-    public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView){
+    public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         mActivity = activity;
         mContext = (Context) mActivity;
         mContentRootView = contentRootView;
@@ -44,6 +44,7 @@ public abstract class BaseViewFlipper{
     }
 
     public abstract void doNext();
+
     public abstract void doPrevious();
 
 }

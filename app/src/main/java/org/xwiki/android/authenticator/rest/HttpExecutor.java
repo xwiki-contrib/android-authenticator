@@ -39,20 +39,24 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * Created by fitz on 2016/4/25.
+ * HttpExecutor
+ * performRequest is the api to execute the http request.
  */
-public class HttpConnector {
-    private static final String TAG = "HttpConnector";
+public class HttpExecutor {
+    private static final String TAG = "HttpExecutor";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private final SSLSocketFactory mSslSocketFactory;
     private static String COOKIE = null;
-    public HttpConnector() {
+
+    public HttpExecutor() {
         mSslSocketFactory = null;
     }
 
-    public HttpResponse performRequest(HttpRequest request) throws IOException{
+    public HttpResponse performRequest(HttpRequest request) throws IOException {
+        //request url
         String url = request.getUrl();
-        HashMap<String, String> map = new HashMap<String, String>();
+        //request headers
+        HashMap<String, String> map = new HashMap<>();
         map.putAll(request.getHeaders());
         URL parsedUrl = new URL(url);
         HttpURLConnection connection = openConnection(parsedUrl, request);
@@ -60,28 +64,25 @@ public class HttpConnector {
             connection.addRequestProperty(headerName, map.get(headerName));
         }
         COOKIE = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
-        if(COOKIE != null && COOKIE.length() > 0) {
+        if (COOKIE != null && COOKIE.length() > 0) {
             //connection.addRequestProperty("Cookie", COOKIE);
             connection.setRequestProperty("Cookie", COOKIE);
         }
-        Log.d(TAG, "url="+url+", header="+map.toString()+", Cookie="+(COOKIE!=null?COOKIE:""));
-        //{Authorization=Basic Zml0OmZpdHoyeHdpa2k=}
+        Log.d(TAG, "url=" + url + ", header=" + map.toString() + ", Cookie=" + (COOKIE != null ? COOKIE : ""));
         setConnectionParametersForRequest(connection, request);
         HttpResponse response = responseFromConnection(connection);
-        Log.d(TAG, "response: code="+response.getResponseCode() + response.getResponseMessage()+", header="+response.getHeaders().toString());
+        Log.d(TAG, "response: code=" + response.getResponseCode() + response.getResponseMessage() + ", header=" + response.getHeaders().toString());
         return response;
     }
 
     private HttpURLConnection openConnection(URL url, HttpRequest request)
             throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
         int timeoutMs = request.getTIMEOUT();
         connection.setConnectTimeout(timeoutMs);
         connection.setReadTimeout(timeoutMs);
         connection.setUseCaches(false);
         connection.setDoInput(true);
-
         // use caller-provided custom SslSocketFactory, if any, for HTTPS
         if ("https".equals(url.getProtocol())) {
             if (mSslSocketFactory != null) {
@@ -95,8 +96,8 @@ public class HttpConnector {
         return connection;
     }
 
-    private void setConnectionParametersForRequest(HttpURLConnection urlConnection, HttpRequest request) throws IOException{
-        switch(request.getMethod()){
+    private void setConnectionParametersForRequest(HttpURLConnection urlConnection, HttpRequest request) throws IOException {
+        switch (request.getMethod()) {
             case HttpRequest.HttpMethod.GET:
                 urlConnection.setRequestMethod("GET");
                 break;
@@ -131,7 +132,6 @@ public class HttpConnector {
     }
 
 
-    //HttpResponse
     private HttpResponse responseFromConnection(HttpURLConnection connection) throws IOException {
         HttpResponse response = new HttpResponse();
         //contentStream
@@ -148,7 +148,7 @@ public class HttpConnector {
         }
         response.setResponseCode(responseCode);
         response.setResponseMessage(connection.getResponseMessage());
-//        response.setContentStream(inputStream);
+        //response.setContentStream(inputStream);
         response.setContentData(getByteArrayFromInputStream(inputStream));
         response.setContentLength(connection.getContentLength());
         response.setContentEncoding(connection.getContentEncoding());
@@ -169,38 +169,6 @@ public class HttpConnector {
         return response;
     }
 
-//    public static void setCookie(String authorization){
-//        COOKIE = authorization ;
-//    }
-
-//    private byte[] entityToBytes(HttpResponse kjHttpResponse) throws IOException,
-//            IOException {
-//        PoolingByteArrayOutputStream bytes = new PoolingByteArrayOutputStream(
-//                ByteArrayPool.get(), (int) kjHttpResponse.getContentLength());
-//        byte[] buffer = null;
-//        try {
-//            InputStream in = kjHttpResponse.getContentStream();
-//            if (in == null) {
-//                throw new IOException("server error");
-//            }
-//            buffer = ByteArrayPool.get().getBuf(1024);
-//            int count;
-//            while ((count = in.read(buffer)) != -1) {
-//                bytes.write(buffer, 0, count);
-//            }
-//            return bytes.toByteArray();
-//        } finally {
-//            try {
-////                entity.consumeContent();
-//                kjHttpResponse.getContentStream().close();
-//            } catch (IOException e) {
-//                Loger.debug("Error occured when calling consumingContent");
-//            }
-//            ByteArrayPool.get().returnBuf(buffer);
-//            bytes.close();
-//        }
-//    }
-
     private byte[] getByteArrayFromInputStream(InputStream is)
             throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -214,6 +182,5 @@ public class HttpConnector {
         os.close();
         return bytes;
     }
-
 
 }

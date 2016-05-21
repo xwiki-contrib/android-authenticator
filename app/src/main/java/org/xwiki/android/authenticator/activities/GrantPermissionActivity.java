@@ -80,7 +80,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
         packageName = getIntent().getStringExtra("packageName");
         accountName = getIntent().getStringExtra("accountName");
         //check null, if null return.
-        if(uid == 0 || accountName == null){
+        if (uid == 0 || accountName == null) {
             Toast.makeText(this, "null uid or accountName", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -99,16 +99,16 @@ public class GrantPermissionActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void handleAuthorize(View view){
+    public void handleAuthorize(View view) {
         accountPasswd = mPasswdEditText.getText().toString();
 
-        if(TextUtils.isEmpty(accountPasswd)){
+        if (TextUtils.isEmpty(accountPasswd)) {
             Toast.makeText(this, "Please input your password!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -118,10 +118,10 @@ public class GrantPermissionActivity extends AppCompatActivity {
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
         String password = mAccountManager.getUserData(account, AccountManager.KEY_PASSWORD);
-        if(accountPasswd.equals(password)){
+        if (accountPasswd.equals(password)) {
             AppContext.addAuthorizedApp(uid, packageName);
             finish();
-        }else{
+        } else {
             Toast.makeText(GrantPermissionActivity.this, "Password error! Try again please!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -131,7 +131,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
     /**
      * login from server to verify the user's passwd in order to grant permission.
      */
-    private void loginFromServer(){
+    private void loginFromServer() {
         new AsyncTask<String, String, Intent>() {
             @Override
             protected Intent doInBackground(String... params) {
@@ -151,13 +151,13 @@ public class GrantPermissionActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Intent intent) {
                 int statusCode = intent.getIntExtra("statusCode", 0);
-                //0: network error, or HttpConnector.performRequest Exception.
-                if(statusCode == 0){
+                //0: network error, or HttpExecutor.performRequest Exception.
+                if (statusCode == 0) {
                     Toast.makeText(GrantPermissionActivity.this, "Network error! Try again please!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //error reponse.
-                if (statusCode < 200 || statusCode > 299){
+                if (statusCode < 200 || statusCode > 299) {
                     Toast.makeText(GrantPermissionActivity.this, "The password is wrong! Input again please!", Toast.LENGTH_SHORT).show();
                     return;
                 }

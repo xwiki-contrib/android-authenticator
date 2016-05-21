@@ -101,7 +101,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             return result;
         }
 
-
         if(!AppContext.isAuthorizedApp(uid)){
             final Intent intent = new Intent(AppContext.getInstance().getApplicationContext(), GrantPermissionActivity.class);
             intent.putExtra("uid",uid);

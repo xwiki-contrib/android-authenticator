@@ -40,14 +40,14 @@
 
             <EditText
                 android:id="@+id/accountName"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textEmailAddress"
-                android:text="fitz" />
+                android:text="" />
 
             <TextView
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -60,14 +60,14 @@
 
             <EditText
                 android:id="@+id/accountPassword"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black"
                 android:inputType="textPassword"
-                android:text="fitz2xwiki" />
+                android:text="" />
 
 
         </LinearLayout>

@@ -20,10 +20,13 @@
 package org.xwiki.android.authenticator.bean;
 
 /**
- * Created by fitz on 2016/4/20.
+ * XWikiGroup
  */
 public class XWikiGroup {
-    public String id; // curriki:XWiki.XWikiAdminGroup
+    /**
+     * curriki:XWiki.XWikiAdminGroup
+     */
+    public String id;
 
     public String wiki;
 

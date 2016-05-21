@@ -20,13 +20,18 @@
 package org.xwiki.android.authenticator.bean;
 
 public class XWikiUser {
-    public String id;  //pageId xwiki:XWiki.LudovicDubost (wiki:space.pageName)
+    /**
+     * pageId xwiki:XWiki.LudovicDubost (wiki:space.pageName)
+     */
+    public String id;
 
     public String wiki;
 
     public String space;
-
-    public String pageName;  //LudovicDubost
+    /**
+     * LudovicDubost
+     */
+    public String pageName;
 
     public String firstName;
 
@@ -48,9 +53,7 @@ public class XWikiUser {
 
     public long rawId;
 
-
-    public XWikiUser(){
-
+    public XWikiUser() {
     }
 
     public XWikiUser(String id, String pageName, String firstName, String lastName, String email, String phone, String avatar, long rawId, String company, String blog, String wiki, String space, String lastModifiedDate, String blogFeed) {
@@ -143,16 +146,17 @@ public class XWikiUser {
 
     /**
      * id(curriki:XWiki.Luisafan)->[wiki,space,pageName]
+     *
      * @param id
      * @return 0:wiki 1:space 2:pageName
      */
-    public static String[] splitId(String id){
+    public static String[] splitId(String id) {
         String[] result = new String[3];
         String[] strs = id.split(":");
-        if(strs.length == 2){
+        if (strs.length == 2) {
             result[0] = strs[0];
             String[] strs2 = strs[1].split("\\.");
-            if(strs2.length == 2){
+            if (strs2.length == 2) {
                 result[1] = strs2[0];
                 result[2] = strs2[1];
                 return result;

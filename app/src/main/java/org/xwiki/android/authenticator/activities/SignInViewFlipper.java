@@ -39,7 +39,7 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 /**
  * Created by lf on 2016/5/16.
  */
-public class SignInViewFlipper extends BaseViewFlipper{
+public class SignInViewFlipper extends BaseViewFlipper {
     private static final String TAG = "SignInViewFlipper";
 
     private CharSequence accountName = null;
@@ -51,7 +51,7 @@ public class SignInViewFlipper extends BaseViewFlipper{
 
     @Override
     public void doNext() {
-        if(checkInput()){
+        if (checkInput()) {
             submit();
         }
     }
@@ -61,7 +61,7 @@ public class SignInViewFlipper extends BaseViewFlipper{
         mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_IP);
     }
 
-    private boolean checkInput(){
+    private boolean checkInput() {
         EditText nameEditText = (EditText) findViewById(R.id.accountName);
         EditText passwordEditText = (EditText) findViewById(R.id.accountPassword);
         nameEditText.setError(null);
@@ -70,19 +70,19 @@ public class SignInViewFlipper extends BaseViewFlipper{
         accountPassword = passwordEditText.getText();
         View focusView = null;
         boolean cancel = false;
-        if(TextUtils.isEmpty(accountName)){
+        if (TextUtils.isEmpty(accountName)) {
             focusView = nameEditText;
             nameEditText.setError(mContext.getString(R.string.error_field_required));
             cancel = true;
-        }else if(TextUtils.isEmpty(accountPassword)){
+        } else if (TextUtils.isEmpty(accountPassword)) {
             focusView = passwordEditText;
             passwordEditText.setError(mContext.getString(R.string.error_field_required));
             cancel = true;
         }
-        if(cancel) {
+        if (cancel) {
             focusView.requestFocus();
             return false;
-        }else {
+        } else {
             return true;
         }
     }

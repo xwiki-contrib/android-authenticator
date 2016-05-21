@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by fitz on 2016/4/16.
+ * XmlUtils
  */
 public class XmlUtils {
     private static final String TAG = "XmlUtils";
@@ -203,7 +203,7 @@ public class XmlUtils {
                     break;
                 case XmlPullParser.END_TAG:
                     if (parser.getName().equalsIgnoreCase("objectSummary") && objectSummary != null) {
-                        if(!TextUtils.isEmpty(objectSummary.headline)) {
+                        if (!TextUtils.isEmpty(objectSummary.headline)) {
                             objectResults.add(objectSummary);
                         }
                         objectSummary = null;
