@@ -7,7 +7,7 @@ There're mainly the following key tasks, such as
 - large capacity performance
 - security issues
 
-![](https://raw.githubusercontent.com/xwiki-contrib/android-authenticator/master/document/process.jpg)
+![](https://raw.githubusercontent.com/xwiki-contrib/android-authenticator/master/document/_images/process.jpg)
 
 First introduce the design and implementation of the synchronization and authenticator
 
