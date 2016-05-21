@@ -3,12 +3,11 @@ What's left and things to improve:
 * android permission request and check 6.0 (TODO)
 * security issues (TODO)
 * show login process dialog (TODO)
-* large volume test (TODO)
+* Large capacity performance and test (TODO)
 * optimize query performance (TODO)
 * json/xml or custom http/okhttp/volley (TODO)
-* admin create users and delete users. (TODO)
-* Security issues (TODO)
-*Large capacity performance (TODO)
+* admin create users, delete users and edit user info(TODO)
+* general user can only edit himself or herself, maybe upload a new photo (TODO)
 
 
 # DONE Function List
