@@ -20,6 +20,8 @@
     <string name="login_activity_port_label">Port</string>
     <string name="login_activity_ok_button">Sign in</string>
     <string name="login_activity_register_button">Sign up</string>
+    <string name="sign_in_authenticating">Sign In... ...</string>
+    <string name="sign_up_authenticating">Sign Up... ...</string>
 
     <!-- menu -->
     <string name="menu_save">Save</string>
@@ -70,4 +72,10 @@
     <string name="sync_all_users">Sync all users</string>
     <string name="sync_selected_groups">Sync selected groups</string>
 
+
+    <array name="swipeRefreshColors">
+        <item>@android:color/holo_blue_light</item>
+        <item>@android:color/holo_green_light</item>
+        <item>@android:color/darker_gray</item>
+    </array>
 </resources>

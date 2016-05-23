@@ -22,9 +22,15 @@ package org.xwiki.android.authenticator.auth;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,7 +54,7 @@ import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 /**
  * @version $Id: $
  */
-public class AuthenticatorActivity extends AccountAuthenticatorActivity {
+public class AuthenticatorActivity extends AccountAuthenticatorActivity implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "AuthenticatorActivity";
 
     public static final String KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE";
@@ -69,6 +75,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
+    public SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -79,6 +86,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setEnabled(false);
 
         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
@@ -157,6 +169,22 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         ((Button) findViewById(R.id.right_button)).setText(rightButton);
     }
 
+    @Override
+    public void onRefresh() {
+        int id = mViewFlipper.getDisplayedChild();
+        switch (id) {
+            case ViewFlipperLayoutId.SIGN_UP_STEP2:
+                signUpStep2ViewFlipper.onRefresh();
+                break;
+            case ViewFlipperLayoutId.SETTING_SYNC:
+                settingSyncViewFlipper.onRefresh();
+                break;
+            default:
+                swipeRefreshLayout.setRefreshing(false);
+                break;
+        }
+    }
+
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
         int SIGN_IN = 1;
@@ -166,6 +194,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     public void showViewFlipper(int id) {
+        swipeRefreshLayout.setEnabled(false);
         mViewFlipper.setDisplayedChild(id);
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
@@ -183,6 +212,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 setLeftRightButton("Previous", "Login");
                 break;
             case ViewFlipperLayoutId.SETTING_SYNC:
+                swipeRefreshLayout.setEnabled(true);
                 if (settingSyncViewFlipper == null) {
                     settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
@@ -197,6 +227,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 setLeftRightButton("Previous", "Next");
                 break;
             case ViewFlipperLayoutId.SIGN_UP_STEP2:
+                swipeRefreshLayout.setEnabled(true);
                 if (signUpStep2ViewFlipper == null) {
                     signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
@@ -269,6 +300,41 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         setResult(RESULT_OK, intent);
         Log.d(TAG, ">" + "finish return");
         // in SettingSyncViewFlipper finish;
+    }
+
+    private Dialog mProgressDialog = null;
+
+    public void showProgress(CharSequence message, final AsyncTask asyncTask) {
+        // To avoid repeatedly create, must ensure hideProgress being called.
+        // if not called hideProgress, the progressDialog title will not be update
+        if(mProgressDialog == null) {
+            final ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setMessage(message);
+            dialog.setIndeterminate(true);
+            dialog.setCancelable(true);
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
+                    Log.i(TAG, "user cancelling authentication");
+                    if (asyncTask != null) {
+                        asyncTask.cancel(true);
+                    }
+                }
+            });
+            // We save off the progress dialog in a field so that we can dismiss
+            // it later.
+            mProgressDialog = dialog;
+            mProgressDialog.show();
+        }
+    }
+
+    /**
+     * Hides the progress UI for a lengthy operation.
+     */
+    public void hideProgress() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
     }
 
 }

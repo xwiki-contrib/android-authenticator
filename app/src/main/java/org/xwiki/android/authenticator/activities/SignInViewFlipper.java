@@ -45,6 +45,8 @@ public class SignInViewFlipper extends BaseViewFlipper {
     private CharSequence accountName = null;
     private CharSequence accountPassword = null;
 
+    private AsyncTask mAuthTask = null;
+
     public SignInViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
     }
@@ -52,6 +54,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
     @Override
     public void doNext() {
         if (checkInput()) {
+            mActivity.showProgress(mContext.getText(R.string.sign_in_authenticating), mAuthTask);
             submit();
         }
     }
@@ -94,7 +97,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
 
         final String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
 
-        new AsyncTask<String, Void, Intent>() {
+        mAuthTask = new AsyncTask<String, Void, Intent>() {
             @Override
             protected Intent doInBackground(String... params) {
                 Log.d(TAG, "Started authenticating");
@@ -125,6 +128,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(Intent intent) {
+                mActivity.hideProgress();
                 if (intent.hasExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE)) {
                     Toast.makeText(mContext, intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
                 } else {
@@ -134,5 +138,8 @@ public class SignInViewFlipper extends BaseViewFlipper {
             }
         }.execute();
     }
+
+
+
 
 }

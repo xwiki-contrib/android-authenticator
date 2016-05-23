@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -56,12 +57,15 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     String confirmPassword = null;
     String captcha = null;
 
+    private AsyncTask mSignUpTask = null;
+
     public SignUpStep2ViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
+        initView();
         initData();
     }
 
-    void initData() {
+    void initView(){
         // init view
         mUserIdEditText = (EditText) findViewById(R.id.user_id_edit);
         mPasswordEditText = (EditText) findViewById(R.id.password);
@@ -74,7 +78,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                 initData();
             }
         });
+    }
 
+    void initData() {
         //init form token and cookie
         new AsyncTask<String, String, Boolean>() {
             @Override
@@ -90,6 +96,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(Boolean flag) {
+                if(mActivity.swipeRefreshLayout.isRefreshing()){
+                    mActivity.swipeRefreshLayout.setRefreshing(false);
+                }
                 if (flag == null) {
                     Toast.makeText(mContext, "init form network error", Toast.LENGTH_SHORT).show();
                 } else if (!flag) {
@@ -105,8 +114,8 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     public void doNext() {
         //sign up and next setting sync
         if (checkInput()) {
+            mActivity.showProgress(mContext.getText(R.string.sign_up_authenticating), mSignUpTask);
             register();
-            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
         }
     }
 
@@ -119,7 +128,7 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     //0:false, 1:true, null:network error, 2:the user exists.
     public void register() {
         final String[] step1Values = mActivity.getStep1Values();
-        new AsyncTask<String, String, Integer>() {
+        mSignUpTask = new AsyncTask<String, String, Integer>() {
             @Override
             protected Integer doInBackground(String... params) {
                 //found whether the user exists.
@@ -147,16 +156,18 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(Integer status) {
+                mActivity.hideProgress();
                 if (status == null) {
                     Toast.makeText(mContext, "network error", Toast.LENGTH_SHORT).show();
                 } else if (status == 2) {
                     Toast.makeText(mContext, "the user exists", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(mContext, status == 1 ? "success!" : "fail!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, status == 1 ? "success!" : "fail!", Toast.LENGTH_SHORT).show();
                     if (status == 0) {
                         refreshCaptcha();
                     } else {
                         finishSignUp();
+                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
                     }
                 }
             }
@@ -220,8 +231,6 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             focusView.requestFocus();
             return false;
         } else {
-            //TODO Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             return true;
         }
     }
@@ -245,6 +254,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             protected void onPostExecute(byte[] bytes) {
                 Bitmap captchaBitmap = getPicFromBytes(bytes, null);
                 mCaptchaImageView.setImageBitmap(captchaBitmap);
+                if(mActivity.swipeRefreshLayout.isRefreshing()){
+                    mActivity.swipeRefreshLayout.setRefreshing(false);
+                }
             }
         }.execute();
     }
@@ -258,6 +270,19 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             else
                 return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         return null;
+    }
+
+    public void onRefresh(){
+        initData();
+        /*
+        //mActivity.swipeRefreshLayout.setRefreshing(true);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
+        */
     }
 
 }

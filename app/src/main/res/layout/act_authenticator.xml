@@ -1,44 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <include layout="@layout/toolbar_layout" />
 
-    <ViewFlipper
-        android:id="@+id/view_flipper"
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/left_right_button"
         android:layout_below="@+id/toolbar">
 
-        <include
-            layout="@layout/viewflipper_setting_ip"
+        <ViewFlipper
+            android:id="@+id/view_flipper"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-        <include
-            layout="@layout/viewflipper_signin"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <include
+                layout="@layout/viewflipper_setting_ip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <include
-            layout="@layout/viewflipper_settings_sync"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <include
+                layout="@layout/viewflipper_signin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <include
-            layout="@layout/viewflipper_signup_step1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <include
+                layout="@layout/viewflipper_settings_sync"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <include
-            layout="@layout/viewflipper_signup_step2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <include
+                layout="@layout/viewflipper_signup_step1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-    </ViewFlipper>
+            <include
+                layout="@layout/viewflipper_signup_step2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </ViewFlipper>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/left_right_button"

@@ -23,6 +23,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -162,6 +163,15 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 0);
         }
+    }
+
+    public void onRefresh(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.swipeRefreshLayout.setRefreshing(false);
+            }
+        },3000);
     }
 
 }
