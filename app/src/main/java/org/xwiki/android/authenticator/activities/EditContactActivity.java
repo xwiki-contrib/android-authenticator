@@ -19,8 +19,12 @@
  */
 package org.xwiki.android.authenticator.activities;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -42,6 +46,7 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 import org.xwiki.android.authenticator.utils.StringUtils;
@@ -63,6 +68,10 @@ public class EditContactActivity extends AppCompatActivity {
     private EditText mLastNameView;
 
     XWikiUser wikiUser = null;
+
+    private AsyncTask mUpdateUserTask;
+    //show progress dialog
+    private Dialog mProgressDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +106,33 @@ public class EditContactActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_contact, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        } else if (item.getItemId() == R.id.action_save) {
+            //check input valid  set input value (firstName, lastName, email, cellPhone)
+            if (checkInput()) {
+                updataContact();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mUpdateUserTask != null && !mUpdateUserTask.isCancelled()){
+            mUpdateUserTask.cancel(true);
+        }
+        mUpdateUserTask = null;
+    }
 
     private XWikiUser getXWikiUser(Context context, Uri uri) {
         ContentResolver cr = context.getContentResolver();
@@ -118,39 +154,24 @@ public class EditContactActivity extends AppCompatActivity {
         return null;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.edit_contact, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        } else if (item.getItemId() == R.id.action_save) {
-            //check input valid  set input value (firstName, lastName, email, cellPhone)
-            if (checkInput()) {
-                updataContact();
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
 
     public void updataContact() {
+        //show progress
+        showProgress("Update user...", mUpdateUserTask);
         //update server at first and check if the user has permission to modify
         // according the response.
-        new AsyncTask<String, String, Boolean>() {
+        mUpdateUserTask = new AsyncTask<Void, Void, HttpResponse>() {
             @Override
-            protected Boolean doInBackground(String... params) {
+            protected HttpResponse doInBackground(Void... params) {
                 try {
                     XWikiUser oldUser = XWikiHttp.getUserDetail(wikiUser.getId());
                     oldUser.firstName = wikiUser.firstName;
                     oldUser.lastName = wikiUser.lastName;
                     oldUser.email = wikiUser.email;
                     oldUser.phone = wikiUser.phone;
-                    boolean response = XWikiHttp.updateUser(oldUser);
+                    HttpResponse response = XWikiHttp.updateUser(oldUser);
                     return response;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -162,14 +183,18 @@ public class EditContactActivity extends AppCompatActivity {
             }
 
             @Override
-            protected void onPostExecute(Boolean response) {
+            protected void onPostExecute(HttpResponse response) {
+                hideProgress();
                 if (response == null) {
                     Toast.makeText(EditContactActivity.this, "Network Error !!!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //500:no permission,  200:success
-                if (!response) {
+                int statusCode = response.getResponseCode();
+                if (statusCode == 401) {
                     Toast.makeText(EditContactActivity.this, "You have no permission !!!", Toast.LENGTH_SHORT).show();
+                } else if(statusCode < 200 || statusCode > 299) {
+                    Toast.makeText(EditContactActivity.this, "error:"+response.getResponseMessage(), Toast.LENGTH_SHORT).show();
                 } else {
                     //update local
                     BatchOperation batchOperation = new BatchOperation(EditContactActivity.this, getContentResolver());
@@ -213,9 +238,7 @@ public class EditContactActivity extends AppCompatActivity {
             focusView = mLastNameView;
             cancel = true;
         } else if (TextUtils.isEmpty(wikiUser.phone)) {
-            mCellPhoneView.setError(getString(R.string.error_field_required));
-            focusView = mCellPhoneView;
-            cancel = true;
+            wikiUser.phone = "";
         } else if (!StringUtils.isEmail(wikiUser.email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
@@ -228,9 +251,41 @@ public class EditContactActivity extends AppCompatActivity {
             focusView.requestFocus();
             return false;
         } else {
-            //TODO Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             return true;
+        }
+    }
+
+    public void showProgress(CharSequence message, final AsyncTask asyncTask) {
+        // To avoid repeatedly create
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            return;
+        }
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(message);
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(true);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                Log.i(TAG, "user cancelling authentication");
+                if (asyncTask != null) {
+                    asyncTask.cancel(true);
+                }
+            }
+        });
+        // We save off the progress dialog in a field so that we can dismiss
+        // it later.
+        mProgressDialog = dialog;
+        mProgressDialog.show();
+    }
+
+    /**
+     * Hides the progress UI for a lengthy operation.
+     */
+    public void hideProgress() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
         }
     }
 

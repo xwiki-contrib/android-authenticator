@@ -32,17 +32,24 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.rest.HttpParams;
+import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 
 /**
- * Created by fitz on 2016/5/16.
+ * SignUpStep2ViewFlipper.
  */
 public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     private EditText mUserIdEditText;
@@ -82,12 +89,12 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
     void initData() {
         //init form token and cookie
-        AsyncTask initFormTokenTask = new AsyncTask<Void, Void, Boolean>() {
+        AsyncTask initFormTokenTask = new AsyncTask<Void, Void, HttpResponse>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected HttpResponse doInBackground(Void... params) {
                 try {
-                    formToken = XWikiHttp.signUpInitCookieForm();
-                    return formToken == null ? false : true;
+                    HttpResponse response = XWikiHttp.signUpInitCookieForm();
+                    return response;
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -95,16 +102,28 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             }
 
             @Override
-            protected void onPostExecute(Boolean flag) {
+            protected void onPostExecute(HttpResponse response) {
                 if(mActivity.swipeRefreshLayout.isRefreshing()){
                     mActivity.swipeRefreshLayout.setRefreshing(false);
                 }
-                if (flag == null) {
-                    showErrorMessage("init form network error");
-                } else if (!flag) {
-                    showErrorMessage("init form error");
-                } else {
-                    refreshCaptcha();
+                if(response == null){
+                    //network error
+                    showErrorMessage("network error, check network and pull to refresh please.");
+                }else{
+                    int statusCode = response.getResponseCode();
+                    if (statusCode < 200 || statusCode > 299) {
+                        //server or client error
+                        showErrorMessage("init form error: "+response.getResponseMessage()+", pull to refresh please");
+                    }else{
+                        //200ok
+                        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
+                        byte[] contentData = response.getContentData();
+                        Document document = Jsoup.parse(new String(contentData));
+                        //get the form token
+                        formToken = document.select("input[name=form_token]").val();
+                        //to get captcha
+                        refreshCaptcha();
+                    }
                 }
             }
         };
@@ -129,9 +148,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     //0:false, 1:true, null:network error, 2:the user exists.
     public void register() {
         final String[] step1Values = mActivity.getStep1Values();
-        mSignUpTask = new AsyncTask<Void, Void, Integer>() {
+        mSignUpTask = new AsyncTask<Void, Void, Object>() {
             @Override
-            protected Integer doInBackground(Void... params) {
+            protected Object doInBackground(Void... params) {
                 //found whether the user exists.
                 XWikiUser userFind = null;
                 try {
@@ -143,12 +162,13 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                     e.printStackTrace();
                     return null;
                 }
-                if (userFind != null) return 2;
+                if (userFind != null) return userFind;
 
+                //sign up
                 try {
                     //boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
-                    boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
-                    return signUpFlag ? 1 : 0;
+                    HttpResponse response = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
+                    return response;
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -156,19 +176,34 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             }
 
             @Override
-            protected void onPostExecute(Integer status) {
+            protected void onPostExecute(Object object) {
                 mActivity.hideProgress();
-                if (status == null) {
+                if(object == null){
                     showErrorMessage("network error");
-                } else if (status == 2) {
+                } else if(object instanceof XWikiUser){
+                    //the user exists
                     showErrorMessage("the user exists");
-                } else {
-                    if (status == 0) {
-                        showErrorMessage("Captcha error");
+                }else if(object instanceof HttpResponse){
+                    HttpResponse response = (HttpResponse) object;
+                    int statusCode = response.getResponseCode();
+                    //response error
+                    if (statusCode < 200 || statusCode > 299) {
+                        showErrorMessage(response.getResponseMessage());
                         refreshCaptcha();
-                    } else {
+                        return;
+                    }
+                    //return 200ok
+                    byte[] contentData = response.getContentData();
+                    Document document = Jsoup.parse(new String(contentData));
+                    Elements elements = document.select("#loginForm");
+                    if(!elements.isEmpty()){
+                        //200ok, sign up successfully because html contains "id=loginForm"
                         finishSignUp();
                         mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+                    }else{
+                        //return 200ok! but not sign up successfully
+                        showErrorMessage("Captcha error");
+                        refreshCaptcha();
                     }
                 }
             }

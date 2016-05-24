@@ -28,7 +28,7 @@ import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 /**
- * Created by fitz on 2016/5/16.
+ * SignUpStep1ViewFlipper.
  */
 public class SignUpStep1ViewFlipper extends BaseViewFlipper {
     private EditText mFirstNameView;

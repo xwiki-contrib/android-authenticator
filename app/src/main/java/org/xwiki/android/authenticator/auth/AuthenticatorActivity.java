@@ -82,8 +82,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
 
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
-    //show refresh
+    //show refresh in SignUpStep2ViewFlipper for refreshing form again.
     public SwipeRefreshLayout swipeRefreshLayout;
+    //refresh ImageView mainly in SettingSyncViewFlipper
     public ImageView refreshImageView;
     //show progress dialog
     private Dialog mProgressDialog = null;

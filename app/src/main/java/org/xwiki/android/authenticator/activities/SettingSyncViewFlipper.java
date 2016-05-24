@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by lf on 2016/5/13.
+ * SettingSyncViewFlipper
  */
 public class SettingSyncViewFlipper extends BaseViewFlipper {
     private static final String TAG = "SettingSyncViewFlipper";

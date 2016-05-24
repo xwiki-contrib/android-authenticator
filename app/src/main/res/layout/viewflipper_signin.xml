@@ -75,7 +75,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="normal"
                 android:textColor="@android:color/holo_red_light"
-                android:singleLine="true"
+                android:maxLines="2"
                 android:layout_marginTop="10dip"
                 android:gravity="left"
                 android:layout_width="match_parent"

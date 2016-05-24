@@ -99,7 +99,7 @@ public class XWikiHttp {
      * false: sign up unsuccessfully
      * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
      */
-    public static Boolean signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email) throws IOException {
+    public static HttpResponse signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email) throws IOException {
         String registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
             registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/RealRegistration";
@@ -118,23 +118,15 @@ public class XWikiHttp {
         request.httpParams.putBodyParams("template", "XWiki.XWikiUserTemplate");
         request.httpParams.putBodyParams("xredirect", "/xwiki/bin/view/Main/UserDirectory");
         HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        byte[] contentData = response.getContentData();
-        Document document = Jsoup.parse(new String(contentData));
-        Elements elements = document.select("#loginForm");
-        if(!elements.isEmpty()){
-            return true;
-        }
+        return response;
+
         /*
         formToken = document.select("input[name=template]").val();
         if (TextUtils.isEmpty(formToken)) {
             return true;
         }
         */
-        return false;
+        //return false;
     }
 
     /**
@@ -144,7 +136,7 @@ public class XWikiHttp {
      * the form token
      * @throws IOException
      */
-    public static String signUpInitCookieForm() throws IOException {
+    public static HttpResponse signUpInitCookieForm() throws IOException {
         SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         String registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
@@ -153,15 +145,7 @@ public class XWikiHttp {
         HttpRequest request = new HttpRequest(registerUrl);
         HttpExecutor httpExecutor = new HttpExecutor();
         HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            return null;
-        }
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
-        byte[] contentData = response.getContentData();
-        Document document = Jsoup.parse(new String(contentData));
-        String formToken = document.select("input[name=form_token]").val();
-        return formToken;
+        return response;
     }
 
 
@@ -173,7 +157,7 @@ public class XWikiHttp {
      * @param formToken
      * @return
      */
-    public static Boolean signUp(String userId, String password, String formToken, String captcha) throws IOException {
+    public static HttpResponse signUp(String userId, String password, String formToken, String captcha) throws IOException {
         return signUp(userId, password, formToken, captcha, "", "", "");
     }
 
@@ -227,7 +211,7 @@ public class XWikiHttp {
      * @return true:update success, false:update fail
      * @throws IOException curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
      */
-    public static boolean updateUser(XWikiUser user) throws IOException {
+    public static HttpResponse updateUser(XWikiUser user) throws IOException {
         String url = getServerRestUrl() + "/wikis/" + user.wiki + "/spaces/" + user.space + "/pages/" + user.pageName + "/objects/XWiki.XWikiUsers/0";
         HttpRequest request = new HttpRequest(url, HttpRequest.HttpMethod.PUT, null);
         request.httpParams.putBodyParams("className", "XWiki.XWikiUsers");
@@ -237,12 +221,7 @@ public class XWikiHttp {
         request.httpParams.putBodyParams("property#phone", user.phone);
         HttpExecutor httpExecutor = new HttpExecutor();
         HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
-            return false;
-        }
-        return true;
+        return response;
     }
 
     /**
@@ -304,6 +283,7 @@ public class XWikiHttp {
                     '}';
         }
     }
+
 
     /**
      * getSyncData
@@ -496,7 +476,12 @@ public class XWikiHttp {
             HttpRequest request = new HttpRequest(avatarUrl);
             HttpExecutor httpExecutor = new HttpExecutor();
             HttpResponse response = httpExecutor.performRequest(request);
-            //int statusCode = response.getResponseCode();
+            int statusCode = response.getResponseCode();
+            if(statusCode == 404){
+                return null;
+            } else if (statusCode < 200 || statusCode > 299) {
+                throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
+            }
             try {
                 final BitmapFactory.Options options = new BitmapFactory.Options();
                 Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),

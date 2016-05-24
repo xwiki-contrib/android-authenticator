@@ -30,7 +30,7 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 /**
- * Created by fitz on 2016/5/16.
+ * SettingIpViewFlipper
  */
 public class SettingIpViewFlipper extends BaseViewFlipper {
 

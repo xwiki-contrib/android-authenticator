@@ -38,7 +38,7 @@ import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 /**
- * Created by lf on 2016/5/16.
+ * SignInViewFlipper.
  */
 public class SignInViewFlipper extends BaseViewFlipper {
     private static final String TAG = "SignInViewFlipper";
@@ -78,7 +78,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
             focusView = nameEditText;
             nameEditText.setError(mContext.getString(R.string.error_field_required));
             cancel = true;
-        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length() < 6) {
+        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length() < 5) {
             focusView = passwordEditText;
             passwordEditText.setError(mContext.getString(R.string.error_invalid_password));
             cancel = true;
@@ -113,7 +113,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
                         if(statusCode == 401) {
                             data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "username or password error");
                         }else{
-                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "network request error");
+                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, response.getResponseMessage());
                         }
                     } else {
                         String authtoken = response.getHeaders().get("Set-Cookie");
