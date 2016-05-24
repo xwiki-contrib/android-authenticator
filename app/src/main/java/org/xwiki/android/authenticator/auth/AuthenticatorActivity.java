@@ -37,6 +37,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -149,6 +150,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
 
     private void doPreviousNext(boolean next) {
         int id = mViewFlipper.getDisplayedChild();
+        //set animation for view flipper (left right)
+        if(next || id == ViewFlipperLayoutId.SETTING_IP){
+            mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                    R.anim.push_left_in));
+            mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                    R.anim.push_left_out));
+        }else{
+            mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                    R.anim.push_right_in));
+            mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                    R.anim.push_right_out));
+        }
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
                 if (settingsIpViewFlipper == null) {
