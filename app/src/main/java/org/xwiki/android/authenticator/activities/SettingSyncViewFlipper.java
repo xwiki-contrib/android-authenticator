@@ -25,15 +25,21 @@ import android.content.ContentResolver;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
@@ -55,11 +61,13 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     GroupListAdapter mAdapter;
     private List<XWikiGroup> groupList;
     private RadioGroup radioGroup;
+    private AppCompatSpinner selectSyncSpinner;
+    private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
 
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
         initView();
-        initData();
+        //initData();
     }
 
     @Override
@@ -70,8 +78,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     @Override
     public void doPrevious() {
-        SharedPrefsUtils.removeKeyValue(mContext, Constants.SYNC_TYPE);
-        resetSync(false);
         mActivity.finish();
     }
 
@@ -82,27 +88,35 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         mListView.setAdapter(mAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        radioGroup = (RadioGroup) findViewById(R.id.radio_sync_type);
-        int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
-        if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
-            radioGroup.check(R.id.radio_all_users);
-            mListView.setVisibility(View.GONE);
-        } else {
-            radioGroup.check(R.id.radio_selected_groups);
-            mListView.setVisibility(View.VISIBLE);
-        }
-
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        selectSyncSpinner = (AppCompatSpinner) findViewById(R.id.select_spinner);
+        //((TextView)selectSyncSpinner.getSelectedView()).setTextColor(0x00000000);
+        selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // find which radio button is selected
-                if (checkedId == R.id.radio_all_users) {
-                    mListView.setVisibility(View.GONE);
-                } else if (checkedId == R.id.radio_selected_groups) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 2){
                     mListView.setVisibility(View.VISIBLE);
+                    initData();
+                }else{
+                    mListView.setVisibility(View.GONE);
                 }
+                SYNC_TYPE = position;
+                //((TextView) view).setTextColor(0x00000000);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
+
+        SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+        selectSyncSpinner.setSelection(SYNC_TYPE);
+
+
+//        if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
+//
+//        } else if(syncType == Constants.SYNC_TYPE_SELECTED_GROUPS){
+//            selectSyncSpinner.setSelection(2);
+//        }
 
         mActivity.refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,17 +153,26 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     mAdapter.refresh(groupList);
                 }
             }
-
-
         };
         mActivity.putAsyncTask(getGroupsTask);
     }
 
 
     void syncSettingComplete() {
-        if (radioGroup.getCheckedRadioButtonId() == R.id.radio_all_users) {
+        int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+        if(oldSyncType == SYNC_TYPE && SYNC_TYPE != Constants.SYNC_TYPE_SELECTED_GROUPS){
+            return;
+        }
+        if(SYNC_TYPE == Constants.SYNC_TYPE_NO_NEED_SYNC){
+            SharedPrefsUtils.removeKeyValue(mContext, Constants.SYNC_TYPE);
+            resetSync(false);
+        } else if (SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS) {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
-        } else {
+            resetSync(true);
+        } else if(SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS){
+            if(oldSyncType == SYNC_TYPE && compareSelectGroups()){
+                return;
+            }
             List<XWikiGroup> list = mAdapter.getSelectGroups();
             //Toast.makeText(mContext, mAdapter.getSelectGroups().toString(), Toast.LENGTH_SHORT).show();
             if (list != null && list.size() > 0) {
@@ -162,8 +185,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
             }
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
+            resetSync(true);
         }
-        resetSync(true);
         mActivity.finish();
     }
 
@@ -186,6 +209,29 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     public void onRefresh(){
         initData();
+    }
+
+    private boolean compareSelectGroups(){
+        //new
+        List<XWikiGroup> newList = mAdapter.getSelectGroups();
+        //old
+        List<String> oldList = SharedPrefsUtils.getArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS);
+        if(newList == null && oldList == null){
+            return true;
+        }else if(newList != null && oldList != null){
+            if(newList.size() != oldList.size()){
+                return false;
+            }else{
+                for(XWikiGroup item : newList){
+                    if(!oldList.contains(item.id)){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }else{
+            return false;
+        }
     }
 
 

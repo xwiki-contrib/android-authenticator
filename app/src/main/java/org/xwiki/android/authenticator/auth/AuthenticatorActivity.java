@@ -271,7 +271,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
                     settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("Setting Sync");
-                setLeftRightButton("Don't Sync", "Complete");
+                setLeftRightButton("Cancel", "Complete");
                 break;
             case ViewFlipperLayoutId.SIGN_UP_STEP1:
                 if (signUpStep1ViewFlipper == null) {

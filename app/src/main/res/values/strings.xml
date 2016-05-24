@@ -73,6 +73,12 @@
     <string name="sync_all_users">Sync all users</string>
     <string name="sync_selected_groups">Sync selected groups</string>
 
+    <string-array name="select_groups_array">
+        <item>Don\'t Sync</item>
+        <item>Sync All The Users</item>
+        <item>Sync The Selected Groups</item>
+    </string-array>
+
 
     <array name="swipeRefreshColors">
         <item>@android:color/holo_blue_light</item>
