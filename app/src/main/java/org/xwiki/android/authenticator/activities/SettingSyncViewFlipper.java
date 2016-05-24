@@ -27,6 +27,8 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -56,6 +58,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
+        initView();
         initData();
     }
 
@@ -72,7 +75,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         mActivity.finish();
     }
 
-    public void initData() {
+    private void initView(){
         mListView = (ListView) findViewById(R.id.list_view);
         groupList = new ArrayList<>();
         mAdapter = new GroupListAdapter(mContext, groupList);
@@ -101,9 +104,20 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         });
 
-        new AsyncTask<String, String, List<XWikiGroup>>() {
+        mActivity.refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected List<XWikiGroup> doInBackground(String... params) {
+            public void onClick(View v) {
+                initData();
+            }
+        });
+    }
+
+    private void initData() {
+        //mActivity.swipeRefreshLayout.setRefreshing(true);
+        refreshImageView(mActivity.refreshImageView);
+        AsyncTask getGroupsTask = new AsyncTask<Void, Void, List<XWikiGroup>>() {
+            @Override
+            protected List<XWikiGroup> doInBackground(Void... params) {
                 try {
                     List<XWikiGroup> groups = XWikiHttp.getGroupList(Constants.LIMIT_MAX_SYNC_USERS);
                     return groups;
@@ -117,13 +131,18 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(List<XWikiGroup> groups) {
+                hideRefreshAnimation(mActivity.refreshImageView);
                 if (groups != null && groups.size() >= 0) {
                     Log.i(TAG, groups.toString());
+                    groupList.clear();
                     groupList.addAll(groups);
                     mAdapter.refresh(groupList);
                 }
             }
-        }.execute();
+
+
+        };
+        mActivity.putAsyncTask(getGroupsTask);
     }
 
 
@@ -132,7 +151,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         } else {
             List<XWikiGroup> list = mAdapter.getSelectGroups();
-            Toast.makeText(mContext, mAdapter.getSelectGroups().toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext, mAdapter.getSelectGroups().toString(), Toast.LENGTH_SHORT).show();
             if (list != null && list.size() > 0) {
                 List<String> groupIdList = new ArrayList<>();
                 for (XWikiGroup iGroup : list) {
@@ -166,12 +185,32 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     public void onRefresh(){
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.swipeRefreshLayout.setRefreshing(false);
-            }
-        },3000);
+        initData();
+    }
+
+
+    /**
+     * animation refresh
+     */
+    private Animation animation;
+    public void refreshImageView(View v) {
+        hideRefreshAnimation(v);
+        //refresh anim
+        animation = AnimationUtils.loadAnimation(mContext, R.anim.refresh);
+        //Defines what this animation should do when it reaches the end
+        animation.setRepeatMode(Animation.RESTART);
+        //repeat times
+        animation.setRepeatCount(Animation.INFINITE);
+        //ImageView startt anim
+        v.startAnimation(animation);
+    }
+    public void hideRefreshAnimation(View v) {
+        if (animation != null) {
+            animation.cancel();
+            v.clearAnimation();
+            v.setAnimation(null);
+//        	v.setImageResource(R.drawable.refresh);
+        }
     }
 
 }

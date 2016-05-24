@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        android:icon="@mipmap/refresh_icon"
+        android:title="@string/menu_refresh">
+    </item>
+</menu>

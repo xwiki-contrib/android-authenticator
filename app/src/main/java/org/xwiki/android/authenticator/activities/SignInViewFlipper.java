@@ -23,11 +23,12 @@ import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
@@ -77,9 +78,9 @@ public class SignInViewFlipper extends BaseViewFlipper {
             focusView = nameEditText;
             nameEditText.setError(mContext.getString(R.string.error_field_required));
             cancel = true;
-        } else if (TextUtils.isEmpty(accountPassword)) {
+        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length() < 6) {
             focusView = passwordEditText;
-            passwordEditText.setError(mContext.getString(R.string.error_field_required));
+            passwordEditText.setError(mContext.getString(R.string.error_invalid_password));
             cancel = true;
         }
         if (cancel) {
@@ -97,9 +98,9 @@ public class SignInViewFlipper extends BaseViewFlipper {
 
         final String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
 
-        mAuthTask = new AsyncTask<String, Void, Intent>() {
+        mAuthTask = new AsyncTask<Void, Void, Intent>() {
             @Override
-            protected Intent doInBackground(String... params) {
+            protected Intent doInBackground(Void... params) {
                 Log.d(TAG, "Started authenticating");
                 Bundle data = new Bundle();
                 try {
@@ -109,7 +110,11 @@ public class SignInViewFlipper extends BaseViewFlipper {
                     int statusCode = response.getResponseCode();
                     if (statusCode < 200 || statusCode > 299) {
                         String msg = "statusCode=" + statusCode + ", response=" + response.getResponseMessage();
-                        data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, msg);
+                        if(statusCode == 401) {
+                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "username or password error");
+                        }else{
+                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "network request error");
+                        }
                     } else {
                         String authtoken = response.getHeaders().get("Set-Cookie");
                         data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
@@ -119,7 +124,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
                         data.putString(AuthenticatorActivity.PARAM_USER_PASS, userPass);
                     }
                 } catch (Exception e) {
-                    data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, e.toString());
+                    data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "network error!");
                 }
                 final Intent res = new Intent();
                 res.putExtras(data);
@@ -130,16 +135,28 @@ public class SignInViewFlipper extends BaseViewFlipper {
             protected void onPostExecute(Intent intent) {
                 mActivity.hideProgress();
                 if (intent.hasExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE)) {
-                    Toast.makeText(mContext, intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
+                    showErrorMessage(intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE));
                 } else {
                     mActivity.finishLogin(intent);
                     mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
                 }
             }
-        }.execute();
+        };
+        mActivity.putAsyncTask(mAuthTask);
     }
 
 
-
+    private void showErrorMessage(String error){
+        //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();
+        final TextView errorTextView = (TextView) findViewById(R.id.error_msg);
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(error);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                errorTextView.setVisibility(View.GONE);
+            }
+        }, 2000);
+    }
 
 }

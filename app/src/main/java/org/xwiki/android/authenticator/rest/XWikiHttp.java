@@ -27,6 +27,7 @@ import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
@@ -123,10 +124,16 @@ public class XWikiHttp {
         }
         byte[] contentData = response.getContentData();
         Document document = Jsoup.parse(new String(contentData));
+        Elements elements = document.select("#loginForm");
+        if(!elements.isEmpty()){
+            return true;
+        }
+        /*
         formToken = document.select("input[name=template]").val();
         if (TextUtils.isEmpty(formToken)) {
             return true;
         }
+        */
         return false;
     }
 

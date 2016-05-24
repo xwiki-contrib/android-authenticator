@@ -69,6 +69,19 @@
                 android:inputType="textPassword"
                 android:text="" />
 
+            <TextView
+                android:id="@+id/error_msg"
+                android:visibility="gone"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="normal"
+                android:textColor="@android:color/holo_red_light"
+                android:singleLine="true"
+                android:layout_marginTop="10dip"
+                android:gravity="left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="error message" />
+
 
         </LinearLayout>
 

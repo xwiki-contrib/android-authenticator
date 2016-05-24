@@ -34,8 +34,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -49,6 +52,10 @@ import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -75,8 +82,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
 
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
+    //show refresh
     public SwipeRefreshLayout swipeRefreshLayout;
-
+    public ImageView refreshImageView;
+    //show progress dialog
+    private Dialog mProgressDialog = null;
+    //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
+    private List<AsyncTask<Void, Void, Object>> mAsyncTasks = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,6 +103,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setEnabled(false);
+
+        refreshImageView = (ImageView) findViewById(R.id.refresh_view);
 
         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
@@ -108,6 +122,28 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
                 return;
             }
         }
+    }
+
+    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.act_authenticator, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            //finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    */
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        clearAsyncTask();
     }
 
     private void doPreviousNext(boolean next) {
@@ -180,7 +216,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
                 settingSyncViewFlipper.onRefresh();
                 break;
             default:
-                swipeRefreshLayout.setRefreshing(false);
                 break;
         }
     }
@@ -194,7 +229,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
     }
 
     public void showViewFlipper(int id) {
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
+        clearAsyncTask();
         swipeRefreshLayout.setEnabled(false);
+        refreshImageView.setVisibility(View.GONE);
         mViewFlipper.setDisplayedChild(id);
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
@@ -212,7 +252,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
                 setLeftRightButton("Previous", "Login");
                 break;
             case ViewFlipperLayoutId.SETTING_SYNC:
-                swipeRefreshLayout.setEnabled(true);
+                refreshImageView.setVisibility(View.VISIBLE);
                 if (settingSyncViewFlipper == null) {
                     settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
@@ -302,29 +342,28 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         // in SettingSyncViewFlipper finish;
     }
 
-    private Dialog mProgressDialog = null;
 
     public void showProgress(CharSequence message, final AsyncTask asyncTask) {
-        // To avoid repeatedly create, must ensure hideProgress being called.
-        // if not called hideProgress, the progressDialog title will not be update
-        if(mProgressDialog == null) {
-            final ProgressDialog dialog = new ProgressDialog(this);
-            dialog.setMessage(message);
-            dialog.setIndeterminate(true);
-            dialog.setCancelable(true);
-            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                public void onCancel(DialogInterface dialog) {
-                    Log.i(TAG, "user cancelling authentication");
-                    if (asyncTask != null) {
-                        asyncTask.cancel(true);
-                    }
-                }
-            });
-            // We save off the progress dialog in a field so that we can dismiss
-            // it later.
-            mProgressDialog = dialog;
-            mProgressDialog.show();
+        // To avoid repeatedly create
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            return;
         }
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(message);
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(true);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                Log.i(TAG, "user cancelling authentication");
+                if (asyncTask != null) {
+                    asyncTask.cancel(true);
+                }
+            }
+        });
+        // We save off the progress dialog in a field so that we can dismiss
+        // it later.
+        mProgressDialog = dialog;
+        mProgressDialog.show();
     }
 
     /**
@@ -337,4 +376,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         }
     }
 
+    public void putAsyncTask(AsyncTask<Void, Void, Object> asyncTask) {
+        mAsyncTasks.add(asyncTask.execute());
+    }
+
+    private void clearAsyncTask() {
+        Iterator<AsyncTask<Void, Void, Object>> iterator = mAsyncTasks.iterator();
+        while (iterator.hasNext()) {
+            AsyncTask<Void, Void, Object> asyncTask = iterator.next();
+            if (asyncTask != null && !asyncTask.isCancelled()) {
+                asyncTask.cancel(true);
+            }
+        }
+        mAsyncTasks.clear();
+    }
 }

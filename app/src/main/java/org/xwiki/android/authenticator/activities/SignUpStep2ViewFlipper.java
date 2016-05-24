@@ -30,7 +30,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
@@ -82,9 +82,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
     void initData() {
         //init form token and cookie
-        new AsyncTask<String, String, Boolean>() {
+        AsyncTask initFormTokenTask = new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Boolean doInBackground(String... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
                     formToken = XWikiHttp.signUpInitCookieForm();
                     return formToken == null ? false : true;
@@ -100,14 +100,15 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                     mActivity.swipeRefreshLayout.setRefreshing(false);
                 }
                 if (flag == null) {
-                    Toast.makeText(mContext, "init form network error", Toast.LENGTH_SHORT).show();
+                    showErrorMessage("init form network error");
                 } else if (!flag) {
-                    Toast.makeText(mContext, "init form error", Toast.LENGTH_SHORT).show();
+                    showErrorMessage("init form error");
                 } else {
                     refreshCaptcha();
                 }
             }
-        }.execute();
+        };
+        mActivity.putAsyncTask(initFormTokenTask);
     }
 
     @Override
@@ -128,9 +129,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     //0:false, 1:true, null:network error, 2:the user exists.
     public void register() {
         final String[] step1Values = mActivity.getStep1Values();
-        mSignUpTask = new AsyncTask<String, String, Integer>() {
+        mSignUpTask = new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Integer doInBackground(String... params) {
+            protected Integer doInBackground(Void... params) {
                 //found whether the user exists.
                 XWikiUser userFind = null;
                 try {
@@ -158,12 +159,12 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             protected void onPostExecute(Integer status) {
                 mActivity.hideProgress();
                 if (status == null) {
-                    Toast.makeText(mContext, "network error", Toast.LENGTH_SHORT).show();
+                    showErrorMessage("network error");
                 } else if (status == 2) {
-                    Toast.makeText(mContext, "the user exists", Toast.LENGTH_SHORT).show();
+                    showErrorMessage("the user exists");
                 } else {
-                    //Toast.makeText(mContext, status == 1 ? "success!" : "fail!", Toast.LENGTH_SHORT).show();
                     if (status == 0) {
+                        showErrorMessage("Captcha error");
                         refreshCaptcha();
                     } else {
                         finishSignUp();
@@ -171,7 +172,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                     }
                 }
             }
-        }.execute();
+        };
+        mActivity.putAsyncTask(mSignUpTask);
+
     }
 
     void finishSignUp() {
@@ -237,9 +240,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
 
     void refreshCaptcha() {
-        new AsyncTask<String, String, byte[]>() {
+        AsyncTask refreshCaptchaTask = new AsyncTask<Void, Void, byte[]>() {
             @Override
-            protected byte[] doInBackground(String... params) {
+            protected byte[] doInBackground(Void... params) {
                 //String captchaUrl = "http://210.76.192.253:8080/xwiki/bin/imagecaptcha/XWiki/Registration";
                 //String url = "http://www.xwiki.org/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
                 String captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/Registration";
@@ -258,7 +261,8 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                     mActivity.swipeRefreshLayout.setRefreshing(false);
                 }
             }
-        }.execute();
+        };
+        mActivity.putAsyncTask(refreshCaptchaTask);
     }
 
     public static Bitmap getPicFromBytes(byte[] bytes,
@@ -283,6 +287,19 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             }
         }, 3000);
         */
+    }
+
+    private void showErrorMessage(String error){
+        //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();
+        final TextView errorTextView = (TextView) findViewById(R.id.error_msg);
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(error);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                errorTextView.setVisibility(View.GONE);
+            }
+        }, 2000);
     }
 
 }

@@ -11,7 +11,7 @@
     <string name="email">Email</string>
     <string name="password">Password(Required)</string>
     <string name="confirm_password">Confirm Password(Required)</string>
-    <string name="captcha_textview">Input the captcha(Required)</string>
+    <string name="captcha_textview">Input the captcha</string>
 
     <!-- login Label username password server-->
     <string name="login_activity_username_label">Username</string>
@@ -25,6 +25,7 @@
 
     <!-- menu -->
     <string name="menu_save">Save</string>
+    <string name="menu_refresh">Refresh</string>
     <string name="menu_ok">OK</string>
 
     <!--Activity label-->
