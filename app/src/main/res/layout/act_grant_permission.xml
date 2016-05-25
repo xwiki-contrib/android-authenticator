@@ -4,23 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:layoutMode="opticalBounds"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    </android.support.v7.widget.Toolbar>
+    <include layout="@layout/toolbar_layout" />
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -68,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dip"
-                android:text="@string/login_activity_username_label"
+                android:text="@string/account_name"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold" />
 
@@ -89,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dip"
                 android:text="@string/login_activity_password_label"
+                android:visibility="gone"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold" />
 
@@ -99,6 +84,7 @@
                 android:hint="Please input a passwd"
                 android:inputType="textPassword"
                 android:maxLines="1"
+                android:visibility="gone"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black" />
@@ -106,23 +92,38 @@
     </ScrollView>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:id="@+id/left_right_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:minHeight="54dip"
         android:orientation="horizontal"
-        android:paddingLeft="40dip"
-        android:paddingRight="40dip"
-        android:paddingTop="4dip">
+        android:paddingBottom="5dip"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip">
 
         <Button
-            android:id="@+id/submit"
-            android:layout_width="fill_parent"
+            android:id="@+id/cancel_button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:minWidth="100dip"
-            android:onClick="handleAuthorize"
-            android:text="@string/authorize_activity_ok_button"
+            android:onClick="onCancel"
+            android:paddingRight="10dp"
+            android:text="@string/cancel"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/submit_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:minWidth="100dip"
+            android:onClick="onHandleAuthorize"
+            android:paddingLeft="10dp"
+            android:text="@string/grant_permission_button"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 </LinearLayout>

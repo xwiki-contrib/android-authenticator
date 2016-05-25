@@ -53,26 +53,15 @@
     <string name="profile_action">XWiki profile</string>
     <string name="view_profile">Edit Contact</string>
 
-    <!--authorize_activity-->
-    <string name="authorize_activity_ok_button">OK</string>
+    <!--grant permission activity-->
+    <string name="authorize_activity_note">Please click to authorize the third-party app to access your account.</string>
     <string name="authorize_activity_package_label">Package Name</string>
-    <string name="authorize_activity_note">Please input a passwd to authorize the app to access your account.</string>
+    <string name="account_name">Account Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="grant_permission_button">Authorize</string>
 
-    <!--prefs arrays-->
-    <string-array name="opts">
-        <item>Synchronize all users</item>
-        <item>Synchronize the selected groups</item>
-    </string-array>
-
-    <string-array name="opts_values">
-        <item>1</item>
-        <item>2</item>
-    </string-array>
 
     <!--select setting-->
-    <string name="sync_all_users">Sync all users</string>
-    <string name="sync_selected_groups">Sync selected groups</string>
-
     <string-array name="select_groups_array">
         <item>Don\'t Sync</item>
         <item>Sync All The Users</item>

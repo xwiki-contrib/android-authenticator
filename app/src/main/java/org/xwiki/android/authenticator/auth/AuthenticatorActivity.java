@@ -350,6 +350,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         //ContentResolver.requestSync(account,ContactsContract.AUTHORITY,params);
 
         //return value to AccountManager
+        //TODO security issue
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
         Log.d(TAG, ">" + "finish return");

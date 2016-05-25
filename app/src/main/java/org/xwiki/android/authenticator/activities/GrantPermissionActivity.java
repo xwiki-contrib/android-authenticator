@@ -73,7 +73,7 @@ public class GrantPermissionActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
-        mPasswdEditText = (EditText) findViewById(R.id.accountPassword);
+        //mPasswdEditText = (EditText) findViewById(R.id.accountPassword);
 
         //get data from intent
         uid = getIntent().getIntExtra("uid", 0);
@@ -105,16 +105,30 @@ public class GrantPermissionActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void handleAuthorize(View view) {
-        accountPasswd = mPasswdEditText.getText().toString();
+    public void onCancel(View view){
+        finish();
+    }
 
-        if (TextUtils.isEmpty(accountPasswd)) {
-            Toast.makeText(this, "Please input your password!", Toast.LENGTH_SHORT).show();
+    public void onHandleAuthorize(View view){
+        AppContext.addAuthorizedApp(uid, packageName);
+        finish();
+    }
+
+    /**
+     * handleAuthorizeLocal
+     * compare the input with local password to grant permission
+     */
+    @Deprecated
+    public void handleAuthorizeLocal(View view) {
+        accountPasswd = mPasswdEditText.getText().toString();
+        mPasswdEditText.setError(null);
+        if (TextUtils.isEmpty(accountPasswd) || accountPasswd.length() < 5) {
+            mPasswdEditText.setError(getString(R.string.error_invalid_password));
+            mPasswdEditText.requestFocus();
             return;
         }
-
         //just compare the local passwd with user's input to grant permission
-        //TODO maybe have some security issue.
+        //Maybe we don't need the compare, just use one-click to grant permission.
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
         String password = mAccountManager.getUserData(account, AccountManager.KEY_PASSWORD);
@@ -127,10 +141,10 @@ public class GrantPermissionActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * login from server to verify the user's passwd in order to grant permission.
      */
+    @Deprecated
     private void loginFromServer() {
         new AsyncTask<String, String, Intent>() {
             @Override
@@ -147,7 +161,6 @@ public class GrantPermissionActivity extends AppCompatActivity {
                 }
                 return intent;
             }
-
             @Override
             protected void onPostExecute(Intent intent) {
                 int statusCode = intent.getIntExtra("statusCode", 0);
