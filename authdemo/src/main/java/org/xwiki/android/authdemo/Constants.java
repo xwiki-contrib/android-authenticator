@@ -22,19 +22,16 @@ package org.xwiki.android.authdemo;
 /**
  * @version $Id: $
  */
-public class AccountGeneral {
+public class Constants {
+    /**
+     * Server
+     */
+    public static final String SERVER_ADDRESS = "requestUrl";
 
     /**
      * Account type id
      */
     public static final String ACCOUNT_TYPE = "org.xwiki.android.authenticator";
-
-    /**
-     * Account name
-     */
-    public static final String ACCOUNT_NAME = "XWiki";
-
-    public static final String USERDATA_SERVER = "XWIKI_SERVER";
 
     /**
      * Auth token types
@@ -44,4 +41,6 @@ public class AccountGeneral {
 
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+
+
 }

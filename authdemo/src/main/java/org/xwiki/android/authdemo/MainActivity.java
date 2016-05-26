@@ -1,8 +1,5 @@
 package org.xwiki.android.authdemo;
 
-/**
- * Created by fitz on 2016/4/28.
- */
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -21,7 +18,13 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
+/**
+ * MainActivity
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String STATE_DIALOG = "state_dialog";
@@ -42,33 +45,33 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnAddAccount).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addNewAccount(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+                addNewAccount(Constants.ACCOUNT_TYPE, Constants.AUTHTOKEN_TYPE_FULL_ACCESS);
             }
         });
 
         findViewById(R.id.btnGetAuthToken).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAccountPicker(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, false);
+                showAccountPicker(Constants.AUTHTOKEN_TYPE_FULL_ACCESS, false);
             }
         });
 
         findViewById(R.id.btnGetAuthTokenConvenient).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getTokenForAccountCreateIfNeeded(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+                getTokenForAccountCreateIfNeeded(Constants.ACCOUNT_TYPE, Constants.AUTHTOKEN_TYPE_FULL_ACCESS);
             }
         });
         findViewById(R.id.btnInvalidateAuthToken).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAccountPicker(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+                showAccountPicker(Constants.AUTHTOKEN_TYPE_FULL_ACCESS, true);
             }
         });
         findViewById(R.id.btnConfirmCredentials).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Account account = new Account("fitz", AccountGeneral.ACCOUNT_TYPE);
+                Account account = new Account("fitz", Constants.ACCOUNT_TYPE);
                 confirmCredentials(account);
             }
         });
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             boolean showDialog = savedInstanceState.getBoolean(STATE_DIALOG);
             boolean invalidate = savedInstanceState.getBoolean(STATE_INVALIDATE);
             if (showDialog) {
-                showAccountPicker(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, invalidate);
+                showAccountPicker(Constants.AUTHTOKEN_TYPE_FULL_ACCESS, invalidate);
             }
         }
 
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void showAccountPicker(final String authTokenType, final boolean invalidate) {
         mInvalidate = invalidate;
-        final Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
+        final Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
 
         if (availableAccounts.length == 0) {
             Toast.makeText(this, "No accounts", Toast.LENGTH_SHORT).show();
@@ -177,9 +180,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     Bundle bnd = future.getResult();
-
-                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    showMessage((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL");
+                    isValidToken(bnd);
                     Log.d(TAG, "GetToken Bundle is " + bnd);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -202,9 +203,9 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     Bundle bnd = future.getResult();
-
-                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    mAccountManager.invalidateAuthToken(account.type, authtoken);
+                    String authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                    String server = bnd.getString(Constants.SERVER_ADDRESS);
+                    mAccountManager.invalidateAuthToken(account.type, authToken);
                     showMessage(account.name + " invalidated");
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -230,10 +231,8 @@ public class MainActivity extends AppCompatActivity {
                         Bundle bnd = null;
                         try {
                             bnd = future.getResult();
-                            final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                            showMessage(((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL"));
+                            isValidToken(bnd);
                             Log.d(TAG, "GetTokenForAccount Bundle is " + bnd);
-
                         } catch (Exception e) {
                             e.printStackTrace();
                             showMessage(e.getMessage());
@@ -241,6 +240,31 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 , null);
+    }
+
+    private void isValidToken(Bundle bnd) throws IOException {
+        final String authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+        String url = bnd.getString(Constants.SERVER_ADDRESS);
+        if(authToken == null || url == null){
+            String errorMessage = bnd.getString(AccountManager.KEY_ERROR_MESSAGE);
+            showMessage("FAIL! getAuthToken error message=" + errorMessage);
+            return;
+        }
+        XWikiHttp.isValidToken(url, authToken, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if(response.isSuccessful()){
+                    showMessage("valid token! token="+ authToken);
+                }else{
+                    showMessage("invalid token!!! statusCode="+ response.code() + ", token="+ authToken);
+                }
+                response.close();
+            }
+        });
     }
 
     private void showMessage(final String msg) {
