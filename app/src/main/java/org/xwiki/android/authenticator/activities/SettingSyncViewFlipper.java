@@ -21,7 +21,13 @@ package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
@@ -32,6 +38,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -46,6 +53,7 @@ import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+import org.xwiki.android.authenticator.utils.SystemTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +70,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     private List<XWikiGroup> groupList;
     private RadioGroup radioGroup;
     private AppCompatSpinner selectSyncSpinner;
+    private Button versionCheckButton;
     private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
 
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
@@ -82,6 +91,15 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     private void initView(){
+        versionCheckButton = (Button) findViewById(R.id.version_check);
+        versionCheckButton.setText(SystemTools.getAppVersionName(mContext));
+        versionCheckButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAppMarket(mContext);
+            }
+        });
+
         mListView = (ListView) findViewById(R.id.list_view);
         groupList = new ArrayList<>();
         mAdapter = new GroupListAdapter(mContext, groupList);
@@ -256,6 +274,34 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             v.clearAnimation();
             v.setAnimation(null);
 //        	v.setImageResource(R.drawable.refresh);
+        }
+    }
+
+
+    private  void openAppMarket(Context context) {
+        Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
+        boolean marketFound = false;
+        // find all applications able to handle our rateIntent
+        final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
+        for (ResolveInfo otherApp: otherApps) {
+            // look for Google Play application
+            if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
+                ActivityInfo otherAppActivity = otherApp.activityInfo;
+                ComponentName componentName = new ComponentName(
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
+                );
+                rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                rateIntent.setComponent(componentName);
+                context.startActivity(rateIntent);
+                marketFound = true;
+                break;
+            }
+        }
+        // if GooglePlay not present on device, open web browser
+        if (!marketFound) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            context.startActivity(webIntent);
         }
     }
 
