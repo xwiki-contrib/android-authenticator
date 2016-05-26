@@ -95,24 +95,27 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         // If the caller requested an authToken type we don't support, then
         // return an error  if checking validity tokenType != TYPE+PackegeName
-        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS+packageName)) {
+        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
             return result;
         }
 
-        if(!AppContext.isAuthorizedApp(uid)){
+        if (!AppContext.isAuthorizedApp(uid)) {
             final Intent intent = new Intent(AppContext.getInstance().getApplicationContext(), GrantPermissionActivity.class);
-            intent.putExtra("uid",uid);
+            intent.putExtra("uid", uid);
             intent.putExtra("packageName", packageName);
-            intent.putExtra("accountName",account.name);
+            intent.putExtra("accountName", account.name);
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
             //Bundle bundle = new Bundle();
             //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
             //return bundle;
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            AppContext.getInstance().getApplicationContext().startActivity(intent);
-            return null;
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+            return bundle;
+            //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //AppContext.getInstance().getApplicationContext().startActivity(intent);
+            //return null;
         }
 
         //authTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
@@ -126,7 +129,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             //authToken corresponding to its authTokenType, but other AuthTokenTypes may have a
             //cached token.
             String consistentToken = getTheSameAuthToken(am, account);
-            if(consistentToken!=null){
+            if (consistentToken != null) {
                 am.setAuthToken(account, authTokenType, consistentToken);
                 final Bundle result = new Bundle();
                 result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -141,7 +144,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
                 authToken = httpResponse.getHeaders().get("Set-Cookie");
-                Log.d(TAG, "XWikiAuthenticator, authtoken="+authToken);
+                Log.d(TAG, "XWikiAuthenticator, authtoken=" + authToken);
             } catch (IOException e) {
                 e.printStackTrace();
                 final Bundle result = new Bundle();
@@ -159,6 +162,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            result.putString(Constants.SERVER_ADDRESS, XWikiHttp.getServerAddress());
             return result;
         }
 
@@ -182,7 +186,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        Log.d(TAG, "getAuthTokenLabel,"+ authTokenType);
+        Log.d(TAG, "getAuthTokenLabel," + authTokenType);
         if (AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
             return AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
         else if (AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
@@ -213,18 +217,18 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         return null;
     }
 
-    public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken){
+    public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken) {
         List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
-        if(packageList == null || packageList.size()==0 ) return;
-        for(String item : packageList){
+        if (packageList == null || packageList.size() == 0) return;
+        for (String item : packageList) {
             String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
     }
 
-    public static String getTheSameAuthToken(AccountManager am, Account account){
+    public static String getTheSameAuthToken(AccountManager am, Account account) {
         List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
-        if(packageList == null || packageList.size()==0 ) return null;
+        if (packageList == null || packageList.size() == 0) return null;
         String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
         String authToken = am.peekAuthToken(account, tokenType);
         return authToken;
