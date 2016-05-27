@@ -38,12 +38,14 @@ import android.provider.ContactsContract.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -103,7 +105,7 @@ public class ContactManager {
      * sync request.
      */
     public static synchronized void updateContacts(Context context, String account,
-                                                   XWikiHttp.SyncData syncData) {
+                                                   XWikiHttp.SyncData syncData) throws IOException, XmlPullParserException {
 
 
         // Make sure that the XWiki group exists
@@ -150,6 +152,8 @@ public class ContactManager {
             if (!allIdSet.contains(key)) {
                 deleteContact(context, rawId, batchOperation);
                 Log.d(TAG, key + " removed");
+            }else{
+                allIdSet.remove(key);
             }
             //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
             if (batchOperation.size() >= 100) {
@@ -158,12 +162,30 @@ public class ContactManager {
         }
         Log.d(TAG, "Remove contacts end");
         batchOperation.execute();
+
+        // if allIdSet size != 0, just add these users to local database.
+        // if newly adding users to the group, these following code will be execute..
+        if(allIdSet.size() > 0 ) {
+            List<XWikiUser> userList = new ArrayList<>();
+            for (String item : allIdSet) {
+                XWikiUser user = XWikiHttp.getUserDetail(item);
+                userList.add(user);
+                Log.d(TAG, "Add contact");
+                addContact(context, account, user, 0, true, batchOperation);
+                if (batchOperation.size() >= 100) {
+                    batchOperation.execute();
+                }
+            }
+            batchOperation.execute();
+            updateAvatars(context, userList);
+        }
+
     }
 
 
     //http://stackoverflow.com/questions/14601209/update-contact-image-in-android-contact-provider
-    public static void updateAvatars(Context context, XWikiHttp.SyncData syncData) throws IOException {
-        List<XWikiUser> updateList = syncData.getUpdateUserList();
+    public static void updateAvatars(Context context, List<XWikiUser> userList) throws IOException {
+        List<XWikiUser> updateList = userList;
         if (updateList == null || updateList.size() == 0) return;
         final ContentResolver resolver = context.getContentResolver();
         for (XWikiUser xwikiUser : updateList) {

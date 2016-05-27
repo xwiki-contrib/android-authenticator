@@ -32,7 +32,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 /**
- * HTTPS CA TRUST
+ * HTTPS  TRUST Manager
  */
 public class HTTPSTrustManager implements X509TrustManager {
 

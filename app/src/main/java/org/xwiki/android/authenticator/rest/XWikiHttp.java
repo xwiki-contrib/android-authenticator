@@ -285,6 +285,8 @@ public class XWikiHttp {
     }
 
 
+
+
     /**
      * getSyncData
      * get SyncData used in SyncAdapter.onPerformSync
@@ -449,7 +451,7 @@ public class XWikiHttp {
      * @param avatarName the avatar name like jvelociter.jpg
      * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
      */
-    public static byte[] downloadAvatar(String user, String avatarName) {
+    public static byte[] downloadAvatar(String user, String avatarName) throws IOException {
         String url = "http://www.xwiki.org/xwiki/bin/download/XWiki/" + user + "/" + avatarName;
         return downloadAvatar(url);
     }
@@ -460,59 +462,42 @@ public class XWikiHttp {
      * @param avatarUrl the URL pointing to the avatar image
      * @return a byte array with the raw JPEG avatar image
      */
-    public static byte[] downloadAvatar(final String avatarUrl) {
+    public static byte[] downloadAvatar(final String avatarUrl) throws IOException {
         // If there is no avatar, we're done
         if (TextUtils.isEmpty(avatarUrl)) {
             return null;
         }
-
-        try {
-            Log.i(TAG, "Downloading avatar: " + avatarUrl);
-            // Request the avatar image from the server, and create a bitmap
-            // object from the stream we get back.
-            //URL url = new URL(avatarUrl);
-            //HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            //connection.connect();
-            HttpRequest request = new HttpRequest(avatarUrl);
-            HttpExecutor httpExecutor = new HttpExecutor();
-            HttpResponse response = httpExecutor.performRequest(request);
-            int statusCode = response.getResponseCode();
-            if(statusCode == 404){
-                return null;
-            } else if (statusCode < 200 || statusCode > 299) {
-                throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-            }
-            try {
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-                Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
-                        null, options);
-                avatar = ImageUtils.compressByQuality(avatar, 900);
-                // Take the image we received from the server, whatever format it
-                // happens to be in, and convert it to a JPEG image. Note: we're
-                // not resizing the avatar - we assume that the image we get from
-                // the server is a reasonable size...
-                Log.i(TAG, "Converting avatar to JPEG");
-                if (avatar == null) return null;
-                ByteArrayOutputStream convertStream = new ByteArrayOutputStream(
-                        avatar.getWidth() * avatar.getHeight() * 4);
-                avatar.compress(Bitmap.CompressFormat.JPEG, 95, convertStream);
-                convertStream.flush();
-                convertStream.close();
-                // On pre-Honeycomb systems, it's important to call recycle on bitmaps
-                avatar.recycle();
-                return convertStream.toByteArray();
-            } finally {
-                //connection.disconnect();
-            }
-        } catch (MalformedURLException muex) {
-            // A bad URL - nothing we can really do about it here...
-            Log.e(TAG, "Malformed avatar URL: " + avatarUrl);
-        } catch (IOException ioex) {
-            // If we're unable to download the avatar, it's a bummer but not the
-            // end of the world. We'll try to get it next time we sync.
-            Log.e(TAG, "Failed to download user avatar: " + avatarUrl);
+        Log.i(TAG, "Downloading avatar: " + avatarUrl);
+        // Request the avatar image from the server, and create a bitmap
+        // object from the stream we get back.
+        HttpRequest request = new HttpRequest(avatarUrl);
+        HttpExecutor httpExecutor = new HttpExecutor();
+        HttpResponse response = httpExecutor.performRequest(request);
+        int statusCode = response.getResponseCode();
+        if (statusCode == 404) {
+            return null;
+        } else if (statusCode < 200 || statusCode > 299) {
+            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
         }
-        return null;
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
+                null, options);
+        avatar = ImageUtils.compressByQuality(avatar, 900);
+        // Take the image we received from the server, whatever format it
+        // happens to be in, and convert it to a JPEG image. Note: we're
+        // not resizing the avatar - we assume that the image we get from
+        // the server is a reasonable size...
+        Log.i(TAG, "Converting avatar to JPEG");
+        if (avatar == null) return null;
+        ByteArrayOutputStream convertStream = new ByteArrayOutputStream(
+                avatar.getWidth() * avatar.getHeight() * 4);
+        avatar.compress(Bitmap.CompressFormat.JPEG, 95, convertStream);
+        convertStream.flush();
+        convertStream.close();
+        // On pre-Honeycomb systems, it's important to call recycle on bitmaps
+        avatar.recycle();
+        return convertStream.toByteArray();
     }
 
 }

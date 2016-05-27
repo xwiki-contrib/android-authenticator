@@ -37,6 +37,8 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 
+import java.io.IOException;
+
 /**
  * Helper class for storing data in the platform content providers.
  */
@@ -204,7 +206,7 @@ public class ContactOperations {
         return this;
     }
 
-    public ContactOperations addAvatar(String pageName, String avatarName) {
+    public ContactOperations addAvatar(String pageName, String avatarName) throws IOException {
         if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
             byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
             if (avatarBuffer != null) {
@@ -332,7 +334,7 @@ public class ContactOperations {
         return this;
     }
 
-    public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) {
+    public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) throws IOException {
         if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
             byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
             if (avatarBuffer != null) {

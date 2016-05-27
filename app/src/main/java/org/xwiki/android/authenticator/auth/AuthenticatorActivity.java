@@ -52,6 +52,7 @@ import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.util.ArrayList;
@@ -295,12 +296,23 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         return signUpStep1ViewFlipper.getValues();
     }
 
-    public void finishLogin(Intent intent) {
-        Log.d(TAG, "> finishLogin");
 
+    public void clearOldAccount(){
         //set rest url null (Maybe also need to do somethings to clear old value)
         //because when you remove the account and add again, the static XWiki.serverRestPreUrl is not updated. serverAddr is the old address.
         XWikiHttp.setRestUrlNULL();
+        //clear SharePreference
+        SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST);
+        SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS);
+        SharedPrefsUtils.removeKeyValue(this, Constants.SYNC_TYPE);
+        SharedPrefsUtils.removeKeyValue(this, Constants.APP_UID);
+    }
+
+    public void finishLogin(Intent intent) {
+        Log.d(TAG, "> finishLogin");
+
+        //before add new account, clear old account data.
+        clearOldAccount();
 
         String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);

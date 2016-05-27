@@ -86,7 +86,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             ContactManager.updateContacts(mContext, account.name, syncData);
 
             //Update the contacts' photo. Separately add photos because of TransactionTooLargeException
-            ContactManager.updateAvatars(mContext, syncData);
+            ContactManager.updateAvatars(mContext, syncData.getUpdateUserList());
 
             // Save off the new sync date. On our next sync, we only want to receive
             // contacts that have changed since this sync...

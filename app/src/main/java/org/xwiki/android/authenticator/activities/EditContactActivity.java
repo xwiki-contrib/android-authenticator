@@ -24,7 +24,6 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -41,7 +40,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
@@ -88,8 +86,6 @@ public class EditContactActivity extends AppCompatActivity {
         mFirstNameView = (EditText) findViewById(R.id.first_name);
         mCellPhoneView = (EditText) findViewById(R.id.cell_phone);
         mLastNameView = (EditText) findViewById(R.id.last_name);
-
-        //TODO here we can do some permission check. If no permission, just finish() and return;
 
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
@@ -166,18 +162,20 @@ public class EditContactActivity extends AppCompatActivity {
             @Override
             protected HttpResponse doInBackground(Void... params) {
                 try {
-                    XWikiUser oldUser = XWikiHttp.getUserDetail(wikiUser.getId());
-                    oldUser.firstName = wikiUser.firstName;
-                    oldUser.lastName = wikiUser.lastName;
-                    oldUser.email = wikiUser.email;
-                    oldUser.phone = wikiUser.phone;
-                    HttpResponse response = XWikiHttp.updateUser(oldUser);
+                    XWikiUser updateUser = new XWikiUser();
+                    String[] idArray = XWikiUser.splitId(wikiUser.getId());
+                    updateUser.wiki = idArray[0];
+                    updateUser.space = idArray[1];
+                    updateUser.pageName = idArray[2];
+                    updateUser.firstName = wikiUser.firstName;
+                    updateUser.lastName = wikiUser.lastName;
+                    updateUser.email = wikiUser.email;
+                    updateUser.phone = wikiUser.phone;
+                    HttpResponse response = XWikiHttp.updateUser(updateUser);
                     return response;
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.d(TAG, e.toString());
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
                 }
                 return null;
             }

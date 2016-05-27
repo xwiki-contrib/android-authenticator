@@ -284,7 +284,12 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                 if (captchaUrl.contains("www.xwiki.org")) {
                     captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
                 }
-                byte[] img = XWikiHttp.downloadAvatar(captchaUrl);
+                byte[] img = null;
+                try {
+                    img = XWikiHttp.downloadAvatar(captchaUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return img;
             }
 

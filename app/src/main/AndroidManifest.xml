@@ -44,12 +44,15 @@
         <activity
             android:theme="@style/AppTheme"
             android:name=".activities.GrantPermissionActivity"
-            android:exported="true"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_authorize">
         </activity>
 
         <activity
             android:theme="@style/AppTheme"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
             android:name=".activities.EditContactActivity"
             android:label="@string/title_activity_edit_contact">
             <!--
