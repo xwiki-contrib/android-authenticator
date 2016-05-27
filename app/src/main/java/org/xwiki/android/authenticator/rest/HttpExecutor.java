@@ -25,6 +25,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -65,8 +66,8 @@ public class HttpExecutor {
         }
         COOKIE = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         if (COOKIE != null && COOKIE.length() > 0) {
-            //connection.addRequestProperty("Cookie", COOKIE);
-            connection.setRequestProperty("Cookie", COOKIE);
+            connection.addRequestProperty("Cookie", COOKIE);
+            //connection.setRequestProperty("Cookie", COOKIE);
         }
         Log.d(TAG, "url=" + url + ", header=" + map.toString() + ", Cookie=" + (COOKIE != null ? COOKIE : ""));
         setConnectionParametersForRequest(connection, request);
@@ -83,13 +84,14 @@ public class HttpExecutor {
         connection.setReadTimeout(timeoutMs);
         connection.setUseCaches(false);
         connection.setDoInput(true);
-        // use caller-provided custom SslSocketFactory, if any, for HTTPS
+        // for HTTPS
         if ("https".equals(url.getProtocol())) {
             if (mSslSocketFactory != null) {
+                //use caller-provided custom SslSocketFactory
                 ((HttpsURLConnection) connection)
                         .setSSLSocketFactory(mSslSocketFactory);
             } else {
-                //trust all ca
+                //trust all
                 HTTPSTrustManager.allowAllSSL();
             }
         }
@@ -169,6 +171,15 @@ public class HttpExecutor {
         return response;
     }
 
+    /**
+     * getByteArrayFromInputStream
+     * close the network inputStream, and transfer it to byte array stored in HttpResponse.
+     * if needed the inputStream, just use the new ByteArrayInputStream.
+     *
+     * @param is
+     * @return
+     * @throws IOException
+     */
     private byte[] getByteArrayFromInputStream(InputStream is)
             throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();

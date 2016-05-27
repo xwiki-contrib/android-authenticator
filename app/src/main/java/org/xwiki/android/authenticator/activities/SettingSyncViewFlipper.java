@@ -92,7 +92,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     private void initView(){
         versionCheckButton = (Button) findViewById(R.id.version_check);
-        versionCheckButton.setText(SystemTools.getAppVersionName(mContext));
+        versionCheckButton.setText("Version " + SystemTools.getAppVersionName(mContext));
         versionCheckButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +107,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         selectSyncSpinner = (AppCompatSpinner) findViewById(R.id.select_spinner);
-        //((TextView)selectSyncSpinner.getSelectedView()).setTextColor(0x00000000);
         selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -118,7 +117,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     mListView.setVisibility(View.GONE);
                 }
                 SYNC_TYPE = position;
-                //((TextView) view).setTextColor(0x00000000);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -192,7 +190,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 return;
             }
             List<XWikiGroup> list = mAdapter.getSelectGroups();
-            //Toast.makeText(mContext, mAdapter.getSelectGroups().toString(), Toast.LENGTH_SHORT).show();
             if (list != null && list.size() > 0) {
                 List<String> groupIdList = new ArrayList<>();
                 for (XWikiGroup iGroup : list) {
