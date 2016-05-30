@@ -29,6 +29,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v7.widget.AppCompatSpinner;
@@ -215,6 +216,13 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
+            //Turn on periodic syncing
+            ContentResolver.addPeriodicSync(
+                    account,
+                    ContactsContract.AUTHORITY,
+                    Bundle.EMPTY,
+                    Constants.SYNC_INTERVAL);
+            ContentResolver.requestSync(account, ContactsContract.AUTHORITY, Bundle.EMPTY);
         } else {
             //don't sync
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);

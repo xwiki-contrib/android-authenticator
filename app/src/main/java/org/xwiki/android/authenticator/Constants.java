@@ -74,4 +74,9 @@ public class Constants {
     public static final String COOKIE = "Cookie";
 
 
+    /**
+     * sync interval
+     */
+    public static final int SYNC_INTERVAL = 30 * 60; //half an hour
+
 }

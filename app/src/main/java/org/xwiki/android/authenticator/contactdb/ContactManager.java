@@ -169,6 +169,7 @@ public class ContactManager {
             List<XWikiUser> userList = new ArrayList<>();
             for (String item : allIdSet) {
                 XWikiUser user = XWikiHttp.getUserDetail(item);
+                if(user == null) continue;
                 userList.add(user);
                 Log.d(TAG, "Add contact");
                 addContact(context, account, user, 0, true, batchOperation);
