@@ -72,7 +72,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     ListView mListView = null;
     GroupListAdapter mAdapter;
     private List<XWikiGroup> groupList;
-    private RadioGroup radioGroup;
     private AppCompatSpinner selectSyncSpinner;
     private Button versionCheckButton;
     private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
@@ -86,6 +85,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     public void doNext() {
         syncSettingComplete();
         mActivity.finish();
+        //mActivity.checkPermissions();
     }
 
     @Override
@@ -169,8 +169,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         mActivity.putAsyncTask(getGroupsTask);
     }
 
+    public void noPermissions(){
+        Toast.makeText(mContext, "Please grant the permission in the app settings", Toast.LENGTH_SHORT).show();
+    }
 
-    void syncSettingComplete() {
+
+    public void syncSettingComplete() {
         int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
         if(oldSyncType == SYNC_TYPE && SYNC_TYPE != Constants.SYNC_TYPE_SELECTED_GROUPS){
             return;

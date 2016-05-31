@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.authenticator.auth;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -30,13 +31,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -54,6 +52,7 @@ import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
@@ -95,6 +94,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
     //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
     private List<AsyncTask<Void, Void, Object>> mAsyncTasks = new ArrayList<>();
 
+    private PermissionsUtils mPermissions;
+    private static final int REQUEST_PERMISSIONS_CODE = 1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,6 +136,30 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
     protected void onDestroy() {
         super.onDestroy();
         clearAsyncTask();
+    }
+
+    /**
+     * now it's useless because of compile sdk 22
+     */
+    public void checkPermissions(){
+        mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
+        if (!mPermissions.checkPermissions()) {
+            mPermissions.requestPermissions(REQUEST_PERMISSIONS_CODE);
+        }else{
+            settingSyncViewFlipper.syncSettingComplete();
+        }
+    }
+    /**
+     * now it's useless because of compile sdk 22
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(mPermissions.areAllRequiredPermissionsGranted(grantResults)){
+            settingSyncViewFlipper.syncSettingComplete();
+        }else{
+            settingSyncViewFlipper.noPermissions();
+        }
     }
 
     private void doPreviousNext(boolean next) {
