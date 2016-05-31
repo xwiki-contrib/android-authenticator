@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
 
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
@@ -17,13 +18,8 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
-    <uses-permission android:name="android.permission.READ_SOCIAL_STREAM" />
-    <uses-permission android:name="android.permission.WRITE_SOCIAL_STREAM" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
 
     <application
         android:name=".AppContext"
@@ -46,6 +42,7 @@
             android:name=".activities.GrantPermissionActivity"
             android:noHistory="true"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:label="@string/title_activity_authorize">
         </activity>
 

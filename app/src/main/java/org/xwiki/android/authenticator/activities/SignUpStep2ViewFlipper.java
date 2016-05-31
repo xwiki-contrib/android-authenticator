@@ -20,6 +20,7 @@
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +29,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -199,6 +201,7 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                     if(!elements.isEmpty()){
                         //200ok, sign up successfully because html contains "id=loginForm"
                         finishSignUp();
+                        mActivity.hideInputMethod();
                         mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
                     }else{
                         //return 200ok! but not sign up successfully
@@ -318,15 +321,6 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
     public void onRefresh(){
         initData();
-        /*
-        //mActivity.swipeRefreshLayout.setRefreshing(true);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 3000);
-        */
     }
 
     private void showErrorMessage(String error){

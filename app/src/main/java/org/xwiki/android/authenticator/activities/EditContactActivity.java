@@ -19,6 +19,8 @@
  */
 package org.xwiki.android.authenticator.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -40,7 +42,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.auth.XWikiAuthenticator;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.contactdb.BatchOperation;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
@@ -172,6 +176,20 @@ public class EditContactActivity extends AppCompatActivity {
                     updateUser.email = wikiUser.email;
                     updateUser.phone = wikiUser.phone;
                     HttpResponse response = XWikiHttp.updateUser(updateUser);
+                    if(response.getResponseCode() == 401){
+                        //login to set new cookies
+                        AccountManager mAccountManager = AccountManager.get(getApplicationContext());
+                        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+                        Account account = availableAccounts[0];
+                        String accountPassword = mAccountManager.getUserData(account, AccountManager.KEY_PASSWORD);
+                        HttpResponse httpResponse = XWikiHttp.login(XWikiHttp.getServerAddress(), account.name, accountPassword);
+                        int statusCode = httpResponse.getResponseCode();
+                        if (statusCode >= 200 && statusCode <= 299) {
+                            String authToken = httpResponse.getHeaders().get("Set-Cookie");
+                            XWikiAuthenticator.refreshAllAuthTokenType(mAccountManager, account, authToken);
+                            response = XWikiHttp.updateUser(updateUser);
+                        }
+                    }
                     return response;
                 } catch (IOException e) {
                     e.printStackTrace();

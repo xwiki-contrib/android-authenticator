@@ -101,19 +101,18 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             return result;
         }
 
-        if (!AppContext.isAuthorizedApp(uid)) {
-            final Intent intent = new Intent(AppContext.getInstance().getApplicationContext(), GrantPermissionActivity.class);
+        if (!AppContext.isAuthorizedApp(packageName)) {
+            final Intent intent = new Intent(mContext, GrantPermissionActivity.class);
             intent.putExtra("uid", uid);
             intent.putExtra("packageName", packageName);
-            intent.putExtra("accountName", account.name);
+            intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+            intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+            intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 
             Bundle bundle = new Bundle();
             bundle.putParcelable(AccountManager.KEY_INTENT, intent);
             return bundle;
-            //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //AppContext.getInstance().getApplicationContext().startActivity(intent);
-            //return null;
         }
 
         //authTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
@@ -122,20 +121,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
-            //if other AuthTokenTypes have a cached token, just return this consistent token.
-            //mainly used when a new app being installed. and at this time, there're no cached
-            //authToken corresponding to its authTokenType, but other AuthTokenTypes may have a
-            //cached token.
-            String consistentToken = getTheSameAuthToken(am, account);
-            if (consistentToken != null) {
-                am.setAuthToken(account, authTokenType, consistentToken);
-                final Bundle result = new Bundle();
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                result.putString(AccountManager.KEY_AUTHTOKEN, consistentToken);
-                return result;
-            }
-
             //if  having no cached token, request server for new token and refreshAllAuthTokenType
             //make all cached authTokenType-tokens consistent.
             try {
@@ -143,19 +128,26 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
                 authToken = httpResponse.getHeaders().get("Set-Cookie");
                 Log.d(TAG, "XWikiAuthenticator, authtoken=" + authToken);
+
+                //If we get an authToken - we return it
+                //refresh all tokentype for all apps' package
+                refreshAllAuthTokenType(am, account, authToken);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 final Bundle result = new Bundle();
                 result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken network error!!!");
                 return result;
             }
+
         }
 
-        // If we get an authToken - we return it
-        if (!TextUtils.isEmpty(authToken)) {
-            //refresh all tokentype for all apps' package
-            refreshAllAuthTokenType(am, account, authToken);
-
+        if (TextUtils.isEmpty(authToken)) {
+            //if we get here, error, it's impossible!
+            Bundle result = new Bundle();
+            result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken error impossible !!!");
+            return result;
+        } else {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
@@ -163,22 +155,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(Constants.SERVER_ADDRESS, XWikiHttp.getServerAddress());
             return result;
         }
-
-        // If we get here, then we couldn't access the user's password - so we
-        // need to re-prompt them for their credentials. We do that by creating
-        // an intent to display our AuthenticatorActivity.
-        //final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
-        //intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        //intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-        //intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
-        //final Bundle bundle = new Bundle();
-        //bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        //return bundle;
-
-        //if we get here, error, it's impossible!
-        Bundle result = new Bundle();
-        result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken error impossible !!!");
-        return result;
     }
 
 
@@ -222,14 +198,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
-    }
-
-    public static String getTheSameAuthToken(AccountManager am, Account account) {
-        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
-        if (packageList == null || packageList.size() == 0) return null;
-        String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageList.get(0);
-        String authToken = am.peekAuthToken(account, tokenType);
-        return authToken;
     }
 
 }

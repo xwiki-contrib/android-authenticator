@@ -22,6 +22,7 @@ package org.xwiki.android.authenticator.auth;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -38,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -127,21 +129,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         }
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.act_authenticator, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            //finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     @Override
     protected void onDestroy() {
@@ -305,7 +292,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST);
         SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS);
         SharedPrefsUtils.removeKeyValue(this, Constants.SYNC_TYPE);
-        SharedPrefsUtils.removeKeyValue(this, Constants.APP_UID);
     }
 
     public void finishLogin(Intent intent) {
@@ -314,27 +300,19 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         //before add new account, clear old account data.
         clearOldAccount();
 
+        //get values
         String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         String accountServer = intent.getStringExtra(PARAM_USER_SERVER);
-        final Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
-
-        Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
-
-        Bundle data = new Bundle();
-        data.putString(PARAM_USER_SERVER, accountServer);
-        data.putString(PARAM_USER_PASS, accountPassword);
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
-        mAccountManager.addAccountExplicitly(account, accountPassword, data);
-
+        Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
+        final Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
+        mAccountManager.addAccountExplicitly(account, accountPassword, null);
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName);
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword);
         mAccountManager.setUserData(account, AuthenticatorActivity.PARAM_USER_SERVER, accountServer);
-
-        //clear all SharedPreferences
-        //SharedPrefsUtil.clearAll(AuthenticatorActivity.this);
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         String packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME);
@@ -350,22 +328,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
             }
         }
 
-        //set sync
-        //ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
-        //ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
-
-        //Bundle params = new Bundle();
-        //params.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, false);
-        //params.putBoolean(ContentResolver.SYNC_EXTRAS_DO_NOT_RETRY, false);
-        //params.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, false);
-        //ContentResolver.addPeriodicSync(account, ContactsContract.AUTHORITY, params, 150);
-        //ContentResolver.requestSync(account,ContactsContract.AUTHORITY,params);
-
         //return value to AccountManager
-        setAccountAuthenticatorResult(intent.getExtras());
-        setResult(RESULT_OK, intent);
+        Intent intentReturn = new Intent();
+        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
+        setAccountAuthenticatorResult(intentReturn.getExtras());
+        setResult(RESULT_OK, intentReturn);
         Log.d(TAG, ">" + "finish return");
-        // in SettingSyncViewFlipper finish;
+        // in SettingSyncViewFlipper this activity finish;
     }
 
 
@@ -415,5 +385,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
             }
         }
         mAsyncTasks.clear();
+    }
+
+    public void hideInputMethod(){
+        View view = this.getCurrentFocus();
+        if(view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

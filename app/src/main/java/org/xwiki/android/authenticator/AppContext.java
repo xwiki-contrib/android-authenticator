@@ -48,7 +48,6 @@ public class AppContext extends Application {
 
     public static void addAuthorizedApp(int uid, String packageName) {
         Log.d(TAG, "packageName=" + packageName + ", uid=" + uid);
-        SharedPrefsUtils.putValue(instance.getApplicationContext(), Constants.APP_UID + uid, packageName);
         List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
         if (packageList == null) {
             packageList = new ArrayList<>();
@@ -57,11 +56,11 @@ public class AppContext extends Application {
         SharedPrefsUtils.putArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST, packageList);
     }
 
-    public static boolean isAuthorizedApp(int uid) {
-        String packageName = SharedPrefsUtils.getValue(instance.getApplicationContext(), Constants.APP_UID + uid, null);
-        if (packageName == null) {
-            return false;
+    public static boolean isAuthorizedApp(String packageName) {
+        List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
+        if (packageList != null && packageList.contains(packageName)) {
+            return true;
         }
-        return true;
+        return false;
     }
 }

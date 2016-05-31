@@ -21,6 +21,7 @@ package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -35,8 +36,10 @@ import android.provider.ContactsContract;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -77,7 +80,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
         initView();
-        //initData();
     }
 
     @Override
@@ -127,13 +129,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
         SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
         selectSyncSpinner.setSelection(SYNC_TYPE);
-
-
-//        if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
-//
-//        } else if(syncType == Constants.SYNC_TYPE_SELECTED_GROUPS){
-//            selectSyncSpinner.setSelection(2);
-//        }
 
         mActivity.refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override

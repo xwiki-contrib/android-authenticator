@@ -138,6 +138,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
                     showErrorMessage(intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE));
                 } else {
                     mActivity.finishLogin(intent);
+                    mActivity.hideInputMethod();
                     mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
                 }
             }
