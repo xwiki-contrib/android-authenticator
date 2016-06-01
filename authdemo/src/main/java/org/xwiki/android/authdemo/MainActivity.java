@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         mAccountManager = AccountManager.get(this);
+
+        ((TextView) findViewById(R.id.signature_textview)).setText("Signature="+SystemTools.getSign(this, getPackageName())+"\nPackageName="+getPackageName());
 
         findViewById(R.id.btnAddAccount).setOnClickListener(new View.OnClickListener() {
             @Override
