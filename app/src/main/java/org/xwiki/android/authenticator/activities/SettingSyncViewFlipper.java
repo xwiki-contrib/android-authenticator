@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -120,6 +121,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     mListView.setVisibility(View.GONE);
                 }
                 SYNC_TYPE = position;
+                ((TextView) view).setTextColor(Color.BLACK);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {

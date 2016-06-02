@@ -71,8 +71,8 @@ public class GroupListAdapter extends BaseAdapter {
 
         final XWikiGroup group = (XWikiGroup) getItem(position);
         viewHolder.groupNameTextView.setText(group.pageName);
-        viewHolder.lastModifiedTime.setText(group.lastModifiedDate);
-        viewHolder.versionTextView.setText(group.wiki + ":" + group.space);
+        viewHolder.lastModifiedTime.setText(group.lastModifiedDate.substring(0,10));
+        viewHolder.versionTextView.setText(group.wiki);
 //        viewHolder.checkBox.setChecked(mSparseBooleanArray.get(position));
         viewHolder.checkBox.setChecked(selected.contains(group));
 
