@@ -52,9 +52,9 @@ public class Constants {
      * SyncType
      * 0: no sync, 1: all users, 2: sync groups
      */
-    public static final int SYNC_TYPE_NO_NEED_SYNC = 0;
-    public static final int SYNC_TYPE_ALL_USERS = 1;
-    public static final int SYNC_TYPE_SELECTED_GROUPS = 2;
+    public static final int SYNC_TYPE_ALL_USERS = 0;
+    public static final int SYNC_TYPE_SELECTED_GROUPS = 1;
+    public static final int SYNC_TYPE_NO_NEED_SYNC = 2;
 
     /**
      * sync maker

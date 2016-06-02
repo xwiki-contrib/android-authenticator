@@ -57,6 +57,7 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.AnimUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.SystemTools;
 
@@ -114,9 +115,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 2){
+                if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
                     mListView.setVisibility(View.VISIBLE);
-                    initData();
                 }else{
                     mListView.setVisibility(View.GONE);
                 }
@@ -128,21 +128,13 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
             }
         });
-
-        SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+        SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
-
-        mActivity.refreshImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initData();
-            }
-        });
+        initData();
     }
 
-    private void initData() {
-        //mActivity.swipeRefreshLayout.setRefreshing(true);
-        refreshImageView(mActivity.refreshImageView);
+    public void initData() {
+        AnimUtils.refreshImageView(mContext, mActivity.refreshImageView);
         AsyncTask getGroupsTask = new AsyncTask<Void, Void, List<XWikiGroup>>() {
             @Override
             protected List<XWikiGroup> doInBackground(Void... params) {
@@ -159,13 +151,21 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(List<XWikiGroup> groups) {
-                hideRefreshAnimation(mActivity.refreshImageView);
+                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
                 if (groups != null && groups.size() >= 0) {
                     Log.i(TAG, groups.toString());
                     groupList.clear();
                     groupList.addAll(groups);
                     mAdapter.refresh(groupList);
+                }else{
+                    Toast.makeText(mContext, "network error! please refresh again!", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
             }
         };
         mActivity.putAsyncTask(getGroupsTask);
@@ -231,10 +231,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         }
     }
 
-    public void onRefresh(){
-        initData();
-    }
-
     private boolean compareSelectGroups(){
         //new
         List<XWikiGroup> newList = mAdapter.getSelectGroups();
@@ -259,29 +255,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
 
-    /**
-     * animation refresh
-     */
-    private Animation animation;
-    public void refreshImageView(View v) {
-        hideRefreshAnimation(v);
-        //refresh anim
-        animation = AnimationUtils.loadAnimation(mContext, R.anim.refresh);
-        //Defines what this animation should do when it reaches the end
-        animation.setRepeatMode(Animation.RESTART);
-        //repeat times
-        animation.setRepeatCount(Animation.INFINITE);
-        //ImageView startt anim
-        v.startAnimation(animation);
-    }
-    public void hideRefreshAnimation(View v) {
-        if (animation != null) {
-            animation.cancel();
-            v.clearAnimation();
-            v.setAnimation(null);
-//        	v.setImageResource(R.drawable.refresh);
-        }
-    }
+
 
 
     private  void openAppMarket(Context context) {

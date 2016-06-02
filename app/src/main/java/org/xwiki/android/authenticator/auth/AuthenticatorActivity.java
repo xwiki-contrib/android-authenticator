@@ -64,7 +64,7 @@ import java.util.List;
 /**
  * @version $Id: $
  */
-public class AuthenticatorActivity extends AccountAuthenticatorActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     private static final String TAG = "AuthenticatorActivity";
 
     public static final String KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE";
@@ -85,8 +85,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
 
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
-    //show refresh in SignUpStep2ViewFlipper for refreshing form again.
-    public SwipeRefreshLayout swipeRefreshLayout;
     //refresh ImageView mainly in SettingSyncViewFlipper
     public ImageView refreshImageView;
     //show progress dialog
@@ -106,12 +104,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
-        swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setEnabled(false);
-
         refreshImageView = (ImageView) findViewById(R.id.refresh_view);
+        refreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int id = mViewFlipper.getDisplayedChild();
+                if(id == ViewFlipperLayoutId.SIGN_UP_STEP2){
+                    signUpStep2ViewFlipper.initData();
+                }else if(id == ViewFlipperLayoutId.SETTING_SYNC){
+                    settingSyncViewFlipper.initData();
+                }
+            }
+        });
 
         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
@@ -233,20 +237,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         ((Button) findViewById(R.id.right_button)).setText(rightButton);
     }
 
-    @Override
-    public void onRefresh() {
-        int id = mViewFlipper.getDisplayedChild();
-        switch (id) {
-            case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                signUpStep2ViewFlipper.onRefresh();
-                break;
-            case ViewFlipperLayoutId.SETTING_SYNC:
-                settingSyncViewFlipper.onRefresh();
-                break;
-            default:
-                break;
-        }
-    }
 
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
@@ -257,11 +247,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
     }
 
     public void showViewFlipper(int id) {
-        if(swipeRefreshLayout.isRefreshing()){
-            swipeRefreshLayout.setRefreshing(false);
-        }
         clearAsyncTask();
-        swipeRefreshLayout.setEnabled(false);
         refreshImageView.setVisibility(View.GONE);
         mViewFlipper.setDisplayedChild(id);
         switch (id) {
@@ -295,7 +281,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
                 setLeftRightButton("Previous", "Next");
                 break;
             case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                swipeRefreshLayout.setEnabled(true);
+                refreshImageView.setVisibility(View.VISIBLE);
                 if (signUpStep2ViewFlipper == null) {
                     signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
                 }

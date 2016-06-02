@@ -46,6 +46,7 @@ import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.HttpParams;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.AnimUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
@@ -89,7 +90,8 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
         });
     }
 
-    void initData() {
+    public void initData() {
+        AnimUtils.refreshImageView(mContext, mActivity.refreshImageView);
         //init form token and cookie
         AsyncTask initFormTokenTask = new AsyncTask<Void, Void, HttpResponse>() {
             @Override
@@ -105,9 +107,6 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(HttpResponse response) {
-                if(mActivity.swipeRefreshLayout.isRefreshing()){
-                    mActivity.swipeRefreshLayout.setRefreshing(false);
-                }
                 if(response == null){
                     //network error
                     showErrorMessage("network error, check network and pull to refresh please.");
@@ -127,6 +126,12 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                         refreshCaptcha();
                     }
                 }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
             }
         };
         mActivity.putAsyncTask(initFormTokenTask);
@@ -298,11 +303,15 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
             @Override
             protected void onPostExecute(byte[] bytes) {
+                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
                 Bitmap captchaBitmap = getPicFromBytes(bytes, null);
                 mCaptchaImageView.setImageBitmap(captchaBitmap);
-                if(mActivity.swipeRefreshLayout.isRefreshing()){
-                    mActivity.swipeRefreshLayout.setRefreshing(false);
-                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
             }
         };
         mActivity.putAsyncTask(refreshCaptchaTask);
@@ -319,9 +328,6 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
         return null;
     }
 
-    public void onRefresh(){
-        initData();
-    }
 
     private void showErrorMessage(String error){
         //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();
