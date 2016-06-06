@@ -33,6 +33,7 @@ import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.contactdb.ContactColumns;
 import org.xwiki.android.authenticator.utils.ImageUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
@@ -345,6 +346,14 @@ public class XWikiHttp {
                 String[] spaceAndName = item.headline.split("\\.");
                 XWikiUser user = getUserDetail(split[0], spaceAndName[0], spaceAndName[1]);
                 syncData.updateUserList.add(user);
+
+                // if many users should be synchronized, the task will not be stop
+                // even though you close the sync in settings or selecting the "don't sync" option.
+                // we should stop the task by checking the sync type each time.
+                int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
+                if(syncType != Constants.SYNC_TYPE_SELECTED_GROUPS){
+                    throw new IOException("the sync type has been changed");
+                }
             }
         }
         return syncData;
@@ -379,6 +388,14 @@ public class XWikiHttp {
             XWikiUser user = getUserDetail(item.id);
             user.lastModifiedDate = item.modified;
             syncData.updateUserList.add(user);
+
+            // if many users should be synchronized, the task will not be stop
+            // even though you close the sync in settings or selecting the "don't sync" option.
+            // we should stop the task by checking the sync type each time.
+            int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
+            if(syncType != Constants.SYNC_TYPE_ALL_USERS){
+                throw new IOException("the sync type has been changed");
+            }
         }
         return syncData;
     }
