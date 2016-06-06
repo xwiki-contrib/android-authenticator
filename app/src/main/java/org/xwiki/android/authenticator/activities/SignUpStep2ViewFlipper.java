@@ -20,7 +20,6 @@
 package org.xwiki.android.authenticator.activities;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,7 +28,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,7 +41,6 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.rest.HttpParams;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.AnimUtils;
@@ -296,7 +293,7 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
                 }
                 byte[] img = null;
                 try {
-                    img = XWikiHttp.downloadAvatar(captchaUrl);
+                    img = XWikiHttp.downloadImage(captchaUrl);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

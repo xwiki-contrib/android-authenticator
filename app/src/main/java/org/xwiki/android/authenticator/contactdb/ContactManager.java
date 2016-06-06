@@ -192,7 +192,7 @@ public class ContactManager {
         for (XWikiUser xwikiUser : updateList) {
             long rawContactId = lookupRawContact(resolver, xwikiUser.getId());
             if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.avatar)) {
-                byte[] avatarBuffer = XWikiHttp.downloadAvatar(xwikiUser.pageName, xwikiUser.avatar);
+                byte[] avatarBuffer = XWikiHttp.downloadImage(xwikiUser.pageName, xwikiUser.avatar);
                 if (avatarBuffer != null) {
                     writeDisplayPhoto(context, rawContactId, avatarBuffer);
                 }

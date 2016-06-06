@@ -25,9 +25,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
@@ -43,7 +40,6 @@ import org.xwiki.android.authenticator.utils.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -444,25 +440,25 @@ public class XWikiHttp {
     }
 
     /**
-     * downloadAvatar
-     * download the photo of contact
+     * downloadImage
+     * download the avatar photo of contact
      *
      * @param user       the user's pageName
      * @param avatarName the avatar name like jvelociter.jpg
      * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
      */
-    public static byte[] downloadAvatar(String user, String avatarName) throws IOException {
+    public static byte[] downloadImage(String user, String avatarName) throws IOException {
         String url = "http://"+ getServerAddress() +"/xwiki/bin/download/XWiki/" + user + "/" + avatarName;
-        return downloadAvatar(url);
+        return downloadImage(url);
     }
 
     /**
-     * Download the avatar image from the server.
+     * Download the image from the server.
      *
      * @param avatarUrl the URL pointing to the avatar image
      * @return a byte array with the raw JPEG avatar image
      */
-    public static byte[] downloadAvatar(final String avatarUrl) throws IOException {
+    public static byte[] downloadImage(final String avatarUrl) throws IOException {
         // If there is no avatar, we're done
         if (TextUtils.isEmpty(avatarUrl)) {
             return null;
@@ -479,25 +475,43 @@ public class XWikiHttp {
         } else if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
         }
+        //byte[] bytes = response.getContentData() maybe should less than 8M.  now only 6M has been tested.
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        //options.inJustDecodeBounds = true;
-        //BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
-
-        Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
-                null, options);
-        avatar = ImageUtils.compressByQuality(avatar, 900);
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
+        Bitmap avatar = null;
+        //calc if the avatar bitmap memory are more than 4096 * 1024 B = 4MB
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+        options.inJustDecodeBounds = false;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inSampleSize = 1;
+        //if the memory size of the image are more than 4M options.inSampleSize>1.
+        int size = height * width * 2; //2 is RGB_565
+        int reqSize = 4096 * 1024;
+        if (size > reqSize ) {
+            final int halfSize = size / 2;
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfSize / inSampleSize) > reqSize) {
+                inSampleSize *= 2;
+            }
+            options.inSampleSize = inSampleSize;
+        }
+        avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
+        //ensure < 1M.  avoid transactionException when storing in local database.
+        avatar = ImageUtils.compressByQuality(avatar, 960);
         // Take the image we received from the server, whatever format it
         // happens to be in, and convert it to a JPEG image. Note: we're
         // not resizing the avatar - we assume that the image we get from
         // the server is a reasonable size...
-        Log.i(TAG, "Converting avatar to JPEG");
+        //return byte[] value
         if (avatar == null) return null;
-        ByteArrayOutputStream convertStream = new ByteArrayOutputStream(
-                avatar.getWidth() * avatar.getHeight() * 4);
-        avatar.compress(Bitmap.CompressFormat.JPEG, 95, convertStream);
+        ByteArrayOutputStream convertStream = new ByteArrayOutputStream();
+        avatar.compress(Bitmap.CompressFormat.PNG, 100, convertStream);
         convertStream.flush();
-        convertStream.close();
-        // On pre-Honeycomb systems, it's important to call recycle on bitmaps
+        //it's important to call recycle on bitmaps
         avatar.recycle();
         return convertStream.toByteArray();
     }

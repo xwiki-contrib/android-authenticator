@@ -208,7 +208,7 @@ public class ContactOperations {
 
     public ContactOperations addAvatar(String pageName, String avatarName) throws IOException {
         if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
-            byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
+            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
             if (avatarBuffer != null) {
                 mValues.clear();
                 mValues.put(Photo.PHOTO, avatarBuffer);
@@ -336,7 +336,7 @@ public class ContactOperations {
 
     public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) throws IOException {
         if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
-            byte[] avatarBuffer = XWikiHttp.downloadAvatar(pageName, avatarName);
+            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
             if (avatarBuffer != null) {
                 mValues.clear();
                 mValues.put(Photo.PHOTO, avatarBuffer);
