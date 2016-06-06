@@ -105,7 +105,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
                 Bundle data = new Bundle();
                 try {
                     Log.d(TAG, userName + " " + userPass + " " + userServer);
-                    HttpResponse response = XWikiHttp.login(userServer, userName, userPass);
+                    HttpResponse response = XWikiHttp.login(userName, userPass);
                     Log.d(TAG, response.getHeaders().toString() + response.getResponseCode());
                     int statusCode = response.getResponseCode();
                     if (statusCode < 200 || statusCode > 299) {

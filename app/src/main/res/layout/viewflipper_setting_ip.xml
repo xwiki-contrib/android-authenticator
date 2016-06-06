@@ -45,26 +45,7 @@
                 android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:text="210.76.193.135"
-                android:textColor="@android:color/black" />
-            <!---->
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_activity_port_label"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/accountPort"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:text="8080"
+                android:text="http://www.xwiki.org/xwiki"
                 android:textColor="@android:color/black" />
 
         </LinearLayout>

@@ -53,7 +53,7 @@ public class XWikiHttp {
     private static String serverRestPreUrl = null;
 
     /**
-     * ogin
+     * login
      *
      * @param username user's name
      * @param password user's password
@@ -61,10 +61,10 @@ public class XWikiHttp {
      * HttpResponse
      * @throws IOException http://localhost:8080/xwiki/bin/login/XWiki/XWikiLogin
      */
-    public static HttpResponse login(String requestUrl, String username, String password) throws IOException {
+    public static HttpResponse login(String username, String password) throws IOException {
         SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
         HttpExecutor httpExecutor = new HttpExecutor();
-        String url = "http://" + requestUrl + "/xwiki/bin/login/XWiki/XWikiLogin";
+        String url = getServerAddress() + "/bin/login/XWiki/XWikiLogin";
         HttpRequest request = new HttpRequest(url);
         String basicAuth = username + ":" + password;
         basicAuth = "Basic " + new String(Base64.encodeToString(basicAuth.getBytes(), Base64.NO_WRAP));
@@ -96,9 +96,9 @@ public class XWikiHttp {
      * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
      */
     public static HttpResponse signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email) throws IOException {
-        String registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/Registration";
+        String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
-            registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/RealRegistration";
+            registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
         }
         HttpRequest request = new HttpRequest(registerUrl, HttpRequest.HttpMethod.POST, null);
         HttpExecutor httpExecutor = new HttpExecutor();
@@ -134,9 +134,9 @@ public class XWikiHttp {
      */
     public static HttpResponse signUpInitCookieForm() throws IOException {
         SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
-        String registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/Registration";
+        String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
-            registerUrl = "http://" + getServerAddress() + "/xwiki/bin/view/XWiki/RealRegistration";
+            registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
         }
         HttpRequest request = new HttpRequest(registerUrl);
         HttpExecutor httpExecutor = new HttpExecutor();
@@ -435,14 +435,13 @@ public class XWikiHttp {
     /**
      * getServerRestUrl
      * get serverRestPreUrl from preference.
-     *
+     * http://www.xwiki.org/xwiki + "/rest"
      * @return String
      * url
      */
     public static String getServerRestUrl() {
         if (serverRestPreUrl == null) {
-            serverRestPreUrl = getServerAddress();
-            serverRestPreUrl = "http://" + serverRestPreUrl + "/xwiki/rest";
+            serverRestPreUrl = getServerAddress() + "/rest";
         }
         return serverRestPreUrl;
     }
@@ -465,7 +464,7 @@ public class XWikiHttp {
      * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
      */
     public static byte[] downloadImage(String user, String avatarName) throws IOException {
-        String url = "http://"+ getServerAddress() +"/xwiki/bin/download/XWiki/" + user + "/" + avatarName;
+        String url = getServerAddress() +"/bin/download/XWiki/" + user + "/" + avatarName;
         return downloadImage(url);
     }
 

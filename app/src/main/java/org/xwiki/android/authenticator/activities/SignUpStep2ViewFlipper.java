@@ -287,9 +287,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             protected byte[] doInBackground(Void... params) {
                 //String captchaUrl = "http://210.76.192.253:8080/xwiki/bin/imagecaptcha/XWiki/Registration";
                 //String url = "http://www.xwiki.org/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
-                String captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/Registration";
+                String captchaUrl = XWikiHttp.getServerAddress() + "/bin/imagecaptcha/XWiki/Registration";
                 if (captchaUrl.contains("www.xwiki.org")) {
-                    captchaUrl = "http://" + XWikiHttp.getServerAddress() + "/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
+                    captchaUrl = XWikiHttp.getServerAddress() + "/bin/imagecaptcha/XWiki/RealRegistration";
                 }
                 byte[] img = null;
                 try {

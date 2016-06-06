@@ -182,7 +182,7 @@ public class EditContactActivity extends AppCompatActivity {
                         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
                         Account account = availableAccounts[0];
                         String accountPassword = mAccountManager.getUserData(account, AccountManager.KEY_PASSWORD);
-                        HttpResponse httpResponse = XWikiHttp.login(XWikiHttp.getServerAddress(), account.name, accountPassword);
+                        HttpResponse httpResponse = XWikiHttp.login(account.name, accountPassword);
                         int statusCode = httpResponse.getResponseCode();
                         if (statusCode >= 200 && statusCode <= 299) {
                             String authToken = httpResponse.getHeaders().get("Set-Cookie");
