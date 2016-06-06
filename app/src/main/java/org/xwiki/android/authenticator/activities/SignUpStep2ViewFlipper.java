@@ -109,10 +109,12 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
             protected void onPostExecute(HttpResponse response) {
                 if(response == null){
                     //network error
+                    AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
                     showErrorMessage("network error, check network and pull to refresh please.");
                 }else{
                     int statusCode = response.getResponseCode();
                     if (statusCode < 200 || statusCode > 299) {
+                        AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
                         //server or client error
                         showErrorMessage("init form error: "+response.getResponseMessage()+", pull to refresh please");
                     }else{

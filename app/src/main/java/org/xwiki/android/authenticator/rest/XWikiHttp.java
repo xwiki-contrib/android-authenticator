@@ -452,7 +452,7 @@ public class XWikiHttp {
      * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
      */
     public static byte[] downloadAvatar(String user, String avatarName) throws IOException {
-        String url = "http://www.xwiki.org/xwiki/bin/download/XWiki/" + user + "/" + avatarName;
+        String url = "http://"+ getServerAddress() +"/xwiki/bin/download/XWiki/" + user + "/" + avatarName;
         return downloadAvatar(url);
     }
 
@@ -479,8 +479,10 @@ public class XWikiHttp {
         } else if (statusCode < 200 || statusCode > 299) {
             throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
         }
-
         final BitmapFactory.Options options = new BitmapFactory.Options();
+        //options.inJustDecodeBounds = true;
+        //BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
+
         Bitmap avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()),
                 null, options);
         avatar = ImageUtils.compressByQuality(avatar, 900);

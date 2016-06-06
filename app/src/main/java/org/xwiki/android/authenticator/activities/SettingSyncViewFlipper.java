@@ -177,12 +177,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
 
     public void syncSettingComplete() {
-        int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+        int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         if(oldSyncType == SYNC_TYPE && SYNC_TYPE != Constants.SYNC_TYPE_SELECTED_GROUPS){
             return;
         }
         if(SYNC_TYPE == Constants.SYNC_TYPE_NO_NEED_SYNC){
-            SharedPrefsUtils.removeKeyValue(mContext, Constants.SYNC_TYPE);
+            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
             resetSync(false);
         } else if (SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS) {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);

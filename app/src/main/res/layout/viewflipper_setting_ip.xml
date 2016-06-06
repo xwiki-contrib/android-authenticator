@@ -45,9 +45,9 @@
                 android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:text="www.xwiki.org"
+                android:text="210.76.193.135"
                 android:textColor="@android:color/black" />
-            <!--210.76.193.135-->
+            <!---->
 
             <TextView
                 android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
                 android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:text="80"
+                android:text="8080"
                 android:textColor="@android:color/black" />
 
         </LinearLayout>
