@@ -383,6 +383,23 @@ public class XWikiHttp {
         return syncData;
     }
 
+    /**
+     * getSyncAllUsersSimple
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
+    public static List<SearchResult> getSyncAllUsersSimple() throws IOException, XmlPullParserException {
+        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
+        HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
+        int statusCode = response.getResponseCode();
+        if (statusCode < 200 || statusCode > 299) {
+            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
+        }
+        List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
+        return searchList;
+    }
+
 
     /**
      * getUserLastModified

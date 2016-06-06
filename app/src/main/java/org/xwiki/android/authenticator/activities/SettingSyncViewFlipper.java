@@ -21,7 +21,6 @@ package org.xwiki.android.authenticator.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -32,29 +31,21 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.AnimUtils;
@@ -72,8 +63,10 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     private static final String TAG = "SettingSyncViewFlipper";
 
     ListView mListView = null;
-    GroupListAdapter mAdapter;
+    GroupListAdapter mGroupAdapter;
+    UserListAdapter mUsersAdapter;
     private List<XWikiGroup> groupList;
+    private List<SearchResult> searchResults;
     private AppCompatSpinner selectSyncSpinner;
     private Button versionCheckButton;
     private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
@@ -107,18 +100,25 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
         mListView = (ListView) findViewById(R.id.list_view);
         groupList = new ArrayList<>();
-        mAdapter = new GroupListAdapter(mContext, groupList);
-        mListView.setAdapter(mAdapter);
+        searchResults = new ArrayList<>();
+        mGroupAdapter = new GroupListAdapter(mContext, groupList);
+        mUsersAdapter = new UserListAdapter(mContext, searchResults);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         selectSyncSpinner = (AppCompatSpinner) findViewById(R.id.select_spinner);
         selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
-                    mListView.setVisibility(View.VISIBLE);
-                }else{
+                if(position == Constants.SYNC_TYPE_NO_NEED_SYNC){
                     mListView.setVisibility(View.GONE);
+                }else if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
+                    mListView.setVisibility(View.VISIBLE);
+                    mListView.setAdapter(mGroupAdapter);
+                    mGroupAdapter.refresh(groupList);
+                }else{
+                    mListView.setVisibility(View.VISIBLE);
+                    mListView.setAdapter(mUsersAdapter);
+                    mUsersAdapter.refresh(searchResults);
                 }
                 SYNC_TYPE = position;
                 ((TextView) view).setTextColor(Color.BLACK);
@@ -135,28 +135,42 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     public void initData() {
         AnimUtils.refreshImageView(mContext, mActivity.refreshImageView);
-        AsyncTask getGroupsTask = new AsyncTask<Void, Void, List<XWikiGroup>>() {
+        AsyncTask getGroupsTask = new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected List<XWikiGroup> doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
                     List<XWikiGroup> groups = XWikiHttp.getGroupList(Constants.LIMIT_MAX_SYNC_USERS);
-                    return groups;
+                    List<SearchResult> searchs = XWikiHttp.getSyncAllUsersSimple();
+                    if (groups != null && groups.size() >= 0) {
+                        Log.i(TAG, groups.toString());
+                        groupList.clear();
+                        groupList.addAll(groups);
+                    }
+                    if(searchs != null && searchs.size() >=0 ){
+                        Log.i(TAG, searchs.toString());
+                        searchResults.clear();
+                        searchResults.addAll(searchs);
+                    }
+                    return true;
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 }
-                return null;
+                return false;
             }
 
             @Override
-            protected void onPostExecute(List<XWikiGroup> groups) {
+            protected void onPostExecute(Boolean flag) {
                 AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-                if (groups != null && groups.size() >= 0) {
-                    Log.i(TAG, groups.toString());
-                    groupList.clear();
-                    groupList.addAll(groups);
-                    mAdapter.refresh(groupList);
+                if (flag) {
+                    if(SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                        mListView.setAdapter(mGroupAdapter);
+                        mGroupAdapter.refresh(groupList);
+                    }else if(SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS){
+                        mListView.setAdapter(mUsersAdapter);
+                        mUsersAdapter.refresh(searchResults);
+                    }
                 }else{
                     Toast.makeText(mContext, "network error! please refresh again!", Toast.LENGTH_SHORT).show();
                 }
@@ -169,6 +183,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         };
         mActivity.putAsyncTask(getGroupsTask);
+
+
+
     }
 
     public void noPermissions(){
@@ -194,7 +211,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             if(oldSyncType == SYNC_TYPE && compareSelectGroups()){
                 return;
             }
-            List<XWikiGroup> list = mAdapter.getSelectGroups();
+            List<XWikiGroup> list = mGroupAdapter.getSelectGroups();
             if (list != null && list.size() > 0) {
                 List<String> groupIdList = new ArrayList<>();
                 for (XWikiGroup iGroup : list) {
@@ -236,7 +253,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     private boolean compareSelectGroups(){
         //new
-        List<XWikiGroup> newList = mAdapter.getSelectGroups();
+        List<XWikiGroup> newList = mGroupAdapter.getSelectGroups();
         //old
         List<String> oldList = SharedPrefsUtils.getArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS);
         if(newList == null && oldList == null){
