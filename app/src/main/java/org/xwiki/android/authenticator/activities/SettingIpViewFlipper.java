@@ -29,13 +29,15 @@ import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * SettingIpViewFlipper
  */
 public class SettingIpViewFlipper extends BaseViewFlipper {
 
     CharSequence serverAddr = null;
-    CharSequence serverPort = null;
 
     public SettingIpViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
@@ -59,29 +61,30 @@ public class SettingIpViewFlipper extends BaseViewFlipper {
 
     public boolean checkInput() {
         EditText serverEditText = (EditText) findViewById(R.id.accountServer);
-        EditText serverPortEditText = (EditText) findViewById(R.id.accountPort);
         serverEditText.setError(null);
-        serverPortEditText.setError(null);
         serverAddr = serverEditText.getText();
-        serverPort = serverPortEditText.getText();
         View focusView = null;
         boolean cancel = false;
-        if (!StringUtils.isIpAddress(serverAddr) && !StringUtils.isDomainAddress(serverAddr)) {
+
+        if (TextUtils.isEmpty(serverAddr)) {
             focusView = serverEditText;
-            serverEditText.setError(mContext.getString(R.string.error_invalid_server));
+            serverEditText.setError(mContext.getString(R.string.error_field_required));
             cancel = true;
-        } else if (TextUtils.isEmpty(serverPort)) {
-            focusView = serverEditText;
-            serverEditText.setError(mContext.getString(R.string.error_invalid_server));
-            cancel = true;
+        }else{
+            try {
+                URL url = new URL(serverAddr.toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                focusView = serverEditText;
+                serverEditText.setError(mContext.getString(R.string.error_invalid_server));
+                cancel = true;
+            }
         }
+
         if (cancel) {
             focusView.requestFocus();
             return false;
         } else {
-            if (StringUtils.isIpAddress(serverAddr)) {
-                serverAddr = serverAddr + ":" + serverPort;
-            }
             return true;
         }
     }

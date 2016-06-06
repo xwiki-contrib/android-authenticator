@@ -88,7 +88,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         final AccountManager am = AccountManager.get(mContext);
         String accountName = am.getUserData(account, AccountManager.KEY_USERDATA);
         String accountPassword = am.getUserData(account, AccountManager.KEY_PASSWORD);
-        String accountServer = am.getUserData(account, AuthenticatorActivity.PARAM_USER_SERVER);
 
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
         String packageName = mContext.getPackageManager().getNameForUid(uid);
@@ -125,7 +124,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             //make all cached authTokenType-tokens consistent.
             try {
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
-                HttpResponse httpResponse = XWikiHttp.login(accountServer, accountName, accountPassword);
+                HttpResponse httpResponse = XWikiHttp.login(accountName, accountPassword);
                 authToken = httpResponse.getHeaders().get("Set-Cookie");
                 Log.d(TAG, "XWikiAuthenticator, authtoken=" + authToken);
 

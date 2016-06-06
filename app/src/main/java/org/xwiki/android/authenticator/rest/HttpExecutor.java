@@ -28,15 +28,21 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -84,7 +90,11 @@ public class HttpExecutor {
         connection.setReadTimeout(timeoutMs);
         connection.setUseCaches(false);
         connection.setDoInput(true);
+        // https://developer.android.com/training/articles/security-ssl.html#SelfSigned
+        // HttpUrlConnection provides default support for ssl if the ca is issued by a well known CA.
+        // but if it's self signed, you should trust all or Create a KeyStore containing your trusted CAs.
         // for HTTPS
+        /*
         if ("https".equals(url.getProtocol())) {
             if (mSslSocketFactory != null) {
                 //use caller-provided custom SslSocketFactory
@@ -95,7 +105,30 @@ public class HttpExecutor {
                 HTTPSTrustManager.allowAllSSL();
             }
         }
+        */
         return connection;
+    }
+
+    /**
+     * isSelfSigned
+     * check if the server ca is self signed
+     * but this function is just for test, because it's not secure
+     * we can just choose one type according to our server(trust well known ca or create our own trust keystore)
+     * https://developer.android.com/training/articles/security-ssl.html#SelfSigned
+     * @param url
+     * @return
+     */
+    private boolean isSelfSigned(URL url){
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            InputStream in = urlConnection.getInputStream();
+        } catch (SSLHandshakeException e){
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void setConnectionParametersForRequest(HttpURLConnection urlConnection, HttpRequest request) throws IOException {
