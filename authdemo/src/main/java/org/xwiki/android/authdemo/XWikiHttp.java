@@ -13,7 +13,7 @@ public class XWikiHttp {
 
     public static void isValidToken(String server, String authToken, Callback callback) throws IOException {
         OkHttpClient client = new OkHttpClient();
-        String url = server+"/xwiki/bin/login/XWiki/XWikiLogin";
+        String url = server+"/bin/login/XWiki/XWikiLogin";
         Request request = new Request.Builder()
                 .addHeader("Cookie", authToken)
                 .url(url)
