@@ -38,6 +38,10 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
         subscriptions.unsubscribe();
     }
 
+    public void clearSubscription() {
+        subscriptions.clear();
+    }
+
     public void updateUser(String wiki, String space, String pageName, UserPayload userPayload) {
         checkViewAttached();
         getMvpView().showProgress();

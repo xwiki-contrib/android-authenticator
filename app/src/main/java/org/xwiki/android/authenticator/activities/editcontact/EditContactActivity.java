@@ -23,6 +23,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -216,6 +217,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     @Override
     public void showProgress() {
         showProgressDialog();
+        onProgressDialogCancel();
     }
 
     @Override
@@ -264,6 +266,15 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     @Override
     public void showErrorLogin() {
         showToast("Authentication Error");
+    }
+
+    @Override
+    public void onProgressDialogCancel() {
+        getProgressDialog().setOnCancelListener(new DialogInterface.OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                editContactPresenter.clearSubscription();
+            }
+        });
     }
 
     @Override

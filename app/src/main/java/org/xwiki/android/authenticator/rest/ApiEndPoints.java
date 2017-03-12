@@ -1,9 +1,5 @@
 package org.xwiki.android.authenticator.rest;
 
-/**
- * Created by Rajan Maurya on 12/03/17.
- */
-
 public class ApiEndPoints {
 
     public static final String REST = "rest/";
