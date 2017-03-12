@@ -26,14 +26,13 @@ import android.util.Base64;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.AppContext;
-import org.xwiki.android.authenticator.contactdb.ContactColumns;
 import org.xwiki.android.authenticator.utils.ImageUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
@@ -464,8 +463,7 @@ public class XWikiHttp {
     }
 
     public static String getServerAddress() {
-        String requestUrl = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SERVER_ADDRESS, null);
-        return requestUrl;
+        return SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SERVER_ADDRESS, null);
     }
 
     public static void setRestUrlNULL() {

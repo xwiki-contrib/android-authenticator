@@ -4,8 +4,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import org.junit.After;
 import org.junit.Before;
-
-import static org.junit.Assert.*;
+import org.xwiki.android.authenticator.activities.editcontact.EditContactActivity;
 
 /**
  * EditContactActivityTest

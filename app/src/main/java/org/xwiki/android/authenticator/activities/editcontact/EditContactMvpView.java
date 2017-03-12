@@ -1,0 +1,21 @@
+package org.xwiki.android.authenticator.activities.editcontact;
+
+import org.xwiki.android.authenticator.activities.base.MVPView;
+
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+
+/**
+ * Created by Rajan Maurya on 12/03/17.
+ */
+
+public interface EditContactMvpView extends MVPView {
+
+    void showContactUpdateSuccessfully();
+
+    void showErrorOnUpdatingContact();
+
+    void showLoginSuccessfully(Response<ResponseBody> response);
+
+    void showErrorLogin();
+}
