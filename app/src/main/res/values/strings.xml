@@ -3,6 +3,9 @@
     <string name="label">XWiki</string>
     <string name="login_label">Log in</string>
 
+    <!--Progress Dialog or Bar-->
+    <string name="dialog_message_working">working</string>
+
     <!-- edit -->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>

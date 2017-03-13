@@ -50,7 +50,7 @@
             android:theme="@style/AppTheme"
             android:noHistory="true"
             android:excludeFromRecents="true"
-            android:name=".activities.EditContactActivity"
+            android:name=".activities.editcontact.EditContactActivity"
             android:label="@string/title_activity_edit_contact">
             <!--
             <intent-filter>
