@@ -1,6 +1,11 @@
+*.iml
 .gradle
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
 /build
+/captures
+.idea/
+android-authenticator.iml
+android-account.iml
