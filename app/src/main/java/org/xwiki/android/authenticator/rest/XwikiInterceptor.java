@@ -16,14 +16,14 @@ import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
 
-public class XwikiInterceptor implements Interceptor {
+public class XWikiInterceptor implements Interceptor {
 
     public static final String HEADER_CONTENT_TYPE = "Content-type";
     public static final String HEADER_ACCEPT = "Accept";
 
     public String cookie;
 
-    public XwikiInterceptor() {
+    public XWikiInterceptor() {
         cookie = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(),
                 Constants.COOKIE, "");
     }

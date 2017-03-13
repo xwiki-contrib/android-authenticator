@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class BaseApiManager {
 
     private static Retrofit retrofit;
-    private static XwikiServices sXwikiServices;
+    private static XWikiServices sXwikiServices;
 
     public BaseApiManager() {
         createService();
@@ -20,7 +20,7 @@ public class BaseApiManager {
     }
 
     private static void init() {
-        sXwikiServices = createApi(XwikiServices.class);
+        sXwikiServices = createApi(XWikiServices.class);
     }
 
     public static void createService() {
@@ -29,7 +29,7 @@ public class BaseApiManager {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new XwikiInterceptor())
+                .addInterceptor(new XWikiInterceptor())
                 .addInterceptor(interceptor)
                 .build();
 
@@ -42,7 +42,7 @@ public class BaseApiManager {
         init();
     }
 
-    public XwikiServices getXwikiServicesApi() {
+    public XWikiServices getXwikiServicesApi() {
         return sXwikiServices;
     }
 }

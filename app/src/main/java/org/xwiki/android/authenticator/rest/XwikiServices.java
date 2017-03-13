@@ -11,7 +11,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import rx.Observable;
 
-public interface XwikiServices {
+public interface XWikiServices {
 
     @POST("bin/login/XWiki/XWikiLogin")
     Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
