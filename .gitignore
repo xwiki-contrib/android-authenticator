@@ -5,5 +5,4 @@
 .DS_Store
 /build
 .idea/
-android-authenticator.iml
-android-account.iml
+*.iml
