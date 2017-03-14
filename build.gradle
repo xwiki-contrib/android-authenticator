@@ -7,10 +7,11 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         //just for automatically installing sdk in jenkins ci
         //https://guides.codepath.com/android/Installing-Android-SDK-Tools#installing-the-android-sdk-automated-way
         classpath 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -29,10 +30,10 @@ ext {
     minSdkVersion = 11
     targetSdkVersion = 25
     compileSdkVersion = 25
-    buildToolsVersion = '24.0.2'
+    buildToolsVersion = '23.0.2'
 
     // App dependencies
-    supportLibraryVersion = '24.2.1'
+    supportLibraryVersion = '23.3.0'
     retrofitVersion = '2.2.0'
     okHttp3Version = '3.6.0'
     butterKnifeVersion = '8.0.1'

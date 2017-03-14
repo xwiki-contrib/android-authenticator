@@ -1,6 +1,8 @@
 // just for installing automatically sdk with com.github.JakeWharton
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -49,7 +51,7 @@ dependencies {
 
     //Butter Knife
     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+    apt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
 
     // For getting the from token in the process of sign up
     compile 'org.jsoup:jsoup:1.9.1'
