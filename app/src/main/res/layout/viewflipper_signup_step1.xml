@@ -29,7 +29,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/textinput_margin"
                 android:layout_marginTop="@dimen/textinput_margin"
-                android:src="@drawable/xwiki_logo"/>
+                android:src="@drawable/xwiki_logo" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

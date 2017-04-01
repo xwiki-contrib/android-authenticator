@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -25,66 +24,70 @@
             android:paddingRight="20dip"
             android:paddingTop="5dip">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/user_id"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin"
+                android:src="@drawable/xwiki_logo" />
 
-            <EditText
-                android:id="@+id/user_id_edit"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="text"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/password"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/user_id_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/user_id"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/password"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="textPassword"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/confirm_password"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/confirm_password"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="textPassword"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/captcha_textview"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/confirm_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
+
 
             <ImageView
                 android:id="@+id/captcha_image"
@@ -92,29 +95,37 @@
                 android:layout_height="35dip"
                 android:scaleType="fitXY" />
 
-            <EditText
-                android:id="@+id/captcha_edit"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="text"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
+
+                <EditText
+                    android:id="@+id/captcha_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:hint="@string/captcha_textview"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
             <TextView
                 android:id="@+id/error_msg"
-                android:visibility="gone"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="normal"
-                android:textColor="@android:color/holo_red_light"
-                android:maxLines="2"
-                android:layout_marginTop="10dip"
-                android:gravity="left"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="error message" />
+                android:layout_marginTop="10dip"
+                android:gravity="left"
+                android:maxLines="2"
+                android:text="error message"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/holo_red_light"
+                android:textStyle="normal"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>
