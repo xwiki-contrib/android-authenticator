@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -9,9 +8,9 @@
         android:id="@+id/login_form"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/scroll_view_margin"
+        android:layout_marginRight="@dimen/scroll_view_margin"
+        android:layout_marginTop="@dimen/scroll_view_margin"
         android:background="@android:color/white"
         android:fillViewport="false">
 
@@ -25,59 +24,69 @@
             android:paddingRight="20dip"
             android:paddingTop="5dip">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/first_name"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin"
+                android:src="@drawable/xwiki_logo"/>
 
-            <EditText
-                android:id="@+id/first_name"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="textPersonName"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/last_name"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/first_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/first_name"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/last_name"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="text"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/email"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                <EditText
+                    android:id="@+id/last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/last_name"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/email"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -93,9 +102,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:inputType="phone"
+                android:maxLines="1"
                 android:minWidth="250dip"
                 android:scrollHorizontally="true"
-                android:maxLines="1"
                 android:textColor="@android:color/black"
                 android:visibility="gone" />
 
