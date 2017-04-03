@@ -7,9 +7,9 @@
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/scroll_view_margin"
+        android:layout_marginRight="@dimen/scroll_view_margin"
+        android:layout_marginTop="@dimen/scroll_view_margin"
         android:background="@android:color/white">
 
         <LinearLayout
@@ -17,70 +17,68 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingTop="5dip"
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
-            android:paddingRight="20dip">
+            android:paddingRight="20dip"
+            android:paddingTop="5dip">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/xwiki_logo"/>
             <TextView
                 android:id="@+id/message"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dip" />
+                android:layout_marginBottom="15dip"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-
-            <TextView
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginTop="5dip"
-                android:textStyle="bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_activity_username_label" />
-
-            <EditText
-                android:id="@+id/accountName"
-                android:maxLines="1"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black"
-                android:inputType="textEmailAddress"
-                android:text="" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
 
-            <TextView
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
-                android:singleLine="true"
-                android:layout_marginTop="5dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_activity_password_label" />
+                <EditText
+                    android:id="@+id/accountName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_activity_username_label"
+                    android:inputType="textEmailAddress"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/accountPassword"
-                android:maxLines="1"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black"
-                android:inputType="textPassword"
-                android:text="" />
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
+
+                <EditText
+                    android:id="@+id/accountPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_activity_password_label"
+                    android:inputType="textPassword"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
 
             <TextView
                 android:id="@+id/error_msg"
-                android:visibility="gone"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="normal"
-                android:textColor="@android:color/holo_red_light"
-                android:maxLines="2"
-                android:layout_marginTop="10dip"
-                android:gravity="left"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="error message" />
+                android:layout_marginTop="10dip"
+                android:gravity="left"
+                android:maxLines="2"
+                android:text="error message"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/holo_red_light"
+                android:textStyle="normal"
+                android:visibility="gone" />
 
 
         </LinearLayout>
