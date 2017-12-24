@@ -54,7 +54,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/textinput_margin"
-                android:layout_marginTop="@dimen/textinput_margin">
+                android:layout_marginTop="@dimen/textinput_margin"
+                app:passwordToggleEnabled="true">
 
                 <EditText
                     android:id="@+id/password"
@@ -73,7 +74,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/textinput_margin"
-                android:layout_marginTop="@dimen/textinput_margin">
+                android:layout_marginTop="@dimen/textinput_margin"
+                app:passwordToggleEnabled="true">
 
                 <EditText
                     android:id="@+id/confirm_password"
