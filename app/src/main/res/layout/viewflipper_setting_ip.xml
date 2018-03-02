@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,22 +13,39 @@
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
             android:paddingRight="20dip"
-            android:paddingTop="5dip">
-
+            android:paddingTop="25dip">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/xwiki_logo"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
             <TextView
                 android:id="@+id/message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dip"
+                android:text="Login to your XWiki Instance. "
+                android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Learn More"
+                android:onClick="next"
+                android:id="@+id/learn_more"
+                android:textColor="@color/primary_dark"/>
+            </LinearLayout>
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login_activity_server_label"
+                android:layout_marginTop="20dip"
+                android:text="Server"
+                android:textSize="20sp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold" />
+                 />
 
             <EditText
                 android:id="@+id/accountServer"
@@ -47,9 +57,19 @@
                 android:scrollHorizontally="true"
                 android:text="http://www.xwiki.org/xwiki"
                 android:textColor="@android:color/black" />
+            <Button
+                android:layout_weight="1"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="Next"
+                android:layout_marginTop="20dp"
+                android:onClick="doPrevious"
+                android:textSize="15sp"
+                android:layout_gravity="right"
+                android:backgroundTint="#0077d9"
+                android:textColor="@android:color/background_light" />
+
 
         </LinearLayout>
 
-    </ScrollView>
-
-</LinearLayout>
+</ScrollView>

@@ -57,7 +57,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
-        Log.d("xwiki", TAG + "> addAccount");
+        Log.e("xwiki", TAG + "> addAccount");
 
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
         String packageName = mContext.getPackageManager().getNameForUid(uid);

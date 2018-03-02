@@ -1,23 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <ScrollView
-        android:id="@+id/login_form"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/scroll_view_margin"
         android:layout_marginRight="@dimen/scroll_view_margin"
         android:layout_marginTop="@dimen/scroll_view_margin"
-        android:background="@android:color/white"
-        android:fillViewport="false">
+        android:background="@android:color/white">
 
         <LinearLayout
-            android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:paddingBottom="13dip"
             android:paddingLeft="20dip"
@@ -27,9 +25,13 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/textinput_margin"
-                android:layout_marginTop="@dimen/textinput_margin"
-                android:src="@drawable/xwiki_logo" />
+                android:src="@drawable/xwiki_logo"/>
+            <TextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dip"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -38,87 +40,76 @@
                 android:layout_marginTop="@dimen/textinput_margin">
 
                 <EditText
-                    android:id="@+id/first_name"
+                    android:id="@+id/accountName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/first_name"
-                    android:inputType="textPersonName"
-                    android:maxLines="1"
-                    android:minWidth="250dip"
-                    android:scrollHorizontally="true"
-                    android:textColor="@android:color/black" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/textinput_margin"
-                android:layout_marginTop="@dimen/textinput_margin">
-
-                <EditText
-                    android:id="@+id/last_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/last_name"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:minWidth="250dip"
-                    android:scrollHorizontally="true"
-                    android:textColor="@android:color/black" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp">
-
-                <EditText
-                    android:id="@+id/email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/email"
+                    android:hint="@string/login_activity_username_label"
                     android:inputType="textEmailAddress"
-                    android:maxLines="1"
+                    android:minWidth="250dip"
+                    android:scrollHorizontally="true"
+                    android:textColor="@android:color/black" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/textinput_margin"
+                android:layout_marginTop="@dimen/textinput_margin">
+
+                <EditText
+                    android:id="@+id/accountPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_activity_password_label"
+                    android:inputType="textPassword"
                     android:minWidth="250dip"
                     android:scrollHorizontally="true"
                     android:textColor="@android:color/black" />
             </android.support.design.widget.TextInputLayout>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:text="@string/phone"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:visibility="gone" />
-
-            <EditText
-                android:id="@+id/cell_phone"
+                android:id="@+id/error_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="phone"
-                android:maxLines="1"
-                android:minWidth="250dip"
-                android:scrollHorizontally="true"
-                android:textColor="@android:color/black"
+                android:layout_marginTop="10dip"
+                android:gravity="left"
+                android:maxLines="2"
+                android:text="error message"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/holo_red_light"
+                android:textStyle="normal"
                 android:visibility="gone" />
             <Button
                 android:layout_weight="1"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="Next"
+                android:text="Log in"
                 android:layout_marginTop="20dp"
                 android:onClick="doNext"
                 android:textSize="15sp"
-                android:layout_gravity="right"
+                android:layout_gravity="center_horizontal"
                 android:backgroundTint="#0077d9"
                 android:textColor="@android:color/background_light" />
-
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dont"
+                    android:text="Don't Have a XWiki Account?" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Create One"
+                    android:onClick="signUp"
+                    android:layout_toRightOf="@+id/dont"
+                    android:textColor="@color/primary_dark"/>
+            </RelativeLayout>
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

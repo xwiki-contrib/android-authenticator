@@ -33,11 +33,8 @@ public class PermissionsUtils {
             }
         }
 
-        if (mPermissionsToRequest.isEmpty()) {
-            return true;
-        }
+        return mPermissionsToRequest.isEmpty();
 
-        return false;
     }
 
     /**

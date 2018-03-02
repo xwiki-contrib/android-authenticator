@@ -135,7 +135,7 @@
                 android:layout_height="50dp"
                 android:text="Next"
                 android:layout_marginTop="20dp"
-                android:onClick="doPrevious"
+                android:onClick="doNext"
                 android:textSize="15sp"
                 android:layout_gravity="right"
                 android:backgroundTint="#0077d9"

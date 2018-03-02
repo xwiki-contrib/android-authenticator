@@ -58,9 +58,6 @@ public class AppContext extends Application {
 
     public static boolean isAuthorizedApp(String packageName) {
         List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
-        if (packageList != null && packageList.contains(packageName)) {
-            return true;
-        }
-        return false;
+        return packageList != null && packageList.contains(packageName);
     }
 }
