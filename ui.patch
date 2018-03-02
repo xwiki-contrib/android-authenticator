@@ -1,0 +1,996 @@
+Index: authdemo/src/main/res/layout/activity_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/res/layout/activity_main.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/res/layout/activity_main.xml	(revision )
+@@ -1,9 +1,10 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:fitsSystemWindows="true"
++    android:orientation="vertical"
+     android:paddingBottom="@dimen/activity_vertical_margin"
+     android:paddingLeft="@dimen/activity_horizontal_margin"
+     android:paddingRight="@dimen/activity_horizontal_margin"
+@@ -61,4 +62,4 @@
+             android:layout_height="wrap_content" />
+ 
+     </LinearLayout>
+-</RelativeLayout>
++</LinearLayout>
+Index: app/src/main/java/org/xwiki/android/authenticator/AppContext.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/AppContext.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/AppContext.java	(revision )
+@@ -58,9 +58,6 @@
+ 
+     public static boolean isAuthorizedApp(String packageName) {
+         List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
+-        if (packageList != null && packageList.contains(packageName)) {
+-            return true;
+-        }
+-        return false;
++        return packageList != null && packageList.contains(packageName);
+     }
+ }
+Index: build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- build.gradle	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ build.gradle	(revision )
+@@ -7,7 +7,7 @@
+         maven { url 'https://jitpack.io' }
+     }
+     dependencies {
+-        classpath 'com.android.tools.build:gradle:2.2.3'
++        classpath 'com.android.tools.build:gradle:3.0.1'
+ 
+         // NOTE: Do not place your application dependencies here; they belong
+         // in the individual module build.gradle files
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/build.gradle	(revision )
+@@ -1,8 +1,8 @@
+ apply plugin: 'com.android.application'
+ 
+ android {
+-    compileSdkVersion 24
+-    buildToolsVersion "$rootProject.buildToolsVersion"
++    compileSdkVersion 27
++    buildToolsVersion '26.0.2'
+  configurations.all {
+         resolutionStrategy {
+             force 'com.android.support:support-annotations:24.2.1'
+@@ -47,6 +47,7 @@
+     //Butter Knife
+     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
+     compile "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
++    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+     // For getting the from token in the process of sign up
+     compile 'org.jsoup:jsoup:1.9.1'
+     // For Local Unit Tests
+Index: authdemo/src/main/java/org/xwiki/android/authdemo/Constants.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/java/org/xwiki/android/authdemo/Constants.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/java/org/xwiki/android/authdemo/Constants.java	(revision )
+@@ -38,7 +38,6 @@
+      */
+     public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
+     public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
+-
+     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
+     public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+ 
+Index: app/src/main/java/org/xwiki/android/authenticator/activities/SettingIpViewFlipper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/activities/SettingIpViewFlipper.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/activities/SettingIpViewFlipper.java	(revision )
+@@ -19,9 +19,14 @@
+  */
+ package org.xwiki.android.authenticator.activities;
+ 
++import android.app.AlertDialog;
++import android.app.Dialog;
++import android.content.DialogInterface;
+ import android.text.TextUtils;
+ import android.view.View;
+ import android.widget.EditText;
++import android.widget.TextView;
++import android.widget.Toast;
+ 
+ import org.xwiki.android.authenticator.Constants;
+ import org.xwiki.android.authenticator.R;
+@@ -38,7 +43,6 @@
+ public class SettingIpViewFlipper extends BaseViewFlipper {
+ 
+     CharSequence serverAddr = null;
+-
+     public SettingIpViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+         super(activity, contentRootView);
+     }
+@@ -59,6 +63,7 @@
+         }
+     }
+ 
++
+     public boolean checkInput() {
+         EditText serverEditText = (EditText) findViewById(R.id.accountServer);
+         serverEditText.setError(null);
+Index: authdemo/src/main/res/values/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/res/values/styles.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/res/values/styles.xml	(revision )
+@@ -1,7 +1,7 @@
+ <resources>
+ 
+     <!-- Base application theme. -->
+-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
++    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+         <!-- Customize your theme here. -->
+         <item name="colorPrimary">@color/colorPrimary</item>
+         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+Index: app/src/main/java/org/xwiki/android/authenticator/utils/PermissionsUtils.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/utils/PermissionsUtils.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/utils/PermissionsUtils.java	(revision )
+@@ -33,11 +33,8 @@
+             }
+         }
+ 
+-        if (mPermissionsToRequest.isEmpty()) {
+-            return true;
+-        }
++        return mPermissionsToRequest.isEmpty();
+ 
+-        return false;
+     }
+ 
+     /**
+Index: app/src/main/res/layout-v14/viewflipper_signup_step2.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout-v14/viewflipper_signup_step2.xml	(revision )
++++ app/src/main/res/layout-v14/viewflipper_signup_step2.xml	(revision )
+@@ -0,0 +1,146 @@
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++              xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:fitsSystemWindows="true"
++    android:orientation="vertical">
++
++    <ScrollView
++        android:id="@+id/login_form"
++        android:layout_width="fill_parent"
++        android:layout_height="match_parent"
++        android:layout_marginLeft="10dp"
++        android:layout_marginRight="10dp"
++        android:layout_marginTop="10dp"
++        android:background="@android:color/white"
++        android:fillViewport="false">
++
++        <LinearLayout
++            android:id="@+id/email_login_form"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="vertical"
++            android:paddingBottom="13dip"
++            android:paddingLeft="20dip"
++            android:paddingRight="20dip"
++            android:paddingTop="5dip">
++
++            <ImageView
++                android:layout_width="wrap_content"
++                android:layout_height="match_parent"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin"
++                android:src="@drawable/xwiki_logo" />
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin">
++
++                <EditText
++                    android:id="@+id/user_id_edit"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:layout_marginBottom="10dp"
++                    android:hint="@string/user_id"
++                    android:inputType="text"
++                    android:maxLines="1"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin"
++                app:passwordToggleEnabled="true">
++
++                <EditText
++                    android:id="@+id/password"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:layout_marginBottom="10dp"
++                    android:hint="@string/password"
++                    android:inputType="textPassword"
++                    android:maxLines="1"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin"
++                app:passwordToggleEnabled="true">
++
++                <EditText
++                    android:id="@+id/confirm_password"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:layout_marginBottom="10dp"
++                    android:hint="@string/confirm_password"
++                    android:inputType="textPassword"
++                    android:maxLines="1"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++
++            <ImageView
++                android:id="@+id/captcha_image"
++                android:layout_width="100dp"
++                android:layout_height="35dip"
++                android:scaleType="fitXY" />
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin">
++
++                <EditText
++                    android:id="@+id/captcha_edit"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:layout_marginBottom="10dp"
++                    android:inputType="text"
++                    android:maxLines="1"
++                    android:hint="@string/captcha_textview"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++            <TextView
++                android:id="@+id/error_msg"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="10dip"
++                android:gravity="left"
++                android:maxLines="2"
++                android:text="error message"
++                android:textAppearance="?android:attr/textAppearanceSmall"
++                android:textColor="@android:color/holo_red_light"
++                android:textStyle="normal"
++                android:visibility="gone" />
++            <Button
++                android:layout_weight="1"
++                android:layout_width="100dp"
++                android:layout_height="50dp"
++                android:text="Next"
++                android:layout_marginTop="20dp"
++                android:onClick="doNext"
++                android:textSize="15sp"
++                android:layout_gravity="right"
++                android:backgroundTint="#0077d9"
++                android:textColor="@android:color/background_light" />
++
++        </LinearLayout>
++    </ScrollView>
++</LinearLayout>
+Index: authdemo/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/AndroidManifest.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/AndroidManifest.xml	(revision )
+@@ -2,8 +2,11 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="org.xwiki.android.authdemo">
+ 
++    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
++    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
++    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+     <uses-permission android:name="android.permission.INTERNET"/>
+ 
+@@ -20,6 +23,7 @@
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
++
+     </application>
+ 
+ </manifest>
+\ No newline at end of file
+Index: gradle/wrapper/gradle-wrapper.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- gradle/wrapper/gradle-wrapper.properties	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ gradle/wrapper/gradle-wrapper.properties	(revision )
+@@ -1,6 +1,6 @@
+-#Mon Mar 27 13:19:26 CEST 2017
++#Tue Feb 27 18:39:45 IST 2018
+ distributionBase=GRADLE_USER_HOME
+ distributionPath=wrapper/dists
+ zipStoreBase=GRADLE_USER_HOME
+ zipStorePath=wrapper/dists
+-distributionUrl=https\://services.gradle.org/distributions/gradle-3.3-all.zip
++distributionUrl=https\://services.gradle.org/distributions/gradle-4.1-all.zip
+Index: app/src/main/res/layout/act_authenticator.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/act_authenticator.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/res/layout/act_authenticator.xml	(revision )
+@@ -32,12 +32,14 @@
+         android:id="@+id/view_flipper"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+-        android:layout_above="@+id/left_right_button"
+-        android:layout_below="@id/toolbar">
++        android:layout_alignParentLeft="true"
++        android:layout_alignParentStart="true"
++        android:layout_below="@+id/toolbar">
+ 
+         <include
+             layout="@layout/viewflipper_setting_ip"
+             android:layout_width="match_parent"
++            android:id="@+id/layout_setting"
+             android:layout_height="match_parent" />
+ 
+         <include
+@@ -82,6 +84,7 @@
+             android:minWidth="100dip"
+             android:onClick="doPrevious"
+             android:paddingRight="10dp"
++            android:visibility="gone"
+             android:text="@string/login_activity_ok_button"
+             android:textAppearance="?android:attr/textAppearanceMedium" />
+ 
+@@ -92,6 +95,7 @@
+             android:layout_gravity="center_horizontal"
+             android:layout_weight="1"
+             android:minWidth="100dip"
++            android:visibility="gone"
+             android:onClick="doNext"
+             android:paddingLeft="10dp"
+             android:text="@string/login_activity_register_button"
+Index: app/src/main/res/layout/viewflipper_signup_step2.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/viewflipper_signup_step2.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/res/layout/viewflipper_signup_step2.xml	(revision )
+@@ -129,6 +129,17 @@
+                 android:textColor="@android:color/holo_red_light"
+                 android:textStyle="normal"
+                 android:visibility="gone" />
++            <Button
++                android:layout_weight="1"
++                android:layout_width="100dp"
++                android:layout_height="50dp"
++                android:text="Next"
++                android:layout_marginTop="20dp"
++                android:onClick="doPrevious"
++                android:textSize="15sp"
++                android:layout_gravity="right"
++                android:backgroundTint="#0077d9"
++                android:textColor="@android:color/background_light" />
+ 
+         </LinearLayout>
+     </ScrollView>
+Index: app/src/main/java/org/xwiki/android/authenticator/activities/BaseViewFlipper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/activities/BaseViewFlipper.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/activities/BaseViewFlipper.java	(revision )
+@@ -35,7 +35,7 @@
+ 
+     public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+         mActivity = activity;
+-        mContext = (Context) mActivity;
++        mContext = mActivity;
+         mContentRootView = contentRootView;
+     }
+ 
+Index: app/src/main/res/layout/viewflipper_signup_step1.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/viewflipper_signup_step1.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/res/layout/viewflipper_signup_step1.xml	(revision )
+@@ -107,6 +107,17 @@
+                 android:scrollHorizontally="true"
+                 android:textColor="@android:color/black"
+                 android:visibility="gone" />
++            <Button
++                android:layout_weight="1"
++                android:layout_width="100dp"
++                android:layout_height="50dp"
++                android:text="Next"
++                android:layout_marginTop="20dp"
++                android:onClick="doNext"
++                android:textSize="15sp"
++                android:layout_gravity="right"
++                android:backgroundTint="#0077d9"
++                android:textColor="@android:color/background_light" />
+ 
+         </LinearLayout>
+     </ScrollView>
+Index: app/src/main/java/org/xwiki/android/authenticator/utils/SystemTools.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/utils/SystemTools.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/utils/SystemTools.java	(revision )
+@@ -73,8 +73,7 @@
+         ConnectivityManager cm = (ConnectivityManager) context
+                 .getSystemService(Context.CONNECTIVITY_SERVICE);
+         NetworkInfo info = cm.getActiveNetworkInfo();
+-        if (info != null && info.isAvailable()) return true;
+-        return false;
++        return info != null && info.isAvailable();
+     }
+ 
+     public static boolean checkWifi(Context context) {
+@@ -82,11 +81,7 @@
+                 .getSystemService(Context.WIFI_SERVICE);
+         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+         int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
+-        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
+-            return true;
+-        } else {
+-            return false;
+-        }
++        return mWifiManager.isWifiEnabled() && ipAddress != 0;
+     }
+ 
+ 
+@@ -100,13 +95,9 @@
+                 .getRunningAppProcesses();
+         for (RunningAppProcessInfo appProcess : appProcesses) {
+             if (appProcess.processName.equals(context.getPackageName())) {
+-                if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+-                    // background
+-                    return true;
+-                } else {
+-                    // foreground
+-                    return false;
+-                }
++                // background
++// foreground
++                return appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND;
+             }
+         }
+         return false;
+Index: app/src/main/res/values/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/styles.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/res/values/styles.xml	(revision )
+@@ -9,8 +9,8 @@
+         <item name="colorPrimaryDark">@color/primary_dark</item>
+         <item name="colorAccent">@color/accent</item>
+         <item name="android:textColorPrimary">@android:color/white</item>
++
+     </style>
+-
+     <!-- AppCompatActivity Theme.AppCompat.Light.NoActionBar-->
+     <style name="AppTheme" parent="@style/BaseAppTheme">
+ 
+Index: authdemo/src/main/res/values/colors.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/res/values/colors.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/res/values/colors.xml	(revision )
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <color name="colorPrimary">#3F51B5</color>
+-    <color name="colorPrimaryDark">#303F9F</color>
++    <color name="colorPrimary">#0078d8</color>
++    <color name="colorPrimaryDark">#0077d9</color>
+     <color name="colorAccent">#FF4081</color>
+ </resources>
+Index: authdemo/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/build.gradle	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/build.gradle	(revision )
+@@ -2,7 +2,7 @@
+ 
+ android {
+     compileSdkVersion 23
+-    buildToolsVersion "$rootProject.buildToolsVersion"
++    buildToolsVersion '26.0.2'
+ 
+     defaultConfig {
+         applicationId "org.xwiki.android.authdemo"
+Index: app/src/main/res/layout-v14/viewflipper_signin.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout-v14/viewflipper_signin.xml	(revision )
++++ app/src/main/res/layout-v14/viewflipper_signin.xml	(revision )
+@@ -0,0 +1,115 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical">
++
++    <ScrollView
++        android:layout_width="fill_parent"
++        android:layout_height="match_parent"
++        android:layout_marginLeft="@dimen/scroll_view_margin"
++        android:layout_marginRight="@dimen/scroll_view_margin"
++        android:layout_marginTop="@dimen/scroll_view_margin"
++        android:background="@android:color/white">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"
++            android:orientation="vertical"
++            android:paddingBottom="13dip"
++            android:paddingLeft="20dip"
++            android:paddingRight="20dip"
++            android:paddingTop="5dip">
++
++            <ImageView
++                android:layout_width="wrap_content"
++                android:layout_height="match_parent"
++                android:src="@drawable/xwiki_logo"/>
++            <TextView
++                android:id="@+id/message"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="15dip"
++                android:textAppearance="?android:attr/textAppearanceSmall" />
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin">
++
++                <EditText
++                    android:id="@+id/accountName"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:hint="@string/login_activity_username_label"
++                    android:inputType="textEmailAddress"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++            <android.support.design.widget.TextInputLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginBottom="@dimen/textinput_margin"
++                android:layout_marginTop="@dimen/textinput_margin">
++
++                <EditText
++                    android:id="@+id/accountPassword"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:hint="@string/login_activity_password_label"
++                    android:inputType="textPassword"
++                    android:minWidth="250dip"
++                    android:scrollHorizontally="true"
++                    android:textColor="@android:color/black" />
++            </android.support.design.widget.TextInputLayout>
++
++            <TextView
++                android:id="@+id/error_msg"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="10dip"
++                android:gravity="left"
++                android:maxLines="2"
++                android:text="error message"
++                android:textAppearance="?android:attr/textAppearanceSmall"
++                android:textColor="@android:color/holo_red_light"
++                android:textStyle="normal"
++                android:visibility="gone" />
++            <Button
++                android:layout_weight="1"
++                android:layout_width="100dp"
++                android:layout_height="50dp"
++                android:text="Log in"
++                android:layout_marginTop="20dp"
++                android:onClick="doNext"
++                android:textSize="15sp"
++                android:layout_gravity="center_horizontal"
++                android:backgroundTint="#0077d9"
++                android:textColor="@android:color/background_light" />
++            <RelativeLayout
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="20dp"
++                android:layout_gravity="center_horizontal"
++                android:orientation="horizontal">
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:id="@+id/dont"
++                    android:text="Don't Have a XWiki Account?" />
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:text=" Create One"
++                    android:onClick="signUp"
++                    android:layout_toRightOf="@+id/dont"
++                    android:textColor="@color/primary_dark"/>
++            </RelativeLayout>
++        </LinearLayout>
++    </ScrollView>
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/org/xwiki/android/authenticator/auth/XWikiAuthenticator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/auth/XWikiAuthenticator.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/auth/XWikiAuthenticator.java	(revision )
+@@ -57,7 +57,7 @@
+ 
+     @Override
+     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
+-        Log.d("xwiki", TAG + "> addAccount");
++        Log.e("xwiki", TAG + "> addAccount");
+ 
+         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
+         String packageName = mContext.getPackageManager().getNameForUid(uid);
+Index: authdemo/src/main/java/org/xwiki/android/authdemo/SystemTools.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- authdemo/src/main/java/org/xwiki/android/authdemo/SystemTools.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ authdemo/src/main/java/org/xwiki/android/authdemo/SystemTools.java	(revision )
+@@ -73,8 +73,7 @@
+         ConnectivityManager cm = (ConnectivityManager) context
+                 .getSystemService(Context.CONNECTIVITY_SERVICE);
+         NetworkInfo info = cm.getActiveNetworkInfo();
+-        if (info != null && info.isAvailable()) return true;
+-        return false;
++        return info != null && info.isAvailable();
+     }
+ 
+     public static boolean checkWifi(Context context) {
+@@ -82,11 +81,7 @@
+                 .getSystemService(Context.WIFI_SERVICE);
+         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+         int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
+-        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
+-            return true;
+-        } else {
+-            return false;
+-        }
++        return mWifiManager.isWifiEnabled() && ipAddress != 0;
+     }
+ 
+ 
+@@ -100,13 +95,9 @@
+                 .getRunningAppProcesses();
+         for (RunningAppProcessInfo appProcess : appProcesses) {
+             if (appProcess.processName.equals(context.getPackageName())) {
+-                if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+-                    // background
+-                    return true;
+-                } else {
+-                    // foreground
+-                    return false;
+-                }
++                // background
++// foreground
++                return appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND;
+             }
+         }
+         return false;
+Index: app/src/main/java/org/xwiki/android/authenticator/auth/AuthenticatorActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/auth/AuthenticatorActivity.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/auth/AuthenticatorActivity.java	(revision )
+@@ -24,12 +24,14 @@
+ import android.accounts.AccountAuthenticatorActivity;
+ import android.accounts.AccountManager;
+ import android.app.Activity;
++import android.app.AlertDialog;
+ import android.app.Dialog;
+ import android.app.ProgressDialog;
+ import android.content.DialogInterface;
+ import android.content.Intent;
+ import android.graphics.Color;
+ import android.os.AsyncTask;
++import android.os.Build;
+ import android.os.Bundle;
+ import android.support.v4.widget.SwipeRefreshLayout;
+ import android.support.v7.widget.Toolbar;
+@@ -40,6 +42,7 @@
+ import android.view.inputmethod.InputMethodManager;
+ import android.widget.Button;
+ import android.widget.ImageView;
++import android.widget.TextView;
+ import android.widget.Toast;
+ import android.widget.ViewFlipper;
+ 
+@@ -80,6 +83,7 @@
+     private SettingSyncViewFlipper settingSyncViewFlipper;
+     private SignUpStep1ViewFlipper signUpStep1ViewFlipper;
+     private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
++    TextView learn;
+ 
+     private AccountManager mAccountManager;
+ 
+@@ -89,9 +93,9 @@
+     public ImageView refreshImageView;
+     //show progress dialog
+     private Dialog mProgressDialog = null;
++    AlertDialog.Builder builder;
+     //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
+     private List<AsyncTask<Void, Void, Object>> mAsyncTasks = new ArrayList<>();
+-
+     private PermissionsUtils mPermissions;
+     private static final int REQUEST_PERMISSIONS_CODE = 1;
+ 
+@@ -103,7 +107,6 @@
+ 
+         toolbar = (Toolbar) findViewById(R.id.toolbar);
+         toolbar.setTitle("XWiki Account");
+-
+         refreshImageView = (ImageView) findViewById(R.id.refresh_view);
+         refreshImageView.setOnClickListener(new View.OnClickListener() {
+             @Override
+@@ -116,7 +119,20 @@
+                 }
+             }
+         });
+-
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
++            builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
++        } else {
++            builder = new AlertDialog.Builder(AuthenticatorActivity.this);
++        }
++        builder.setTitle("XWiki")
++                .setIcon(getResources().getDrawable(R.drawable.logo))
++                .setMessage("Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps" )
++                .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
++                    @Override
++                    public void onClick(DialogInterface dialog, int which) {
++                        dialog.dismiss();
++                    }
++                });
+         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
+         if (is_set_sync) {
+@@ -133,8 +149,15 @@
+                 return;
+             }
+         }
+-    }
+ 
++    }
++
++    @Override
++    public void onBackPressed() {
++        if(mViewFlipper.getDisplayedChild()==ViewFlipperLayoutId.SETTING_IP)
++            super.onBackPressed();
++        doPreviousNext(false);
++    }
+ 
+     @Override
+     protected void onDestroy() {
+@@ -238,6 +261,16 @@
+     }
+ 
+ 
++    public void next(View view) {
++        AlertDialog dialog=builder.create();
++        dialog.show();
++    }
++    public void signUp(View view)
++    {
++        showViewFlipper(ViewFlipperLayoutId.SIGN_UP_STEP1);
++    }
++
++
+     public interface ViewFlipperLayoutId {
+         int SETTING_IP = 0;
+         int SIGN_IN = 1;
+@@ -253,7 +286,7 @@
+         switch (id) {
+             case ViewFlipperLayoutId.SETTING_IP:
+                 if (settingsIpViewFlipper == null) {
+-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
++                    settingsIpViewFlipper = new SettingIpViewFlipper(AuthenticatorActivity.this,mViewFlipper.getChildAt(id));
+                 }
+                 toolbar.setTitle("XWiki Account");
+                 setLeftRightButton("Sign In", "Sign Up");
+Index: app/src/main/res/layout/viewflipper_setting_ip.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/viewflipper_setting_ip.xml	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/res/layout/viewflipper_setting_ip.xml	(revision )
+@@ -1,16 +1,9 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical">
+ 
+-    <ScrollView
+-        android:layout_width="fill_parent"
+-        android:layout_height="match_parent"
+-        android:layout_marginLeft="10dp"
+-        android:layout_marginRight="10dp"
+-        android:layout_marginTop="10dp"
+-        android:background="@android:color/white">
+ 
+         <LinearLayout
+             android:layout_width="match_parent"
+@@ -20,22 +13,39 @@
+             android:paddingBottom="13dip"
+             android:paddingLeft="20dip"
+             android:paddingRight="20dip"
+-            android:paddingTop="5dip">
+-
++            android:paddingTop="25dip">
++            <ImageView
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:src="@drawable/xwiki_logo"/>
++            <LinearLayout
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:orientation="horizontal">
+             <TextView
+                 android:id="@+id/message"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+-                android:layout_marginBottom="15dip"
++                android:text="Login to your XWiki Instance. "
++                android:textStyle="bold"
+                 android:textAppearance="?android:attr/textAppearanceSmall" />
+-
++            <TextView
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Learn More"
++                android:onClick="next"
++                android:id="@+id/learn_more"
++                android:textColor="@color/primary_dark"/>
++            </LinearLayout>
+             <TextView
+                 android:id="@+id/textView"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+-                android:text="@string/login_activity_server_label"
++                android:layout_marginTop="20dip"
++                android:text="Server"
++                android:textSize="20sp"
+                 android:textAppearance="?android:attr/textAppearanceSmall"
+-                android:textStyle="bold" />
++                 />
+ 
+             <EditText
+                 android:id="@+id/accountServer"
+@@ -47,9 +57,19 @@
+                 android:scrollHorizontally="true"
+                 android:text="http://www.xwiki.org/xwiki"
+                 android:textColor="@android:color/black" />
++            <Button
++                android:layout_weight="1"
++                android:layout_width="100dp"
++                android:layout_height="50dp"
++                android:text="Next"
++                android:layout_marginTop="20dp"
++                android:onClick="doPrevious"
++                android:textSize="15sp"
++                android:layout_gravity="right"
++                android:backgroundTint="#0077d9"
++                android:textColor="@android:color/background_light" />
++
+ 
+         </LinearLayout>
+ 
+-    </ScrollView>
+-
+-</LinearLayout>
+\ No newline at end of file
++</ScrollView>
+\ No newline at end of file
+Index: app/src/main/java/org/xwiki/android/authenticator/contactdb/ContactManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/org/xwiki/android/authenticator/contactdb/ContactManager.java	(revision 820cd53b6eab5c4b4c1c4a30d7562e430bfecc6d)
++++ app/src/main/java/org/xwiki/android/authenticator/contactdb/ContactManager.java	(revision )
+@@ -419,9 +419,7 @@
+         try {
+             while (c.moveToNext()) {
+                 final String serverId = c.getString(AllQuery.COLUMN_SERVER_ID);
+-                ;
+                 final long rawId = c.getLong(AllQuery.COLUMN_RAW_CONTACT_ID);
+-                ;
+                 allMaps.put(serverId, rawId);
+             }
+         } finally {
