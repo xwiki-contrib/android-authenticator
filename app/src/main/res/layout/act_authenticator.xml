@@ -62,40 +62,4 @@
 
     </ViewFlipper>
 
-    <LinearLayout
-        android:id="@+id/left_right_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:minHeight="54dip"
-        android:orientation="horizontal"
-        android:paddingBottom="5dip"
-        android:paddingLeft="10dip"
-        android:paddingRight="10dip">
-
-        <Button
-            android:id="@+id/left_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:minWidth="100dip"
-            android:onClick="doPrevious"
-            android:paddingRight="10dp"
-            android:text="@string/login_activity_ok_button"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <Button
-            android:id="@+id/right_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:minWidth="100dip"
-            android:onClick="doNext"
-            android:paddingLeft="10dp"
-            android:text="@string/login_activity_register_button"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </LinearLayout>
-
 </RelativeLayout>

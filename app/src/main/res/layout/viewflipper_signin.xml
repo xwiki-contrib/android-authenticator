@@ -76,11 +76,39 @@
                 android:maxLines="2"
                 android:text="error message"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/holo_red_light"
+                android:textColor="#e10a0a"
                 android:textStyle="normal"
                 android:visibility="gone" />
-
-
+            <Button
+                android:layout_weight="1"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="Log in"
+                android:layout_marginTop="20dp"
+                android:onClick="doNext"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#0077d9"
+                android:textColor="@android:color/background_light" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dont"
+                    android:text="Don't Have a XWiki Account?" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Create One"
+                    android:onClick="signUp"
+                    android:layout_toRightOf="@+id/dont"
+                    android:textColor="@color/primary_dark"/>
+            </RelativeLayout>
         </LinearLayout>
 
     </ScrollView>
