@@ -133,7 +133,7 @@
                 android:layout_weight="1"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="Next"
+                android:text="Register"
                 android:layout_marginTop="20dp"
                 android:onClick="doNext"
                 android:textSize="15sp"
