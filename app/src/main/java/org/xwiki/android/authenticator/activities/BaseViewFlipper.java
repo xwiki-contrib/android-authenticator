@@ -35,7 +35,7 @@ public abstract class BaseViewFlipper {
 
     public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         mActivity = activity;
-        mContext = (Context) mActivity;
+        mContext = mActivity;
         mContentRootView = contentRootView;
     }
 

@@ -419,9 +419,7 @@ public class ContactManager {
         try {
             while (c.moveToNext()) {
                 final String serverId = c.getString(AllQuery.COLUMN_SERVER_ID);
-                ;
                 final long rawId = c.getLong(AllQuery.COLUMN_RAW_CONTACT_ID);
-                ;
                 allMaps.put(serverId, rawId);
             }
         } finally {

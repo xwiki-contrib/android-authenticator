@@ -73,8 +73,7 @@ public final class SystemTools {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        if (info != null && info.isAvailable()) return true;
-        return false;
+        return info != null && info.isAvailable();
     }
 
     public static boolean checkWifi(Context context) {
@@ -82,11 +81,7 @@ public final class SystemTools {
                 .getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
         int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
-        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return mWifiManager.isWifiEnabled() && ipAddress != 0;
     }
 
 
@@ -100,13 +95,9 @@ public final class SystemTools {
                 .getRunningAppProcesses();
         for (RunningAppProcessInfo appProcess : appProcesses) {
             if (appProcess.processName.equals(context.getPackageName())) {
-                if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-                    // background
-                    return true;
-                } else {
-                    // foreground
-                    return false;
-                }
+                // background
+// foreground
+                return appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND;
             }
         }
         return false;

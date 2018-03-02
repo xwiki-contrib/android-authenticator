@@ -19,9 +19,14 @@
  */
 package org.xwiki.android.authenticator.activities;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
@@ -38,7 +43,6 @@ import java.net.URL;
 public class SettingIpViewFlipper extends BaseViewFlipper {
 
     CharSequence serverAddr = null;
-
     public SettingIpViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
     }
@@ -58,6 +62,7 @@ public class SettingIpViewFlipper extends BaseViewFlipper {
             mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
         }
     }
+
 
     public boolean checkInput() {
         EditText serverEditText = (EditText) findViewById(R.id.accountServer);

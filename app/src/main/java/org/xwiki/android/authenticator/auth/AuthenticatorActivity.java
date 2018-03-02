@@ -24,12 +24,14 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +42,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -80,6 +83,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     private SettingSyncViewFlipper settingSyncViewFlipper;
     private SignUpStep1ViewFlipper signUpStep1ViewFlipper;
     private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
+    TextView learn;
 
     private AccountManager mAccountManager;
 
@@ -89,9 +93,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     public ImageView refreshImageView;
     //show progress dialog
     private Dialog mProgressDialog = null;
+    AlertDialog.Builder builder;
     //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
     private List<AsyncTask<Void, Void, Object>> mAsyncTasks = new ArrayList<>();
-
     private PermissionsUtils mPermissions;
     private static final int REQUEST_PERMISSIONS_CODE = 1;
 
@@ -103,7 +107,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
-
         refreshImageView = (ImageView) findViewById(R.id.refresh_view);
         refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +119,20 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 }
             }
         });
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(AuthenticatorActivity.this);
+        }
+        builder.setTitle("XWiki")
+                .setIcon(getResources().getDrawable(R.drawable.logo))
+                .setMessage("Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps" )
+                .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
         if (is_set_sync) {
@@ -133,8 +149,15 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 return;
             }
         }
+
     }
 
+    @Override
+    public void onBackPressed() {
+        if(mViewFlipper.getDisplayedChild()==ViewFlipperLayoutId.SETTING_IP)
+            super.onBackPressed();
+        doPreviousNext(false);
+    }
 
     @Override
     protected void onDestroy() {
@@ -238,6 +261,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     }
 
 
+    public void next(View view) {
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+    public void signUp(View view)
+    {
+        showViewFlipper(ViewFlipperLayoutId.SIGN_UP_STEP1);
+    }
+
+
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
         int SIGN_IN = 1;
@@ -253,7 +286,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
                 if (settingsIpViewFlipper == null) {
-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
+                    settingsIpViewFlipper = new SettingIpViewFlipper(AuthenticatorActivity.this,mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("XWiki Account");
                 setLeftRightButton("Sign In", "Sign Up");

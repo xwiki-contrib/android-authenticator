@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "$rootProject.buildToolsVersion"
+    compileSdkVersion 27
+    buildToolsVersion '26.0.2'
  configurations.all {
         resolutionStrategy {
             force 'com.android.support:support-annotations:24.2.1'
@@ -47,6 +47,7 @@ dependencies {
     //Butter Knife
     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     compile "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
     // For getting the from token in the process of sign up
     compile 'org.jsoup:jsoup:1.9.1'
     // For Local Unit Tests
