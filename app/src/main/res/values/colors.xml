@@ -4,4 +4,6 @@
     <color name="primary_dark">#0077D9</color>
     <color name="primary_light">#0078D8</color>
     <color name="accent">#0078D8</color>
+    <color name="next_button_color">#0077d9</color>
+    <color name="error_color">#e10a0a</color>
 </resources>

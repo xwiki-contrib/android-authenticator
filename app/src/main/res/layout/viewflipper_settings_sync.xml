@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="10dp"
-        android:text="About Version"
+        android:text="@string/about_version"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
@@ -23,7 +23,7 @@
         android:gravity="center_vertical"
         android:background="@drawable/button_selector"
         android:layout_marginRight="20dp"
-        android:text="Version 1.0"
+        android:text="@string/version"
         android:textColor="@android:color/black"/>
 
 
@@ -60,16 +60,15 @@
         android:dividerHeight="1dp"></ListView>
 
     <Button
-        android:layout_width="120dp"
+        android:layout_width="@dimen/button_width"
         android:layout_height="50dp"
         android:layout_alignEnd="@+id/version_check"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/version_check"
-        android:layout_weight="1"
-        android:backgroundTint="#0077d9"
+        android:backgroundTint="@color/next_button_color"
         android:onClick="doNext"
-        android:text="Complete"
+        android:text="@string/complete"
         android:textColor="@android:color/background_light"
-        android:textSize="15sp" />
+        />
 
 </RelativeLayout>

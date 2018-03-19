@@ -17,10 +17,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingBottom="13dip"
-            android:paddingLeft="20dip"
-            android:paddingRight="20dip"
-            android:paddingTop="5dip">
+            android:paddingBottom="@dimen/layout_padding_bottom"
+            android:paddingLeft="@dimen/layout_padding_left_right"
+            android:paddingRight="@dimen/layout_padding_left_right"
+            android:paddingTop="@dimen/layout_padding_top">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -45,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/login_activity_username_label"
                     android:inputType="textEmailAddress"
-                    android:minWidth="250dip"
+                    android:minWidth="@dimen/edittext_min_width"
                     android:scrollHorizontally="true"
                     android:textColor="@android:color/black" />
             </android.support.design.widget.TextInputLayout>
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/login_activity_password_label"
                     android:inputType="textPassword"
-                    android:minWidth="250dip"
+                    android:minWidth="@dimen/edittext_min_width"
                     android:scrollHorizontally="true"
                     android:textColor="@android:color/black" />
             </android.support.design.widget.TextInputLayout>
@@ -74,21 +74,21 @@
                 android:layout_marginTop="10dip"
                 android:gravity="left"
                 android:maxLines="2"
-                android:text="error message"
+                android:text="@string/error_message"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#e10a0a"
+                android:textColor="@color/error_color"
                 android:textStyle="normal"
                 android:visibility="gone" />
             <Button
                 android:layout_weight="1"
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:text="Log in"
-                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/button_width"
+                android:layout_height="@dimen/button_height"
+                android:minHeight="@dimen/button_min_height"
+                android:text="@string/log_in"
+                android:layout_marginTop="@dimen/button_margin_top"
                 android:onClick="doNext"
-                android:textSize="15sp"
                 android:layout_gravity="center_horizontal"
-                android:backgroundTint="#0077d9"
+                android:backgroundTint="@color/next_button_color"
                 android:textColor="@android:color/background_light" />
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -100,11 +100,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/dont"
-                    android:text="Don't Have a XWiki Account?" />
+                    android:text="@string/don_t_have_a_account" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" Create One"
+                    android:text="@string/create_one"
                     android:onClick="signUp"
                     android:layout_toRightOf="@+id/dont"
                     android:textColor="@color/primary_dark"/>
