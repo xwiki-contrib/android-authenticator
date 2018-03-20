@@ -24,12 +24,14 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
@@ -82,7 +84,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
 
     private AccountManager mAccountManager;
-
+    AlertDialog.Builder builder;
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
     //refresh ImageView mainly in SettingSyncViewFlipper
@@ -116,7 +118,20 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 }
             }
         });
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(AuthenticatorActivity.this);
+        }
+        builder.setTitle("XWiki")
+                .setIcon(getResources().getDrawable(R.drawable.logo))
+                .setMessage("Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps" )
+                .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
         mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
         if (is_set_sync) {
@@ -134,7 +149,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
             }
         }
     }
-
+    @Override
+    public void onBackPressed() {
+        if(mViewFlipper.getDisplayedChild()==ViewFlipperLayoutId.SETTING_IP)
+            super.onBackPressed();
+        doPreviousNext(false);
+    }
 
     @Override
     protected void onDestroy() {
@@ -232,12 +252,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         doPreviousNext(true);
     }
 
-    public void setLeftRightButton(String leftButton, String rightButton) {
-        ((Button) findViewById(R.id.left_button)).setText(leftButton);
-        ((Button) findViewById(R.id.right_button)).setText(rightButton);
+
+
+    public void next(View view) {
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
-
-
+    public void signUp(View view)
+    {
+        showViewFlipper(ViewFlipperLayoutId.SIGN_UP_STEP1);
+    }
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
         int SIGN_IN = 1;
@@ -256,14 +280,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                     settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("XWiki Account");
-                setLeftRightButton("Sign In", "Sign Up");
+
                 break;
             case ViewFlipperLayoutId.SIGN_IN:
                 if (signInViewFlipper == null) {
                     signInViewFlipper = new SignInViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("Sign In");
-                setLeftRightButton("Previous", "Login");
+
                 break;
             case ViewFlipperLayoutId.SETTING_SYNC:
                 refreshImageView.setVisibility(View.VISIBLE);
@@ -271,14 +295,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                     settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("Setting Sync");
-                setLeftRightButton("Cancel", "Complete");
+
                 break;
             case ViewFlipperLayoutId.SIGN_UP_STEP1:
                 if (signUpStep1ViewFlipper == null) {
                     signUpStep1ViewFlipper = new SignUpStep1ViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("Sign Up Step1");
-                setLeftRightButton("Previous", "Next");
+
                 break;
             case ViewFlipperLayoutId.SIGN_UP_STEP2:
                 refreshImageView.setVisibility(View.VISIBLE);
@@ -286,7 +310,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                     signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("Sign Up Step2");
-                setLeftRightButton("Previous", "Register");
+
                 break;
         }
     }

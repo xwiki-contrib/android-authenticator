@@ -11,9 +11,9 @@
         android:id="@+id/login_form"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/scroll_view_margin"
+        android:layout_marginRight="@dimen/scroll_view_margin"
+        android:layout_marginTop="@dimen/scroll_view_margin"
         android:background="@android:color/white"
         android:fillViewport="false">
 
@@ -22,10 +22,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="13dip"
-            android:paddingLeft="20dip"
-            android:paddingRight="20dip"
-            android:paddingTop="5dip">
+            android:paddingBottom="@dimen/layout_padding_bottom"
+            android:paddingLeft="@dimen/layout_padding_left_right"
+            android:paddingRight="@dimen/layout_padding_left_right"
+            android:paddingTop="@dimen/layout_padding_top">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
                 android:layout_marginBottom="10dp"
                 android:inputType="textPersonName"
                 android:maxLines="1"
-                android:minWidth="250dip"
+                android:minWidth="@dimen/edittext_min_width"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black" />
 
@@ -59,7 +59,7 @@
                 android:layout_marginBottom="10dp"
                 android:inputType="text"
                 android:maxLines="1"
-                android:minWidth="250dip"
+                android:minWidth="@dimen/edittext_min_width"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black" />
 
@@ -77,7 +77,7 @@
                 android:layout_marginBottom="10dp"
                 android:inputType="phone"
                 android:maxLines="1"
-                android:minWidth="250dip"
+                android:minWidth="@dimen/edittext_min_width"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black" />
 
@@ -95,7 +95,7 @@
                 android:layout_marginBottom="10dp"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
-                android:minWidth="250dip"
+                android:minWidth="@dimen/edittext_min_width"
                 android:scrollHorizontally="true"
                 android:textColor="@android:color/black" />
 

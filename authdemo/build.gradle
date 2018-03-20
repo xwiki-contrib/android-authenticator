@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "$rootProject.buildToolsVersion"
-
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "org.xwiki.android.authdemo"
         minSdkVersion 16
-        targetSdkVersion "$rootProject.targetSdkVersion"
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
@@ -20,11 +19,13 @@ android {
     lintOptions {
         abortOnError false
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     compile 'com.squareup.okhttp3:okhttp:3.3.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
 }
