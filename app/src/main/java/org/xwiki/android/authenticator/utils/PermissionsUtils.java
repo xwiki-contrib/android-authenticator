@@ -1,6 +1,7 @@
 package org.xwiki.android.authenticator.utils;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,22 @@ public class PermissionsUtils {
     public PermissionsUtils(Activity context, String... requiredPermissions) {
         mContext = context;
         mRequiredPermissions = requiredPermissions;
+    }
+
+    public PermissionsUtils(Activity activity) throws IllegalArgumentException {
+        mContext = activity;
+        try {
+            PackageInfo info = activity
+                    .getPackageManager()
+                    .getPackageInfo(
+                            activity.getPackageName(),
+                            PackageManager.GET_PERMISSIONS
+                    );
+            mRequiredPermissions = info.requestedPermissions;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(PermissionsUtils.class.getSimpleName(), "Can't get package of input activity");
+            throw new IllegalArgumentException("This activity can't be used as source of app context");
+        }
     }
 
     /**
