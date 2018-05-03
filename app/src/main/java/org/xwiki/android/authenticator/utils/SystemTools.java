@@ -127,8 +127,7 @@ public final class SystemTools {
     public static boolean isSleeping(Context context) {
         KeyguardManager kgMgr = (KeyguardManager) context
                 .getSystemService(Context.KEYGUARD_SERVICE);
-        boolean isSleeping = kgMgr.inKeyguardRestrictedInputMode();
-        return isSleeping;
+        return kgMgr.inKeyguardRestrictedInputMode();
     }
 
     /**
@@ -153,30 +152,26 @@ public final class SystemTools {
      * get app version name
      */
     public static String getAppVersionName(Context context) {
-        String version = "0";
         try {
-            version = context.getPackageManager().getPackageInfo(
+            return context.getPackageManager().getPackageInfo(
                     context.getPackageName(), 0).versionName;
         } catch (NameNotFoundException e) {
             throw new RuntimeException(SystemTools.class.getName()
                     + "the application not found");
         }
-        return version;
     }
 
     /**
      * get app version code
      */
     public static int getAppVersionCode(Context context) {
-        int version = 0;
         try {
-            version = context.getPackageManager().getPackageInfo(
+            return context.getPackageManager().getPackageInfo(
                     context.getPackageName(), 0).versionCode;
         } catch (NameNotFoundException e) {
             throw new RuntimeException(SystemTools.class.getName()
                     + "the application not found");
         }
-        return version;
     }
 
     /**
