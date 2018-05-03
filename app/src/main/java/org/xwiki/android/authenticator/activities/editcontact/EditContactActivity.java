@@ -137,13 +137,12 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         //getRawContactId
         long rawContactId = 0;
         if (cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
+            if (cursor.moveToNext()) {
                 rawContactId = cursor.getLong(
                         cursor.getColumnIndex(ContactsContract.Contacts.Data.RAW_CONTACT_ID));
-                break;
             }
+            cursor.close();
         }
-        cursor.close();
         //getXWikiUser
         if (rawContactId > 0) {
             //first, lastName, email, phone, serverId=id.
