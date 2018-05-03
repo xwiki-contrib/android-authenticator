@@ -23,6 +23,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Application;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -34,8 +35,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import org.xwiki.android.authenticator.exceptions.ReadPhoneStateException;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -49,11 +53,21 @@ public final class SystemTools {
 
     /**
      * Get IMEI
+     * @throws ReadPhoneStateException - will be thrown in cases when need to get permission to read
+     *                                  phone state
      */
-    public static String getPhoneIMEI(Context cxt) {
+    public static String getPhoneIMEI(Context cxt) throws ReadPhoneStateException{
         TelephonyManager tm = (TelephonyManager) cxt
                 .getSystemService(Context.TELEPHONY_SERVICE);
-        return tm.getDeviceId();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return tm.getImei();
+            } else {
+                return tm.getMeid();
+            }
+        } catch (SecurityException e) {
+            throw new ReadPhoneStateException(e);
+        }
     }
 
     /**
