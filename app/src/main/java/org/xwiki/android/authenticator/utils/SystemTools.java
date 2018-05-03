@@ -91,16 +91,11 @@ public final class SystemTools {
         return false;
     }
 
-    public static boolean checkWifi(Context context) {
-        WifiManager mWifiManager = (WifiManager) context
-                .getSystemService(Context.WIFI_SERVICE);
+    public static boolean checkWifi(Application context) {
+        WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
         int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
-        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return mWifiManager.isWifiEnabled() && ipAddress != 0;
     }
 
 
