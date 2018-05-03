@@ -416,9 +416,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     }
 
     private void clearAsyncTask() {
-        Iterator<AsyncTask<Void, Void, Object>> iterator = mAsyncTasks.iterator();
-        while (iterator.hasNext()) {
-            AsyncTask<Void, Void, Object> asyncTask = iterator.next();
+        for (AsyncTask<Void, Void, Object> asyncTask : mAsyncTasks) {
             if (asyncTask != null && !asyncTask.isCancelled()) {
                 asyncTask.cancel(true);
             }
