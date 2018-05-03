@@ -104,10 +104,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         setContentView(R.layout.act_authenticator);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
-        refreshImageView = (ImageView) findViewById(R.id.refresh_view);
+        refreshImageView = findViewById(R.id.refresh_view);
         refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,7 +133,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                         dialog.dismiss();
                     }
                 });
-        mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        mViewFlipper = findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
         if (is_set_sync) {
             //just set sync
@@ -167,6 +167,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
      * now it's useless because of compile sdk 22
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
+    @Deprecated
     public void checkPermissions(){
         mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
         if (!mPermissions.checkPermissions()) {

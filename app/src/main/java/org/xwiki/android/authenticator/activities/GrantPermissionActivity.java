@@ -60,7 +60,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_grant_permission);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
