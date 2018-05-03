@@ -33,6 +33,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -118,7 +119,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 }
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this);
@@ -165,6 +166,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     /**
      * now it's useless because of compile sdk 22
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void checkPermissions(){
         mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
         if (!mPermissions.checkPermissions()) {
