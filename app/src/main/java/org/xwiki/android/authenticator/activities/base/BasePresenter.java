@@ -2,7 +2,7 @@ package org.xwiki.android.authenticator.activities.base;
 
 import android.content.Context;
 
-public class BasePresenter<T extends MVPView> implements Presenter<T> {
+public abstract class BasePresenter<T extends MVPView> implements Presenter<T> {
 
     protected Context context;
     private T mMvpView;

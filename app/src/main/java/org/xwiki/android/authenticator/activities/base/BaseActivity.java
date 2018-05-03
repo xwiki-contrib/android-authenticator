@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import org.xwiki.android.authenticator.R;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     protected Toolbar toolbar;
     private ProgressDialog progress;
