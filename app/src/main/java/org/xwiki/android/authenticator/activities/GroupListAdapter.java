@@ -135,10 +135,10 @@ public class GroupListAdapter extends BaseAdapter {
         public CheckBox checkBox;
 
         public ViewHolder(View view) {
-            groupNameTextView = (TextView) view.findViewById(R.id.groupName);
-            lastModifiedTime = (TextView) view.findViewById(R.id.lastModifiedTime);
-            versionTextView = (TextView) view.findViewById(R.id.version);
-            checkBox = (CheckBox) view.findViewById(R.id.checkbox);
+            groupNameTextView = view.findViewById(R.id.groupName);
+            lastModifiedTime = view.findViewById(R.id.lastModifiedTime);
+            versionTextView = view.findViewById(R.id.version);
+            checkBox = view.findViewById(R.id.checkbox);
         }
     }
 

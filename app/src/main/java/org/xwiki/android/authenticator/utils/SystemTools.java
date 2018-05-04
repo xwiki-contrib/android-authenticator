@@ -23,6 +23,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Application;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -34,8 +35,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import org.xwiki.android.authenticator.exceptions.ReadPhoneStateException;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -49,11 +53,21 @@ public final class SystemTools {
 
     /**
      * Get IMEI
+     * @throws ReadPhoneStateException - will be thrown in cases when need to get permission to read
+     *                                  phone state
      */
-    public static String getPhoneIMEI(Context cxt) {
+    public static String getPhoneIMEI(Context cxt) throws ReadPhoneStateException{
         TelephonyManager tm = (TelephonyManager) cxt
                 .getSystemService(Context.TELEPHONY_SERVICE);
-        return tm.getDeviceId();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return tm.getImei();
+            } else {
+                return tm.getMeid();
+            }
+        } catch (SecurityException e) {
+            throw new ReadPhoneStateException(e);
+        }
     }
 
     /**
@@ -77,16 +91,11 @@ public final class SystemTools {
         return false;
     }
 
-    public static boolean checkWifi(Context context) {
-        WifiManager mWifiManager = (WifiManager) context
-                .getSystemService(Context.WIFI_SERVICE);
+    public static boolean checkWifi(Application context) {
+        WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
         int ipAddress = wifiInfo == null ? 0 : wifiInfo.getIpAddress();
-        if (mWifiManager.isWifiEnabled() && ipAddress != 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return mWifiManager.isWifiEnabled() && ipAddress != 0;
     }
 
 
@@ -118,8 +127,7 @@ public final class SystemTools {
     public static boolean isSleeping(Context context) {
         KeyguardManager kgMgr = (KeyguardManager) context
                 .getSystemService(Context.KEYGUARD_SERVICE);
-        boolean isSleeping = kgMgr.inKeyguardRestrictedInputMode();
-        return isSleeping;
+        return kgMgr.inKeyguardRestrictedInputMode();
     }
 
     /**
@@ -144,30 +152,26 @@ public final class SystemTools {
      * get app version name
      */
     public static String getAppVersionName(Context context) {
-        String version = "0";
         try {
-            version = context.getPackageManager().getPackageInfo(
+            return context.getPackageManager().getPackageInfo(
                     context.getPackageName(), 0).versionName;
         } catch (NameNotFoundException e) {
             throw new RuntimeException(SystemTools.class.getName()
                     + "the application not found");
         }
-        return version;
     }
 
     /**
      * get app version code
      */
     public static int getAppVersionCode(Context context) {
-        int version = 0;
         try {
-            version = context.getPackageManager().getPackageInfo(
+            return context.getPackageManager().getPackageInfo(
                     context.getPackageName(), 0).versionCode;
         } catch (NameNotFoundException e) {
             throw new RuntimeException(SystemTools.class.getName()
                     + "the application not found");
         }
-        return version;
     }
 
     /**

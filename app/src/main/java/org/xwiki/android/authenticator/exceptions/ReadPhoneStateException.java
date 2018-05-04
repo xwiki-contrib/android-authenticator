@@ -17,12 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.activities.base;
+package org.xwiki.android.authenticator.exceptions;
 
-public interface Presenter<V extends MVPView> {
+public class ReadPhoneStateException extends SecurityException {
+    public ReadPhoneStateException() {
+    }
 
-    void attachView(V mvpView);
+    public ReadPhoneStateException(String s) {
+        super(s);
+    }
 
-    void detachView();
+    public ReadPhoneStateException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
+    public ReadPhoneStateException(Throwable cause) {
+        super(cause);
+    }
 }

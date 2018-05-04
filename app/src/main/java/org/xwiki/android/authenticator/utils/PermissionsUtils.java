@@ -1,6 +1,26 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.android.authenticator.utils;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +40,22 @@ public class PermissionsUtils {
     public PermissionsUtils(Activity context, String... requiredPermissions) {
         mContext = context;
         mRequiredPermissions = requiredPermissions;
+    }
+
+    public PermissionsUtils(Activity activity) throws IllegalArgumentException {
+        mContext = activity;
+        try {
+            PackageInfo info = activity
+                    .getPackageManager()
+                    .getPackageInfo(
+                            activity.getPackageName(),
+                            PackageManager.GET_PERMISSIONS
+                    );
+            mRequiredPermissions = info.requestedPermissions;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(PermissionsUtils.class.getSimpleName(), "Can't get package of input activity");
+            throw new IllegalArgumentException("This activity can't be used as source of app context");
+        }
     }
 
     /**

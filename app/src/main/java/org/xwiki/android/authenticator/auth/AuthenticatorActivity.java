@@ -33,6 +33,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -103,10 +104,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         setContentView(R.layout.act_authenticator);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
-        refreshImageView = (ImageView) findViewById(R.id.refresh_view);
+        refreshImageView = findViewById(R.id.refresh_view);
         refreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,7 +119,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 }
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this);
@@ -132,7 +133,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                         dialog.dismiss();
                     }
                 });
-        mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        mViewFlipper = findViewById(R.id.view_flipper);
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
         if (is_set_sync) {
             //just set sync
@@ -165,6 +166,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     /**
      * now it's useless because of compile sdk 22
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Deprecated
     public void checkPermissions(){
         mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
         if (!mPermissions.checkPermissions()) {
@@ -413,9 +416,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     }
 
     private void clearAsyncTask() {
-        Iterator<AsyncTask<Void, Void, Object>> iterator = mAsyncTasks.iterator();
-        while (iterator.hasNext()) {
-            AsyncTask<Void, Void, Object> asyncTask = iterator.next();
+        for (AsyncTask<Void, Void, Object> asyncTask : mAsyncTasks) {
             if (asyncTask != null && !asyncTask.isCancelled()) {
                 asyncTask.cancel(true);
             }
