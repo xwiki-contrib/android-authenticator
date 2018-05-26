@@ -47,7 +47,6 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.AnimUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.SystemTools;

@@ -24,7 +24,6 @@ import android.util.Base64;
 
 import org.xwiki.android.authenticator.activities.base.BasePresenter;
 import org.xwiki.android.authenticator.bean.UserPayload;
-import org.xwiki.android.authenticator.rest.DataManager;
 
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;

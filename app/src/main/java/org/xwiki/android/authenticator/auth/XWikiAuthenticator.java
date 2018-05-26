@@ -33,8 +33,6 @@ import android.text.TextUtils;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
-import org.xwiki.android.authenticator.rest.HttpResponse;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;

@@ -22,7 +22,6 @@ package org.xwiki.android.authenticator.syncadapter;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 

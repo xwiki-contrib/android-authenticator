@@ -34,14 +34,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -54,13 +52,11 @@ import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
 import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
