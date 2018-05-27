@@ -19,26 +19,42 @@
  */
 package org.xwiki.android.authenticator.rest;
 
-import org.xwiki.android.authenticator.bean.UserPayload;
+import android.os.Handler;
+import android.os.Looper;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
-import retrofit2.http.Body;
-import retrofit2.http.Header;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
-import rx.Observable;
+/**
+ * HttpCallback
+ */
+public abstract class HttpCallback {
 
-public interface XWikiServices {
+    public Handler handler;
 
-    @POST("bin/login/XWiki/XWikiLogin")
-    Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
+    public HttpCallback() {
+        handler = new Handler(Looper.getMainLooper());
+    }
 
-    @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + ApiEndPoints.SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
-    Observable<ResponseBody> updateUser(
-            @Path("wiki") String wiki,
-            @Path("space") String space,
-            @Path("pageName") String pageName,
-            @Body UserPayload userPayload);
+    public void postSuccess(final Object obj) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                onSuccess(obj);
+            }
+        });
+    }
+
+    public void postFailure(final String msg) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                onFailure(msg);
+            }
+        });
+    }
+
+    public void onSuccess(Object obj) {
+    }
+
+    public void onFailure(String msg) {
+    }
+
 }

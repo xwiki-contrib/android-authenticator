@@ -27,10 +27,22 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BaseApiManager {
 
-    private final Retrofit retrofit;
-    private final XWikiServices xwikiServices;
+    private static Retrofit retrofit;
+    private static XWikiServices sXwikiServices;
 
-    public BaseApiManager(String baseUrl) {
+    public BaseApiManager() {
+        createService();
+    }
+
+    private static <T> T createApi(Class<T> clazz) {
+        return retrofit.create(clazz);
+    }
+
+    private static void init() {
+        sXwikiServices = createApi(XWikiServices.class);
+    }
+
+    public static void createService() {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -41,24 +53,15 @@ public class BaseApiManager {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(BaseUrl.getBaseUrl())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(okHttpClient)
                 .build();
-        
-        xwikiServices = initXWikiServices(retrofit);
-    }
-    
-    
-    
-    private static XWikiServices initXWikiServices(
-            Retrofit retrofit
-    ) {
-        return retrofit.create(XWikiServices.class);
+        init();
     }
 
     public XWikiServices getXwikiServicesApi() {
-        return xwikiServices;
+        return sXwikiServices;
     }
 }
