@@ -463,38 +463,6 @@ public class XWikiHttp {
         return searchList;
     }
 
-
-    /**
-     * getUserLastModified
-     * get User Lass Modified Time
-     *
-     * @param id the user's id like xwiki:XWiki.fitz
-     * @return Date
-     * the last modified time.
-     * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/zhouwenhai
-     *                     http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers%20and%20name:fitz
-     */
-    private static Date getUserLastModified(String wiki, String id) throws IOException, XmlPullParserException {
-        String[] split = id.split("\\.");
-        if (split == null)
-            throw new IOException(TAG + ",in getUserLastModified, groupId error" + id);
-        String url = getServerRestUrl() + "/wikis/" + wiki + "/spaces/" + split[0] + "/pages/" + split[1];
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        // 404 Not Found return null; because the user may not exist.
-        if (statusCode == 404) {
-            return null;
-        }
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        Page page = XmlUtils.getPage(new ByteArrayInputStream(response.getContentData()));
-        Date date = StringUtils.iso8601ToDate(page.lastModified);
-        return date;
-    }
-
     /**
      * getServerRestUrl
      * get serverRestPreUrl from preference.
