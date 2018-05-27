@@ -19,8 +19,10 @@
  */
 package org.xwiki.android.authenticator.rest.new_rest;
 
+import org.xwiki.android.authenticator.bean.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.UserPayload;
 import org.xwiki.android.authenticator.bean.SearchResultContainer;
+import org.xwiki.android.authenticator.bean.XWikiGroup;
 
 import java.util.List;
 
@@ -49,7 +51,7 @@ public interface XWikiServices {
     );
 
     @GET(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/query?q=object:XWiki.XWikiGroups")
-    Observable<SearchResultContainer> availableGroups(
+    Observable<CustomSearchResultContainer<XWikiGroup>> availableGroups(
             @Query("number") Integer number
     );
 

@@ -28,6 +28,7 @@ import android.util.Log;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
+import org.xwiki.android.authenticator.bean.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
@@ -201,60 +202,6 @@ public class XWikiHttp {
         HttpExecutor httpExecutor = new HttpExecutor();
         HttpResponse response = httpExecutor.performRequest(request);
         return response;
-    }
-
-    /**
-     * get all groups
-     *
-     * @param number
-     * @return List<XWikiGroup>
-     * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
-     */
-    public static List<XWikiGroup> getGroupList(int number) throws IOException, XmlPullParserException {
-        final Object sync = new Object();
-        final Object[] completed = {null};
-        //String wiki,  wiki:"+ wiki
-        final List<XWikiGroup> groupList = new ArrayList<>();
-
-        AppContext.getApiManager().getXwikiServicesApi().availableGroups(
-                number
-        ).subscribe(
-                new Action1<SearchResultContainer>() {
-                    @Override
-                    public void call(SearchResultContainer searchResultsContainer) {
-                        synchronized (sync) {
-                            completed[0] = new Object();
-
-                            if (searchResultsContainer.searchResults != null) {
-                                for (SearchResult item : searchResultsContainer.searchResults) {
-                                    XWikiGroup group = new XWikiGroup();
-                                    group.id = item.id;
-                                    group.wiki = item.wiki;
-                                    group.space = item.space;
-                                    group.pageName = item.pageName;
-                                    group.lastModifiedDate = item.modified;
-                                    group.version = item.version;
-                                    groupList.add(group);
-                                }
-                            }
-
-                            sync.notifyAll();
-                        }
-                    }
-                }
-        );
-
-        synchronized (sync) {
-            while (completed[0] == null) {
-                try {
-                    sync.wait();
-                } catch (InterruptedException e) {
-                    Log.e(XWikiHttp.class.getSimpleName(), "Can't await user groups", e);
-                }
-            }
-        }
-
-        return groupList;
     }
 
     public static class SyncData {

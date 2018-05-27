@@ -45,6 +45,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.bean.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
@@ -55,6 +56,10 @@ import org.xwiki.android.authenticator.utils.SystemTools;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.functions.Action1;
+
+import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
 /**
  * SettingSyncViewFlipper
@@ -135,17 +140,34 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     public void initData() {
         AnimUtils.refreshImageView(mContext, mActivity.refreshImageView);
+        getApiManager().getXwikiServicesApi().availableGroups(
+                Constants.LIMIT_MAX_SYNC_USERS
+        ).subscribe(
+                new Action1<CustomSearchResultContainer<XWikiGroup>>() {
+                    @Override
+                    public void call(CustomSearchResultContainer<XWikiGroup> xWikiGroupCustomSearchResultContainer) {
+                        List<XWikiGroup> searchResults = xWikiGroupCustomSearchResultContainer.searchResults;
+                        if (searchResults != null) {
+                            groupList.clear();
+                            groupList.addAll(searchResults);
+                            mActivity.runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mListView.setAdapter(mGroupAdapter);
+                                            mGroupAdapter.refresh(groupList);
+                                        }
+                                    }
+                            );
+                        }
+                    }
+                }
+        );
         AsyncTask getGroupsTask = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    List<XWikiGroup> groups = XWikiHttp.getGroupList(Constants.LIMIT_MAX_SYNC_USERS);
                     List<SearchResult> searchs = XWikiHttp.getSyncAllUsersSimple();
-                    if (groups != null && groups.size() >= 0) {
-                        Log.i(TAG, groups.toString());
-                        groupList.clear();
-                        groupList.addAll(groups);
-                    }
                     if(searchs != null && searchs.size() >=0 ){
                         Log.i(TAG, searchs.toString());
                         searchResults.clear();
@@ -164,13 +186,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             protected void onPostExecute(Boolean flag) {
                 AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
                 if (flag) {
-                    if(SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                        mListView.setAdapter(mGroupAdapter);
-                        mGroupAdapter.refresh(groupList);
-                    }else if(SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS){
-                        mListView.setAdapter(mUsersAdapter);
-                        mUsersAdapter.refresh(searchResults);
-                    }
+                    mListView.setAdapter(mUsersAdapter);
+                    mUsersAdapter.refresh(searchResults);
                 }else{
                     Toast.makeText(mContext, "network error! please refresh again!", Toast.LENGTH_SHORT).show();
                 }
@@ -183,9 +200,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         };
         mActivity.putAsyncTask(getGroupsTask);
-
-
-
     }
 
     public void noPermissions(){
