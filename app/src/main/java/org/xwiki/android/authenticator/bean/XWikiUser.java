@@ -19,6 +19,11 @@
  */
 package org.xwiki.android.authenticator.bean;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.AbstractMap;
+import java.util.Map;
+
 public class XWikiUser {
     /**
      * pageId xwiki:XWiki.LudovicDubost (wiki:space.pageName)
@@ -41,6 +46,7 @@ public class XWikiUser {
 
     public String phone;
 
+    @SerializedName("modified")
     public String lastModifiedDate;
 
     public String avatar;
@@ -163,5 +169,15 @@ public class XWikiUser {
             }
         }
         return null;
+    }
+
+    public static Map.Entry<String, String> spaceAndPage(String id) {
+        if (id.contains(":")) {
+            id = id.substring(
+                    id.indexOf(":") + 1//substring with position of ":" will return string from ":" sign
+            );
+        }
+        String[] splitted = id.split("\\.");
+        return new AbstractMap.SimpleEntry<>(splitted[0], splitted[1]);
     }
 }

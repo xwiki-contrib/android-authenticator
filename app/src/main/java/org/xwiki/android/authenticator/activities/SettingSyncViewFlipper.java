@@ -45,7 +45,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
-import org.xwiki.android.authenticator.bean.CustomSearchResultContainer;
+import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.rest.XWikiHttp;

@@ -154,68 +154,68 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     //0:false, 1:true, null:network error, 2:the user exists.
     public void register() {
         final String[] step1Values = mActivity.getStep1Values();
-        mSignUpTask = new AsyncTask<Void, Void, Object>() {
-            @Override
-            protected Object doInBackground(Void... params) {
-                //found whether the user exists.
-                XWikiUser userFind = null;
-                try {
-                    userFind = XWikiHttp.getUserDetail("xwiki", "XWiki", userId);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                if (userFind != null) return userFind;
-
-                //sign up
-                try {
-                    //boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
-                    HttpResponse response = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
-                    return response;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Object object) {
-                mActivity.hideProgress();
-                if(object == null){
-                    showErrorMessage("network error");
-                } else if(object instanceof XWikiUser){
-                    //the user exists
-                    showErrorMessage("the user exists");
-                }else if(object instanceof HttpResponse){
-                    HttpResponse response = (HttpResponse) object;
-                    int statusCode = response.getResponseCode();
-                    //response error
-                    if (statusCode < 200 || statusCode > 299) {
-                        showErrorMessage(response.getResponseMessage());
-                        refreshCaptcha();
-                        return;
-                    }
-                    //return 200ok
-                    byte[] contentData = response.getContentData();
-                    Document document = Jsoup.parse(new String(contentData));
-                    Elements elements = document.select("#loginForm");
-                    if(!elements.isEmpty()){
-                        //200ok, sign up successfully because html contains "id=loginForm"
-                        finishSignUp();
-                        mActivity.hideInputMethod();
-                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
-                    }else{
-                        //return 200ok! but not sign up successfully
-                        showErrorMessage("Captcha error");
-                        refreshCaptcha();
-                    }
-                }
-            }
-        };
-        mActivity.putAsyncTask(mSignUpTask);
+//        mSignUpTask = new AsyncTask<Void, Void, Object>() {
+//            @Override
+//            protected Object doInBackground(Void... params) {
+//                //found whether the user exists.
+//                XWikiUser userFind = null;
+//                try {
+//                    userFind = XWikiHttp.getUserDetail("xwiki", "XWiki", userId);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                } catch (XmlPullParserException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//                if (userFind != null) return userFind;
+//
+//                //sign up
+//                try {
+//                    //boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
+//                    HttpResponse response = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
+//                    return response;
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Object object) {
+//                mActivity.hideProgress();
+//                if(object == null){
+//                    showErrorMessage("network error");
+//                } else if(object instanceof XWikiUser){
+//                    //the user exists
+//                    showErrorMessage("the user exists");
+//                }else if(object instanceof HttpResponse){
+//                    HttpResponse response = (HttpResponse) object;
+//                    int statusCode = response.getResponseCode();
+//                    //response error
+//                    if (statusCode < 200 || statusCode > 299) {
+//                        showErrorMessage(response.getResponseMessage());
+//                        refreshCaptcha();
+//                        return;
+//                    }
+//                    //return 200ok
+//                    byte[] contentData = response.getContentData();
+//                    Document document = Jsoup.parse(new String(contentData));
+//                    Elements elements = document.select("#loginForm");
+//                    if(!elements.isEmpty()){
+//                        //200ok, sign up successfully because html contains "id=loginForm"
+//                        finishSignUp();
+//                        mActivity.hideInputMethod();
+//                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+//                    }else{
+//                        //return 200ok! but not sign up successfully
+//                        showErrorMessage("Captcha error");
+//                        refreshCaptcha();
+//                    }
+//                }
+//            }
+//        };
+//        mActivity.putAsyncTask(mSignUpTask);
 
     }
 

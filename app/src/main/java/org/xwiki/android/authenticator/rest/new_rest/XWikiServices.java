@@ -19,12 +19,12 @@
  */
 package org.xwiki.android.authenticator.rest.new_rest;
 
-import org.xwiki.android.authenticator.bean.CustomSearchResultContainer;
+import org.xwiki.android.authenticator.bean.ObjectSummary;
+import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
+import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.UserPayload;
-import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
-
-import java.util.List;
+import org.xwiki.android.authenticator.bean.XWikiUser;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -37,12 +37,14 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
+import static org.xwiki.android.authenticator.rest.new_rest.ApiEndPoints.SPACES;
+
 public interface XWikiServices {
 
     @POST("bin/login/XWiki/XWikiLogin")
     Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
 
-    @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + ApiEndPoints.SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
+    @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
     Observable<ResponseBody> updateUser(
             @Path("wiki") String wiki,
             @Path("space") String space,
@@ -55,6 +57,49 @@ public interface XWikiServices {
             @Query("number") Integer number
     );
 
+    @GET(
+            ApiEndPoints.REST +
+                    ApiEndPoints.WIKIS +
+                    "/{wiki}/" +
+                    ApiEndPoints.SPACES +
+                    "/{space}/" +
+                    ApiEndPoints.PAGES +
+                    "/{name}"
+    )
+    Observable<XWikiUser> getUserDetails(
+            @Path("wiki") String wiki,
+            @Path("space") String space,
+            @Path("name") String name
+    );
+
+    @GET(
+            ApiEndPoints.REST +
+                    ApiEndPoints.WIKIS +
+                    "/xwiki/" +
+                    ApiEndPoints.SPACES +
+                    "/{space}/" +
+                    ApiEndPoints.PAGES +
+                    "/{name}"
+    )
+    Observable<XWikiUser> getUserDetails(
+            @Path("space") String space,
+            @Path("name") String name
+    );
+
+    @GET(
+            ApiEndPoints.REST +
+                    ApiEndPoints.WIKIS +
+                    "/{wiki}/" +
+                    ApiEndPoints.SPACES +
+                    "/{space}/" +
+                    ApiEndPoints.PAGES +
+                    "/{name}/objects/XWiki.XWikiGroups"
+    )
+    Observable<CustomObjectsSummariesContainer<ObjectSummary>> getGroupMembers(
+            @Path("wiki") String wiki,
+            @Path("space") String space,
+            @Path("name") String name
+    );
 
 //
 //    /**

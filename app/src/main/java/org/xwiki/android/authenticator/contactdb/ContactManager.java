@@ -39,6 +39,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
@@ -50,6 +51,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import rx.functions.Action1;
 
 /**
  * Class for managing contacts sync related mOperations
@@ -104,7 +108,7 @@ public class ContactManager {
      * @return the server syncState that should be used in our next
      * sync request.
      */
-    public static synchronized void updateContacts(Context context, String account,
+    public static synchronized void updateContacts(final Context context, final String account,
                                                    XWikiHttp.SyncData syncData) throws IOException, XmlPullParserException {
 
 
@@ -166,16 +170,38 @@ public class ContactManager {
         // if allIdSet size != 0, just add these users to local database.
         // if newly adding users to the group, these following code will be execute..
         if(allIdSet.size() > 0 ) {
-            List<XWikiUser> userList = new ArrayList<>();
+            final List<XWikiUser> userList = new ArrayList<>();
+            final CountDownLatch countDown = new CountDownLatch(allIdSet.size());
             for (String item : allIdSet) {
-                XWikiUser user = XWikiHttp.getUserDetail(item);
-                if(user == null) continue;
-                userList.add(user);
-                Log.d(TAG, "Add contact");
-                addContact(context, account, user, 0, true, batchOperation);
-                if (batchOperation.size() >= 100) {
-                    batchOperation.execute();
-                }
+                String[] splitted = XWikiUser.splitId(item);
+                AppContext.getApiManager().getXwikiServicesApi().getUserDetails(
+                        splitted[0],
+                        splitted[1],
+                        splitted[2]
+                ).subscribe(
+                        new Action1<XWikiUser>() {
+                            @Override
+                            public void call(XWikiUser xWikiUser) {
+                                userList.add(xWikiUser);
+                                countDown.countDown();
+                                addContact(context, account, xWikiUser, 0, true, batchOperation);
+                                if (batchOperation.size() >= 100) {
+                                    batchOperation.execute();
+                                }
+                            }
+                        },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                countDown.countDown();
+                            }
+                        }
+                );
+            }
+            try {
+                countDown.await();
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Can't await update of user", e);
             }
             batchOperation.execute();
             updateAvatars(context, userList);

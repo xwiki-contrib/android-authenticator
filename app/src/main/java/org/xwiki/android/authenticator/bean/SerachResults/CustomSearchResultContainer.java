@@ -1,4 +1,4 @@
-package org.xwiki.android.authenticator.bean;
+package org.xwiki.android.authenticator.bean.SerachResults;
 
 import java.util.List;
 
