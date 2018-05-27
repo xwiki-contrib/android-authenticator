@@ -41,6 +41,7 @@ import android.util.Log;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
 import java.io.OutputStream;

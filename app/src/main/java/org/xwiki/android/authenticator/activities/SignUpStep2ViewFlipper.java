@@ -41,6 +41,8 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.rest.HttpResponse;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.AnimUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 

@@ -33,7 +33,15 @@ import android.widget.TextView;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+import rx.functions.Action1;
+
+import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
 /**
  * SignInViewFlipper.
@@ -90,60 +98,69 @@ public class SignInViewFlipper extends BaseViewFlipper {
     }
 
     public void submit() {
-        final String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
         final String userName = accountName.toString();
         final String userPass = accountPassword.toString();
 
-        final String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+        BaseApiManager apiManager = getApiManager();
 
-        mAuthTask = new AsyncTask<Void, Void, Intent>() {
-            @Override
-            protected Intent doInBackground(Void... params) {
-                Log.d(TAG, "Started authenticating");
-                Bundle data = new Bundle();
-                try {
-                    Log.d(TAG, userName + " " + userPass + " " + userServer);
-                    HttpResponse response = XWikiHttp.login(userName, userPass);
-                    Log.d(TAG, response.getHeaders().toString() + response.getResponseCode());
-                    int statusCode = response.getResponseCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        String msg = "statusCode=" + statusCode + ", response=" + response.getResponseMessage();
-                        if(statusCode == 401) {
-                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "username or password error");
-                        }else{
-                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, response.getResponseMessage());
+        apiManager.getXwikiServicesApi().login(
+                Credentials.basic(userName, userPass)
+        ).subscribe(
+                new Action1<Response<ResponseBody>>() {
+                    @Override
+                    public void call(Response<ResponseBody> responseBodyResponse) {
+                        try {
+                            String authtoken = responseBodyResponse.headers().get("Set-Cookie");
+
+                            signedIn(
+                                    authtoken,
+                                    userName,
+                                    userPass
+                            );
+                        } catch (Exception e) {
+                            showErrorMessage("Network error");
                         }
-                    } else {
-                        String authtoken = response.getHeaders().get("Set-Cookie");
-                        data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
-                        data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-                        data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
-                        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, userServer);
-                        data.putString(AuthenticatorActivity.PARAM_USER_PASS, userPass);
                     }
-                } catch (Exception e) {
-                    data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "network error!");
                 }
-                final Intent res = new Intent();
-                res.putExtras(data);
-                return res;
-            }
-
-            @Override
-            protected void onPostExecute(Intent intent) {
-                mActivity.hideProgress();
-                if (intent.hasExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE)) {
-                    showErrorMessage(intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE));
-                } else {
-                    mActivity.finishLogin(intent);
-                    mActivity.hideInputMethod();
-                    mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
-                }
-            }
-        };
-        mActivity.putAsyncTask(mAuthTask);
+        );
     }
 
+    private Intent prepareIntent(String authtoken, String username, String password) {
+        String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
+
+        String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+
+        Bundle data = new Bundle();
+        data.putString(AccountManager.KEY_ACCOUNT_NAME, username);
+        data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
+        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, userServer);
+        data.putString(AuthenticatorActivity.PARAM_USER_PASS, password);
+
+        final Intent intent = new Intent();
+        intent.putExtras(data);
+        return intent;
+    }
+
+    private void signedIn(String authtoken, String username, String password) {
+        final Intent signedIn = prepareIntent(
+                authtoken,
+                username,
+                password
+        );
+
+        mActivity.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mActivity.hideProgress();
+                        mActivity.finishLogin(signedIn);
+                        mActivity.hideInputMethod();
+                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+                    }
+                }
+        );
+    }
 
     private void showErrorMessage(String error){
         //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();

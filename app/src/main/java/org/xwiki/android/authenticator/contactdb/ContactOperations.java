@@ -35,6 +35,7 @@ import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
 

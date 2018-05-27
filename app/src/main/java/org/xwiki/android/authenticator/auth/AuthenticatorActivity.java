@@ -320,9 +320,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
 
 
     public void clearOldAccount(){
-        //set rest url null (Maybe also need to do somethings to clear old value)
-        //because when you remove the account and add again, the static XWiki.serverRestPreUrl is not updated. serverAddr is the old address.
-        XWikiHttp.setRestUrlNULL();
+        //TODO: clear current user url
         //clear SharePreference
         SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST);
         SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS);

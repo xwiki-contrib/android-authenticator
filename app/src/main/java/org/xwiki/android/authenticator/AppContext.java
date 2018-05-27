@@ -22,6 +22,7 @@ package org.xwiki.android.authenticator;
 import android.app.Application;
 import android.util.Log;
 
+import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.List;
  * AppContext.
  */
 public class AppContext extends Application {
+    private static BaseApiManager baseApiManager;
     private static final String TAG = "AppContext";
 
     private static AppContext instance;
@@ -62,5 +64,14 @@ public class AppContext extends Application {
             return true;
         }
         return false;
+    }
+
+    public static BaseApiManager getApiManager() {
+        if (baseApiManager != null) {
+            return baseApiManager;
+        } else {
+            baseApiManager = new BaseApiManager(instance);
+            return baseApiManager;
+        }
     }
 }
