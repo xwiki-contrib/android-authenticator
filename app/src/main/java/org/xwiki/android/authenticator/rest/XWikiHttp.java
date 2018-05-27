@@ -52,33 +52,6 @@ public class XWikiHttp {
     private static final String TAG = "XWikiHttp";
     private static String serverRestPreUrl = null;
 
-    /**
-     * login
-     *
-     * @param username user's name
-     * @param password user's password
-     * @return HttpResponse
-     * HttpResponse
-     * @throws IOException http://localhost:8080/xwiki/bin/login/XWiki/XWikiLogin
-     */
-    public static HttpResponse login(String username, String password) throws IOException {
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        String url = getServerAddress() + "/bin/login/XWiki/XWikiLogin";
-        HttpRequest request = new HttpRequest(url);
-        String basicAuth = username + ":" + password;
-        basicAuth = "Basic " + new String(Base64.encodeToString(basicAuth.getBytes(), Base64.NO_WRAP));
-        request.httpParams.putHeaders("Authorization", basicAuth);
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            return response;
-            //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
-        }
-        //global value setting for http
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
-        return response;
-    }
 
     /**
      * Sign Up

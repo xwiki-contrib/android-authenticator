@@ -40,7 +40,13 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import java.io.IOException;
 import java.util.List;
 
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+import rx.functions.Action1;
+
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
+import static org.xwiki.android.authenticator.AppContext.getApiManager;
 import static org.xwiki.android.authenticator.Constants.*;
 
 /**
@@ -115,33 +121,52 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         }
 
         //authTokenType = AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
-        String authToken = am.peekAuthToken(account, authTokenType);
-        Log.d("xwiki", TAG + "> peekAuthToken returned - " + authToken);
+        // Auth token array because it can be modified in parallel threads or world.
+        // In this case we will need to change it, but string immutable what we can't say
+        // about array items
+        final String[] authToken = {am.peekAuthToken(account, authTokenType)};
+        Log.d("xwiki", TAG + "> peekAuthToken returned - " + authToken[0]);
 
         // Lets give another try to authenticate the user
-        if (TextUtils.isEmpty(authToken)) {
+        if (TextUtils.isEmpty(authToken[0])) {
             //if  having no cached token, request server for new token and refreshAllAuthTokenType
             //make all cached authTokenType-tokens consistent.
             try {
+                authToken[0] = null;
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
-                HttpResponse httpResponse = XWikiHttp.login(accountName, accountPassword);
-                authToken = httpResponse.getHeaders().get("Set-Cookie");
-                Log.d(TAG, "XWikiAuthenticator, authtoken=" + authToken);
+                final Object sync = new Object();
+                getApiManager().getXwikiServicesApi().login(
+                        Credentials.basic(accountName, accountPassword)
+                ).subscribe(
+                        new Action1<Response<ResponseBody>>() {
+                            @Override
+                            public void call(Response<ResponseBody> responseBodyResponse) {
+                                synchronized (sync) {
+                                    authToken[0] = responseBodyResponse.headers().get("Set-Cookie");
+                                    Log.d(TAG, "XWikiAuthenticator, authtoken=" + authToken[0]);
+                                    sync.notifyAll();
+                                }
+                            }
+                        }
+                );
+                synchronized (sync) {
+                    while (authToken[0] == null) {
+                        sync.wait();
+                    }
+                }
 
                 //If we get an authToken - we return it
                 //refresh all tokentype for all apps' package
-                refreshAllAuthTokenType(am, account, authToken);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                final Bundle result = new Bundle();
-                result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken network error!!!");
+                refreshAllAuthTokenType(am, account, authToken[0]);
+            } catch (InterruptedException e) {
+                Bundle result = new Bundle();
+                result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken error impossible !!!");
                 return result;
             }
 
         }
 
-        if (TextUtils.isEmpty(authToken)) {
+        if (TextUtils.isEmpty(authToken[0])) {
             //if we get here, error, it's impossible!
             Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "getAuthToken error impossible !!!");
@@ -150,7 +175,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+            result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
             result.putString(Constants.SERVER_ADDRESS, XWikiHttp.getServerAddress());
             return result;
         }
