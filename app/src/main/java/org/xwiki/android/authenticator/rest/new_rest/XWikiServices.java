@@ -20,11 +20,14 @@
 package org.xwiki.android.authenticator.rest.new_rest;
 
 import org.xwiki.android.authenticator.bean.UserPayload;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
 
-import okhttp3.Credentials;
+import java.util.List;
+
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -42,16 +45,12 @@ public interface XWikiServices {
             @Path("wiki") String wiki,
             @Path("space") String space,
             @Path("pageName") String pageName,
-            @Body UserPayload userPayload);
+            @Body UserPayload userPayload
+    );
 
-    Observable<Boolean> signUp(
-            @Query("") String userId,
-            String password,
-            String formToken,
-            String captcha,
-            String firstName,
-            String lastName,
-            String email
+    @GET(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/query?q=object:XWiki.XWikiGroups")
+    Observable<SearchResultContainer> availableGroups(
+            @Query("number") Integer number
     );
 
 

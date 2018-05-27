@@ -31,6 +31,7 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.utils.ImageUtils;
@@ -44,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+
+import rx.functions.Action1;
 
 /**
  * XWikiHttp
@@ -68,7 +71,14 @@ public class XWikiHttp {
      * false: sign up unsuccessfully
      * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
      */
-    public static HttpResponse signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email) throws IOException {
+    public static HttpResponse signUp(
+            String userId, String password,
+            String formToken,
+            String captcha,
+            String firstName,
+            String lastName,
+            String email
+    ) throws IOException {
         String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
             registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
@@ -201,27 +211,49 @@ public class XWikiHttp {
      * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
      */
     public static List<XWikiGroup> getGroupList(int number) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=" + "object:XWiki.XWikiGroups&number=" + number;
+        final Object sync = new Object();
+        final Object[] completed = {null};
         //String wiki,  wiki:"+ wiki
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
+        final List<XWikiGroup> groupList = new ArrayList<>();
+
+        AppContext.getApiManager().getXwikiServicesApi().availableGroups(
+                number
+        ).subscribe(
+                new Action1<SearchResultContainer>() {
+                    @Override
+                    public void call(SearchResultContainer searchResultsContainer) {
+                        synchronized (sync) {
+                            completed[0] = new Object();
+
+                            if (searchResultsContainer.searchResults != null) {
+                                for (SearchResult item : searchResultsContainer.searchResults) {
+                                    XWikiGroup group = new XWikiGroup();
+                                    group.id = item.id;
+                                    group.wiki = item.wiki;
+                                    group.space = item.space;
+                                    group.pageName = item.pageName;
+                                    group.lastModifiedDate = item.modified;
+                                    group.version = item.version;
+                                    groupList.add(group);
+                                }
+                            }
+
+                            sync.notifyAll();
+                        }
+                    }
+                }
+        );
+
+        synchronized (sync) {
+            while (completed[0] == null) {
+                try {
+                    sync.wait();
+                } catch (InterruptedException e) {
+                    Log.e(XWikiHttp.class.getSimpleName(), "Can't await user groups", e);
+                }
+            }
         }
-        List<XWikiGroup> groupList = new ArrayList<>();
-        List<SearchResult> searchlist = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
-        for (SearchResult item : searchlist) {
-            XWikiGroup group = new XWikiGroup();
-            group.id = item.id;
-            group.wiki = item.wiki;
-            group.space = item.space;
-            group.pageName = item.pageName;
-            group.lastModifiedDate = item.modified;
-            group.version = item.version;
-            groupList.add(group);
-        }
+
         return groupList;
     }
 
