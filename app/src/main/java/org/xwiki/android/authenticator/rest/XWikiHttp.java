@@ -28,7 +28,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
-import org.xwiki.android.authenticator.bean.Page;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.XWikiUser;
@@ -76,12 +75,12 @@ public class XWikiHttp {
      * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
      */
     public static HttpResponse signUp(
-            String userId, String password,
-            String formToken,
-            String captcha,
-            String firstName,
-            String lastName,
-            String email
+        String userId, String password,
+        String formToken,
+        String captcha,
+        String firstName,
+        String lastName,
+        String email
     ) throws IOException {
         String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
         if (registerUrl.contains("www.xwiki.org")) {
@@ -229,13 +228,11 @@ public class XWikiHttp {
         @Override
         public String toString() {
             return "SyncData{" +
-                    "updateUserList=" + updateUserList +
-                    ", allIdSet=" + allIdSet +
-                    '}';
+                "updateUserList=" + updateUserList +
+                ", allIdSet=" + allIdSet +
+                '}';
         }
     }
-
-
 
 
     /**
@@ -280,49 +277,49 @@ public class XWikiHttp {
             String[] split = XWikiUser.splitId(groupId);
             if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
             getApiManager().getXwikiServicesApi().getGroupMembers(
-                    split[0],
-                    split[1],
-                    split[2]
+                split[0],
+                split[1],
+                split[2]
             ).map(
-                    // Map<String, String> : keys - usernames, values - spaces
-                    new Func1<CustomObjectsSummariesContainer<ObjectSummary>, Map<String, String>>() {
-                        @Override
-                        public Map<String, String> call(CustomObjectsSummariesContainer<ObjectSummary> xWikiUserCustomObjectsSummariesContainer) {
-                            Map<String, String> pairs = new HashMap<>();
+                // Map<String, String> : keys - usernames, values - spaces
+                new Func1<CustomObjectsSummariesContainer<ObjectSummary>, Map<String, String>>() {
+                    @Override
+                    public Map<String, String> call(CustomObjectsSummariesContainer<ObjectSummary> xWikiUserCustomObjectsSummariesContainer) {
+                        Map<String, String> pairs = new HashMap<>();
 
-                            for (ObjectSummary summary : xWikiUserCustomObjectsSummariesContainer.objectSummaries) {
-                                try {
-                                    Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
-                                    pairs.put(
-                                            spaceAndName.getValue(),
-                                            spaceAndName.getKey()
-                                    );
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Can't transform group member headline", e);
-                                }
+                        for (ObjectSummary summary : xWikiUserCustomObjectsSummariesContainer.objectSummaries) {
+                            try {
+                                Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
+                                pairs.put(
+                                    spaceAndName.getValue(),
+                                    spaceAndName.getKey()
+                                );
+                            } catch (Exception e) {
+                                Log.e(TAG, "Can't transform group member headline", e);
                             }
+                        }
 
-                            return pairs;
-                        }
+                        return pairs;
                     }
+                }
             ).subscribe(
-                    new Action1<Map<String, String>>() {
-                        @Override
-                        public void call(Map<String, String> pairs) {
-                            syncData.updateUserList.addAll(
-                                    getDetailedInfo(
-                                            pairs
-                                    )
-                            );
-                            groupsCountDown.countDown();
-                        }
-                    },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            groupsCountDown.countDown();
-                        }
+                new Action1<Map<String, String>>() {
+                    @Override
+                    public void call(Map<String, String> pairs) {
+                        syncData.updateUserList.addAll(
+                            getDetailedInfo(
+                                pairs
+                            )
+                        );
+                        groupsCountDown.countDown();
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        groupsCountDown.countDown();
+                    }
+                }
             );
         }
         try {
@@ -344,23 +341,23 @@ public class XWikiHttp {
 
         for (final String userPage : from.keySet()) {
             getApiManager().getXwikiServicesApi().getUserDetails(
-                    from.get(userPage),
-                    userPage
+                from.get(userPage),
+                userPage
             ).subscribe(
-                    new Action1<XWikiUser>() {
-                        @Override
-                        public void call(XWikiUser xWikiUser) {
-                            users.add(xWikiUser);
-                            countDown.countDown();
-                        }
-                    },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.e(TAG, "Can't get user info", throwable);
-                            countDown.countDown();
-                        }
+                new Action1<XWikiUser>() {
+                    @Override
+                    public void call(XWikiUser xWikiUser) {
+                        users.add(xWikiUser);
+                        countDown.countDown();
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e(TAG, "Can't get user info", throwable);
+                        countDown.countDown();
+                    }
+                }
             );
         }
 
@@ -407,24 +404,24 @@ public class XWikiHttp {
                 String space = splitted[1];
                 String pageName = splitted[2];
                 getApiManager().getXwikiServicesApi().getUserDetails(
-                        wiki,
-                        space,
-                        pageName
+                    wiki,
+                    space,
+                    pageName
                 ).subscribe(
-                        new Action1<XWikiUser>() {
-                            @Override
-                            public void call(XWikiUser xWikiUser) {
-                                syncData.updateUserList.add(xWikiUser);
-                                countDown.countDown();
-                            }
-                        },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                Log.e(TAG, "Can't get user", e);
-                                countDown.countDown();
-                            }
+                    new Action1<XWikiUser>() {
+                        @Override
+                        public void call(XWikiUser xWikiUser) {
+                            syncData.updateUserList.add(xWikiUser);
+                            countDown.countDown();
                         }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable e) {
+                            Log.e(TAG, "Can't get user", e);
+                            countDown.countDown();
+                        }
+                    }
                 );
             }
 
@@ -432,7 +429,7 @@ public class XWikiHttp {
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
             int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
-            if(syncType != Constants.SYNC_TYPE_ALL_USERS){
+            if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
                 throw new IOException("the sync type has been changed");
             } else {
                 countDown.countDown();
@@ -448,6 +445,7 @@ public class XWikiHttp {
 
     /**
      * getSyncAllUsersSimple
+     *
      * @return
      * @throws IOException
      * @throws XmlPullParserException
@@ -467,6 +465,7 @@ public class XWikiHttp {
      * getServerRestUrl
      * get serverRestPreUrl from preference.
      * http://www.xwiki.org/xwiki + "/rest"
+     *
      * @return String
      * url
      */
@@ -494,7 +493,7 @@ public class XWikiHttp {
      * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
      */
     public static byte[] downloadImage(String user, String avatarName) throws IOException {
-        String url = getServerAddress() +"/bin/download/XWiki/" + user + "/" + avatarName;
+        String url = getServerAddress() + "/bin/download/XWiki/" + user + "/" + avatarName;
         return downloadImage(url);
     }
 
@@ -536,7 +535,7 @@ public class XWikiHttp {
         //if the memory size of the image are more than 4M options.inSampleSize>1.
         int size = height * width * 2; //2 is RGB_565
         int reqSize = 4096 * 1024;
-        if (size > reqSize ) {
+        if (size > reqSize) {
             final int halfSize = size / 2;
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
