@@ -33,7 +33,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class BaseApiManager {
 
     private final Retrofit retrofit;
-    private final XWikiServices xwikiServices;
+    private final XWikiServices xWikiServices;
+    private final XWikiPhotosManager xWikiPhotosManager;
 
     public BaseApiManager(String baseUrl) {
 
@@ -57,7 +58,8 @@ public class BaseApiManager {
                 .client(okHttpClient)
                 .build();
         
-        xwikiServices = initXWikiServices(retrofit);
+        xWikiServices = initXWikiServices(retrofit);
+        xWikiPhotosManager = initXWikiPhotosManager(okHttpClient, baseUrl);
     }
     
     public BaseApiManager(Context context) {
@@ -70,7 +72,18 @@ public class BaseApiManager {
         return retrofit.create(XWikiServices.class);
     }
 
+    private static XWikiPhotosManager initXWikiPhotosManager(
+            OkHttpClient client,
+            String baseUrl
+    ) {
+        return new XWikiPhotosManager(client, baseUrl);
+    }
+
     public XWikiServices getXwikiServicesApi() {
-        return xwikiServices;
+        return xWikiServices;
+    }
+
+    public XWikiPhotosManager getXWikiPhotosManager() {
+        return xWikiPhotosManager;
     }
 }

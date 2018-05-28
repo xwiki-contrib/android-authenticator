@@ -50,9 +50,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import rx.functions.Action1;
 
@@ -149,24 +149,24 @@ public class ContactManager {
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
         HashSet<String> allIdSet = syncData.getAllIdSet();
-        Iterator iterLocalMap = localUserMaps.entrySet().iterator();
-        while (iterLocalMap.hasNext()) {
-            HashMap.Entry entry = (HashMap.Entry) iterLocalMap.next();
-            String key = (String) entry.getKey();
-            long rawId = (Long) entry.getValue();
-            if (!allIdSet.contains(key)) {
-                deleteContact(context, rawId, batchOperation);
-                Log.d(TAG, key + " removed");
-            }else{
-                allIdSet.remove(key);
-            }
-            //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
-            if (batchOperation.size() >= 100) {
-                batchOperation.execute();
-            }
-        }
-        Log.d(TAG, "Remove contacts end");
-        batchOperation.execute();
+//        Iterator iterLocalMap = localUserMaps.entrySet().iterator();
+//        while (iterLocalMap.hasNext()) {
+//            HashMap.Entry entry = (HashMap.Entry) iterLocalMap.next();
+//            String key = (String) entry.getKey();
+//            long rawId = (Long) entry.getValue();
+//            if (!allIdSet.contains(key)) {
+//                deleteContact(context, rawId, batchOperation);
+//                Log.d(TAG, key + " removed");
+//            }else{
+//                allIdSet.remove(key);
+//            }
+//            //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
+//            if (batchOperation.size() >= 100) {
+//                batchOperation.execute();
+//            }
+//        }
+//        Log.d(TAG, "Remove contacts end");
+//        batchOperation.execute();
 
         // if allIdSet size != 0, just add these users to local database.
         // if newly adding users to the group, these following code will be execute..
@@ -212,17 +212,50 @@ public class ContactManager {
 
 
     //http://stackoverflow.com/questions/14601209/update-contact-image-in-android-contact-provider
-    public static void updateAvatars(Context context, List<XWikiUserFull> userList) throws IOException {
-        List<XWikiUserFull> updateList = userList;
-        if (updateList == null || updateList.size() == 0) return;
+    public static void updateAvatars(final Context context, List<XWikiUserFull> userList) throws IOException {
+        if (userList == null || userList.size() == 0) return;
         final ContentResolver resolver = context.getContentResolver();
-        for (XWikiUserFull xwikiUser : updateList) {
-            long rawContactId = lookupRawContact(resolver, xwikiUser.id);
+        final Semaphore semaphore = new Semaphore(3);
+        for (XWikiUserFull xwikiUser : userList) {
+            final long rawContactId = lookupRawContact(resolver, xwikiUser.id);
             if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.getAvatar())) {
-                byte[] avatarBuffer = XWikiHttp.downloadImage(xwikiUser.pageName, xwikiUser.getAvatar());
-                if (avatarBuffer != null) {
-                    writeDisplayPhoto(context, rawContactId, avatarBuffer);
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
+                    xwikiUser.pageName, xwikiUser.getAvatar()
+                ).subscribe(
+                    new Action1<byte[]>() {
+                        @Override
+                        public void call(byte[] bytes) {
+                            if (bytes != null) {
+                                try {
+                                    writeDisplayPhoto(context, rawContactId, bytes);
+                                } catch (IOException e) {
+                                    Log.e(
+                                        TAG,
+                                        "Can't update avatar of user",
+                                        e
+                                    );
+                                }
+                            }
+                            semaphore.release();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.e(
+                                TAG,
+                                "Can't update avatar of user",
+                                throwable
+                            );
+                            semaphore.release();
+                        }
+                    }
+                );
             }
         }
     }

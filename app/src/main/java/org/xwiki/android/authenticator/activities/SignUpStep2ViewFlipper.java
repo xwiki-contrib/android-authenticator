@@ -48,6 +48,9 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+
 /**
  * SignUpStep2ViewFlipper.
  */
@@ -282,38 +285,26 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 
 
     void refreshCaptcha() {
-        AsyncTask refreshCaptchaTask = new AsyncTask<Void, Void, byte[]>() {
-            @Override
-            protected byte[] doInBackground(Void... params) {
-                //String captchaUrl = "http://210.76.192.253:8080/xwiki/bin/imagecaptcha/XWiki/Registration";
-                //String url = "http://www.xwiki.org/xwiki/bin/imagecaptcha/XWiki/RealRegistration";
-                String captchaUrl = XWikiHttp.getServerAddress() + "/bin/imagecaptcha/XWiki/Registration";
-                if (captchaUrl.contains("www.xwiki.org")) {
-                    captchaUrl = XWikiHttp.getServerAddress() + "/bin/imagecaptcha/XWiki/RealRegistration";
+        AppContext.getApiManager()
+            .getXWikiPhotosManager()
+            .downloadCaptcha()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                new Action1<byte[]>() {
+                    @Override
+                    public void call(byte[] bytes) {
+                        AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
+                        Bitmap captchaBitmap = getPicFromBytes(bytes, null);
+                        mCaptchaImageView.setImageBitmap(captchaBitmap);
+                    }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
+                    }
                 }
-                byte[] img = null;
-                try {
-                    img = XWikiHttp.downloadImage(captchaUrl);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return img;
-            }
-
-            @Override
-            protected void onPostExecute(byte[] bytes) {
-                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-                Bitmap captchaBitmap = getPicFromBytes(bytes, null);
-                mCaptchaImageView.setImageBitmap(captchaBitmap);
-            }
-
-            @Override
-            protected void onCancelled() {
-                super.onCancelled();
-                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-            }
-        };
-        mActivity.putAsyncTask(refreshCaptchaTask);
+            );
     }
 
     public static Bitmap getPicFromBytes(byte[] bytes,
