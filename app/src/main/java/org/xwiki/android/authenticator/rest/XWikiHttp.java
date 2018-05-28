@@ -144,22 +144,6 @@ public class XWikiHttp {
         return signUp(userId, password, formToken, captcha, "", "", "");
     }
 
-
-    /**
-     * get user information
-     *
-     * @param id curriki:XWiki.Luisafan
-     * @return XWikiUser
-     * Without Getting LastModifiedDate
-     * @throws IOException
-     */
-    public static XWikiUser getUserDetail(String id) throws IOException, XmlPullParserException {
-        String[] split = XWikiUser.splitId(id);
-        if (split == null) throw new IOException(TAG + ",in getUserDetail, userId error");
-        return getUserDetail(split[0], split[1], split[2]);
-    }
-
-
     /**
      * get user information
      *
@@ -442,24 +426,6 @@ public class XWikiHttp {
             Log.e(TAG, "Can't perform `getSyncAllUsers`", e);
         }
         return syncData;
-    }
-
-    /**
-     * getSyncAllUsersSimple
-     *
-     * @return
-     * @throws IOException
-     * @throws XmlPullParserException
-     */
-    public static List<SearchResult> getSyncAllUsersSimple() throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
-        HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
-        return searchList;
     }
 
     /**

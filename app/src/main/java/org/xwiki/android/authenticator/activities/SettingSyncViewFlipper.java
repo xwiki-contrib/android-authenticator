@@ -45,6 +45,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
@@ -108,6 +109,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         searchResults = new ArrayList<>();
         mGroupAdapter = new GroupListAdapter(mContext, groupList);
         mUsersAdapter = new UserListAdapter(mContext, searchResults);
+        initData();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         selectSyncSpinner = (AppCompatSpinner) findViewById(R.id.select_spinner);
@@ -135,7 +137,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         });
         SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
-        initData();
     }
 
     public void initData() {
@@ -151,55 +152,43 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                             groupList.clear();
                             groupList.addAll(searchResults);
                             mActivity.runOnUiThread(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
+                                        if (selectSyncSpinner.getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
                                             mListView.setAdapter(mGroupAdapter);
                                             mGroupAdapter.refresh(groupList);
                                         }
                                     }
+                                }
                             );
                         }
                     }
                 }
         );
-        AsyncTask getGroupsTask = new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                try {
-                    List<SearchResult> searchs = XWikiHttp.getSyncAllUsersSimple();
-                    if(searchs != null && searchs.size() >=0 ){
-                        Log.i(TAG, searchs.toString());
-                        searchResults.clear();
-                        searchResults.addAll(searchs);
-                    }
-                    return true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
-                return false;
-            }
+        getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
+            new Action1<SearchResultContainer>() {
+                @Override
+                public void call(SearchResultContainer searchResultContainer) {
+                    searchResults.clear();
+                    searchResults.addAll(searchResultContainer.searchResults);
+                    mActivity.runOnUiThread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
+                                if (selectSyncSpinner.getSelectedItemPosition() != Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                                    mListView.setAdapter(mUsersAdapter);
+                                    mUsersAdapter.refresh(searchResults);
+                                }
+                            }
+                        }
+                    );
 
-            @Override
-            protected void onPostExecute(Boolean flag) {
-                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-                if (flag) {
-                    mListView.setAdapter(mUsersAdapter);
-                    mUsersAdapter.refresh(searchResults);
-                }else{
-                    Toast.makeText(mContext, "network error! please refresh again!", Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            protected void onCancelled() {
-                super.onCancelled();
-                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-            }
-        };
-        mActivity.putAsyncTask(getGroupsTask);
+        );
     }
 
     public void noPermissions(){

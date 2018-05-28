@@ -20,6 +20,7 @@
 package org.xwiki.android.authenticator.rest.new_rest;
 
 import org.xwiki.android.authenticator.bean.ObjectSummary;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.authenticator.bean.UserPayload;
@@ -114,6 +115,25 @@ public interface XWikiServices {
         @Path("wiki") String wiki,
         @Path("space") String space,
         @Path("name") String name
+    );
+
+    @GET(
+        ApiEndPoints.REST +
+            ApiEndPoints.WIKIS +
+            "/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Integer.MAX_VALUE
+    )
+    Observable<SearchResultContainer> getAllUsersPreview();
+
+    @GET(
+        ApiEndPoints.REST +
+            ApiEndPoints.WIKIS +
+            "/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers" +
+            "&number={count}" +
+            "&start={offset}"
+    )
+    Observable<SearchResultContainer> getUsersPreview(
+        @Query("number") Integer count,
+        @Query("start") Integer offset
     );
 
     @GET(
