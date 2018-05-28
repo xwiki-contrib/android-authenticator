@@ -19,13 +19,6 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.authenticator.Constants;
-import org.xwiki.android.authenticator.contactdb.ContactManager;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
-import org.xwiki.android.authenticator.utils.StringUtils;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
@@ -35,6 +28,13 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.Constants;
+import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Date;

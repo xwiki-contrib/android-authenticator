@@ -44,11 +44,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
+import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SignInViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
 import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;

@@ -27,7 +27,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
@@ -35,9 +34,6 @@ import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
-
-import java.io.IOException;
 
 /**
  * Helper class for storing data in the platform content providers.

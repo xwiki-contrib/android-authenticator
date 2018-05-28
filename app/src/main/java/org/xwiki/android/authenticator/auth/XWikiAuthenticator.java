@@ -27,17 +27,15 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.text.TextUtils;
+import android.util.Log;
 
-import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.activities.GrantPermissionActivity;
-import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import okhttp3.Credentials;
@@ -47,7 +45,10 @@ import rx.functions.Action1;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
-import static org.xwiki.android.authenticator.Constants.*;
+import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
+import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
+import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_READ_ONLY;
+import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
 
 /**
  * @version $Id: $

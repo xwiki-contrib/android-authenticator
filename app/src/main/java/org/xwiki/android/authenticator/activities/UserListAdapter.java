@@ -27,13 +27,9 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.bean.SearchResult;
-import org.xwiki.android.authenticator.bean.XWikiGroup;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserListAdapter extends BaseAdapter {

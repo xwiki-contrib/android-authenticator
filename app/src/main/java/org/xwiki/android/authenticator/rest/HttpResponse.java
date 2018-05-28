@@ -19,8 +19,6 @@
  */
 package org.xwiki.android.authenticator.rest;
 
-import android.os.Parcelable;
-
 import java.io.Serializable;
 import java.util.Map;
 

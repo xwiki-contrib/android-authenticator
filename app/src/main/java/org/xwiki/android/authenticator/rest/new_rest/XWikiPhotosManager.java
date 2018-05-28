@@ -6,7 +6,6 @@ import android.util.Log;
 
 import org.xwiki.android.authenticator.utils.ImageUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 

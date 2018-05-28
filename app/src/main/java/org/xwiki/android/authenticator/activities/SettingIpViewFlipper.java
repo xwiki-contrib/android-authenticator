@@ -27,7 +27,6 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
-import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
