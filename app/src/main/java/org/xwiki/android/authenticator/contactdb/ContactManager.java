@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -124,89 +125,87 @@ public class ContactManager {
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
         List<XWikiUserFull> wikiUsers = syncData.getUpdateUserList();
 
-        // Add new contact and update changed ones
-        Log.d(TAG, "Synchronizing XWiki contacts");
-        if (wikiUsers != null && wikiUsers.size() > 0) {
-            for (final XWikiUserFull xwikiUser : wikiUsers) {
-                long rawContactId = lookupRawContact(resolver, xwikiUser.id);
-                if (rawContactId != 0) {
-                    Log.d(TAG, "Update contact");
-                    updateContact(context, resolver, xwikiUser, false, true, true, true, rawContactId, batchOperation);
-                } else {
-                    Log.d(TAG, "Add contact");
-                    addContact(context, account, xwikiUser, 0, true, batchOperation);
-                }
-                // A sync adapter should batch operations on multiple contacts,
-                // because it will make a dramatic performance difference.
-                // (UI updates, etc)
-                if (batchOperation.size() >= 100) {
-                    batchOperation.execute();
-                }
-            }
-            batchOperation.execute();
-        }
-
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
-        HashSet<String> allIdSet = syncData.getAllIdSet();
-//        Iterator iterLocalMap = localUserMaps.entrySet().iterator();
-//        while (iterLocalMap.hasNext()) {
-//            HashMap.Entry entry = (HashMap.Entry) iterLocalMap.next();
-//            String key = (String) entry.getKey();
-//            long rawId = (Long) entry.getValue();
-//            if (!allIdSet.contains(key)) {
-//                deleteContact(context, rawId, batchOperation);
-//                Log.d(TAG, key + " removed");
-//            }else{
-//                allIdSet.remove(key);
-//            }
-//            //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
-//            if (batchOperation.size() >= 100) {
-//                batchOperation.execute();
-//            }
-//        }
-//        Log.d(TAG, "Remove contacts end");
-//        batchOperation.execute();
+        Set<String> allIdSet = syncData.getAllIdSet();
+        Set<String> idToDelete = new HashSet<>();
+        Set<String> idToAdd = new HashSet<>();
+        Set<String> idToUpdate = new HashSet<>();
 
-        // if allIdSet size != 0, just add these users to local database.
-        // if newly adding users to the group, these following code will be execute..
-        if(allIdSet.size() > 0 ) {
-            final List<XWikiUserFull> userList = new ArrayList<>();
-            final CountDownLatch countDown = new CountDownLatch(allIdSet.size());
-            for (String item : allIdSet) {
-                String[] splitted = XWikiUser.splitId(item);
-                AppContext.getApiManager().getXwikiServicesApi().getFullUserDetails(
-                        splitted[0],
-                        splitted[1],
-                        splitted[2]
-                ).subscribe(
-                        new Action1<XWikiUserFull>() {
-                            @Override
-                            public void call(XWikiUserFull xWikiUser) {
-                                userList.add(xWikiUser);
-                                countDown.countDown();
-                                addContact(context, account, xWikiUser, 0, true, batchOperation);
-                                if (batchOperation.size() >= 100) {
-                                    batchOperation.execute();
-                                }
-                            }
-                        },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                countDown.countDown();
-                            }
-                        }
-                );
+        for (String key: localUserMaps.keySet()) {
+            if (!allIdSet.contains(key)) {
+                idToAdd.add(key);
+            } else {
+                idToUpdate.add(key);
             }
-            try {
-                countDown.await();
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Can't await update of user", e);
-            }
-            batchOperation.execute();
-            updateAvatars(context, userList);
         }
+
+        for (String key: allIdSet) {
+            if (!localUserMaps.containsKey(key)) {
+                idToDelete.add(key);
+            }
+        }
+
+        for (String id : idToDelete) {
+            long rawId = localUserMaps.get(id);
+            deleteContact(context, rawId, batchOperation);
+            if (batchOperation.size() >= 100) {
+                batchOperation.execute();
+            }
+        }
+
+        for (String id : idToAdd) {
+            XWikiUserFull xWikiUserFull = null;
+            for (XWikiUserFull userFull : wikiUsers) {
+                if (userFull.id.equals(id)) {
+                    xWikiUserFull = userFull;
+                    break;
+                }
+            }
+            if (xWikiUserFull == null) {
+                continue;
+            }
+            addContact(
+                context,
+                account,
+                xWikiUserFull,
+                0,
+                true,
+                batchOperation
+            );
+            if (batchOperation.size() >= 100) {
+                batchOperation.execute();
+            }
+        }
+
+        for (String id : idToUpdate) {
+            XWikiUserFull xWikiUserFull = null;
+            for (XWikiUserFull userFull : wikiUsers) {
+                if (userFull.id.equals(id)) {
+                    xWikiUserFull = userFull;
+                    break;
+                }
+            }
+            if (xWikiUserFull == null) {
+                continue;
+            }
+            long rawContactId = lookupRawContact(resolver, id);
+            updateContact(
+                context,
+                resolver,
+                xWikiUserFull,
+                false,
+                true,
+                true,
+                true,
+                rawContactId,
+                batchOperation
+            );
+            if (batchOperation.size() >= 100) {
+                batchOperation.execute();
+            }
+        }
+        batchOperation.execute();
 
     }
 

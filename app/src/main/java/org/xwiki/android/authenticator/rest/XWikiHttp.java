@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -77,27 +78,27 @@ public class XWikiHttp {
     public static class SyncData {
         //the users which have been modified from the last sync time. mainly used for updating and adding..
         private List<XWikiUserFull> updateUserList;
-        //all the users in the server or all the users of the selected groups used for deleting.
-        private HashSet<String> allIdSet;
 
         public SyncData() {
             updateUserList = new ArrayList<>();
-            allIdSet = new HashSet<>();
         }
 
         public List<XWikiUserFull> getUpdateUserList() {
             return updateUserList;
         }
 
-        public HashSet<String> getAllIdSet() {
-            return allIdSet;
+        public Set<String> getAllIdSet() {
+            Set<String> idsSet = new HashSet<>();
+            for (XWikiUserFull user : getUpdateUserList()) {
+                idsSet.add(user.id);
+            }
+            return idsSet;
         }
 
         @Override
         public String toString() {
             return "SyncData{" +
                 "updateUserList=" + updateUserList +
-                ", allIdSet=" + allIdSet +
                 '}';
         }
     }
@@ -272,7 +273,6 @@ public class XWikiHttp {
         Date itemDate = null;
         final CountDownLatch countDown = new CountDownLatch(searchList.size());
         for (SearchResult item : searchList) {
-            syncData.allIdSet.add(item.id);
             itemDate = StringUtils.iso8601ToDate(item.modified);
             if (itemDate != null && itemDate.before(lastSynDate)) {
                 countDown.countDown();
