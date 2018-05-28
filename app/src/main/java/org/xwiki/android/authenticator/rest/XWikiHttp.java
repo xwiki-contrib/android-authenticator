@@ -61,59 +61,6 @@ public class XWikiHttp {
     private static final String TAG = "XWikiHttp";
     private static String serverRestPreUrl = null;
 
-
-    /**
-     * Sign Up
-     *
-     * @param userId    Required. user id which is used for login.
-     * @param password  Required. user's password
-     * @param formToken Required. the form token which is initialized before sign up
-     * @param captcha   Required if needed. the user's input captcha
-     * @param firstName Not Required. user's firstName
-     * @param lastName  Not Required. user's lastName
-     * @param email     Not Required. user's email
-     * @return Boolean
-     * true:  sign up successfully
-     * false: sign up unsuccessfully
-     * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
-     */
-    public static HttpResponse signUp(
-        String userId, String password,
-        String formToken,
-        String captcha,
-        String firstName,
-        String lastName,
-        String email
-    ) throws IOException {
-        String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
-        if (registerUrl.contains("www.xwiki.org")) {
-            registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
-        }
-        HttpRequest request = new HttpRequest(registerUrl, HttpRequest.HttpMethod.POST, null);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        request.httpParams.putBodyParams("form_token", formToken);
-        request.httpParams.putBodyParams("parent", "xwiki:Main.UserDirectory");
-        request.httpParams.putBodyParams("register_first_name", firstName);
-        request.httpParams.putBodyParams("register_last_name", lastName);
-        request.httpParams.putBodyParams("xwikiname", userId);
-        request.httpParams.putBodyParams("register_password", password);
-        request.httpParams.putBodyParams("register2_password", password);
-        request.httpParams.putBodyParams("register_email", email);
-        request.httpParams.putBodyParams("captcha_answer", captcha);
-        request.httpParams.putBodyParams("template", "XWiki.XWikiUserTemplate");
-        request.httpParams.putBodyParams("xredirect", "/xwiki/bin/view/Main/UserDirectory");
-        HttpResponse response = httpExecutor.performRequest(request);
-        return response;
-
-        /*
-        formToken = document.select("input[name=template]").val();
-        if (TextUtils.isEmpty(formToken)) {
-            return true;
-        }
-        */
-        //return false;
-    }
-
     /**
      * before sign up, we should init the cookie, get the form token and the captcha.
      *
@@ -131,46 +78,6 @@ public class XWikiHttp {
         HttpExecutor httpExecutor = new HttpExecutor();
         HttpResponse response = httpExecutor.performRequest(request);
         return response;
-    }
-
-
-    /**
-     * sign up
-     *
-     * @param userId
-     * @param password
-     * @param formToken
-     * @return
-     */
-    public static HttpResponse signUp(String userId, String password, String formToken, String captcha) throws IOException {
-        return signUp(userId, password, formToken, captcha, "", "", "");
-    }
-
-    /**
-     * get user information
-     *
-     * @param wiki
-     * @param space
-     * @param name
-     * @return XWikiUser
-     * Without Getting LastModifiedDate
-     * @throws IOException
-     * @throws XmlPullParserException
-     */
-    public static XWikiUser getUserDetail(String wiki, String space, String name) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/" + wiki + "/spaces/" + space + "/pages/" + name + "/objects/XWiki.XWikiUsers/0";
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode == 404) {
-            return null;
-        }
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        XWikiUser user = XmlUtils.getXWikiUser(new ByteArrayInputStream(response.getContentData()));
-        return user;
     }
 
     /**
