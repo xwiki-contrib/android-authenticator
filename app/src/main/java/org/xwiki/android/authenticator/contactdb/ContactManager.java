@@ -128,21 +128,20 @@ public class ContactManager {
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
         Set<String> allIdSet = syncData.getAllIdSet();
-        Set<String> idToDelete = new HashSet<>();
-        Set<String> idToAdd = new HashSet<>();
+        Set<String> idToDelete = new HashSet<>(localUserMaps.keySet());
+        Set<String> idToAdd = new HashSet<>(allIdSet);
         Set<String> idToUpdate = new HashSet<>();
 
-        for (String key: localUserMaps.keySet()) {
-            if (!allIdSet.contains(key)) {
-                idToAdd.add(key);
-            } else {
+        for (String key: allIdSet) {
+            if (localUserMaps.containsKey(key)) {
+                idToAdd.remove(key);
                 idToUpdate.add(key);
             }
         }
 
-        for (String key: allIdSet) {
-            if (!localUserMaps.containsKey(key)) {
-                idToDelete.add(key);
+        for (String key: localUserMaps.keySet()) {
+            if (allIdSet.contains(key)) {
+                idToDelete.remove(key);
             }
         }
 
