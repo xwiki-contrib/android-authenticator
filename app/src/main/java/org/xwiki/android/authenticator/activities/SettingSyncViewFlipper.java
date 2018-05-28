@@ -58,7 +58,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
@@ -105,6 +107,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         });
 
         mListView = (ListView) findViewById(R.id.list_view);
+        mListView.setEmptyView(
+            findViewById(R.id.list_viewProgressBar)
+        );
         groupList = new ArrayList<>();
         searchResults = new ArrayList<>();
         mGroupAdapter = new GroupListAdapter(mContext, groupList);
@@ -118,14 +123,16 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position == Constants.SYNC_TYPE_NO_NEED_SYNC){
                     mListView.setVisibility(View.GONE);
-                }else if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
-                    mListView.setVisibility(View.VISIBLE);
-                    mListView.setAdapter(mGroupAdapter);
-                    mGroupAdapter.refresh(groupList);
-                }else{
-                    mListView.setVisibility(View.VISIBLE);
-                    mListView.setAdapter(mUsersAdapter);
-                    mUsersAdapter.refresh(searchResults);
+                }else {
+                    if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
+                        mListView.setVisibility(View.VISIBLE);
+                        mListView.setAdapter(mGroupAdapter);
+                        mGroupAdapter.refresh(groupList);
+                    }else{
+                        mListView.setVisibility(View.VISIBLE);
+                        mListView.setAdapter(mUsersAdapter);
+                        mUsersAdapter.refresh(searchResults);
+                    }
                 }
                 SYNC_TYPE = position;
                 ((TextView) view).setTextColor(Color.BLACK);
@@ -140,10 +147,11 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     public void initData() {
-        AnimUtils.refreshImageView(mContext, mActivity.refreshImageView);
         getApiManager().getXwikiServicesApi().availableGroups(
                 Constants.LIMIT_MAX_SYNC_USERS
-        ).subscribe(
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
                 new Action1<CustomSearchResultContainer<XWikiGroup>>() {
                     @Override
                     public void call(CustomSearchResultContainer<XWikiGroup> xWikiGroupCustomSearchResultContainer) {
@@ -151,43 +159,28 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                         if (searchResults != null) {
                             groupList.clear();
                             groupList.addAll(searchResults);
-                            mActivity.runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-                                        if (selectSyncSpinner.getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                            mListView.setAdapter(mGroupAdapter);
-                                            mGroupAdapter.refresh(groupList);
-                                        }
-                                    }
-                                }
-                            );
+                            if (selectSyncSpinner.getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                                mListView.setAdapter(mGroupAdapter);
+                                mGroupAdapter.refresh(groupList);
+                            }
                         }
                     }
                 }
         );
-        getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
-            new Action1<SearchResultContainer>() {
-                @Override
-                public void call(SearchResultContainer searchResultContainer) {
-                    searchResults.clear();
-                    searchResults.addAll(searchResultContainer.searchResults);
-                    mActivity.runOnUiThread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                AnimUtils.hideRefreshAnimation(mActivity.refreshImageView);
-                                if (selectSyncSpinner.getSelectedItemPosition() != Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                    mListView.setAdapter(mUsersAdapter);
-                                    mUsersAdapter.refresh(searchResults);
-                                }
-                            }
+        getApiManager().getXwikiServicesApi().getAllUsersPreview()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                new Action1<SearchResultContainer>() {
+                    @Override
+                    public void call(SearchResultContainer searchResultContainer) {
+                        searchResults.clear();
+                        searchResults.addAll(searchResultContainer.searchResults);
+                        if (selectSyncSpinner.getSelectedItemPosition() != Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                            mListView.setAdapter(mUsersAdapter);
+                            mUsersAdapter.refresh(searchResults);
                         }
-                    );
-
+                    }
                 }
-            }
         );
     }
 
