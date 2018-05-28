@@ -31,6 +31,7 @@ import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.bean.XWikiUserFull;
 import org.xwiki.android.authenticator.utils.ImageUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
@@ -208,16 +209,16 @@ public class XWikiHttp {
 
     public static class SyncData {
         //the users which have been modified from the last sync time. mainly used for updating and adding..
-        List<XWikiUser> updateUserList;
+        private List<XWikiUserFull> updateUserList;
         //all the users in the server or all the users of the selected groups used for deleting.
-        HashSet<String> allIdSet;
+        private HashSet<String> allIdSet;
 
         public SyncData() {
             updateUserList = new ArrayList<>();
             allIdSet = new HashSet<>();
         }
 
-        public List<XWikiUser> getUpdateUserList() {
+        public List<XWikiUserFull> getUpdateUserList() {
             return updateUserList;
         }
 
@@ -306,7 +307,7 @@ public class XWikiHttp {
                 new Action1<Map<String, String>>() {
                     @Override
                     public void call(Map<String, String> pairs) {
-                        syncData.updateUserList.addAll(
+                        syncData.getUpdateUserList().addAll(
                             getDetailedInfo(
                                 pairs
                             )
@@ -334,19 +335,19 @@ public class XWikiHttp {
      * @param from Key-value pairs where key - username, value - space
      * @return List of users
      */
-    private static List<XWikiUser> getDetailedInfo(Map<String, String> from) {
-        final List<XWikiUser> users = new ArrayList<>();
+    private static List<XWikiUserFull> getDetailedInfo(Map<String, String> from) {
+        final List<XWikiUserFull> users = new ArrayList<>();
 
         final CountDownLatch countDown = new CountDownLatch(from.size());
 
         for (final String userPage : from.keySet()) {
-            getApiManager().getXwikiServicesApi().getUserDetails(
+            getApiManager().getXwikiServicesApi().getFullUserDetails(
                 from.get(userPage),
                 userPage
             ).subscribe(
-                new Action1<XWikiUser>() {
+                new Action1<XWikiUserFull>() {
                     @Override
-                    public void call(XWikiUser xWikiUser) {
+                    public void call(XWikiUserFull xWikiUser) {
                         users.add(xWikiUser);
                         countDown.countDown();
                     }
@@ -403,15 +404,15 @@ public class XWikiHttp {
                 String wiki = splitted[0];
                 String space = splitted[1];
                 String pageName = splitted[2];
-                getApiManager().getXwikiServicesApi().getUserDetails(
+                getApiManager().getXwikiServicesApi().getFullUserDetails(
                     wiki,
                     space,
                     pageName
                 ).subscribe(
-                    new Action1<XWikiUser>() {
+                    new Action1<XWikiUserFull>() {
                         @Override
-                        public void call(XWikiUser xWikiUser) {
-                            syncData.updateUserList.add(xWikiUser);
+                        public void call(XWikiUserFull xWikiUser) {
+                            syncData.getUpdateUserList().add(xWikiUser);
                             countDown.countDown();
                         }
                     },

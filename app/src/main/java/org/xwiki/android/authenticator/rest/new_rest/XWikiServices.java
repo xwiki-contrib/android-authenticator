@@ -25,6 +25,7 @@ import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultCont
 import org.xwiki.android.authenticator.bean.UserPayload;
 import org.xwiki.android.authenticator.bean.XWikiGroup;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.bean.XWikiUserFull;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -84,6 +85,35 @@ public interface XWikiServices {
     Observable<XWikiUser> getUserDetails(
             @Path("space") String space,
             @Path("name") String name
+    );
+
+    @GET(
+        ApiEndPoints.REST +
+            ApiEndPoints.WIKIS +
+            "/xwiki/" +
+            ApiEndPoints.SPACES +
+            "/{space}/" +
+            ApiEndPoints.PAGES +
+            "/{name}/objects/XWiki.XWikiUsers/0"
+    )
+    Observable<XWikiUserFull> getFullUserDetails(
+        @Path("space") String space,
+        @Path("name") String name
+    );
+
+    @GET(
+        ApiEndPoints.REST +
+            ApiEndPoints.WIKIS +
+            "/{wiki}/" +
+            ApiEndPoints.SPACES +
+            "/{space}/" +
+            ApiEndPoints.PAGES +
+            "/{name}/objects/XWiki.XWikiUsers/0"
+    )
+    Observable<XWikiUserFull> getFullUserDetails(
+        @Path("wiki") String wiki,
+        @Path("space") String space,
+        @Path("name") String name
     );
 
     @GET(
