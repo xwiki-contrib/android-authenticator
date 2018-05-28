@@ -74,26 +74,6 @@ public class XWikiHttp {
         return response;
     }
 
-    /**
-     * update user information
-     *
-     * @param user
-     * @return true:update success, false:update fail
-     * @throws IOException curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
-     */
-    public static HttpResponse updateUser(XWikiUser user) throws IOException {
-        String url = getServerRestUrl() + "/wikis/" + user.wiki + "/spaces/" + user.space + "/pages/" + user.pageName + "/objects/XWiki.XWikiUsers/0";
-        HttpRequest request = new HttpRequest(url, HttpRequest.HttpMethod.PUT, null);
-        request.httpParams.putBodyParams("className", "XWiki.XWikiUsers");
-        request.httpParams.putBodyParams("property#first_name", user.firstName);
-        request.httpParams.putBodyParams("property#last_name", user.lastName);
-        request.httpParams.putBodyParams("property#email", user.email);
-        request.httpParams.putBodyParams("property#phone", user.phone);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        return response;
-    }
-
     public static class SyncData {
         //the users which have been modified from the last sync time. mainly used for updating and adding..
         private List<XWikiUserFull> updateUserList;
