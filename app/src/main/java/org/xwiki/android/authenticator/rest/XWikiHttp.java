@@ -29,6 +29,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
 import org.xwiki.android.authenticator.bean.SearchResult;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.bean.XWikiUserFull;
@@ -46,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -366,13 +368,24 @@ public class XWikiHttp {
      * @throws XmlPullParserException
      */
     private static SyncData getSyncAllUsers(String lastSyncTime) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
-        HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
+        final List<SearchResult> searchList = new ArrayList<>();
+        final Semaphore semaphore = new Semaphore(1);
+        try {
+            semaphore.acquire();
+            getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
+                new Action1<SearchResultContainer>() {
+                    @Override
+                    public void call(SearchResultContainer searchResultContainer) {
+                        searchList.addAll(searchResultContainer.searchResults);
+                        semaphore.release();
+                    }
+                }
+            );
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
+
         final SyncData syncData = new SyncData();
         Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
         Date itemDate = null;
@@ -380,7 +393,7 @@ public class XWikiHttp {
         for (SearchResult item : searchList) {
             syncData.allIdSet.add(item.id);
             itemDate = StringUtils.iso8601ToDate(item.modified);
-            if (itemDate.before(lastSynDate)) {
+            if (itemDate != null && itemDate.before(lastSynDate)) {
                 countDown.countDown();
                 continue;
             } else {
