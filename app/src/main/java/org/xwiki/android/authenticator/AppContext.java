@@ -22,7 +22,7 @@ package org.xwiki.android.authenticator;
 import android.app.Application;
 import android.util.Log;
 
-import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
+import org.xwiki.android.authenticator.rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.AbstractMap;

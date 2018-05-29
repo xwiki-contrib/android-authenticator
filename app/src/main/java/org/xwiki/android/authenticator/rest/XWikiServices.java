@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authenticator.rest.new_rest;
+package org.xwiki.android.authenticator.rest;
 
 import org.xwiki.android.authenticator.bean.ObjectSummary;
-import org.xwiki.android.authenticator.bean.RegisterForm;
 import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
@@ -40,7 +39,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
-import static org.xwiki.android.authenticator.rest.new_rest.ApiEndPoints.SPACES;
+import static org.xwiki.android.authenticator.rest.ApiEndPoints.SPACES;
 
 public interface XWikiServices {
 

@@ -1,4 +1,4 @@
-package org.xwiki.android.authenticator.rest.new_rest;
+package org.xwiki.android.authenticator.rest;
 
 import org.xwiki.android.authenticator.bean.XWikiUser;
 

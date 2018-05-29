@@ -33,16 +33,10 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-
-import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
 /**
  * SignInViewFlipper.
