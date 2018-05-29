@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
+import retrofit2.HttpException;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -79,6 +80,8 @@ public class XWikiHttp {
         //the users which have been modified from the last sync time. mainly used for updating and adding..
         private List<XWikiUserFull> updateUserList;
 
+        private Set<String> additionalIds = new HashSet<>();
+
         public SyncData() {
             updateUserList = new ArrayList<>();
         }
@@ -88,11 +91,15 @@ public class XWikiHttp {
         }
 
         public Set<String> getAllIdSet() {
-            Set<String> idsSet = new HashSet<>();
+            Set<String> idsSet = new HashSet<>(additionalIds);
             for (XWikiUserFull user : getUpdateUserList()) {
                 idsSet.add(user.id);
             }
             return idsSet;
+        }
+
+        public void addAdditionalId(String id) {
+            additionalIds.add(id);
         }
 
         @Override
@@ -142,6 +149,7 @@ public class XWikiHttp {
         if (groupIdList == null || groupIdList.size() == 0) return null;
         final SyncData syncData = new SyncData();
         final CountDownLatch groupsCountDown = new CountDownLatch(groupIdList.size());
+        final List<Throwable> throwables = new ArrayList<>();
         for (String groupId : groupIdList) {
             String[] split = XWikiUser.splitId(groupId);
             if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
@@ -149,43 +157,26 @@ public class XWikiHttp {
                 split[0],
                 split[1],
                 split[2]
-            ).map(
-                // Map<String, String> : keys - usernames, values - spaces
-                new Func1<CustomObjectsSummariesContainer<ObjectSummary>, Map<String, String>>() {
-                    @Override
-                    public Map<String, String> call(CustomObjectsSummariesContainer<ObjectSummary> xWikiUserCustomObjectsSummariesContainer) {
-                        Map<String, String> pairs = new HashMap<>();
-
-                        for (ObjectSummary summary : xWikiUserCustomObjectsSummariesContainer.objectSummaries) {
-                            try {
-                                Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
-                                pairs.put(
-                                    spaceAndName.getValue(),
-                                    spaceAndName.getKey()
-                                );
-                            } catch (Exception e) {
-                                Log.e(TAG, "Can't transform group member headline", e);
-                            }
-                        }
-
-                        return pairs;
-                    }
-                }
             ).subscribe(
-                new Action1<Map<String, String>>() {
+                new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
-                    public void call(Map<String, String> pairs) {
-                        syncData.getUpdateUserList().addAll(
+                    public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
+                        try {
                             getDetailedInfo(
-                                pairs
-                            )
-                        );
+                                summaries.objectSummaries,
+                                syncData
+                            );
+                        } catch (IOException e) {
+                            Log.e(TAG, "Can't get users info", e);
+                            throwables.add(e);
+                        }
                         groupsCountDown.countDown();
                     }
                 },
                 new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        throwables.add(throwable);
                         groupsCountDown.countDown();
                     }
                 }
@@ -196,6 +187,9 @@ public class XWikiHttp {
         } catch (InterruptedException e) {
             Log.e(TAG, "Can't await update of user", e);
         }
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't get groups info");
+        }
         return syncData;
     }
 
@@ -203,31 +197,45 @@ public class XWikiHttp {
      * @param from Key-value pairs where key - username, value - space
      * @return List of users
      */
-    private static List<XWikiUserFull> getDetailedInfo(Map<String, String> from) {
-        final List<XWikiUserFull> users = new ArrayList<>();
+    private static void getDetailedInfo(List<ObjectSummary> from, final SyncData to) throws IOException {
 
         final CountDownLatch countDown = new CountDownLatch(from.size());
 
-        for (final String userPage : from.keySet()) {
-            getApiManager().getXwikiServicesApi().getFullUserDetails(
-                from.get(userPage),
-                userPage
-            ).subscribe(
-                new Action1<XWikiUserFull>() {
-                    @Override
-                    public void call(XWikiUserFull xWikiUser) {
-                        users.add(xWikiUser);
-                        countDown.countDown();
+        final List<Throwable> throwables = new ArrayList<>();
+
+        for (final ObjectSummary summary : from) {
+            if (!throwables.isEmpty()) {
+                throw new IOException("Can't synchronize users info: " + from);
+            }
+            try {
+                Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
+                getApiManager().getXwikiServicesApi().getFullUserDetails(
+                    spaceAndName.getKey(),
+                    spaceAndName.getValue()
+                ).subscribe(
+                    new Action1<XWikiUserFull>() {
+                        @Override
+                        public void call(XWikiUserFull xWikiUser) {
+                            to.getUpdateUserList().add(xWikiUser);
+                            countDown.countDown();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.e(TAG, "Can't get user info: " + summary.headline, throwable);
+                            if (!HttpException.class.isInstance(throwable) || ((HttpException)throwable).code() != 404) {
+                                throwables.add(throwable);
+                            }
+                            countDown.countDown();
+                        }
                     }
-                },
-                new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Log.e(TAG, "Can't get user info", throwable);
-                        countDown.countDown();
-                    }
-                }
-            );
+                );
+            } catch (Exception e) {
+                to.addAdditionalId(summary.headline);
+                countDown.countDown();
+                Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
+            }
         }
 
         try {
@@ -235,7 +243,9 @@ public class XWikiHttp {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return users;
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't synchronize users info: " + from);
+        }
     }
 
     /**
@@ -271,8 +281,9 @@ public class XWikiHttp {
         final SyncData syncData = new SyncData();
         Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
         Date itemDate = null;
+        final List<Throwable> throwables = new ArrayList<>();
         final CountDownLatch countDown = new CountDownLatch(searchList.size());
-        for (SearchResult item : searchList) {
+        for (final SearchResult item : searchList) {
             itemDate = StringUtils.iso8601ToDate(item.modified);
             if (itemDate != null && itemDate.before(lastSynDate)) {
                 countDown.countDown();
@@ -298,6 +309,11 @@ public class XWikiHttp {
                         @Override
                         public void call(Throwable e) {
                             Log.e(TAG, "Can't get user", e);
+                            if (!HttpException.class.isInstance(e) || ((HttpException)e).code() != 404) {
+                                throwables.add(e);
+                            } else {
+                                syncData.addAdditionalId(item.id);
+                            }
                             countDown.countDown();
                         }
                     }
@@ -318,6 +334,9 @@ public class XWikiHttp {
             countDown.await();
         } catch (InterruptedException e) {
             Log.e(TAG, "Can't perform `getSyncAllUsers`", e);
+        }
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't synchronize all users");
         }
         return syncData;
     }

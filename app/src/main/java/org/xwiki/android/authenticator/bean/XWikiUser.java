@@ -177,6 +177,13 @@ public class XWikiUser {
                     id.indexOf(":") + 1//substring with position of ":" will return string from ":" sign
             );
         }
+        // If still contains ":"
+        if (id.contains(":")) {
+            id = id.substring(
+                0,
+                id.indexOf(":")//substring with position of ":" will return string from ":" sign
+            );
+        }
         String[] splitted = id.split("\\.");
         return new AbstractMap.SimpleEntry<>(splitted[0], splitted[1]);
     }
