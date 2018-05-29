@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources><string name="app_name">XWiki Authenticator</string>
+    <string name="label">XWiki</string>
+    <string name="login_label">Connexion</string>
+
+    <string name="first_name">Prénom</string>
+    <string name="last_name">Nom</string>
+    <string name="user_id">Id utilisateur (Requis)\t</string>
+    <string name="phone">Téléphone mobile</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe (Requis)</string>
+    <string name="confirm_password">Confirmez le mot de passe (Requis)\t</string>
+    <string name="captcha_textview">Entrez le captcha</string>
+
+    <string name="login_activity_username_label">Nom d\'utilisateur</string>
+    <string name="login_activity_password_label">Mot de passe</string>
+    <string name="login_activity_server_label">Serveur</string>
+    <string name="login_activity_port_label">Port</string>
+    <string name="login_activity_ok_button">Connexion</string>
+    <string name="login_activity_register_button">Inscription</string>
+    <string name="menu_save">Enregistrer</string>
+    <string name="menu_refresh">Rafraîchir</string>
+    <string name="menu_ok">OK</string>
+
+    <string name="title_activity_edit_contact">Éditer le contact</string>
+    <string name="title_activity_sign_up">Inscription</string>
+    <string name="title_activity_authorize">Autoriser</string>
+    <string name="title_activity_select_groups">Sélectionner les groupes</string>
+    <string name="title_activity_setting">Paramètres</string>
+
+    <string name="error_invalid_server">L\'adresse du serveur est invalide</string>
+    <string name="error_invalid_email">Cette adresse e-mail n\'est pas valide</string>
+    <string name="error_invalid_password">Ce mot de passe est trop court</string>
+    <string name="error_incorrect_password">Ce mot de passe est incorrect\t</string>
+    <string name="error_field_required">Ce champ est requis</string>
+    <string name="error_confirm_password">Les mots de passe ne correspondent pas</string>
+    <string name="error_userid_password">Cet ID utilisateur est incorrect</string>
+    <string name="error_invalid_captcha">Ce captcha est invalide</string>
+
+    <string name="profile_action">Profil XWiki</string>
+    <string name="view_profile">Éditer le contact</string>
+
+    <string name="authorize_activity_note">Veuillez cliquer pour autoriser l\'application tierce à accéder à votre compte.</string>
+    <string name="account_name">Nom du compte</string>
+    <string name="cancel">Annuler</string>
+    <string name="grant_permission_button">Autoriser</string>
+    <string name="server_url">http://www.xwiki.org/xwiki</string>
+    <string name="login_sub_head">Connectez-vous à votre instance XWiki.</string>
+    <string name="learn_more_dialog">En savoir plus</string>
+    <string name="log_in">Se connecter</string>
+    <string name="don_t_have_a_account">Pas encore de compte XWiki ?</string>
+    <string name="create_one">Créez-en un</string>
+    <string name="error_message">Message d\'erreur</string>
+    <string name="register">Enregistrement</string>
+    <string name="next">Suivant</string>
+    <string name="about_version">À propos de la version</string>
+    <string name="version">Version 1.0</string>
+    <string name="complete">Finaliser</string>
+
+
+    </resources>
