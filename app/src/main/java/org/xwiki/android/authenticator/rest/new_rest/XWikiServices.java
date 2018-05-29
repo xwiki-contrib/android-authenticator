@@ -47,11 +47,6 @@ public interface XWikiServices {
     @POST("bin/login/XWiki/XWikiLogin")
     Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
 
-    @POST("bin/view/XWiki/Registration")
-    Observable<Response<ResponseBody>> signUp(
-        @Body RegisterForm form
-    );
-
     @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
     Observable<ResponseBody> updateUser(
             @Path("wiki") String wiki,

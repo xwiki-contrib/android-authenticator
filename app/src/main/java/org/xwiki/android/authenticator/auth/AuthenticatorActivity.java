@@ -50,8 +50,6 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
 import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SignInViewFlipper;
-import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
-import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
 import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
