@@ -43,6 +43,10 @@ public class AppContext extends Application {
         return instance;
     }
 
+    public static String currentBaseUrl() {
+        return SharedPrefsUtils.getValue(instance, Constants.SERVER_ADDRESS, null);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,7 +73,7 @@ public class AppContext extends Application {
     }
 
     public static BaseApiManager getApiManager() {
-        String url = SharedPrefsUtils.getValue(instance, Constants.SERVER_ADDRESS, null);
+        String url = currentBaseUrl();
         if (baseApiManager == null || !baseApiManager.getKey().equals(url)) {
             baseApiManager = new AbstractMap.SimpleEntry<>(
                 url,

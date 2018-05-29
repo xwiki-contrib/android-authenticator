@@ -50,12 +50,15 @@ import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
 import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SignInViewFlipper;
+import org.xwiki.android.authenticator.utils.IntentUtils;
 import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.xwiki.android.authenticator.AppContext.currentBaseUrl;
 
 
 /**
@@ -75,8 +78,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     private SettingIpViewFlipper settingsIpViewFlipper;
     private SignInViewFlipper signInViewFlipper;
     private SettingSyncViewFlipper settingSyncViewFlipper;
-    private SignUpStep1ViewFlipper signUpStep1ViewFlipper;
-    private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
 
     private AccountManager mAccountManager;
     AlertDialog.Builder builder;
@@ -106,9 +107,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
             @Override
             public void onClick(View v) {
                 int id = mViewFlipper.getDisplayedChild();
-                if(id == ViewFlipperLayoutId.SIGN_UP_STEP2){
-                    signUpStep2ViewFlipper.initData();
-                }else if(id == ViewFlipperLayoutId.SETTING_SYNC){
+                if(id == ViewFlipperLayoutId.SETTING_SYNC){
                     settingSyncViewFlipper.initData();
                 }
             }
@@ -222,20 +221,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                     settingSyncViewFlipper.doPrevious();
                 }
                 break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP1:
-                if (next) {
-                    signUpStep1ViewFlipper.doNext();
-                } else {
-                    signUpStep1ViewFlipper.doPrevious();
-                }
-                break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                if (next) {
-                    signUpStep2ViewFlipper.doNext();
-                } else {
-                    signUpStep2ViewFlipper.doPrevious();
-                }
-                break;
             default:
                 break;
         }
@@ -255,16 +240,22 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         AlertDialog dialog=builder.create();
         dialog.show();
     }
-    public void signUp(View view)
-    {
-        showViewFlipper(ViewFlipperLayoutId.SIGN_UP_STEP1);
+    public void signUp(View view) {
+        String url = currentBaseUrl();
+        if (url.endsWith("/")) {
+            url += "bin/view/XWiki/Registration";
+        } else {
+            url += "/bin/view/XWiki/Registration";
+        }
+        Intent intent = IntentUtils.openLink(
+            url
+        );
+        startActivity(intent);
     }
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
         int SIGN_IN = 1;
         int SETTING_SYNC = 2;
-        int SIGN_UP_STEP1 = 3;
-        int SIGN_UP_STEP2 = 4;
     }
 
     public void showViewFlipper(int id) {
@@ -294,26 +285,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 toolbar.setTitle("Setting Sync");
 
                 break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP1:
-                if (signUpStep1ViewFlipper == null) {
-                    signUpStep1ViewFlipper = new SignUpStep1ViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Sign Up Step1");
-
-                break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                refreshImageView.setVisibility(View.VISIBLE);
-                if (signUpStep2ViewFlipper == null) {
-                    signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Sign Up Step2");
-
-                break;
         }
-    }
-
-    public String[] getStep1Values() {
-        return signUpStep1ViewFlipper.getValues();
     }
 
 
