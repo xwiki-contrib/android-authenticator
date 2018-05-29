@@ -20,6 +20,7 @@
 package org.xwiki.android.authenticator.rest.new_rest;
 
 import org.xwiki.android.authenticator.bean.ObjectSummary;
+import org.xwiki.android.authenticator.bean.RegisterForm;
 import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomSearchResultContainer;
@@ -45,6 +46,11 @@ public interface XWikiServices {
 
     @POST("bin/login/XWiki/XWikiLogin")
     Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
+
+    @POST("bin/view/XWiki/Registration")
+    Observable<Response<ResponseBody>> signUp(
+        @Body RegisterForm form
+    );
 
     @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
     Observable<ResponseBody> updateUser(

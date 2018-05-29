@@ -38,6 +38,9 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.bean.RegisterForm;
+import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.exceptions.NeedCaptchaException;
 import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.AnimUtils;
@@ -154,6 +157,58 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
     //0:false, 1:true, null:network error, 2:the user exists.
     public void register() {
         final String[] step1Values = mActivity.getStep1Values();
+        AppContext.getApiManager().getXwikiServicesApi().getUserDetails(
+            "xwiki",
+            "XWiki",
+            userId
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                new Action1<XWikiUser>() {
+                    @Override
+                    public void call(XWikiUser xWikiUser) {
+                        showErrorMessage(mContext.getString(R.string.userExists));
+                    }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        XWikiHttp.signUp(
+                            userId,
+                            password,
+                            formToken,
+                            captcha,
+                            step1Values[0],
+                            step1Values[1],
+                            step1Values[2]
+                        ).observeOn(
+                            AndroidSchedulers.mainThread()
+                        ).subscribe(
+                            new Action1<Boolean>() {
+                                @Override
+                                public void call(Boolean registered) {
+                                    if (registered) {
+                                        finishSignUp();
+                                        mActivity.hideInputMethod();
+                                        mActivity.showViewFlipper(
+                                            AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC
+                                        );
+                                    }
+                                }
+                            },
+                            new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    if (NeedCaptchaException.class.isInstance(throwable)) {
+                                        showErrorMessage("Captcha error");
+                                        refreshCaptcha();
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+            );
 //        mSignUpTask = new AsyncTask<Void, Void, Object>() {
 //            @Override
 //            protected Object doInBackground(Void... params) {
@@ -173,6 +228,9 @@ public class SignUpStep2ViewFlipper extends BaseViewFlipper {
 //                //sign up
 //                try {
 //                    //boolean signUpFlag = XWikiHttp.signUp(userId, password, formToken, captcha);
+//                    new RegisterForm(
+//                        formToken, step1Values[0], step1Values[1], userId, password, password, step1Values[2], captcha
+//                        )
 //                    HttpResponse response = XWikiHttp.signUp(userId, password, formToken, captcha, step1Values[0], step1Values[1], step1Values[2]);
 //                    return response;
 //                } catch (IOException e) {

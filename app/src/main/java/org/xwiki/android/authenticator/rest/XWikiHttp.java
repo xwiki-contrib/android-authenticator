@@ -26,6 +26,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
+import org.xwiki.android.authenticator.bean.RegisterForm;
 import org.xwiki.android.authenticator.bean.SearchResult;
 import org.xwiki.android.authenticator.bean.SearchResultContainer;
 import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
@@ -82,7 +83,66 @@ public class XWikiHttp {
         HttpResponse response = httpExecutor.performRequest(request);
         return response;
     }
+    /**
+     * Sign Up
+     *
+     * @param userId    Required. user id which is used for login.
+     * @param password  Required. user's password
+     * @param formToken Required. the form token which is initialized before sign up
+     * @param captcha   Required if needed. the user's input captcha
+     * @param firstName Not Required. user's firstName
+     * @param lastName  Not Required. user's lastName
+     * @param email     Not Required. user's email
+     * @return Boolean
+     * true:  sign up successfully
+     * false: sign up unsuccessfully
+     * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
+     */
+    public static Observable<Boolean> signUp(
+        String userId,
+        String password,
+        String formToken,
+        String captcha,
+        String firstName,
+        String lastName,
+        String email
+    ) {
+        final PublishSubject<Boolean> subject = PublishSubject.create();
+        getApiManager().getXwikiServicesApi().signUp(
+            new RegisterForm(
+                formToken,
+                firstName,
+                lastName,
+                userId,
+                password,
+                email,
+                captcha
+            )
+        ).subscribe(
+            new Action1<Response<ResponseBody>>() {
+                @Override
+                public void call(Response<ResponseBody> responseBodyResponse) {
+                    subject.onNext(true);
+                }
+            },
+            new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    subject.onError(throwable);
+                }
+            }
+        );
 
+        return subject;
+
+        /*
+        formToken = document.select("input[name=template]").val();
+        if (TextUtils.isEmpty(formToken)) {
+            return true;
+        }
+        */
+        //return false;
+    }
     public static Observable<String> login(
         String username,
         String password
