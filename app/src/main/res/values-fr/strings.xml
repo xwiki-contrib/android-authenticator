@@ -8,5 +8,5 @@
     <string name="user_id">Id utilisateur (obligatoire)\t</string>
     <string name="phone">Téléphone mobile</string>
     <string name="email">Email</string>
-    <string name="password">Mot de passe (obligatoire)</string>
+    <string name="password">Mot de passe (requis)</string>
     </resources>
