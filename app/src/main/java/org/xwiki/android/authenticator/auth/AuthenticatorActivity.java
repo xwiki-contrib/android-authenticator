@@ -99,6 +99,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         setContentView(R.layout.act_authenticator);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
+        PermissionsUtils permissionsUtils = new PermissionsUtils(this);
+        if (!permissionsUtils.checkPermissions()) {
+            permissionsUtils.requestPermissions(REQUEST_PERMISSIONS_CODE);
+        }
+
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
@@ -156,19 +161,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         clearAsyncTask();
     }
 
-    /**
-     * now it's useless because of compile sdk 22
-     */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Deprecated
-    public void checkPermissions(){
-        mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
-        if (!mPermissions.checkPermissions()) {
-            mPermissions.requestPermissions(REQUEST_PERMISSIONS_CODE);
-        }else{
-            settingSyncViewFlipper.syncSettingComplete();
-        }
-    }
     /**
      * now it's useless because of compile sdk 22
      */

@@ -49,6 +49,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final AccountManager mAccountManager;
     private final Context mContext;
 
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+        mContext = context;
+        mAccountManager = AccountManager.get(context);
+    }
+
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
@@ -100,7 +106,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             syncResult.stats.numParseExceptions++;
         }
     }
-
 
     /**
      * This helper function fetches the last known high-water-mark
