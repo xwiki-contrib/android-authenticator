@@ -39,6 +39,7 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import okhttp3.Credentials;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
@@ -101,22 +102,35 @@ public class SignInViewFlipper extends BaseViewFlipper {
         final String userName = accountName.toString();
         final String userPass = accountPassword.toString();
 
-        BaseApiManager apiManager = getApiManager();
-
-        String authtoken = XWikiHttp.login(
+        XWikiHttp.login(
             userName,
             userPass
-        );
-
-        if (authtoken == null) {
-            showErrorMessage(mContext.getString(R.string.loginError));
-        } else {
-            signedIn(
-                authtoken,
-                userName,
-                userPass
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                new Action1<String>() {
+                    @Override
+                    public void call(String authtoken) {
+                        mActivity.hideProgress();
+                        if (authtoken == null) {
+                            showErrorMessage(mContext.getString(R.string.loginError));
+                        } else {
+                            signedIn(
+                                authtoken,
+                                userName,
+                                userPass
+                            );
+                        }
+                    }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mActivity.hideProgress();
+                        showErrorMessage(mContext.getString(R.string.loginError));
+                    }
+                }
             );
-        }
     }
 
     private Intent prepareIntent(String authtoken, String username, String password) {

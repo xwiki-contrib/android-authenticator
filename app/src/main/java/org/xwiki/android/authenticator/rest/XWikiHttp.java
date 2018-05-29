@@ -49,8 +49,11 @@ import okhttp3.Credentials;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
+import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
@@ -80,48 +83,33 @@ public class XWikiHttp {
         return response;
     }
 
-    @Nullable
-    public static String login(
+    public static Observable<String> login(
         String username,
         String password
     ) {
-        final String[] result = new String[]{null};
-        final Boolean[] response = new Boolean[]{false};
+        final PublishSubject<String> authTokenSubject = PublishSubject.create();
         getApiManager().getXwikiServicesApi().login(
             Credentials.basic(username, password)
         ).subscribe(
             new Action1<Response<ResponseBody>>() {
                 @Override
                 public void call(Response<ResponseBody> responseBodyResponse) {
-                    String authtoken = responseBodyResponse.headers().get("Set-Cookie");
-                    synchronized (response) {
-                        result[0] = authtoken;
-                        response[0] = true;
-                        response.notifyAll();
+                    if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
+                        authTokenSubject.onNext(responseBodyResponse.headers().get("Set-Cookie"));
+                    } else {
+                        authTokenSubject.onNext(null);
                     }
+                    authTokenSubject.onCompleted();
                 }
             },
             new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    synchronized (response) {
-                        response[0] = true;
-                        response.notifyAll();
-                    }
+                    authTokenSubject.onError(throwable);
                 }
             }
         );
-
-        synchronized (response) {
-            while (!response[0]) {
-                try {
-                    response.wait();
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            return result[0];
-        }
+        return authTokenSubject;
     }
 
     public static class SyncData {
