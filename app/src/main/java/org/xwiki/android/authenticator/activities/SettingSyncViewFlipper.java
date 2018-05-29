@@ -158,6 +158,23 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                             }
                         }
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mActivity.runOnUiThread(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(
+                                        mActivity,
+                                        R.string.cantGetGroups,
+                                        Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+                        );
+                    }
                 }
         );
         getApiManager().getXwikiServicesApi().getAllUsersPreview()
@@ -173,8 +190,25 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                             mUsersAdapter.refresh(searchResults);
                         }
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mActivity.runOnUiThread(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(
+                                        mActivity,
+                                        R.string.cantGetAllUsers,
+                                        Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+                        );
+                    }
                 }
-        );
+            );
     }
 
     public void noPermissions(){

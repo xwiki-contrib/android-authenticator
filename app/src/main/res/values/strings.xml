@@ -74,6 +74,8 @@
     <string name="about_version">About Version</string>
     <string name="version">Version 1.0</string>
     <string name="complete">Complete</string>
+    <string name="cantGetAllUsers">Can\'t get all users, try again</string>
+    <string name="cantGetGroups">Can\'t get groups</string>
 
 
     <!--select setting-->
