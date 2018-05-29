@@ -76,6 +76,7 @@
     <string name="complete">Complete</string>
     <string name="cantGetAllUsers">Can\'t get all users, try again</string>
     <string name="cantGetGroups">Can\'t get groups</string>
+    <string name="loginError">Can\'t login: check server url and credentials</string>
 
 
     <!--select setting-->

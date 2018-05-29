@@ -25,14 +25,16 @@ import android.util.Log;
 import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AppContext.
  */
 public class AppContext extends Application {
-    private static BaseApiManager baseApiManager;
+    private static Map.Entry<String, BaseApiManager> baseApiManager;
     private static final String TAG = "AppContext";
 
     private static AppContext instance;
@@ -67,11 +69,13 @@ public class AppContext extends Application {
     }
 
     public static BaseApiManager getApiManager() {
-        if (baseApiManager != null) {
-            return baseApiManager;
-        } else {
-            baseApiManager = new BaseApiManager(instance);
-            return baseApiManager;
+        String url = SharedPrefsUtils.getValue(instance, Constants.SERVER_ADDRESS, null);
+        if (baseApiManager == null || !baseApiManager.getKey().equals(url)) {
+            baseApiManager = new AbstractMap.SimpleEntry<>(
+                url,
+                new BaseApiManager(url)
+            );
         }
+        return baseApiManager.getValue();
     }
 }

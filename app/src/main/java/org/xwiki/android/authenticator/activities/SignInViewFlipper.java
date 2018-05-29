@@ -32,6 +32,7 @@ import android.widget.TextView;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.rest.new_rest.BaseApiManager;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
@@ -102,26 +103,20 @@ public class SignInViewFlipper extends BaseViewFlipper {
 
         BaseApiManager apiManager = getApiManager();
 
-        apiManager.getXwikiServicesApi().login(
-                Credentials.basic(userName, userPass)
-        ).subscribe(
-                new Action1<Response<ResponseBody>>() {
-                    @Override
-                    public void call(Response<ResponseBody> responseBodyResponse) {
-                        try {
-                            String authtoken = responseBodyResponse.headers().get("Set-Cookie");
-
-                            signedIn(
-                                    authtoken,
-                                    userName,
-                                    userPass
-                            );
-                        } catch (Exception e) {
-                            showErrorMessage("Network error");
-                        }
-                    }
-                }
+        String authtoken = XWikiHttp.login(
+            userName,
+            userPass
         );
+
+        if (authtoken == null) {
+            showErrorMessage(mContext.getString(R.string.loginError));
+        } else {
+            signedIn(
+                authtoken,
+                userName,
+                userPass
+            );
+        }
     }
 
     private Intent prepareIntent(String authtoken, String username, String password) {
