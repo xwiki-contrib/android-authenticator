@@ -1,2 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<?xml version='1.0' encoding='UTF-8'?>
+<resources><string name="app_name">XWiki Authenticator</string>
+    <string name="label">XWiki</string>
+    <string name="login_label">Connexion</string>
+
+    <string name="first_name">Prénom</string>
+    <string name="last_name">Nom</string>
+    <string name="user_id">Id utilisateur (obligatoire)\t</string>
+    <string name="phone">Téléphone mobile</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe (obligatoire)</string>
+    </resources>
