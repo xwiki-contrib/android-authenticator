@@ -94,41 +94,6 @@ public class XWikiHttp {
         return authTokenSubject;
     }
 
-    public static class SyncData {
-        //the users which have been modified from the last sync time. mainly used for updating and adding..
-        private List<XWikiUserFull> updateUserList;
-
-        private Set<String> additionalIds = new HashSet<>();
-
-        public SyncData() {
-            updateUserList = new ArrayList<>();
-        }
-
-        public List<XWikiUserFull> getUpdateUserList() {
-            return updateUserList;
-        }
-
-        public Set<String> getAllIdSet() {
-            Set<String> idsSet = new HashSet<>(additionalIds);
-            for (XWikiUserFull user : getUpdateUserList()) {
-                idsSet.add(user.id);
-            }
-            return idsSet;
-        }
-
-        public void addAdditionalId(String id) {
-            additionalIds.add(id);
-        }
-
-        @Override
-        public String toString() {
-            return "SyncData{" +
-                "updateUserList=" + updateUserList +
-                '}';
-        }
-    }
-
-
     /**
      * getSyncData
      * get SyncData used in SyncAdapter.onPerformSync

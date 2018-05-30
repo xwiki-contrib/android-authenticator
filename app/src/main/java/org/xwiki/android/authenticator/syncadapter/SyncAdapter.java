@@ -32,6 +32,7 @@ import android.util.Log;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.SyncData;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
@@ -85,7 +86,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-            XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
+            SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
             Log.i(TAG, syncData != null ? syncData.toString() : "syncData null");
 
             // Update the local contacts database with the last modified changes. updateContact()

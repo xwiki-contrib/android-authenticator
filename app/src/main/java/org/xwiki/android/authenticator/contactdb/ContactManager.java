@@ -43,6 +43,7 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.bean.XWikiUserFull;
+import org.xwiki.android.authenticator.rest.SyncData;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
@@ -111,7 +112,7 @@ public class ContactManager {
      * sync request.
      */
     public static synchronized void updateContacts(final Context context, final String account,
-                                                   XWikiHttp.SyncData syncData) throws IOException, XmlPullParserException {
+                                                   SyncData syncData) throws IOException, XmlPullParserException {
 
 
         // Make sure that the XWiki group exists
