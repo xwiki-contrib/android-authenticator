@@ -34,34 +34,31 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SettingIpViewFlipper;
+import org.xwiki.android.authenticator.activities.SettingSyncViewFlipper;
 import org.xwiki.android.authenticator.activities.SignInViewFlipper;
-import org.xwiki.android.authenticator.activities.SignUpStep1ViewFlipper;
-import org.xwiki.android.authenticator.activities.SignUpStep2ViewFlipper;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.IntentUtils;
 import org.xwiki.android.authenticator.utils.PermissionsUtils;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import static org.xwiki.android.authenticator.AppContext.currentBaseUrl;
 
 
 /**
@@ -81,8 +78,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     private SettingIpViewFlipper settingsIpViewFlipper;
     private SignInViewFlipper signInViewFlipper;
     private SettingSyncViewFlipper settingSyncViewFlipper;
-    private SignUpStep1ViewFlipper signUpStep1ViewFlipper;
-    private SignUpStep2ViewFlipper signUpStep2ViewFlipper;
 
     private AccountManager mAccountManager;
     AlertDialog.Builder builder;
@@ -104,6 +99,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         setContentView(R.layout.act_authenticator);
         StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
+        PermissionsUtils permissionsUtils = new PermissionsUtils(this);
+        if (!permissionsUtils.checkPermissions()) {
+            permissionsUtils.requestPermissions(REQUEST_PERMISSIONS_CODE);
+        }
+
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
@@ -112,9 +112,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
             @Override
             public void onClick(View v) {
                 int id = mViewFlipper.getDisplayedChild();
-                if(id == ViewFlipperLayoutId.SIGN_UP_STEP2){
-                    signUpStep2ViewFlipper.initData();
-                }else if(id == ViewFlipperLayoutId.SETTING_SYNC){
+                if(id == ViewFlipperLayoutId.SETTING_SYNC){
                     settingSyncViewFlipper.initData();
                 }
             }
@@ -163,19 +161,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         clearAsyncTask();
     }
 
-    /**
-     * now it's useless because of compile sdk 22
-     */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Deprecated
-    public void checkPermissions(){
-        mPermissions = new PermissionsUtils(this, Manifest.permission_group.CONTACTS);
-        if (!mPermissions.checkPermissions()) {
-            mPermissions.requestPermissions(REQUEST_PERMISSIONS_CODE);
-        }else{
-            settingSyncViewFlipper.syncSettingComplete();
-        }
-    }
     /**
      * now it's useless because of compile sdk 22
      */
@@ -228,20 +213,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                     settingSyncViewFlipper.doPrevious();
                 }
                 break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP1:
-                if (next) {
-                    signUpStep1ViewFlipper.doNext();
-                } else {
-                    signUpStep1ViewFlipper.doPrevious();
-                }
-                break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                if (next) {
-                    signUpStep2ViewFlipper.doNext();
-                } else {
-                    signUpStep2ViewFlipper.doPrevious();
-                }
-                break;
             default:
                 break;
         }
@@ -261,16 +232,22 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         AlertDialog dialog=builder.create();
         dialog.show();
     }
-    public void signUp(View view)
-    {
-        showViewFlipper(ViewFlipperLayoutId.SIGN_UP_STEP1);
+    public void signUp(View view) {
+        String url = currentBaseUrl();
+        if (url.endsWith("/")) {
+            url += "bin/view/XWiki/Registration";
+        } else {
+            url += "/bin/view/XWiki/Registration";
+        }
+        Intent intent = IntentUtils.openLink(
+            url
+        );
+        startActivity(intent);
     }
     public interface ViewFlipperLayoutId {
         int SETTING_IP = 0;
         int SIGN_IN = 1;
         int SETTING_SYNC = 2;
-        int SIGN_UP_STEP1 = 3;
-        int SIGN_UP_STEP2 = 4;
     }
 
     public void showViewFlipper(int id) {
@@ -300,33 +277,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
                 toolbar.setTitle("Setting Sync");
 
                 break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP1:
-                if (signUpStep1ViewFlipper == null) {
-                    signUpStep1ViewFlipper = new SignUpStep1ViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Sign Up Step1");
-
-                break;
-            case ViewFlipperLayoutId.SIGN_UP_STEP2:
-                refreshImageView.setVisibility(View.VISIBLE);
-                if (signUpStep2ViewFlipper == null) {
-                    signUpStep2ViewFlipper = new SignUpStep2ViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Sign Up Step2");
-
-                break;
         }
-    }
-
-    public String[] getStep1Values() {
-        return signUpStep1ViewFlipper.getValues();
     }
 
 
     public void clearOldAccount(){
-        //set rest url null (Maybe also need to do somethings to clear old value)
-        //because when you remove the account and add again, the static XWiki.serverRestPreUrl is not updated. serverAddr is the old address.
-        XWikiHttp.setRestUrlNULL();
+        //TODO: clear current user url
         //clear SharePreference
         SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST);
         SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS);

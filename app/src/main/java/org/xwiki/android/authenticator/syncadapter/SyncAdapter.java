@@ -19,13 +19,6 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.authenticator.Constants;
-import org.xwiki.android.authenticator.contactdb.ContactManager;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
-import org.xwiki.android.authenticator.utils.StringUtils;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
@@ -35,6 +28,14 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
+import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.Constants;
+import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.SyncData;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -48,6 +49,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     private final AccountManager mAccountManager;
     private final Context mContext;
+
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+        mContext = context;
+        mAccountManager = AccountManager.get(context);
+    }
 
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -79,7 +86,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-            XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
+            SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
             Log.i(TAG, syncData != null ? syncData.toString() : "syncData null");
 
             // Update the local contacts database with the last modified changes. updateContact()
@@ -100,7 +107,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             syncResult.stats.numParseExceptions++;
         }
     }
-
 
     /**
      * This helper function fetches the last known high-water-mark

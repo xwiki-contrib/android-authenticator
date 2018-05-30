@@ -27,7 +27,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
@@ -35,9 +34,6 @@ import android.text.TextUtils;
 
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
-
-import java.io.IOException;
 
 /**
  * Helper class for storing data in the platform content providers.
@@ -206,18 +202,18 @@ public class ContactOperations {
         return this;
     }
 
-    public ContactOperations addAvatar(String pageName, String avatarName) throws IOException {
-        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
-            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
-            if (avatarBuffer != null) {
-                mValues.clear();
-                mValues.put(Photo.PHOTO, avatarBuffer);
-                mValues.put(Photo.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
-                addInsertOp();
-            }
-        }
-        return this;
-    }
+//    public ContactOperations addAvatar(String pageName, String avatarName) throws IOException {
+//        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
+//            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
+//            if (avatarBuffer != null) {
+//                mValues.clear();
+//                mValues.put(Photo.PHOTO, avatarBuffer);
+//                mValues.put(Photo.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
+//                addInsertOp();
+//            }
+//        }
+//        return this;
+//    }
 
     /**
      * Adds a profile action
@@ -334,18 +330,18 @@ public class ContactOperations {
         return this;
     }
 
-    public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) throws IOException {
-        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
-            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
-            if (avatarBuffer != null) {
-                mValues.clear();
-                mValues.put(Photo.PHOTO, avatarBuffer);
-                mValues.put(Photo.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
-                addUpdateOp(uri);
-            }
-        }
-        return this;
-    }
+//    public ContactOperations updateAvatar(String pageName, String avatarName, Uri uri) throws IOException {
+//        if (!TextUtils.isEmpty(pageName) && !TextUtils.isEmpty(avatarName)) {
+//            byte[] avatarBuffer = XWikiHttp.downloadImage(pageName, avatarName);
+//            if (avatarBuffer != null) {
+//                mValues.clear();
+//                mValues.put(Photo.PHOTO, avatarBuffer);
+//                mValues.put(Photo.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
+//                addUpdateOp(uri);
+//            }
+//        }
+//        return this;
+//    }
 
     /**
      * Updates contact's profile action

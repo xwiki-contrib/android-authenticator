@@ -27,7 +27,6 @@ import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
-import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,7 +46,7 @@ public class SettingIpViewFlipper extends BaseViewFlipper {
     public void doNext() {
         if (checkInput()) {
             SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
-            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_UP_STEP1);
+            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
         }
     }
 

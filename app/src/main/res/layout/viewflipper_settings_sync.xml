@@ -47,17 +47,28 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
-    <ListView
-        android:id="@+id/list_view"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/select_spinner"
+        android:layout_above="@+id/nextButton"
         android:layout_marginBottom="60dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:layout_marginTop="10dp"
-        android:divider="#b5b5b5"
-        android:dividerHeight="1dp"></ListView>
+        android:layout_marginTop="10dp">
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#b5b5b5"
+            android:dividerHeight="1dp"/>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/list_viewProgressBar"/>
+    </RelativeLayout>
 
     <Button
         android:layout_width="@dimen/button_width"
@@ -67,6 +78,7 @@
         android:layout_alignRight="@+id/version_check"
         android:backgroundTint="@color/next_button_color"
         android:onClick="doNext"
+        android:id="@+id/nextButton"
         android:text="@string/complete"
         android:textColor="@android:color/background_light"
         />

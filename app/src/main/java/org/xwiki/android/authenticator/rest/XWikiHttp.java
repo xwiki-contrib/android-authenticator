@@ -19,31 +19,44 @@
  */
 package org.xwiki.android.authenticator.rest;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.text.TextUtils;
-import android.util.Base64;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.ObjectSummary;
-import org.xwiki.android.authenticator.bean.Page;
+import org.xwiki.android.authenticator.bean.RegisterForm;
 import org.xwiki.android.authenticator.bean.SearchResult;
-import org.xwiki.android.authenticator.bean.XWikiGroup;
+import org.xwiki.android.authenticator.bean.SearchResultContainer;
+import org.xwiki.android.authenticator.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.authenticator.bean.XWikiUser;
-import org.xwiki.android.authenticator.utils.ImageUtils;
+import org.xwiki.android.authenticator.bean.XWikiUserFull;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
+import retrofit2.Response;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
+
+import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
 /**
  * XWikiHttp
@@ -52,236 +65,34 @@ public class XWikiHttp {
     private static final String TAG = "XWikiHttp";
     private static String serverRestPreUrl = null;
 
-    /**
-     * login
-     *
-     * @param username user's name
-     * @param password user's password
-     * @return HttpResponse
-     * HttpResponse
-     * @throws IOException http://localhost:8080/xwiki/bin/login/XWiki/XWikiLogin
-     */
-    public static HttpResponse login(String username, String password) throws IOException {
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        String url = getServerAddress() + "/bin/login/XWiki/XWikiLogin";
-        HttpRequest request = new HttpRequest(url);
-        String basicAuth = username + ":" + password;
-        basicAuth = "Basic " + new String(Base64.encodeToString(basicAuth.getBytes(), Base64.NO_WRAP));
-        request.httpParams.putHeaders("Authorization", basicAuth);
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            return response;
-            //throw new IOException("statusCode="+statusCode+",response="+response.getResponseMessage());
-        }
-        //global value setting for http
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, response.getHeaders().get("Set-Cookie"));
-        return response;
+    public static Observable<String> login(
+        String username,
+        String password
+    ) {
+        final PublishSubject<String> authTokenSubject = PublishSubject.create();
+        getApiManager().getXwikiServicesApi().login(
+            Credentials.basic(username, password)
+        ).subscribe(
+            new Action1<Response<ResponseBody>>() {
+                @Override
+                public void call(Response<ResponseBody> responseBodyResponse) {
+                    if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
+                        authTokenSubject.onNext(responseBodyResponse.headers().get("Set-Cookie"));
+                    } else {
+                        authTokenSubject.onNext(null);
+                    }
+                    authTokenSubject.onCompleted();
+                }
+            },
+            new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    authTokenSubject.onError(throwable);
+                }
+            }
+        );
+        return authTokenSubject;
     }
-
-    /**
-     * Sign Up
-     *
-     * @param userId    Required. user id which is used for login.
-     * @param password  Required. user's password
-     * @param formToken Required. the form token which is initialized before sign up
-     * @param captcha   Required if needed. the user's input captcha
-     * @param firstName Not Required. user's firstName
-     * @param lastName  Not Required. user's lastName
-     * @param email     Not Required. user's email
-     * @return Boolean
-     * true:  sign up successfully
-     * false: sign up unsuccessfully
-     * @throws IOException //String registerUrl = "http://210.76.192.253:8080/xwiki/bin/view/XWiki/Registration";
-     */
-    public static HttpResponse signUp(String userId, String password, String formToken, String captcha, String firstName, String lastName, String email) throws IOException {
-        String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
-        if (registerUrl.contains("www.xwiki.org")) {
-            registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
-        }
-        HttpRequest request = new HttpRequest(registerUrl, HttpRequest.HttpMethod.POST, null);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        request.httpParams.putBodyParams("form_token", formToken);
-        request.httpParams.putBodyParams("parent", "xwiki:Main.UserDirectory");
-        request.httpParams.putBodyParams("register_first_name", firstName);
-        request.httpParams.putBodyParams("register_last_name", lastName);
-        request.httpParams.putBodyParams("xwikiname", userId);
-        request.httpParams.putBodyParams("register_password", password);
-        request.httpParams.putBodyParams("register2_password", password);
-        request.httpParams.putBodyParams("register_email", email);
-        request.httpParams.putBodyParams("captcha_answer", captcha);
-        request.httpParams.putBodyParams("template", "XWiki.XWikiUserTemplate");
-        request.httpParams.putBodyParams("xredirect", "/xwiki/bin/view/Main/UserDirectory");
-        HttpResponse response = httpExecutor.performRequest(request);
-        return response;
-
-        /*
-        formToken = document.select("input[name=template]").val();
-        if (TextUtils.isEmpty(formToken)) {
-            return true;
-        }
-        */
-        //return false;
-    }
-
-    /**
-     * before sign up, we should init the cookie, get the form token and the captcha.
-     *
-     * @return String
-     * the form token
-     * @throws IOException
-     */
-    public static HttpResponse signUpInitCookieForm() throws IOException {
-        SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
-        String registerUrl = getServerAddress() + "/bin/view/XWiki/Registration";
-        if (registerUrl.contains("www.xwiki.org")) {
-            registerUrl = getServerAddress() + "/bin/view/XWiki/RealRegistration";
-        }
-        HttpRequest request = new HttpRequest(registerUrl);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        return response;
-    }
-
-
-    /**
-     * sign up
-     *
-     * @param userId
-     * @param password
-     * @param formToken
-     * @return
-     */
-    public static HttpResponse signUp(String userId, String password, String formToken, String captcha) throws IOException {
-        return signUp(userId, password, formToken, captcha, "", "", "");
-    }
-
-
-    /**
-     * get user information
-     *
-     * @param id curriki:XWiki.Luisafan
-     * @return XWikiUser
-     * Without Getting LastModifiedDate
-     * @throws IOException
-     */
-    public static XWikiUser getUserDetail(String id) throws IOException, XmlPullParserException {
-        String[] split = XWikiUser.splitId(id);
-        if (split == null) throw new IOException(TAG + ",in getUserDetail, userId error");
-        return getUserDetail(split[0], split[1], split[2]);
-    }
-
-
-    /**
-     * get user information
-     *
-     * @param wiki
-     * @param space
-     * @param name
-     * @return XWikiUser
-     * Without Getting LastModifiedDate
-     * @throws IOException
-     * @throws XmlPullParserException
-     */
-    public static XWikiUser getUserDetail(String wiki, String space, String name) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/" + wiki + "/spaces/" + space + "/pages/" + name + "/objects/XWiki.XWikiUsers/0";
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode == 404) {
-            return null;
-        }
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        XWikiUser user = XmlUtils.getXWikiUser(new ByteArrayInputStream(response.getContentData()));
-        return user;
-    }
-
-    /**
-     * update user information
-     *
-     * @param user
-     * @return true:update success, false:update fail
-     * @throws IOException curl -u fitz:fitz2xwiki -X PUT -H "Content-type: application/x-www-form-urlencoded" -d "className=XWiki.XWikiUsers" -d "property#company=iiedacas" http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/fitz/objects/XWiki.XWikiUsers/0
-     */
-    public static HttpResponse updateUser(XWikiUser user) throws IOException {
-        String url = getServerRestUrl() + "/wikis/" + user.wiki + "/spaces/" + user.space + "/pages/" + user.pageName + "/objects/XWiki.XWikiUsers/0";
-        HttpRequest request = new HttpRequest(url, HttpRequest.HttpMethod.PUT, null);
-        request.httpParams.putBodyParams("className", "XWiki.XWikiUsers");
-        request.httpParams.putBodyParams("property#first_name", user.firstName);
-        request.httpParams.putBodyParams("property#last_name", user.lastName);
-        request.httpParams.putBodyParams("property#email", user.email);
-        request.httpParams.putBodyParams("property#phone", user.phone);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        return response;
-    }
-
-    /**
-     * get all groups
-     *
-     * @param number
-     * @return List<XWikiGroup>
-     * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiGroups&number=20
-     */
-    public static List<XWikiGroup> getGroupList(int number) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=" + "object:XWiki.XWikiGroups&number=" + number;
-        //String wiki,  wiki:"+ wiki
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        List<XWikiGroup> groupList = new ArrayList<>();
-        List<SearchResult> searchlist = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
-        for (SearchResult item : searchlist) {
-            XWikiGroup group = new XWikiGroup();
-            group.id = item.id;
-            group.wiki = item.wiki;
-            group.space = item.space;
-            group.pageName = item.pageName;
-            group.lastModifiedDate = item.modified;
-            group.version = item.version;
-            groupList.add(group);
-        }
-        return groupList;
-    }
-
-    public static class SyncData {
-        //the users which have been modified from the last sync time. mainly used for updating and adding..
-        List<XWikiUser> updateUserList;
-        //all the users in the server or all the users of the selected groups used for deleting.
-        HashSet<String> allIdSet;
-
-        public SyncData() {
-            updateUserList = new ArrayList<>();
-            allIdSet = new HashSet<>();
-        }
-
-        public List<XWikiUser> getUpdateUserList() {
-            return updateUserList;
-        }
-
-        public HashSet<String> getAllIdSet() {
-            return allIdSet;
-        }
-
-        @Override
-        public String toString() {
-            return "SyncData{" +
-                    "updateUserList=" + updateUserList +
-                    ", allIdSet=" + allIdSet +
-                    '}';
-        }
-    }
-
-
-
 
     /**
      * getSyncData
@@ -319,43 +130,105 @@ public class XWikiHttp {
      */
     private static SyncData getSyncGroups(List<String> groupIdList, String lastSyncTime) throws IOException, XmlPullParserException {
         if (groupIdList == null || groupIdList.size() == 0) return null;
-        SyncData syncData = new SyncData();
+        final SyncData syncData = new SyncData();
+        final CountDownLatch groupsCountDown = new CountDownLatch(groupIdList.size());
+        final List<Throwable> throwables = new ArrayList<>();
         for (String groupId : groupIdList) {
             String[] split = XWikiUser.splitId(groupId);
             if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
-            String url = getServerRestUrl() + "/wikis/" + split[0] + "/spaces/" + split[1] + "/pages/" + split[2] + "/objects/XWiki.XWikiGroups";
-            HttpRequest request = new HttpRequest(url);
-            HttpExecutor httpExecutor = new HttpExecutor();
-            HttpResponse response = httpExecutor.performRequest(request);
-            int statusCode = response.getResponseCode();
-            if (statusCode < 200 || statusCode > 299) {
-                throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-            }
-            Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
-            Date itemDate = null;
-            List<ObjectSummary> objectList = XmlUtils.getObjectSummarys(new ByteArrayInputStream(response.getContentData()));
-            for (ObjectSummary item : objectList) {
-                //TODO ask why this situation occur? <headline>xwiki:XWiki.gdelhumeau</headline>
-                if (item.headline.startsWith(split[0])) {
-                    item.headline = item.headline.substring(split[0].length() + 1);
+            getApiManager().getXwikiServicesApi().getGroupMembers(
+                split[0],
+                split[1],
+                split[2]
+            ).subscribe(
+                new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
+                    @Override
+                    public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
+                        try {
+                            getDetailedInfo(
+                                summaries.objectSummaries,
+                                syncData
+                            );
+                        } catch (IOException e) {
+                            Log.e(TAG, "Can't get users info", e);
+                            throwables.add(e);
+                        }
+                        groupsCountDown.countDown();
+                    }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwables.add(throwable);
+                        groupsCountDown.countDown();
+                    }
                 }
-                syncData.allIdSet.add(split[0] + ":" + item.headline);
-                itemDate = getUserLastModified(split[0], item.headline);
-                if (itemDate == null || itemDate.before(lastSynDate)) continue;
-                String[] spaceAndName = item.headline.split("\\.");
-                XWikiUser user = getUserDetail(split[0], spaceAndName[0], spaceAndName[1]);
-                syncData.updateUserList.add(user);
-
-                // if many users should be synchronized, the task will not be stop
-                // even though you close the sync in settings or selecting the "don't sync" option.
-                // we should stop the task by checking the sync type each time.
-                int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
-                if(syncType != Constants.SYNC_TYPE_SELECTED_GROUPS){
-                    throw new IOException("the sync type has been changed");
-                }
-            }
+            );
+        }
+        try {
+            groupsCountDown.await();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Can't await update of user", e);
+        }
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't get groups info");
         }
         return syncData;
+    }
+
+    /**
+     * @param from Key-value pairs where key - username, value - space
+     * @return List of users
+     */
+    private static void getDetailedInfo(List<ObjectSummary> from, final SyncData to) throws IOException {
+
+        final CountDownLatch countDown = new CountDownLatch(from.size());
+
+        final List<Throwable> throwables = new ArrayList<>();
+
+        for (final ObjectSummary summary : from) {
+            if (!throwables.isEmpty()) {
+                throw new IOException("Can't synchronize users info: " + from);
+            }
+            try {
+                Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
+                getApiManager().getXwikiServicesApi().getFullUserDetails(
+                    spaceAndName.getKey(),
+                    spaceAndName.getValue()
+                ).subscribe(
+                    new Action1<XWikiUserFull>() {
+                        @Override
+                        public void call(XWikiUserFull xWikiUser) {
+                            to.getUpdateUserList().add(xWikiUser);
+                            countDown.countDown();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.e(TAG, "Can't get user info: " + summary.headline, throwable);
+                            if (!HttpException.class.isInstance(throwable) || ((HttpException)throwable).code() != 404) {
+                                throwables.add(throwable);
+                            }
+                            countDown.countDown();
+                        }
+                    }
+                );
+            } catch (Exception e) {
+                to.addAdditionalId(summary.headline);
+                countDown.countDown();
+                Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
+            }
+        }
+
+        try {
+            countDown.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't synchronize users info: " + from);
+        }
     }
 
     /**
@@ -370,88 +243,92 @@ public class XWikiHttp {
      * @throws XmlPullParserException
      */
     private static SyncData getSyncAllUsers(String lastSyncTime) throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
-        HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
+        final List<SearchResult> searchList = new ArrayList<>();
+        final Semaphore semaphore = new Semaphore(1);
+        try {
+            semaphore.acquire();
+            getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
+                new Action1<SearchResultContainer>() {
+                    @Override
+                    public void call(SearchResultContainer searchResultContainer) {
+                        searchList.addAll(searchResultContainer.searchResults);
+                        semaphore.release();
+                    }
+                }
+            );
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
-        SyncData syncData = new SyncData();
+
+        final SyncData syncData = new SyncData();
         Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
         Date itemDate = null;
-        for (SearchResult item : searchList) {
-            syncData.allIdSet.add(item.id);
+        final List<Throwable> throwables = new ArrayList<>();
+        final CountDownLatch countDown = new CountDownLatch(searchList.size());
+        for (final SearchResult item : searchList) {
             itemDate = StringUtils.iso8601ToDate(item.modified);
-            if (itemDate.before(lastSynDate)) continue;
-            XWikiUser user = getUserDetail(item.id);
-            user.lastModifiedDate = item.modified;
-            syncData.updateUserList.add(user);
+            if (itemDate != null && itemDate.before(lastSynDate)) {
+                countDown.countDown();
+                continue;
+            } else {
+                String[] splitted = XWikiUser.splitId(item.id);
+                String wiki = splitted[0];
+                String space = splitted[1];
+                String pageName = splitted[2];
+                getApiManager().getXwikiServicesApi().getFullUserDetails(
+                    wiki,
+                    space,
+                    pageName
+                ).subscribe(
+                    new Action1<XWikiUserFull>() {
+                        @Override
+                        public void call(XWikiUserFull xWikiUser) {
+                            syncData.getUpdateUserList().add(xWikiUser);
+                            countDown.countDown();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable e) {
+                            Log.e(TAG, "Can't get user", e);
+                            if (!HttpException.class.isInstance(e) || ((HttpException)e).code() != 404) {
+                                throwables.add(e);
+                            } else {
+                                syncData.addAdditionalId(item.id);
+                            }
+                            countDown.countDown();
+                        }
+                    }
+                );
+            }
 
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
             int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
-            if(syncType != Constants.SYNC_TYPE_ALL_USERS){
+            if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
                 throw new IOException("the sync type has been changed");
+            } else {
+                countDown.countDown();
             }
         }
+        try {
+            countDown.await();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Can't perform `getSyncAllUsers`", e);
+        }
+        if (!throwables.isEmpty()) {
+            throw new IOException("Can't synchronize all users");
+        }
         return syncData;
-    }
-
-    /**
-     * getSyncAllUsersSimple
-     * @return
-     * @throws IOException
-     * @throws XmlPullParserException
-     */
-    public static List<SearchResult> getSyncAllUsersSimple() throws IOException, XmlPullParserException {
-        String url = getServerRestUrl() + "/wikis/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Constants.LIMIT_MAX_SYNC_USERS;
-        HttpResponse response = new HttpExecutor().performRequest(new HttpRequest(url));
-        int statusCode = response.getResponseCode();
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        List<SearchResult> searchList = XmlUtils.getSearchResults(new ByteArrayInputStream(response.getContentData()));
-        return searchList;
-    }
-
-
-    /**
-     * getUserLastModified
-     * get User Lass Modified Time
-     *
-     * @param id the user's id like xwiki:XWiki.fitz
-     * @return Date
-     * the last modified time.
-     * @throws IOException http://www.xwiki.org/xwiki/rest/wikis/xwiki/spaces/XWiki/pages/zhouwenhai
-     *                     http://www.xwiki.org/xwiki/rest/wikis/query?q=object:XWiki.XWikiUsers%20and%20name:fitz
-     */
-    private static Date getUserLastModified(String wiki, String id) throws IOException, XmlPullParserException {
-        String[] split = id.split("\\.");
-        if (split == null)
-            throw new IOException(TAG + ",in getUserLastModified, groupId error" + id);
-        String url = getServerRestUrl() + "/wikis/" + wiki + "/spaces/" + split[0] + "/pages/" + split[1];
-        HttpRequest request = new HttpRequest(url);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        // 404 Not Found return null; because the user may not exist.
-        if (statusCode == 404) {
-            return null;
-        }
-        if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        Page page = XmlUtils.getPage(new ByteArrayInputStream(response.getContentData()));
-        Date date = StringUtils.iso8601ToDate(page.lastModified);
-        return date;
     }
 
     /**
      * getServerRestUrl
      * get serverRestPreUrl from preference.
      * http://www.xwiki.org/xwiki + "/rest"
+     *
      * @return String
      * url
      */
@@ -469,82 +346,4 @@ public class XWikiHttp {
     public static void setRestUrlNULL() {
         serverRestPreUrl = null;
     }
-
-    /**
-     * downloadImage
-     * download the avatar photo of contact
-     *
-     * @param user       the user's pageName
-     * @param avatarName the avatar name like jvelociter.jpg
-     * @return http://www.xwiki.org/xwiki/bin/download/XWiki/jvelociter/jvelociter.jpg
-     */
-    public static byte[] downloadImage(String user, String avatarName) throws IOException {
-        String url = getServerAddress() +"/bin/download/XWiki/" + user + "/" + avatarName;
-        return downloadImage(url);
-    }
-
-    /**
-     * Download the image from the server.
-     *
-     * @param avatarUrl the URL pointing to the avatar image
-     * @return a byte array with the raw JPEG avatar image
-     */
-    public static byte[] downloadImage(final String avatarUrl) throws IOException {
-        // If there is no avatar, we're done
-        if (TextUtils.isEmpty(avatarUrl)) {
-            return null;
-        }
-        Log.i(TAG, "Downloading avatar: " + avatarUrl);
-        // Request the avatar image from the server, and create a bitmap
-        // object from the stream we get back.
-        HttpRequest request = new HttpRequest(avatarUrl);
-        HttpExecutor httpExecutor = new HttpExecutor();
-        HttpResponse response = httpExecutor.performRequest(request);
-        int statusCode = response.getResponseCode();
-        if (statusCode == 404) {
-            return null;
-        } else if (statusCode < 200 || statusCode > 299) {
-            throw new IOException("statusCode=" + statusCode + ",response=" + response.getResponseMessage());
-        }
-        //byte[] bytes = response.getContentData() maybe should less than 8M.  now only 6M has been tested.
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
-        Bitmap avatar = null;
-        //calc if the avatar bitmap memory are more than 4096 * 1024 B = 4MB
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-        options.inJustDecodeBounds = false;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-        options.inSampleSize = 1;
-        //if the memory size of the image are more than 4M options.inSampleSize>1.
-        int size = height * width * 2; //2 is RGB_565
-        int reqSize = 4096 * 1024;
-        if (size > reqSize ) {
-            final int halfSize = size / 2;
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfSize / inSampleSize) > reqSize) {
-                inSampleSize *= 2;
-            }
-            options.inSampleSize = inSampleSize;
-        }
-        avatar = BitmapFactory.decodeStream(new ByteArrayInputStream(response.getContentData()), null, options);
-        //ensure < 1M.  avoid transactionException when storing in local database.
-        avatar = ImageUtils.compressByQuality(avatar, 960);
-        // Take the image we received from the server, whatever format it
-        // happens to be in, and convert it to a JPEG image. Note: we're
-        // not resizing the avatar - we assume that the image we get from
-        // the server is a reasonable size...
-        //return byte[] value
-        if (avatar == null) return null;
-        ByteArrayOutputStream convertStream = new ByteArrayOutputStream();
-        avatar.compress(Bitmap.CompressFormat.PNG, 100, convertStream);
-        convertStream.flush();
-        //it's important to call recycle on bitmaps
-        avatar.recycle();
-        return convertStream.toByteArray();
-    }
-
 }

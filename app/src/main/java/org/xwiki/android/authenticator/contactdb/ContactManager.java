@@ -28,8 +28,8 @@ import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Groups;
@@ -39,8 +39,11 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
+import org.xwiki.android.authenticator.bean.XWikiUserFull;
+import org.xwiki.android.authenticator.rest.SyncData;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
@@ -48,8 +51,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+
+import rx.functions.Action1;
 
 /**
  * Class for managing contacts sync related mOperations
@@ -104,8 +111,8 @@ public class ContactManager {
      * @return the server syncState that should be used in our next
      * sync request.
      */
-    public static synchronized void updateContacts(Context context, String account,
-                                                   XWikiHttp.SyncData syncData) throws IOException, XmlPullParserException {
+    public static synchronized void updateContacts(final Context context, final String account,
+                                                   SyncData syncData) throws IOException, XmlPullParserException {
 
 
         // Make sure that the XWiki group exists
@@ -117,85 +124,137 @@ public class ContactManager {
 
         final ContentResolver resolver = context.getContentResolver();
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
-        List<XWikiUser> wikiUsers = syncData.getUpdateUserList();
-
-        // Add new contact and update changed ones
-        Log.d(TAG, "Synchronizing XWiki contacts");
-        if (wikiUsers != null && wikiUsers.size() > 0) {
-            for (final XWikiUser xwikiUser : wikiUsers) {
-                long rawContactId = lookupRawContact(resolver, xwikiUser.getId());
-                if (rawContactId != 0) {
-                    Log.d(TAG, "Update contact");
-                    updateContact(context, resolver, xwikiUser, false, true, true, true, rawContactId, batchOperation);
-                } else {
-                    Log.d(TAG, "Add contact");
-                    addContact(context, account, xwikiUser, 0, true, batchOperation);
-                }
-                // A sync adapter should batch operations on multiple contacts,
-                // because it will make a dramatic performance difference.
-                // (UI updates, etc)
-                if (batchOperation.size() >= 100) {
-                    batchOperation.execute();
-                }
-            }
-            batchOperation.execute();
-        }
+        List<XWikiUserFull> wikiUsers = syncData.getUpdateUserList();
 
         // Remove contacts that don't exist anymore
         HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
-        HashSet<String> allIdSet = syncData.getAllIdSet();
-        Iterator iterLocalMap = localUserMaps.entrySet().iterator();
-        while (iterLocalMap.hasNext()) {
-            HashMap.Entry entry = (HashMap.Entry) iterLocalMap.next();
-            String key = (String) entry.getKey();
-            long rawId = (Long) entry.getValue();
-            if (!allIdSet.contains(key)) {
-                deleteContact(context, rawId, batchOperation);
-                Log.d(TAG, key + " removed");
-            }else{
-                allIdSet.remove(key);
+        Set<String> allIdSet = syncData.getAllIdSet();
+        Set<String> idToDelete = new HashSet<>(localUserMaps.keySet());
+        Set<String> idToAdd = new HashSet<>(allIdSet);
+        Set<String> idToUpdate = new HashSet<>();
+
+        for (String key: allIdSet) {
+            if (localUserMaps.containsKey(key)) {
+                idToAdd.remove(key);
+                idToUpdate.add(key);
             }
-            //avoid the exception "android.os.TransactionTooLargeException: data parcel size 1846232 bytes"
+        }
+
+        for (String key: localUserMaps.keySet()) {
+            if (allIdSet.contains(key)) {
+                idToDelete.remove(key);
+            }
+        }
+
+        for (String id : idToDelete) {
+            long rawId = localUserMaps.get(id);
+            deleteContact(context, rawId, batchOperation);
             if (batchOperation.size() >= 100) {
                 batchOperation.execute();
             }
         }
-        Log.d(TAG, "Remove contacts end");
-        batchOperation.execute();
 
-        // if allIdSet size != 0, just add these users to local database.
-        // if newly adding users to the group, these following code will be execute..
-        if(allIdSet.size() > 0 ) {
-            List<XWikiUser> userList = new ArrayList<>();
-            for (String item : allIdSet) {
-                XWikiUser user = XWikiHttp.getUserDetail(item);
-                if(user == null) continue;
-                userList.add(user);
-                Log.d(TAG, "Add contact");
-                addContact(context, account, user, 0, true, batchOperation);
-                if (batchOperation.size() >= 100) {
-                    batchOperation.execute();
+        for (String id : idToAdd) {
+            XWikiUserFull xWikiUserFull = null;
+            for (XWikiUserFull userFull : wikiUsers) {
+                if (userFull.id.equals(id)) {
+                    xWikiUserFull = userFull;
+                    break;
                 }
             }
-            batchOperation.execute();
-            updateAvatars(context, userList);
+            if (xWikiUserFull == null) {
+                continue;
+            }
+            addContact(
+                context,
+                account,
+                xWikiUserFull,
+                0,
+                true,
+                batchOperation
+            );
+            if (batchOperation.size() >= 100) {
+                batchOperation.execute();
+            }
         }
+
+        for (String id : idToUpdate) {
+            XWikiUserFull xWikiUserFull = null;
+            for (XWikiUserFull userFull : wikiUsers) {
+                if (userFull.id.equals(id)) {
+                    xWikiUserFull = userFull;
+                    break;
+                }
+            }
+            if (xWikiUserFull == null) {
+                continue;
+            }
+            long rawContactId = lookupRawContact(resolver, id);
+            updateContact(
+                context,
+                resolver,
+                xWikiUserFull,
+                false,
+                true,
+                true,
+                true,
+                rawContactId,
+                batchOperation
+            );
+            if (batchOperation.size() >= 100) {
+                batchOperation.execute();
+            }
+        }
+        batchOperation.execute();
 
     }
 
 
     //http://stackoverflow.com/questions/14601209/update-contact-image-in-android-contact-provider
-    public static void updateAvatars(Context context, List<XWikiUser> userList) throws IOException {
-        List<XWikiUser> updateList = userList;
-        if (updateList == null || updateList.size() == 0) return;
+    public static void updateAvatars(final Context context, List<XWikiUserFull> userList) throws IOException {
+        if (userList == null || userList.size() == 0) return;
         final ContentResolver resolver = context.getContentResolver();
-        for (XWikiUser xwikiUser : updateList) {
-            long rawContactId = lookupRawContact(resolver, xwikiUser.getId());
-            if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.avatar)) {
-                byte[] avatarBuffer = XWikiHttp.downloadImage(xwikiUser.pageName, xwikiUser.avatar);
-                if (avatarBuffer != null) {
-                    writeDisplayPhoto(context, rawContactId, avatarBuffer);
+        final Semaphore semaphore = new Semaphore(3);
+        for (XWikiUserFull xwikiUser : userList) {
+            final long rawContactId = lookupRawContact(resolver, xwikiUser.id);
+            if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.getAvatar())) {
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
+                    xwikiUser.pageName, xwikiUser.getAvatar()
+                ).subscribe(
+                    new Action1<byte[]>() {
+                        @Override
+                        public void call(byte[] bytes) {
+                            if (bytes != null) {
+                                try {
+                                    writeDisplayPhoto(context, rawContactId, bytes);
+                                } catch (IOException e) {
+                                    Log.e(
+                                        TAG,
+                                        "Can't update avatar of user",
+                                        e
+                                    );
+                                }
+                            }
+                            semaphore.release();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.e(
+                                TAG,
+                                "Can't update avatar of user",
+                                throwable
+                            );
+                            semaphore.release();
+                        }
+                    }
+                );
             }
         }
     }
@@ -206,30 +265,31 @@ public class ContactManager {
      * This can be used to respond to a new contact found as part
      * of sync information returned from the server, or because a
      * user added a new contact.
-     *
-     * @param context        the Authenticator Activity context
+     *  @param context        the Authenticator Activity context
      * @param accountName    the account the contact belongs to
      * @param user           the sample SyncAdapter User object
      * @param groupId        the id of the sample group
      * @param inSync         is the add part of a client-server sync?
      * @param batchOperation allow us to batch together multiple operations
-     *                       into a single provider call
      */
-    public static void addContact(Context context, String accountName, XWikiUser user,
+    public static void addContact(Context context, String accountName, XWikiUserFull user,
                                   long groupId, boolean inSync, BatchOperation batchOperation) {
         // Put the data in the contacts provider
         final ContactOperations contactOp = ContactOperations.createNewContact(
-                context, user.getId(), accountName, inSync, batchOperation);
+                context, user.id, accountName, inSync, batchOperation);
 
         //avoid that the contact information is empty in the phone's local address book.
-        if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)) {
-            user.firstName = user.pageName;
-        }
+//        if (TextUtils.isEmpty(user.getFirstName()) && TextUtils.isEmpty(user.getLastName())) {
+//            user.get = user.pageName;
+//        }
 
-        contactOp.addName(null, user.getFirstName(),
-                user.getLastName())
-                .addEmail(user.getEmail())
-                .addPhone(user.getPhone(), Phone.TYPE_MOBILE);
+        contactOp.addName(
+            user.getFullName(),
+            user.getFirstName(),
+            user.getLastName()
+        )
+            .addEmail(user.getEmail())
+            .addPhone(user.getPhone(), Phone.TYPE_MOBILE);
         //.addPhone(user.getPhone(), Phone.TYPE_HOME)
         //.addPhone(user.getPhone(), Phone.TYPE_WORK)
         //.addGroupMembership(groupId)
@@ -238,8 +298,8 @@ public class ContactManager {
         // If we have a serverId, then go ahead and create our status profile.
         // Otherwise skip it - and we'll create it after we sync-up to the
         // server later on.
-        if (user.getId() != null) {
-            contactOp.addProfileAction(user.getId());
+        if (user.id != null) {
+            contactOp.addProfileAction(user.id);
         }
     }
 
@@ -277,20 +337,18 @@ public class ContactManager {
      * modifying existing fields), we create an update operation
      * to change that field.  But for fields we're adding, we create
      * "add" operations to create new rows for those fields.
-     *
-     * @param context        the Authenticator Activity context
+     *  @param context        the Authenticator Activity context
      * @param resolver       the ContentResolver to use
      * @param user           the sample SyncAdapter contact object
      * @param updateStatus   should we update this user's status
      * @param updateAvatar   should we update this user's avatar image
      * @param inSync         is the update part of a client-server sync?
      * @param rawContactId   the unique Id for this user in contacts
-     *                       provider
+*                       provider
      * @param batchOperation allow us to batch together multiple operations
-     *                       into a single provider call
      */
     public static void updateContact(Context context, ContentResolver resolver,
-                                     XWikiUser user, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
+                                     XWikiUserFull user, boolean updateServerId, boolean updateStatus, boolean updateAvatar,
                                      boolean inSync, long rawContactId, BatchOperation batchOperation) {
 
         boolean existingCellPhone = false;
@@ -307,9 +365,9 @@ public class ContactManager {
                         inSync, batchOperation);
 
         //avoid that the contact information is empty in the phone's local address book.
-        if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)) {
-            user.firstName = user.pageName;
-        }
+//        if (TextUtils.isEmpty(user.firstName) && TextUtils.isEmpty(user.lastName)) {
+//            user.firstName = user.pageName;
+//        }
 
         try {
             // Iterate over the existing rows of data, and update each one
@@ -388,13 +446,13 @@ public class ContactManager {
         // the serverId.
         if (updateServerId) {
             Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
-            contactOp.updateServerId(user.getId(), uri);
+            contactOp.updateServerId(user.id, uri);
         }
 
         // If we don't have a status profile, then create one.  This could
         // happen for contacts that were created on the client - we don't
         // create the status profile until after the first sync...
-        final String serverId = user.getId();
+        final String serverId = user.id;
         final long profileId = lookupProfile(resolver, serverId);
         if (profileId <= 0) {
             contactOp.addProfileAction(serverId);
