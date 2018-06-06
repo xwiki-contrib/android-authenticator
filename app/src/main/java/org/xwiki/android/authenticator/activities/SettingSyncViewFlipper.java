@@ -54,6 +54,7 @@ import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
 
@@ -143,6 +144,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         getApiManager().getXwikiServicesApi().availableGroups(
                 Constants.LIMIT_MAX_SYNC_USERS
         )
+            .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 new Action1<CustomSearchResultContainer<XWikiGroup>>() {
@@ -178,6 +180,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 }
         );
         getApiManager().getXwikiServicesApi().getAllUsersPreview()
+            .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 new Action1<SearchResultContainer>() {

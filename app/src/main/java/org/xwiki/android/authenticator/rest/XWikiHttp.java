@@ -54,6 +54,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
@@ -72,6 +73,8 @@ public class XWikiHttp {
         final PublishSubject<String> authTokenSubject = PublishSubject.create();
         getApiManager().getXwikiServicesApi().login(
             Credentials.basic(username, password)
+        ).subscribeOn(
+            Schedulers.newThread()
         ).subscribe(
             new Action1<Response<ResponseBody>>() {
                 @Override
@@ -266,7 +269,7 @@ public class XWikiHttp {
      */
     private void getSyncAllUsers(
         final PublishSubject<XWikiUserFull> subject
-    ) throws IOException{
+    ) {
         final List<SearchResult> searchList = new ArrayList<>();
         final Semaphore semaphore = new Semaphore(1);
         try {
@@ -296,6 +299,7 @@ public class XWikiHttp {
             return;
         }
 
+        final CountDownLatch countDown = new CountDownLatch(searchList.size());
         for (final SearchResult item : searchList) {
             if (subject.getThrowable() != null) {// was was not error in sync
                 return;
@@ -309,23 +313,21 @@ public class XWikiHttp {
                 space,
                 pageName
             ).subscribe(
-                new Observer<XWikiUserFull>() {
+                new Action1<XWikiUserFull>() {
                     @Override
-                    public void onCompleted() {
-                        subject.onCompleted();
+                    public void call(XWikiUserFull xWikiUser) {
+                        subject.onNext(xWikiUser);
+                        countDown.countDown();
                     }
-
+                },
+                new Action1<Throwable>() {
                     @Override
-                    public void onError(Throwable e) {
+                    public void call(Throwable e) {
                         Log.e(TAG, "Can't get user", e);
                         if (!HttpException.class.isInstance(e) || ((HttpException) e).code() != 404) {
                             subject.onError(e);
                         }
-                    }
-
-                    @Override
-                    public void onNext(XWikiUserFull xWikiUserFull) {
-                        subject.onNext(xWikiUserFull);
+                        countDown.countDown();
                     }
                 }
             );
@@ -338,6 +340,15 @@ public class XWikiHttp {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);
             }
+        }
+        try {
+            countDown.await();
+            if (!subject.hasThrowable()) {
+                subject.onCompleted();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            subject.onError(e);
         }
     }
 }

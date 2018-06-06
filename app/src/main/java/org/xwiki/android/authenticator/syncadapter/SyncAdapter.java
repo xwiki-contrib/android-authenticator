@@ -39,6 +39,7 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.Future;
 
