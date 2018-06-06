@@ -98,7 +98,6 @@ public class XWikiHttp {
      * getSyncData
      * get SyncData used in SyncAdapter.onPerformSync
      *
-     * @param lastSyncTime the last sync time.
      * @param syncType     Constants.SYNC_TYPE_ALL_USERS
      *                     Constants.SYNC_TYPE_SELECTED_GROUPS
      * @return SyncData
@@ -106,14 +105,44 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    public static SyncData getSyncData(String lastSyncTime, int syncType) throws IOException, XmlPullParserException {
-        if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
-            return getSyncAllUsers(lastSyncTime);
-        } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-            List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
-            return getSyncGroups(groupIdList, lastSyncTime);
+    public static Observable<XWikiUserFull> getSyncData(final int syncType) {
+        final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
+        final Semaphore semaphore = new Semaphore(1);
+        try {
+            semaphore.acquire();
+            new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            synchronized (subject) {
+                                try {
+                                    semaphore.release();
+                                    subject.wait();
+                                } catch (InterruptedException e) {
+                                    subject.onError(e);
+                                    return;
+                                }
+                            }
+                            if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
+                                getSyncAllUsers(subject);
+                            } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                                List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
+                                getSyncGroups(groupIdList, subject);
+                            } else {
+                                throw new IOException(TAG + "syncType error, SyncType=" + syncType);
+                            }
+                        } catch (IOException e) {
+                            subject.onError(e);
+                        }
+                    }
+                }
+            ).start();
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            return subject;
         }
-        throw new IOException(TAG + "syncType error, SyncType=" + syncType);
+        return subject;
     }
 
     /**
@@ -122,20 +151,26 @@ public class XWikiHttp {
      * get the selected groups' SyncData
      *
      * @param groupIdList  the selected groups' id list.
-     * @param lastSyncTime the last sync time.
      * @return SyncData
      * the SyncData can be used in updating the data.
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static SyncData getSyncGroups(List<String> groupIdList, String lastSyncTime) throws IOException, XmlPullParserException {
-        if (groupIdList == null || groupIdList.size() == 0) return null;
-        final SyncData syncData = new SyncData();
+    private static void getSyncGroups(
+        List<String> groupIdList,
+        final PublishSubject<XWikiUserFull> subject
+    ) throws IOException {
         final CountDownLatch groupsCountDown = new CountDownLatch(groupIdList.size());
-        final List<Throwable> throwables = new ArrayList<>();
         for (String groupId : groupIdList) {
+            if (subject.getThrowable() != null) {
+                return;
+            }
             String[] split = XWikiUser.splitId(groupId);
-            if (split == null) throw new IOException(TAG + ",in getSyncGroups, groupId error");
+            if (split == null) {
+                IOException exception = new IOException(TAG + ",in getSyncGroups, groupId error");
+                subject.onError(exception);
+                throw exception;
+            }
             getApiManager().getXwikiServicesApi().getGroupMembers(
                 split[0],
                 split[1],
@@ -147,11 +182,11 @@ public class XWikiHttp {
                         try {
                             getDetailedInfo(
                                 summaries.objectSummaries,
-                                syncData
+                                subject
                             );
                         } catch (IOException e) {
                             Log.e(TAG, "Can't get users info", e);
-                            throwables.add(e);
+                            subject.onError(e);
                         }
                         groupsCountDown.countDown();
                     }
@@ -159,35 +194,27 @@ public class XWikiHttp {
                 new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwables.add(throwable);
+                        subject.onError(throwable);
                         groupsCountDown.countDown();
                     }
                 }
             );
         }
-        try {
-            groupsCountDown.await();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Can't await update of user", e);
-        }
-        if (!throwables.isEmpty()) {
-            throw new IOException("Can't get groups info");
-        }
-        return syncData;
     }
 
     /**
      * @param from Key-value pairs where key - username, value - space
      * @return List of users
      */
-    private static void getDetailedInfo(List<ObjectSummary> from, final SyncData to) throws IOException {
+    private static void getDetailedInfo(
+        List<ObjectSummary> from,
+        final PublishSubject<XWikiUserFull> subject
+    ) throws IOException {
 
         final CountDownLatch countDown = new CountDownLatch(from.size());
 
-        final List<Throwable> throwables = new ArrayList<>();
-
         for (final ObjectSummary summary : from) {
-            if (!throwables.isEmpty()) {
+            if (subject.getThrowable() != null) {
                 throw new IOException("Can't synchronize users info: " + from);
             }
             try {
@@ -199,7 +226,7 @@ public class XWikiHttp {
                     new Action1<XWikiUserFull>() {
                         @Override
                         public void call(XWikiUserFull xWikiUser) {
-                            to.getUpdateUserList().add(xWikiUser);
+                            subject.onNext(xWikiUser);
                             countDown.countDown();
                         }
                     },
@@ -208,14 +235,13 @@ public class XWikiHttp {
                         public void call(Throwable throwable) {
                             Log.e(TAG, "Can't get user info: " + summary.headline, throwable);
                             if (!HttpException.class.isInstance(throwable) || ((HttpException)throwable).code() != 404) {
-                                throwables.add(throwable);
+                                subject.onError(throwable);
                             }
                             countDown.countDown();
                         }
                     }
                 );
             } catch (Exception e) {
-                to.addAdditionalId(summary.headline);
                 countDown.countDown();
                 Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
             }
@@ -226,9 +252,6 @@ public class XWikiHttp {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (!throwables.isEmpty()) {
-            throw new IOException("Can't synchronize users info: " + from);
-        }
     }
 
     /**
@@ -236,13 +259,14 @@ public class XWikiHttp {
      * Constants.SYNC_TYPE_ALL_USERS
      * used for getting the all users from server.
      *
-     * @param lastSyncTime the last sync time.
      * @return SyncData
      * the SyncData can be used in updating the data.
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static SyncData getSyncAllUsers(String lastSyncTime) throws IOException, XmlPullParserException {
+    private static void getSyncAllUsers(
+        final PublishSubject<XWikiUserFull> subject
+    ) throws IOException{
         final List<SearchResult> searchList = new ArrayList<>();
         final Semaphore semaphore = new Semaphore(1);
         try {
@@ -261,67 +285,54 @@ public class XWikiHttp {
             e.printStackTrace();
         }
 
-        final SyncData syncData = new SyncData();
-        Date lastSynDate = StringUtils.iso8601ToDate(lastSyncTime);
-        Date itemDate = null;
-        final List<Throwable> throwables = new ArrayList<>();
         final CountDownLatch countDown = new CountDownLatch(searchList.size());
         for (final SearchResult item : searchList) {
-            itemDate = StringUtils.iso8601ToDate(item.modified);
-            if (itemDate != null && itemDate.before(lastSynDate)) {
-                countDown.countDown();
-                continue;
-            } else {
-                String[] splitted = XWikiUser.splitId(item.id);
-                String wiki = splitted[0];
-                String space = splitted[1];
-                String pageName = splitted[2];
-                getApiManager().getXwikiServicesApi().getFullUserDetails(
-                    wiki,
-                    space,
-                    pageName
-                ).subscribe(
-                    new Action1<XWikiUserFull>() {
-                        @Override
-                        public void call(XWikiUserFull xWikiUser) {
-                            syncData.getUpdateUserList().add(xWikiUser);
-                            countDown.countDown();
-                        }
-                    },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable e) {
-                            Log.e(TAG, "Can't get user", e);
-                            if (!HttpException.class.isInstance(e) || ((HttpException)e).code() != 404) {
-                                throwables.add(e);
-                            } else {
-                                syncData.addAdditionalId(item.id);
-                            }
-                            countDown.countDown();
-                        }
-                    }
-                );
+            if (subject.getThrowable() != null) {// was was not error in sync
+                return;
             }
+            String[] splitted = XWikiUser.splitId(item.id);
+            String wiki = splitted[0];
+            String space = splitted[1];
+            String pageName = splitted[2];
+            getApiManager().getXwikiServicesApi().getFullUserDetails(
+                wiki,
+                space,
+                pageName
+            ).subscribe(
+                new Action1<XWikiUserFull>() {
+                    @Override
+                    public void call(XWikiUserFull xWikiUser) {
+                        subject.onNext(xWikiUser);
+                        countDown.countDown();
+                    }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable e) {
+                        Log.e(TAG, "Can't get user", e);
+                        if (!HttpException.class.isInstance(e) || ((HttpException) e).code() != 404) {
+                            subject.onError(e);
+                        }
+                        countDown.countDown();
+                    }
+                }
+            );
 
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
             int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
             if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
-                throw new IOException("the sync type has been changed");
+                IOException exception = new IOException("the sync type has been changed");
+                subject.onError(exception);
+                throw exception;
             } else {
                 countDown.countDown();
             }
         }
-        try {
-            countDown.await();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Can't perform `getSyncAllUsers`", e);
+        if (subject.getThrowable() == null) {
+            subject.onCompleted();
         }
-        if (!throwables.isEmpty()) {
-            throw new IOException("Can't synchronize all users");
-        }
-        return syncData;
     }
 
     /**

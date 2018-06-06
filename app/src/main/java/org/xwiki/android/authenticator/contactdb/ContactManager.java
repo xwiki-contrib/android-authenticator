@@ -43,20 +43,19 @@ import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUser;
 import org.xwiki.android.authenticator.bean.XWikiUserFull;
-import org.xwiki.android.authenticator.rest.SyncData;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
+import rx.Observable;
+import rx.Observer;
 import rx.functions.Action1;
+import rx.subjects.PublishSubject;
 
 /**
  * Class for managing contacts sync related mOperations
@@ -107,156 +106,116 @@ public class ContactManager {
      *
      * @param context  The context of Authenticator Activity
      * @param account  The username for the account
-     * @param syncData The list of contacts to update
      * @return the server syncState that should be used in our next
      * sync request.
      */
-    public static synchronized void updateContacts(final Context context, final String account,
-                                                   SyncData syncData) throws IOException, XmlPullParserException {
-
-
-        // Make sure that the XWiki group exists
-        //List<String> groupIdList = SharedPrefsUtil.getArrayList(AppContext.getInstance().getApplicationContext(), "SelectGroups");
-        //for(String groupIdString : groupIdList){
-        //    long groupId = ContactManager.ensureXWikiGroupExists(context, account);
-        //}
-        Log.i(TAG, "syncData updateContact size=" + syncData.getUpdateUserList().size() + ", All Id size=" + syncData.getAllIdSet().size());
+    public static synchronized void updateContacts(
+        final Context context,
+        final String account,
+        Observable<XWikiUserFull> observable
+    ) {
 
         final ContentResolver resolver = context.getContentResolver();
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
-        List<XWikiUserFull> wikiUsers = syncData.getUpdateUserList();
+        final HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
 
-        // Remove contacts that don't exist anymore
-        HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
-        Set<String> allIdSet = syncData.getAllIdSet();
-        Set<String> idToDelete = new HashSet<>(localUserMaps.keySet());
-        Set<String> idToAdd = new HashSet<>(allIdSet);
-        Set<String> idToUpdate = new HashSet<>();
+        observable.subscribe(
+            new Observer<XWikiUserFull>() {
+                @Override
+                public void onCompleted() {
+                    for (String id : localUserMaps.keySet()) {
+                        long rawId = localUserMaps.get(id);
+                        deleteContact(context, rawId, batchOperation);
+                        if (batchOperation.size() >= 100) {
+                            batchOperation.execute();
+                        }
+                    }
+                    batchOperation.execute();
+                }
 
-        for (String key: allIdSet) {
-            if (localUserMaps.containsKey(key)) {
-                idToAdd.remove(key);
-                idToUpdate.add(key);
-            }
-        }
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "Can't synchronize users", e);
+                }
 
-        for (String key: localUserMaps.keySet()) {
-            if (allIdSet.contains(key)) {
-                idToDelete.remove(key);
-            }
-        }
-
-        for (String id : idToDelete) {
-            long rawId = localUserMaps.get(id);
-            deleteContact(context, rawId, batchOperation);
-            if (batchOperation.size() >= 100) {
-                batchOperation.execute();
-            }
-        }
-
-        for (String id : idToAdd) {
-            XWikiUserFull xWikiUserFull = null;
-            for (XWikiUserFull userFull : wikiUsers) {
-                if (userFull.id.equals(id)) {
-                    xWikiUserFull = userFull;
-                    break;
+                @Override
+                public void onNext(XWikiUserFull xWikiUserFull) {
+                    long userRawId = -1L;
+                    if (localUserMaps.containsKey(xWikiUserFull.id)) {
+                        userRawId = localUserMaps.get(xWikiUserFull.id);
+                        updateContact(
+                            context,
+                            resolver,
+                            xWikiUserFull,
+                            false,
+                            true,
+                            true,
+                            true,
+                            userRawId,
+                            batchOperation
+                        );
+                        if (batchOperation.size() >= 100) {
+                            batchOperation.execute();
+                        }
+                    } else {
+                        addContact(
+                            context,
+                            account,
+                            xWikiUserFull,
+                            0,
+                            true,
+                            batchOperation
+                        );
+                        batchOperation.execute();// refresh for get user raw id
+                        userRawId = lookupRawContact(resolver, xWikiUserFull.id);
+                    }
+                    updateAvatar(
+                        context,
+                        userRawId,
+                        xWikiUserFull
+                    );
                 }
             }
-            if (xWikiUserFull == null) {
-                continue;
-            }
-            addContact(
-                context,
-                account,
-                xWikiUserFull,
-                0,
-                true,
-                batchOperation
-            );
-            if (batchOperation.size() >= 100) {
-                batchOperation.execute();
-            }
-        }
-
-        for (String id : idToUpdate) {
-            XWikiUserFull xWikiUserFull = null;
-            for (XWikiUserFull userFull : wikiUsers) {
-                if (userFull.id.equals(id)) {
-                    xWikiUserFull = userFull;
-                    break;
-                }
-            }
-            if (xWikiUserFull == null) {
-                continue;
-            }
-            long rawContactId = lookupRawContact(resolver, id);
-            updateContact(
-                context,
-                resolver,
-                xWikiUserFull,
-                false,
-                true,
-                true,
-                true,
-                rawContactId,
-                batchOperation
-            );
-            if (batchOperation.size() >= 100) {
-                batchOperation.execute();
-            }
-        }
-        batchOperation.execute();
-
+        );
     }
 
 
     //http://stackoverflow.com/questions/14601209/update-contact-image-in-android-contact-provider
-    public static void updateAvatars(final Context context, List<XWikiUserFull> userList) throws IOException {
-        if (userList == null || userList.size() == 0) return;
-        final ContentResolver resolver = context.getContentResolver();
-        final Semaphore semaphore = new Semaphore(3);
-        for (XWikiUserFull xwikiUser : userList) {
-            final long rawContactId = lookupRawContact(resolver, xwikiUser.id);
-            if (!TextUtils.isEmpty(xwikiUser.pageName) && !TextUtils.isEmpty(xwikiUser.getAvatar())) {
-                try {
-                    semaphore.acquire();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
-                    xwikiUser.pageName, xwikiUser.getAvatar()
-                ).subscribe(
-                    new Action1<byte[]>() {
-                        @Override
-                        public void call(byte[] bytes) {
-                            if (bytes != null) {
-                                try {
-                                    writeDisplayPhoto(context, rawContactId, bytes);
-                                } catch (IOException e) {
-                                    Log.e(
-                                        TAG,
-                                        "Can't update avatar of user",
-                                        e
-                                    );
-                                }
-                            }
-                            semaphore.release();
-                        }
-                    },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
+    public static void updateAvatar(
+        final Context context,
+        final long rawId,
+        XWikiUserFull xwikiUser
+    ) {
+        AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
+            xwikiUser.pageName, xwikiUser.getAvatar()
+        ).subscribe(
+            new Action1<byte[]>() {
+                @Override
+                public void call(byte[] bytes) {
+                    if (bytes != null) {
+                        try {
+                            writeDisplayPhoto(context, rawId, bytes);
+                        } catch (IOException e) {
                             Log.e(
                                 TAG,
                                 "Can't update avatar of user",
-                                throwable
+                                e
                             );
-                            semaphore.release();
                         }
                     }
-                );
+                }
+            },
+            new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    Log.e(
+                        TAG,
+                        "Can't update avatar of user",
+                        throwable
+                    );
+                }
             }
-        }
+        );
     }
 
 
