@@ -32,12 +32,11 @@ import android.widget.TextView;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-
-import static org.xwiki.android.authenticator.AppContext.getXWikiHttp;
 
 /**
  * SignInViewFlipper.
@@ -97,7 +96,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
         final String userName = accountName.toString();
         final String userPass = accountPassword.toString();
 
-        getXWikiHttp().login(
+        XWikiHttp.login(
             userName,
             userPass
         )

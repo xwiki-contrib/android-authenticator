@@ -51,7 +51,6 @@ import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
-import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -64,9 +63,9 @@ import static org.xwiki.android.authenticator.AppContext.getApiManager;
  * XWikiHttp
  */
 public class XWikiHttp {
-    private final String TAG = "XWikiHttp";
+    private static final String TAG = "XWikiHttp";
 
-    public Observable<String> login(
+    public static Observable<String> login(
         String username,
         String password
     ) {
@@ -108,7 +107,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    public Observable<XWikiUserFull> getSyncData(final int syncType) {
+    public static Observable<XWikiUserFull> getSyncData(final int syncType) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
         final Semaphore semaphore = new Semaphore(1);
         try {
@@ -159,7 +158,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private void getSyncGroups(
+    private static void getSyncGroups(
         List<String> groupIdList,
         final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
@@ -209,7 +208,7 @@ public class XWikiHttp {
      * @param from Key-value pairs where key - username, value - space
      * @return List of users
      */
-    private void getDetailedInfo(
+    private static void getDetailedInfo(
         List<ObjectSummary> from,
         final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
@@ -267,7 +266,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private void getSyncAllUsers(
+    private static void getSyncAllUsers(
         final PublishSubject<XWikiUserFull> subject
     ) {
         final List<SearchResult> searchList = new ArrayList<>();

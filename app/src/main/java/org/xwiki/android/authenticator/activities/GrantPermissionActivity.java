@@ -39,7 +39,6 @@ import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
 import static org.xwiki.android.authenticator.AppContext.currentBaseUrl;
-import static org.xwiki.android.authenticator.AppContext.getXWikiHttp;
 
 
 /**

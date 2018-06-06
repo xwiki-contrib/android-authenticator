@@ -36,7 +36,6 @@ import java.util.Map;
  */
 public class AppContext extends Application {
     private static Map.Entry<String, BaseApiManager> baseApiManager;
-    private static Map.Entry<String, XWikiHttp> xWikiHttp;
     private static final String TAG = "AppContext";
 
     private static AppContext instance;
@@ -83,16 +82,5 @@ public class AppContext extends Application {
             );
         }
         return baseApiManager.getValue();
-    }
-
-    public static XWikiHttp getXWikiHttp() {
-        String url = currentBaseUrl();
-        if (xWikiHttp == null || !xWikiHttp.getKey().equals(url)) {
-            xWikiHttp = new AbstractMap.SimpleEntry<>(
-                url,
-                new XWikiHttp()
-            );
-        }
-        return xWikiHttp.getValue();
     }
 }

@@ -93,7 +93,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 
         // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-        final Observable<XWikiUserFull> observable = AppContext.getXWikiHttp().getSyncData(syncType);
+        final Observable<XWikiUserFull> observable = XWikiHttp.getSyncData(syncType);
 
         // Update the local contacts database with the last modified changes. updateContact()
         ContactManager.updateContacts(mContext, account.name, observable);
