@@ -252,7 +252,7 @@ public class XWikiHttp {
         try {
             countDown.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Can't await completing of getting user detailed info", e);
         }
     }
 
@@ -291,7 +291,7 @@ public class XWikiHttp {
             );
             semaphore.acquire();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Can't await synchronize all users", e);
         }
 
         if (subject.hasThrowable()) {
@@ -346,7 +346,6 @@ public class XWikiHttp {
                 subject.onCompleted();
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
             subject.onError(e);
         }
     }
