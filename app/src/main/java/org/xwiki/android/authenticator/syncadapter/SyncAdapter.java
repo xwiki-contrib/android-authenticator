@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.bean.XWikiUserFull;
 import org.xwiki.android.authenticator.contactdb.ContactManager;
@@ -91,10 +92,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 
         // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-        final Observable<XWikiUserFull> observable = XWikiHttp.getSyncData(syncType);
+        final Observable<XWikiUserFull> observable = AppContext.getXWikiHttp().getSyncData(syncType);
 
         // Update the local contacts database with the last modified changes. updateContact()
         ContactManager.updateContacts(mContext, account.name, observable);
+
+        final Object[] sync = new Object[]{null};
 
         observable.subscribe(
             new Observer<XWikiUserFull>() {
@@ -103,11 +106,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     // Save off the new sync date. On our next sync, we only want to receive
                     // contacts that have changed since this sync...
                     setServerSyncMarker(account, StringUtils.dateToIso8601String(new Date()));
+                    synchronized (sync) {
+                        sync[0] = new Object();
+                        sync.notifyAll();
+                    }
                 }
 
                 @Override
                 public void onError(Throwable e) {
                     syncResult.stats.numIoExceptions++;
+                    synchronized (sync) {
+                        sync[0] = new Object();
+                        sync.notifyAll();
+                    }
                 }
 
                 @Override
@@ -119,6 +130,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         synchronized (observable) {
             observable.notifyAll();
+        }
+        synchronized (sync) {
+            while (sync[0] == null) {
+                try {
+                    sync.wait();
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "Can't await end of sync", e);
+                }
+            }
         }
     }
 

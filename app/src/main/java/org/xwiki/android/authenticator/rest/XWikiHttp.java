@@ -51,6 +51,7 @@ import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -62,10 +63,9 @@ import static org.xwiki.android.authenticator.AppContext.getApiManager;
  * XWikiHttp
  */
 public class XWikiHttp {
-    private static final String TAG = "XWikiHttp";
-    private static String serverRestPreUrl = null;
+    private final String TAG = "XWikiHttp";
 
-    public static Observable<String> login(
+    public Observable<String> login(
         String username,
         String password
     ) {
@@ -105,7 +105,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    public static Observable<XWikiUserFull> getSyncData(final int syncType) {
+    public Observable<XWikiUserFull> getSyncData(final int syncType) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
         final Semaphore semaphore = new Semaphore(1);
         try {
@@ -156,7 +156,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static void getSyncGroups(
+    private void getSyncGroups(
         List<String> groupIdList,
         final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
@@ -206,7 +206,7 @@ public class XWikiHttp {
      * @param from Key-value pairs where key - username, value - space
      * @return List of users
      */
-    private static void getDetailedInfo(
+    private void getDetailedInfo(
         List<ObjectSummary> from,
         final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
@@ -264,7 +264,7 @@ public class XWikiHttp {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static void getSyncAllUsers(
+    private void getSyncAllUsers(
         final PublishSubject<XWikiUserFull> subject
     ) throws IOException{
         final List<SearchResult> searchList = new ArrayList<>();
@@ -278,6 +278,13 @@ public class XWikiHttp {
                         searchList.addAll(searchResultContainer.searchResults);
                         semaphore.release();
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        subject.onError(throwable);
+                        semaphore.release();
+                    }
                 }
             );
             semaphore.acquire();
@@ -285,7 +292,10 @@ public class XWikiHttp {
             e.printStackTrace();
         }
 
-        final CountDownLatch countDown = new CountDownLatch(searchList.size());
+        if (subject.hasThrowable()) {
+            return;
+        }
+
         for (final SearchResult item : searchList) {
             if (subject.getThrowable() != null) {// was was not error in sync
                 return;
@@ -299,21 +309,23 @@ public class XWikiHttp {
                 space,
                 pageName
             ).subscribe(
-                new Action1<XWikiUserFull>() {
+                new Observer<XWikiUserFull>() {
                     @Override
-                    public void call(XWikiUserFull xWikiUser) {
-                        subject.onNext(xWikiUser);
-                        countDown.countDown();
+                    public void onCompleted() {
+                        subject.onCompleted();
                     }
-                },
-                new Action1<Throwable>() {
+
                     @Override
-                    public void call(Throwable e) {
+                    public void onError(Throwable e) {
                         Log.e(TAG, "Can't get user", e);
                         if (!HttpException.class.isInstance(e) || ((HttpException) e).code() != 404) {
                             subject.onError(e);
                         }
-                        countDown.countDown();
+                    }
+
+                    @Override
+                    public void onNext(XWikiUserFull xWikiUserFull) {
+                        subject.onNext(xWikiUserFull);
                     }
                 }
             );
@@ -325,36 +337,7 @@ public class XWikiHttp {
             if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);
-                throw exception;
-            } else {
-                countDown.countDown();
             }
         }
-        if (subject.getThrowable() == null) {
-            subject.onCompleted();
-        }
-    }
-
-    /**
-     * getServerRestUrl
-     * get serverRestPreUrl from preference.
-     * http://www.xwiki.org/xwiki + "/rest"
-     *
-     * @return String
-     * url
-     */
-    public static String getServerRestUrl() {
-        if (serverRestPreUrl == null) {
-            serverRestPreUrl = getServerAddress() + "/rest";
-        }
-        return serverRestPreUrl;
-    }
-
-    public static String getServerAddress() {
-        return SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SERVER_ADDRESS, null);
-    }
-
-    public static void setRestUrlNULL() {
-        serverRestPreUrl = null;
     }
 }

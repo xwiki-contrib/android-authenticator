@@ -55,6 +55,7 @@ import java.util.concurrent.Semaphore;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 /**
@@ -112,14 +113,15 @@ public class ContactManager {
     public static synchronized void updateContacts(
         final Context context,
         final String account,
-        Observable<XWikiUserFull> observable
+        final Observable<XWikiUserFull> observable
     ) {
-
         final ContentResolver resolver = context.getContentResolver();
         final BatchOperation batchOperation = new BatchOperation(context, resolver);
         final HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
 
-        observable.subscribe(
+        observable.subscribeOn(
+            Schedulers.newThread()
+        ).subscribe(
             new Observer<XWikiUserFull>() {
                 @Override
                 public void onCompleted() {
