@@ -8,5 +8,37 @@
     <string name="confirm_password">Подтвердите пароль (обязательно)</string>
     <string name="captcha_textview">Введите код с картинки</string>
 
-    <string name="login_activity_username_label">Username</string>
+    <string name="login_activity_username_label">Имя пользователя</string>
+    <string name="login_activity_password_label">Пароль</string>
+    <string name="login_activity_server_label">Сервер</string>
+    <string name="login_activity_port_label">Порт</string>
+    <string name="login_activity_ok_button">Вход</string>
+    <string name="login_activity_register_button">Регистрация</string>
+    <string name="sign_in_authenticating">Вход...</string>
+    <string name="sign_up_authenticating">Регистрация...</string>
+
+    <string name="menu_save">Сохранить</string>
+    <string name="menu_refresh">Обновить</string>
+    <string name="menu_ok">Принять</string>
+
+    <string name="title_activity_edit_contact">Редактировать контакт</string>
+    <string name="title_activity_sign_up">Регистрация</string>
+    <string name="title_activity_authorize">Авторизация</string>
+    <string name="title_activity_select_groups">Выберите группы</string>
+    <string name="title_activity_setting">Настройки</string>
+
+    <string name="error_invalid_server">Не верный адрес сервера</string>
+    <string name="error_invalid_email">Не вырный E-Mail адрес</string>
+    <string name="error_invalid_password">Пароль слишком короткий</string>
+    <string name="error_incorrect_password">Не верный пароль</string>
+    <string name="error_field_required">Это поле обязательно</string>
+    <string name="error_confirm_password">Пароли не совпадают</string>
+    <string name="error_userid_password">Не верный идентификатор пользователя</string>
+    <string name="error_invalid_captcha">Не верный код проверки</string>
+
+    <string name="view_group_action_label">Подробнее о группе</string>
+    <string name="profile_action">XWiki профиль</string>
+    <string name="view_profile">Редактировать</string>
+
+    <string name="authorize_activity_note">Авторизация через другие приложения</string>
     </resources>
