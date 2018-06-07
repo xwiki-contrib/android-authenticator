@@ -67,4 +67,10 @@
     <string name="invite_action_label">Ajouter a Sample SyncAdaper</string>
 
     <string name="authorize_activity_package_label">Nom du Paquet</string>
+    <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
+    <string name="cantGetGroups">Impossible de télécharger les groupes</string>
+    <string name="loginError">Impossible de se connecter: vérifier l’adresse du serveur et l\'utilisateur/mot de passe</string>
+    <string name="userExists">L\'utilisateur existe</string>
+
+
     </resources>
