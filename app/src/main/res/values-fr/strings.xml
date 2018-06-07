@@ -52,8 +52,5 @@
     <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
     <string name="loginError">Impossible de se connecter: vérifier l’adresse du serveur et l\'utilisateur/mot de passe</string>
-    <string name="signIn">Signe dans</string>
-    <string name="signIUp">Inscription</string>
-
 
 </resources>
