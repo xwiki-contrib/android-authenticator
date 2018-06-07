@@ -42,7 +42,6 @@ public class XWikiPhotosManager {
                 System.out.println("request failed: " + e.getMessage());
 
                 subject.onError(e);
-                subject.onCompleted();
             }
 
             @Override
@@ -57,7 +56,6 @@ public class XWikiPhotosManager {
                 );
 
                 subject.onNext(avatarBytes);
-                subject.onCompleted();
             }
         });
 
@@ -83,7 +81,6 @@ public class XWikiPhotosManager {
                 System.out.println("request failed: " + e.getMessage());
 
                 subject.onError(e);
-                subject.onCompleted();
             }
 
             @Override
@@ -94,7 +91,6 @@ public class XWikiPhotosManager {
                 }
 
                 subject.onNext(response.body().bytes());
-                subject.onCompleted();
             }
         });
 

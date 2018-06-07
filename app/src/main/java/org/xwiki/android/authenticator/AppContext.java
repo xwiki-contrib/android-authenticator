@@ -23,6 +23,7 @@ import android.app.Application;
 import android.util.Log;
 
 import org.xwiki.android.authenticator.rest.BaseApiManager;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
 import java.util.AbstractMap;

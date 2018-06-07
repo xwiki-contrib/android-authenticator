@@ -38,6 +38,7 @@ import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 import org.xwiki.android.authenticator.utils.StatusBarColorCompat;
 
+import static org.xwiki.android.authenticator.AppContext.currentBaseUrl;
 
 
 /**
@@ -97,7 +98,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken);
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
-        intent.putExtra(Constants.SERVER_ADDRESS, XWikiHttp.getServerAddress());
+        intent.putExtra(Constants.SERVER_ADDRESS, currentBaseUrl());
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);
         finish();

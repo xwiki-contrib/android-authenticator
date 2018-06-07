@@ -44,6 +44,7 @@ import retrofit2.Response;
 import rx.functions.Action1;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
+import static org.xwiki.android.authenticator.AppContext.currentBaseUrl;
 import static org.xwiki.android.authenticator.AppContext.getApiManager;
 import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
 import static org.xwiki.android.authenticator.Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
@@ -177,7 +178,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(Constants.SERVER_ADDRESS, XWikiHttp.getServerAddress());
+            result.putString(Constants.SERVER_ADDRESS, currentBaseUrl());
             return result;
         }
     }
