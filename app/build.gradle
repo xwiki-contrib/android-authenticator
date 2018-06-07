@@ -3,11 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
-    configurations.all {
-        resolutionStrategy {
-            force 'com.android.support:support-annotations:24.2.1'
-        }
-    }
     defaultConfig {
         applicationId "org.xwiki.android.authenticator"
         minSdkVersion rootProject.minSdkVersion
@@ -33,14 +28,9 @@ dependencies {
     implementation "com.android.support:design:$rootProject.supportLibraryVersion"
 
     //Square dependencies
-    implementation("com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion") {
-        // exclude Retrofit’s OkHttp peer-dependency module and define your own module import
-        exclude module: 'okhttp'
-    }
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava:$rootProject.retrofitVersion"
-    implementation "com.squareup.okhttp3:okhttp:$rootProject.okHttp3Version"
-    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okHttp3Version"
 
     //rxjava Dependencies
     implementation 'io.reactivex:rxandroid:1.1.0'
@@ -50,9 +40,6 @@ dependencies {
     implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     implementation "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-
-    // For getting the from token in the process of sign up
-    implementation 'org.jsoup:jsoup:1.9.1'
 
     // For Local Unit Tests
 

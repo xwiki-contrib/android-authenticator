@@ -21,6 +21,7 @@ package org.xwiki.android.authenticator.rest;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.Constants;

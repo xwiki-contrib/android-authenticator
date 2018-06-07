@@ -48,6 +48,9 @@ public class XWikiPhotosManager {
             public void onResponse(Call request, Response response) throws IOException {
 
                 if (response.code() < 200 || response.code() > 209) {
+                    if (response.code() == 404) {
+                        return;
+                    }
                     throw new IOException("Response with error: " + response.toString());
                 }
 
