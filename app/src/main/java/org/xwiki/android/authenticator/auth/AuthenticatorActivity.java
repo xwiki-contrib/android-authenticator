@@ -95,7 +95,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_authenticator);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         PermissionsUtils permissionsUtils = new PermissionsUtils(this);
         if (!permissionsUtils.checkPermissions()) {

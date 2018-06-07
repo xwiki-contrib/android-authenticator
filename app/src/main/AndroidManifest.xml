@@ -26,12 +26,12 @@
     <application
         android:name=".AppContext"
         android:allowBackup="true" android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/ActivityTheme">
 
         <activity android:name=".auth.AuthenticatorActivity"
             android:label="@string/login_label"
-            android:excludeFromRecents="true" android:exported="true"
-            android:theme="@style/ActivityTheme" >
+            android:excludeFromRecents="true" android:exported="true" >
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -40,7 +40,6 @@
         </activity>
 
         <activity
-            android:theme="@style/AppTheme"
             android:name=".activities.GrantPermissionActivity"
             android:noHistory="true"
             android:excludeFromRecents="true"
@@ -49,7 +48,6 @@
         </activity>
 
         <activity
-            android:theme="@style/AppTheme"
             android:noHistory="true"
             android:excludeFromRecents="true"
             android:name=".activities.editcontact.EditContactActivity"

@@ -94,7 +94,6 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         atomicInteger = new AtomicInteger(0);
         editContactPresenter = new EditContactPresenter(this);
         editContactPresenter.attachView(this);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
