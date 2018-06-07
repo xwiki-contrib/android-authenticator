@@ -12,29 +12,20 @@
     <string name="login_activity_password_label">Пароль</string>
     <string name="login_activity_server_label">Сервер</string>
     <string name="login_activity_port_label">Порт</string>
-    <string name="login_activity_ok_button">Вход</string>
-    <string name="login_activity_register_button">Регистрация</string>
-    <string name="sign_in_authenticating">Вход...</string>
-    <string name="sign_up_authenticating">Регистрация...</string>
+    <string name="sign_in_authenticating">Вход…</string>
+    <string name="sign_up_authenticating">Регистрация…</string>
 
     <string name="menu_save">Сохранить</string>
-    <string name="menu_refresh">Обновить</string>
-    <string name="menu_ok">Принять</string>
 
     <string name="title_activity_edit_contact">Редактировать контакт</string>
-    <string name="title_activity_sign_up">Регистрация</string>
     <string name="title_activity_authorize">Авторизация</string>
     <string name="title_activity_select_groups">Выберите группы</string>
     <string name="title_activity_setting">Настройки</string>
 
     <string name="error_invalid_server">Не верный адрес сервера</string>
-    <string name="error_invalid_email">Не вырный E-Mail адрес</string>
     <string name="error_invalid_password">Пароль слишком короткий</string>
     <string name="error_incorrect_password">Не верный пароль</string>
     <string name="error_field_required">Это поле обязательно</string>
-    <string name="error_confirm_password">Пароли не совпадают</string>
-    <string name="error_userid_password">Не верный идентификатор пользователя</string>
-    <string name="error_invalid_captcha">Не верный код проверки</string>
 
     <string name="view_group_action_label">Подробнее о группе</string>
     <string name="profile_action">XWiki профиль</string>
@@ -46,4 +37,17 @@
     <string name="cancel">Отмена</string>
     <string name="grant_permission_button">Авторизовать</string>
     <string name="login_sub_head">Вход в ваш XWiki</string>
-    </resources>
+    <string name="learn_more_dialog">Узнать больше</string>
+    <string name="don_t_have_a_account">Нет аккаунта?</string>
+    <string name="create_one">Создать</string>
+    <string name="next">Далее</string>
+    <string name="about_version">О версии</string>
+    <string name="version">Версия 1.0</string>
+    <string name="complete">Принять</string>
+    <string name="cantGetAllUsers">Не могу получить пользователей</string>
+    <string name="cantGetGroups">Не могу получить группы</string>
+    <string name="loginError">Ошибка авторизации</string>
+    <string name="signIn">Вход</string>
+    <string name="signUp">Регистрация</string>
+    <string name="logIn">Войти</string>
+</resources>

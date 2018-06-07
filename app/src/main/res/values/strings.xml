@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">XWiki Authenticator</string>
-    <string name="label">XWiki</string>
-    <string name="login_label">@string/log_in</string>
+    <string name="label" translatable="false">XWiki</string>
+    <string name="login_label" translatable="false">@string/log_in</string>
 
     <string name="signIn">Sign in</string>
     <string name="signUp">Sign up</string>
@@ -23,18 +23,18 @@
     <string name="login_activity_password_label">Password</string>
     <string name="login_activity_server_label">Server</string>
     <string name="login_activity_port_label">Port</string>
-    <string name="login_activity_ok_button">@string/signIn</string>
-    <string name="login_activity_register_button">@string/signUp</string>
+    <string name="login_activity_ok_button" translatable="false">@string/signIn</string>
+    <string name="login_activity_register_button" translatable="false">@string/signUp</string>
     <string name="sign_in_authenticating">Sign In…</string>
     <string name="sign_up_authenticating">Sign Up…</string>
 
     <!-- menu -->
     <string name="menu_save">Save</string>
-    <string name="menu_ok">@android:string/ok</string>
+    <string name="menu_ok" translatable="false">@android:string/ok</string>
 
     <!--Activity label-->
     <string name="title_activity_edit_contact">Edit Contact</string>
-    <string name="title_activity_sign_up">@string/signUp</string>
+    <string name="title_activity_sign_up" translatable="false">@string/signUp</string>
     <string name="title_activity_authorize">Authorize</string>
     <string name="title_activity_select_groups">Select Groups</string>
     <string name="title_activity_setting">Settings</string>
@@ -62,7 +62,7 @@
     <string name="server_url" translatable="false" formatted="false">http://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Login to your XWiki Instance.</string>
     <string name="learn_more_dialog">Learn More</string>
-    <string name="log_in">@string/logIn</string>
+    <string name="log_in" translatable="false">@string/logIn</string>
     <string name="don_t_have_a_account">Don\'t Have a XWiki Account?</string>
     <string name="create_one">Create One</string>
     <string name="next">Next</string>
@@ -72,7 +72,6 @@
     <string name="cantGetAllUsers">Can\'t get all users, try again</string>
     <string name="cantGetGroups">Can\'t get groups</string>
     <string name="loginError">Wrong server URL or credentials</string>
-    <string name="userExists">User exists</string>
 
 
     <!--select setting-->
