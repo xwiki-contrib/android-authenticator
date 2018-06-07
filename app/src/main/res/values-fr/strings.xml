@@ -22,6 +22,7 @@
     <string name="title_activity_setting">Paramètres</string>
 
     <string name="error_invalid_server">L\'adresse du serveur est invalide</string>
+    <string name="error_invalid_email">Cette adresse e-mail n\'est pas valide</string>
     <string name="error_invalid_password">Ce mot de passe est trop court</string>
     <string name="error_incorrect_password">Ce mot de passe est incorrect\t</string>
     <string name="error_field_required">Ce champ est requis</string>
@@ -52,5 +53,15 @@
     <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
     <string name="loginError">Impossible de se connecter: vérifier l’adresse du serveur et l\'utilisateur/mot de passe</string>
+    <string name="signIn">Signe dans</string>
+    <string name="logIn">Connecter</string>
+    <string name="signUp">Inscription</string>
+    <string name="pleaseWait">Veuillez patienter</string>
 
+    <!--select setting-->
+    <string-array name="select_groups_array">
+        <item>Tous les utilisateurs</item>
+        <item>Groupes d'utilisateurs</item>
+        <item>Désactivé</item>
+    </string-array>
 </resources>
