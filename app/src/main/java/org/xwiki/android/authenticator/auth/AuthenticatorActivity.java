@@ -83,8 +83,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     AlertDialog.Builder builder;
     private ViewFlipper mViewFlipper;
     private Toolbar toolbar;
-    //refresh ImageView mainly in SettingSyncViewFlipper
-    public ImageView refreshImageView;
     //show progress dialog
     private Dialog mProgressDialog = null;
     //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
@@ -97,7 +95,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_authenticator);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         PermissionsUtils permissionsUtils = new PermissionsUtils(this);
         if (!permissionsUtils.checkPermissions()) {
@@ -107,16 +104,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("XWiki Account");
 
-        refreshImageView = findViewById(R.id.refresh_view);
-        refreshImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = mViewFlipper.getDisplayedChild();
-                if(id == ViewFlipperLayoutId.SETTING_SYNC){
-                    settingSyncViewFlipper.initData();
-                }
-            }
-        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
         } else {
@@ -252,7 +239,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
 
     public void showViewFlipper(int id) {
         clearAsyncTask();
-        refreshImageView.setVisibility(View.GONE);
         mViewFlipper.setDisplayedChild(id);
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
@@ -270,7 +256,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
 
                 break;
             case ViewFlipperLayoutId.SETTING_SYNC:
-                refreshImageView.setVisibility(View.VISIBLE);
                 if (settingSyncViewFlipper == null) {
                     settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
                 }

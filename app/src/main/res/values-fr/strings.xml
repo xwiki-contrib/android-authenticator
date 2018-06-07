@@ -14,7 +14,7 @@
     <string name="login_activity_password_label">Mot de passe</string>
     <string name="login_activity_server_label">Serveur</string>
     <string name="login_activity_port_label">Port</string>
-    <string name="menu_save">Enregistrer</string>
+    <string name="save">Enregistrer</string>
 
     <string name="title_activity_edit_contact">Éditer le contact</string>
     <string name="title_activity_authorize">Autoriser</string>
@@ -34,6 +34,7 @@
     <string name="account_name">Nom du compte</string>
     <string name="cancel">Annuler</string>
     <string name="grant_permission_button">Autoriser</string>
+    <string name="defaultServerUrl" translatable="false">http://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Connectez-vous à votre instance XWiki.</string>
     <string name="learn_more_dialog">En savoir plus</string>
     <string name="don_t_have_a_account">Pas encore de compte XWiki ?</string>

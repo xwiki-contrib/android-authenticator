@@ -36,6 +36,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,9 +70,10 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     UserListAdapter mUsersAdapter;
     private List<XWikiGroup> groupList;
     private List<SearchResult> searchResults;
-    private AppCompatSpinner selectSyncSpinner;
-    private Button versionCheckButton;
     private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
+
+    private volatile Boolean groupsAreLoading = false;
+    private volatile Boolean allAreLoading = false;
 
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
@@ -91,8 +93,13 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     private void initView(){
-        versionCheckButton = (Button) findViewById(R.id.version_check);
-        versionCheckButton.setText("Version " + SystemTools.getAppVersionName(mContext));
+        Button versionCheckButton = (Button) findViewById(R.id.version_check);
+        versionCheckButton.setText(
+            String.format(
+                mContext.getString(R.string.versionTemplate),
+                SystemTools.getAppVersionName(mContext)
+            )
+        );
         versionCheckButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,9 +107,18 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         });
 
+        findViewById(R.id.settingsSyncRefreshCurrentTypeListButton).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    initData();
+                }
+            }
+        );
+
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setEmptyView(
-            findViewById(R.id.list_viewProgressBar)
+            findViewById(R.id.syncTypeGetErrorContainer)
         );
         groupList = new ArrayList<>();
         searchResults = new ArrayList<>();
@@ -111,7 +127,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         initData();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        selectSyncSpinner = (AppCompatSpinner) findViewById(R.id.select_spinner);
+        AppCompatSpinner selectSyncSpinner = getSelectSyncSpinner();
         selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -122,10 +138,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                         mListView.setVisibility(View.VISIBLE);
                         mListView.setAdapter(mGroupAdapter);
                         mGroupAdapter.refresh(groupList);
+                        refreshProgressBar();
                     }else{
                         mListView.setVisibility(View.VISIBLE);
                         mListView.setAdapter(mUsersAdapter);
                         mUsersAdapter.refresh(searchResults);
+                        refreshProgressBar();
                     }
                 }
                 SYNC_TYPE = position;
@@ -136,82 +154,141 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
             }
         });
+
+
         SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
     }
 
-    public void initData() {
-        getApiManager().getXwikiServicesApi().availableGroups(
-                Constants.LIMIT_MAX_SYNC_USERS
-        )
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                new Action1<CustomSearchResultContainer<XWikiGroup>>() {
-                    @Override
-                    public void call(CustomSearchResultContainer<XWikiGroup> xWikiGroupCustomSearchResultContainer) {
-                        List<XWikiGroup> searchResults = xWikiGroupCustomSearchResultContainer.searchResults;
-                        if (searchResults != null) {
-                            groupList.clear();
-                            groupList.addAll(searchResults);
-                            if (selectSyncSpinner.getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                mListView.setAdapter(mGroupAdapter);
-                                mGroupAdapter.refresh(groupList);
-                            }
-                        }
-                    }
-                },
-                new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mActivity.runOnUiThread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(
-                                        mActivity,
-                                        R.string.cantGetGroups,
-                                        Toast.LENGTH_SHORT
-                                    ).show();
-                                }
-                            }
-                        );
+    private AppCompatSpinner getSelectSyncSpinner() {
+        return (AppCompatSpinner) findViewById(R.id.select_spinner);
+    }
+
+    private ProgressBar getProgressBar() {
+        return (ProgressBar) findViewById(R.id.list_viewProgressBar);
+    }
+
+    private View getListViewContainer() {
+        return findViewById(R.id.settingsSyncListViewContainer);
+    }
+
+    private void refreshProgressBar() {
+        Integer selectedSyncType = getSelectSyncSpinner().getSelectedItemPosition();
+        final Boolean progressBarVisible;
+        switch (selectedSyncType) {
+            case Constants.SYNC_TYPE_SELECTED_GROUPS:
+                progressBarVisible = groupsAreLoading;
+            break;
+            case Constants.SYNC_TYPE_ALL_USERS:
+                progressBarVisible = allAreLoading;
+            break;
+            default:
+                progressBarVisible = false;
+            break;
+        }
+        mActivity.runOnUiThread(
+            new Runnable() {
+                @Override
+                public void run() {
+                    if (progressBarVisible) {
+                        getProgressBar().setVisibility(View.VISIBLE);
+                        getListViewContainer().setVisibility(View.GONE);
+                    } else {
+                        getProgressBar().setVisibility(View.GONE);
+                        getListViewContainer().setVisibility(View.VISIBLE);
                     }
                 }
+            }
         );
-        getApiManager().getXwikiServicesApi().getAllUsersPreview()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                new Action1<SearchResultContainer>() {
-                    @Override
-                    public void call(SearchResultContainer searchResultContainer) {
-                        searchResults.clear();
-                        searchResults.addAll(searchResultContainer.searchResults);
-                        if (selectSyncSpinner.getSelectedItemPosition() != Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                            mListView.setAdapter(mUsersAdapter);
-                            mUsersAdapter.refresh(searchResults);
-                        }
-                    }
-                },
-                new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mActivity.runOnUiThread(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(
-                                        mActivity,
-                                        R.string.cantGetAllUsers,
-                                        Toast.LENGTH_SHORT
-                                    ).show();
+    }
+
+    private void initData() {
+        if (groupList.isEmpty()) {
+            groupsAreLoading = true;
+            getApiManager().getXwikiServicesApi().availableGroups(
+                Constants.LIMIT_MAX_SYNC_USERS
+            )
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    new Action1<CustomSearchResultContainer<XWikiGroup>>() {
+                        @Override
+                        public void call(CustomSearchResultContainer<XWikiGroup> xWikiGroupCustomSearchResultContainer) {
+                            List<XWikiGroup> searchResults = xWikiGroupCustomSearchResultContainer.searchResults;
+                            if (searchResults != null) {
+                                groupList.clear();
+                                groupList.addAll(searchResults);
+                                if (getSelectSyncSpinner().getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
+                                    mListView.setAdapter(mGroupAdapter);
+                                    mGroupAdapter.refresh(groupList);
                                 }
                             }
-                        );
+                            groupsAreLoading = false;
+                            refreshProgressBar();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            groupsAreLoading = false;
+                            mActivity.runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(
+                                            mActivity,
+                                            R.string.cantGetGroups,
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                }
+                            );
+                            refreshProgressBar();
+                        }
                     }
-                }
-            );
+                );
+        }
+        if (searchResults.isEmpty()) {
+            allAreLoading = true;
+            getApiManager().getXwikiServicesApi().getAllUsersPreview()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    new Action1<SearchResultContainer>() {
+                        @Override
+                        public void call(SearchResultContainer searchResultContainer) {
+                            searchResults.clear();
+                            searchResults.addAll(searchResultContainer.searchResults);
+                            if (getSelectSyncSpinner().getSelectedItemPosition() == Constants.SYNC_TYPE_ALL_USERS) {
+                                mListView.setAdapter(mUsersAdapter);
+                                mUsersAdapter.refresh(searchResults);
+                            }
+                            allAreLoading = false;
+                            refreshProgressBar();
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mActivity.runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(
+                                            mActivity,
+                                            R.string.cantGetAllUsers,
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+                                }
+                            );
+                            allAreLoading = false;
+                            refreshProgressBar();
+                        }
+                    }
+                );
+        }
+        refreshProgressBar();
     }
 
     public void noPermissions(){

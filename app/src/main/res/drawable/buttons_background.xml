@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="@dimen/defaultViewSmallPadding"
+    android:insetTop="@dimen/defaultViewSmallPadding"
+    android:insetRight="@dimen/defaultViewSmallPadding"
+    android:insetBottom="@dimen/defaultViewSmallPadding">
+    <shape android:shape="rectangle">
+        <corners android:radius="@dimen/defaultViewSmallPadding" />
+        <solid android:color="@color/primary"/>
+        <padding android:left="@dimen/defaultViewSmallPadding"
+            android:top="@dimen/defaultViewSmallPadding"
+            android:right="@dimen/defaultViewSmallPadding"
+            android:bottom="@dimen/defaultViewSmallPadding" />
+    </shape>
+</inset>

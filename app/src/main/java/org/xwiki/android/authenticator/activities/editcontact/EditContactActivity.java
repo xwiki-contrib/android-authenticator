@@ -31,8 +31,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -51,8 +49,6 @@ import org.xwiki.android.authenticator.utils.StringUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
@@ -66,19 +62,14 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     private static final String TAG = EditContactActivity.class.getSimpleName();
 
     // UI references.
-    @BindView(R.id.first_name)
     EditText mFirstNameView;
 
-    @BindView(R.id.email)
     EditText mEmailView;
 
-    @BindView(R.id.cell_phone)
     EditText mCellPhoneView;
 
-    @BindView(R.id.last_name)
     EditText mLastNameView;
 
-    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     XWikiUser wikiUser = null;
@@ -92,12 +83,17 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_edit_contact);
-        ButterKnife.bind(this);
+
+        mFirstNameView = findViewById(R.id.first_name);
+        mLastNameView = findViewById(R.id.last_name);
+        mEmailView = findViewById(R.id.email);
+        mCellPhoneView = findViewById(R.id.cell_phone);
+        toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
         atomicInteger = new AtomicInteger(0);
         editContactPresenter = new EditContactPresenter(this);
         editContactPresenter.attachView(this);
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
 
         Uri mUri = getIntent().getData();
         wikiUser = getXWikiUser(this, mUri);
@@ -110,25 +106,17 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         mFirstNameView.setText(wikiUser.getFirstName());
         mCellPhoneView.setText(wikiUser.getPhone());
         mLastNameView.setText(wikiUser.getLastName());
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.edit_contact, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        } else if (item.getItemId() == R.id.action_save) {
-            //check input valid  set input value (firstName, lastName, email, cellPhone)
-            if (checkInput()) {
-                updateContact();
+        findViewById(R.id.action_save).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkInput()) {
+                        updateContact();
+                    }
+                }
             }
-        }
-        return super.onOptionsItemSelected(item);
+        );
     }
 
     private XWikiUser getXWikiUser(Context context, Uri uri) {

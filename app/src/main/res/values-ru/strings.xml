@@ -15,7 +15,7 @@
     <string name="sign_in_authenticating">Вход…</string>
     <string name="sign_up_authenticating">Регистрация…</string>
 
-    <string name="menu_save">Сохранить</string>
+    <string name="save">Сохранить</string>
 
     <string name="title_activity_edit_contact">Редактировать контакт</string>
     <string name="title_activity_authorize">Авторизация</string>

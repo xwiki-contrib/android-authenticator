@@ -8,7 +8,11 @@
     <dimen name="button_height">0dp</dimen>
     <dimen name="button_width">100dp</dimen>
     <dimen name="button_margin_top">20dp</dimen>
-    <dimen name="layout_padding_bottom">13dip</dimen>
-    <dimen name="layout_padding_left_right">20dip</dimen>
-    <dimen name="layout_padding_top">5dip</dimen>
+    <dimen name="defaultViewSmallPadding">4dp</dimen>
+    <dimen name="defaultViewMediumPadding">8dp</dimen>
+    <dimen name="defaultViewLargePadding">16dp</dimen>
+    <dimen name="defaultViewExtraLargePadding">32dp</dimen>
+
+    <dimen name="logoPadding">@dimen/defaultViewMediumPadding</dimen>
+    <dimen name="syncTypeGetListErrorWidth">180dp</dimen>
 </resources>
