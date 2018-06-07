@@ -34,6 +34,7 @@
     <string name="account_name">Nom du compte</string>
     <string name="cancel">Annuler</string>
     <string name="grant_permission_button">Autoriser</string>
+    <string name="defaultServerUrl" translatable="false">http://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Connectez-vous à votre instance XWiki.</string>
     <string name="learn_more_dialog">En savoir plus</string>
     <string name="don_t_have_a_account">Pas encore de compte XWiki ?</string>

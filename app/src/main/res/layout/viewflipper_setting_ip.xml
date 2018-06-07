@@ -15,12 +15,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical"
             android:paddingBottom="@dimen/layout_padding_bottom"
             android:paddingLeft="@dimen/layout_padding_left_right"
             android:paddingRight="@dimen/layout_padding_left_right"
-            android:paddingTop="@dimen/layout_padding_top">
+            android:paddingTop="@dimen/layout_padding_top"
+            android:gravity="center">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,37 +45,26 @@
                     android:textColor="@color/primary_dark"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_activity_server_label"
-                android:textSize="@dimen/head_text_size"
-                android:layout_marginTop="20dip"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                />
-
-            <EditText
-                android:id="@+id/accountServer"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:minWidth="@dimen/edittext_min_width"
-                android:scrollHorizontally="true"
-                android:text="@string/server_url"
-                android:textColor="@android:color/black" />
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accountServer"
+                    android:inputType="textUri"
+                    android:text="@string/defaultServerUrl"
+                    android:lines="1"
+                    android:hint="@string/serverAddress"
+                    />
+            </android.support.design.widget.TextInputLayout>
             <Button
-                android:layout_weight="1"
                 android:layout_width="@dimen/button_width"
-                android:layout_height="@dimen/button_height"
-                android:minHeight="@dimen/button_min_height"
+                android:layout_height="wrap_content"
                 android:text="@string/next"
                 android:layout_marginTop="@dimen/button_margin_top"
                 android:onClick="doPrevious"
-                android:layout_gravity="end"
-                android:backgroundTint="@color/next_button_color"
-                android:textColor="@android:color/background_light" />
+                android:layout_gravity="end" />
 
         </LinearLayout>
 

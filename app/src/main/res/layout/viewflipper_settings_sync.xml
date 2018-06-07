@@ -76,7 +76,6 @@
         android:layout_alignEnd="@+id/version_check"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/version_check"
-        android:backgroundTint="@color/next_button_color"
         android:onClick="doNext"
         android:id="@+id/nextButton"
         android:text="@string/complete"

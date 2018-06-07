@@ -8,12 +8,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-    </style>
-
-    <!-- AppCompatActivity Theme.AppCompat.Light.NoActionBar-->
-    <style name="AppTheme" parent="@style/BaseAppTheme">
-
+        <item name="android:buttonStyle">@style/AppTheme.Button</item>
     </style>
 
     <!--Activity  Theme.AppCompat.Light -->
@@ -22,7 +17,12 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:buttonStyle">@style/AppTheme.Button</item>
+    </style>
+
+    <style name="AppTheme.Button" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/buttons_background</item>
+        <item name="android:textColor">@color/textPrimary</item>
     </style>
 
 </resources>

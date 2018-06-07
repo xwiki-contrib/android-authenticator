@@ -11,4 +11,5 @@
     <dimen name="layout_padding_bottom">13dip</dimen>
     <dimen name="layout_padding_left_right">20dip</dimen>
     <dimen name="layout_padding_top">5dip</dimen>
+    <dimen name="defaultViewSmallPad">4dp</dimen>
 </resources>
