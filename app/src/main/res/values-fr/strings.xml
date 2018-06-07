@@ -47,12 +47,10 @@
     <string name="sign_up_authenticating">S\'inscrire…</string>
 
     <string name="view_group_action_label">Montrer les détails du groupe d\'example</string>
-    <string name="invite_action_label">Ajouter a Sample SyncAdaper</string>
 
     <string name="authorize_activity_package_label">Nom du Paquet</string>
     <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
     <string name="loginError">Impossible de se connecter: vérifier l’adresse du serveur et l\'utilisateur/mot de passe</string>
-
 
 </resources>

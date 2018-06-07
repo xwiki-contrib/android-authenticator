@@ -50,16 +50,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <include
-            layout="@layout/viewflipper_signup_step1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <include
-            layout="@layout/viewflipper_signup_step2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </ViewFlipper>
 
 </RelativeLayout>

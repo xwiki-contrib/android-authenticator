@@ -47,7 +47,6 @@
 
     <!--contacts.xml-->
     <string name="view_group_action_label">Show sample group details</string>
-    <string name="invite_action_label">Add to Sample SyncAdaper</string>
 
     <!--edit profile-->
     <string name="profile_action">XWiki profile</string>
@@ -72,6 +71,8 @@
     <string name="cantGetAllUsers">Can\'t get all users, try again</string>
     <string name="cantGetGroups">Can\'t get groups</string>
     <string name="loginError">Wrong server URL or credentials</string>
+    <string name="pleaseWait">Please, wait</string>
+    <string name="error_invalid_email">Invalid E-Mail</string>
 
 
     <!--select setting-->
