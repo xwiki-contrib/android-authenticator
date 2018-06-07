@@ -16,16 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/layout_padding_bottom"
-            android:paddingLeft="@dimen/layout_padding_left_right"
-            android:paddingRight="@dimen/layout_padding_left_right"
-            android:paddingTop="@dimen/layout_padding_top"
+            android:padding="@dimen/defaultViewMediumPadding"
             android:gravity="center">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/xwiki_logo"/>
+            <include layout="@layout/logo"/>
+
             <View
                 android:id="@+id/message"
                 android:layout_width="wrap_content"

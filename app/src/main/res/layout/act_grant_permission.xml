@@ -17,10 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/layout_padding_bottom"
-            android:paddingLeft="@dimen/layout_padding_left_right"
-            android:paddingRight="@dimen/layout_padding_left_right"
-            android:paddingTop="@dimen/layout_padding_top">
+            android:padding="@dimen/defaultViewMediumPadding">
 
             <TextView
                 android:id="@+id/message"
