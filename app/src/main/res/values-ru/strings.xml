@@ -1,2 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<?xml version='1.0' encoding='UTF-8'?>
+<resources><string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="user_id">Пользовательский id</string>
+    <string name="phone">Телефон</string>
+    <string name="email">E-Mail</string>
+    <string name="password">Пароль (обязательно)</string>
+    <string name="confirm_password">Подтвердите пароль (обязательно)</string>
+    <string name="captcha_textview">Введите код с картинки</string>
+
+    <string name="login_activity_username_label">Username</string>
+    </resources>
