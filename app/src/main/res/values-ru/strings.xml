@@ -50,4 +50,13 @@
     <string name="signIn">Вход</string>
     <string name="signUp">Регистрация</string>
     <string name="logIn">Войти</string>
+    <string name="pleaseWait">Пожалуйста, подождите</string>
+    <string name="error_invalid_email">Не верный E-Mail</string>
+
+    <!--select setting-->
+    <string-array name="select_groups_array">
+        <item>Все пользователи</item>
+        <item>Группы пользователей</item>
+        <item>Отключено</item>
+    </string-array>
 </resources>
