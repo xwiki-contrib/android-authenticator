@@ -7,7 +7,7 @@
     <string name="phone">Téléphone mobile</string>
     <string name="email">Email</string>
     <string name="password">Mot de passe (Requis)</string>
-    <string name="confirm_password">Confirmez le mot de passe (Requis)\t</string>
+    <string name="confirm_password">Confirmez le mot de passe (Requis)</string>
     <string name="captcha_textview">Entrez le captcha</string>
 
     <string name="login_activity_username_label">Nom d\'utilisateur</string>
@@ -51,6 +51,15 @@
     <string name="authorize_activity_package_label">Nom du Paquet</string>
     <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
-    <string name="loginError">Impossible de se connecter: vérifier l’adresse du serveur et l\'utilisateur/mot de passe</string>
+    <string name="loginError">Mauvais serveur ou utilisateur/mot de passe</string>
 
-</resources>
+<string name="signIn">Connexion</string>
+    <string name="signUp">Enregistrement</string>
+
+    <string name="logIn">Connexion</string>
+
+    <string name="pleaseWait">Veuillez patienter</string>
+    <string name="error_invalid_email">Email invalide</string>
+
+
+    </resources>
