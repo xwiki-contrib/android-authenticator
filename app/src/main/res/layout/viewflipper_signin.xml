@@ -51,7 +51,6 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/defaultViewMediumPadding"
             android:maxLines="2"
-            android:text="@string/error_message"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/error_color"
             android:textStyle="normal"
