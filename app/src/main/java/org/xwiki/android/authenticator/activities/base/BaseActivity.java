@@ -85,7 +85,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void showProgressDialog() {
-        showProgressDialog(getString(R.string.dialog_message_working));
+        showProgressDialog(getString(R.string.pleaseWait));
     }
 
     public void showProgressDialog(String message) {
