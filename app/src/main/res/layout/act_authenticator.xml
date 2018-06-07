@@ -21,7 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:background="@android:color/white">
+        android:background="@android:color/white"
+        android:padding="@dimen/defaultViewMediumPadding">
 
         <include
             layout="@layout/viewflipper_setting_ip"
