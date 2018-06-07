@@ -41,4 +41,9 @@
     <string name="view_profile">Редактировать</string>
 
     <string name="authorize_activity_note">Авторизация через другие приложения</string>
+    <string name="authorize_activity_package_label">Имя пакета</string>
+    <string name="account_name">Имя аккаунта</string>
+    <string name="cancel">Отмена</string>
+    <string name="grant_permission_button">Авторизовать</string>
+    <string name="login_sub_head">Вход в ваш XWiki</string>
     </resources>
