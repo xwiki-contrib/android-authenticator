@@ -75,6 +75,7 @@
     <string name="error_invalid_email">Invalid E-Mail</string>
     <string name="userExists">User exists</string>
     <string name="serverAddress">Server address</string>
+    <string name="synchronizationType">Sync type</string>
 
 
     <!--select setting-->

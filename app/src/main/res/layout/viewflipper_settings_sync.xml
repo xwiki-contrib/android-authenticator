@@ -1,85 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_margin="@dimen/defaultViewSmallPadding">
 
-    <TextView
-        android:id="@+id/version_label"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/about_version"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <Button
-        android:id="@+id/version_check"
-        android:layout_below="@id/version_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:minWidth="50dip"
-        android:gravity="center_vertical"
-        android:background="@drawable/button_selector"
-        android:layout_marginRight="20dp"
-        android:text="@string/version"
-        android:textColor="@android:color/black"/>
-
-
-    <TextView
-        android:id="@+id/sync_label"
-        android:layout_below="@id/version_check"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:text="Synchronization Type"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <android.support.v7.widget.AppCompatSpinner
-        android:id="@+id/select_spinner"
-        android:entries="@array/select_groups_array"
-        android:layout_below="@id/sync_label"
-        android:minHeight="50dip"
-        android:theme="@style/ThemeOverlay.AppCompat.Light"
-        android:layout_marginLeft="10dp"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/select_spinner"
-        android:layout_above="@+id/nextButton"
-        android:layout_marginBottom="60dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="10dp">
-        <ListView
-            android:id="@+id/list_view"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/nextButton">
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="#b5b5b5"
-            android:dividerHeight="1dp"/>
+            android:stretchColumns="1"
+            android:padding="@dimen/defaultViewMediumPadding">
+            <TableRow>
+                <TextView
+                    android:id="@+id/version_label"
+                    android:text="@string/about_version"
+                    android:padding="@dimen/defaultViewSmallPadding"/>
 
-        <ProgressBar
-            android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/version_check"
+                    android:text="@string/version"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:id="@+id/sync_label"
+                    android:text="@string/synchronizationType"
+                    android:padding="@dimen/defaultViewSmallPadding"/>
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/select_spinner"
+                    android:entries="@array/select_groups_array"
+                    android:padding="@dimen/defaultViewSmallPadding"/>
+            </TableRow>
+        </TableLayout>
+
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:id="@+id/list_viewProgressBar"/>
-    </RelativeLayout>
+            android:padding="@dimen/defaultViewMediumPadding">
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#b5b5b5"
+                android:dividerHeight="1dp"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/list_viewProgressBar"/>
+        </RelativeLayout>
+    </LinearLayout>
+
 
     <Button
-        android:layout_width="@dimen/button_width"
-        android:layout_height="50dp"
-        android:layout_alignEnd="@+id/version_check"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/version_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:onClick="doNext"
         android:id="@+id/nextButton"
         android:text="@string/complete"
-        android:textColor="@android:color/background_light"
-        />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
