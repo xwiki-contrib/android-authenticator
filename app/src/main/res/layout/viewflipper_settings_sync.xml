@@ -43,20 +43,46 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="@dimen/defaultViewMediumPadding">
-            <ListView
-                android:id="@+id/list_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="#b5b5b5"
-                android:dividerHeight="1dp"/>
 
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/list_viewProgressBar"
                 android:layout_centerInParent="true"
-                android:id="@+id/list_viewProgressBar"/>
+                android:visibility="gone"/>
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/settingsSyncListViewContainer">
+                <ListView
+                    android:id="@+id/list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dividerHeight="1dp"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:id="@+id/syncTypeGetErrorContainer"
+                    android:visibility="gone">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="@dimen/syncTypeGetListErrorWidth"
+                        android:text="@string/syncTypeGetListErrorMessage"
+                        android:gravity="center"/>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tryAgain"
+                        android:id="@+id/settingsSyncRefreshCurrentTypeListButton"/>
+                </LinearLayout>
+            </FrameLayout>
         </RelativeLayout>
     </LinearLayout>
 

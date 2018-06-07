@@ -14,4 +14,5 @@
     <dimen name="defaultViewExtraLargePadding">32dp</dimen>
 
     <dimen name="logoPadding">@dimen/defaultViewMediumPadding</dimen>
+    <dimen name="syncTypeGetListErrorWidth">180dp</dimen>
 </resources>
