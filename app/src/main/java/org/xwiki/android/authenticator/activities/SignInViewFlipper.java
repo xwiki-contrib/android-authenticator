@@ -25,7 +25,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,9 +32,11 @@ import android.widget.TextView;
 import org.xwiki.android.authenticator.Constants;
 import org.xwiki.android.authenticator.R;
 import org.xwiki.android.authenticator.auth.AuthenticatorActivity;
-import org.xwiki.android.authenticator.rest.HttpResponse;
 import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * SignInViewFlipper.
@@ -92,60 +93,76 @@ public class SignInViewFlipper extends BaseViewFlipper {
     }
 
     public void submit() {
-        final String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
         final String userName = accountName.toString();
         final String userPass = accountPassword.toString();
 
-        final String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
-
-        mAuthTask = new AsyncTask<Void, Void, Intent>() {
-            @Override
-            protected Intent doInBackground(Void... params) {
-                Log.d(TAG, "Started authenticating");
-                Bundle data = new Bundle();
-                try {
-                    Log.d(TAG, userName + " " + userPass + " " + userServer);
-                    HttpResponse response = XWikiHttp.login(userName, userPass);
-                    Log.d(TAG, response.getHeaders().toString() + response.getResponseCode());
-                    int statusCode = response.getResponseCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        String msg = "statusCode=" + statusCode + ", response=" + response.getResponseMessage();
-                        if(statusCode == 401) {
-                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "username or password error");
-                        }else{
-                            data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, response.getResponseMessage());
+        XWikiHttp.login(
+            userName,
+            userPass
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                new Action1<String>() {
+                    @Override
+                    public void call(String authtoken) {
+                        mActivity.hideProgress();
+                        if (authtoken == null) {
+                            showErrorMessage(mContext.getString(R.string.loginError));
+                        } else {
+                            signedIn(
+                                authtoken,
+                                userName,
+                                userPass
+                            );
                         }
-                    } else {
-                        String authtoken = response.getHeaders().get("Set-Cookie");
-                        data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
-                        data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-                        data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
-                        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, userServer);
-                        data.putString(AuthenticatorActivity.PARAM_USER_PASS, userPass);
                     }
-                } catch (Exception e) {
-                    data.putString(AuthenticatorActivity.KEY_ERROR_MESSAGE, "network error!");
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mActivity.hideProgress();
+                        showErrorMessage(mContext.getString(R.string.loginError));
+                    }
                 }
-                final Intent res = new Intent();
-                res.putExtras(data);
-                return res;
-            }
-
-            @Override
-            protected void onPostExecute(Intent intent) {
-                mActivity.hideProgress();
-                if (intent.hasExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE)) {
-                    showErrorMessage(intent.getStringExtra(AuthenticatorActivity.KEY_ERROR_MESSAGE));
-                } else {
-                    mActivity.finishLogin(intent);
-                    mActivity.hideInputMethod();
-                    mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
-                }
-            }
-        };
-        mActivity.putAsyncTask(mAuthTask);
+            );
     }
 
+    private Intent prepareIntent(String authtoken, String username, String password) {
+        String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
+
+        String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+
+        Bundle data = new Bundle();
+        data.putString(AccountManager.KEY_ACCOUNT_NAME, username);
+        data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
+        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, userServer);
+        data.putString(AuthenticatorActivity.PARAM_USER_PASS, password);
+
+        final Intent intent = new Intent();
+        intent.putExtras(data);
+        return intent;
+    }
+
+    private void signedIn(String authtoken, String username, String password) {
+        final Intent signedIn = prepareIntent(
+                authtoken,
+                username,
+                password
+        );
+
+        mActivity.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mActivity.hideProgress();
+                        mActivity.finishLogin(signedIn);
+                        mActivity.hideInputMethod();
+                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+                    }
+                }
+        );
+    }
 
     private void showErrorMessage(String error){
         //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();

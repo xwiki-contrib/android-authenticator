@@ -22,21 +22,30 @@ package org.xwiki.android.authenticator;
 import android.app.Application;
 import android.util.Log;
 
+import org.xwiki.android.authenticator.rest.BaseApiManager;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
 import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AppContext.
  */
 public class AppContext extends Application {
+    private static Map.Entry<String, BaseApiManager> baseApiManager;
     private static final String TAG = "AppContext";
 
     private static AppContext instance;
 
     public static AppContext getInstance() {
         return instance;
+    }
+
+    public static String currentBaseUrl() {
+        return SharedPrefsUtils.getValue(instance, Constants.SERVER_ADDRESS, null);
     }
 
     @Override
@@ -62,5 +71,16 @@ public class AppContext extends Application {
             return true;
         }
         return false;
+    }
+
+    public static BaseApiManager getApiManager() {
+        String url = currentBaseUrl();
+        if (baseApiManager == null || !baseApiManager.getKey().equals(url)) {
+            baseApiManager = new AbstractMap.SimpleEntry<>(
+                url,
+                new BaseApiManager(url)
+            );
+        }
+        return baseApiManager.getValue();
     }
 }

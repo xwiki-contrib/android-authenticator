@@ -19,6 +19,11 @@
  */
 package org.xwiki.android.authenticator.rest;
 
+import android.content.Context;
+
+import org.xwiki.android.authenticator.Constants;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -27,22 +32,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BaseApiManager {
 
-    private static Retrofit retrofit;
-    private static XWikiServices sXwikiServices;
+    private final Retrofit retrofit;
+    private final XWikiServices xWikiServices;
+    private final XWikiPhotosManager xWikiPhotosManager;
 
-    public BaseApiManager() {
-        createService();
-    }
-
-    private static <T> T createApi(Class<T> clazz) {
-        return retrofit.create(clazz);
-    }
-
-    private static void init() {
-        sXwikiServices = createApi(XWikiServices.class);
-    }
-
-    public static void createService() {
+    public BaseApiManager(String baseUrl) {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -52,16 +46,44 @@ public class BaseApiManager {
                 .addInterceptor(interceptor)
                 .build();
 
+        // Check that url ends with `/` and put it if not
+        if (!baseUrl.endsWith("/")) {
+            baseUrl = baseUrl + "/";
+        }
+
         retrofit = new Retrofit.Builder()
-                .baseUrl(BaseUrl.getBaseUrl())
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(okHttpClient)
                 .build();
-        init();
+        
+        xWikiServices = initXWikiServices(retrofit);
+        xWikiPhotosManager = initXWikiPhotosManager(okHttpClient, baseUrl);
+    }
+    
+    public BaseApiManager(Context context) {
+        this(SharedPrefsUtils.getValue(context, Constants.SERVER_ADDRESS, null));
+    }
+    
+    private static XWikiServices initXWikiServices(
+            Retrofit retrofit
+    ) {
+        return retrofit.create(XWikiServices.class);
+    }
+
+    private static XWikiPhotosManager initXWikiPhotosManager(
+            OkHttpClient client,
+            String baseUrl
+    ) {
+        return new XWikiPhotosManager(client, baseUrl);
     }
 
     public XWikiServices getXwikiServicesApi() {
-        return sXwikiServices;
+        return xWikiServices;
+    }
+
+    public XWikiPhotosManager getXWikiPhotosManager() {
+        return xWikiPhotosManager;
     }
 }

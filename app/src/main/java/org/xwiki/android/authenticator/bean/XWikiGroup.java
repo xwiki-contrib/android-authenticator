@@ -19,6 +19,8 @@
  */
 package org.xwiki.android.authenticator.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * XWikiGroup
  */
@@ -34,6 +36,7 @@ public class XWikiGroup {
 
     public String pageName;
 
+    @SerializedName("modified")
     public String lastModifiedDate;
 
     public String version;

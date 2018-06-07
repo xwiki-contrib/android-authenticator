@@ -19,13 +19,6 @@
  */
 package org.xwiki.android.authenticator.syncadapter;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.authenticator.Constants;
-import org.xwiki.android.authenticator.contactdb.ContactManager;
-import org.xwiki.android.authenticator.rest.XWikiHttp;
-import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
-import org.xwiki.android.authenticator.utils.StringUtils;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
@@ -36,8 +29,24 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParserException;
+import org.xwiki.android.authenticator.AppContext;
+import org.xwiki.android.authenticator.Constants;
+import org.xwiki.android.authenticator.bean.XWikiUserFull;
+import org.xwiki.android.authenticator.contactdb.ContactManager;
+import org.xwiki.android.authenticator.rest.XWikiHttp;
+import org.xwiki.android.authenticator.utils.SharedPrefsUtils;
+import org.xwiki.android.authenticator.utils.StringUtils;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.Future;
+
+import rx.Observable;
+import rx.Observer;
+import rx.functions.Action0;
+import rx.subjects.PublishSubject;
 
 /**
  * SyncAdapter
@@ -49,6 +58,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final AccountManager mAccountManager;
     private final Context mContext;
 
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+        mContext = context;
+        mAccountManager = AccountManager.get(context);
+    }
+
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
@@ -56,51 +71,77 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
-                              ContentProviderClient provider, SyncResult syncResult) {
+    public void onPerformSync(final Account account, Bundle extras, String authority,
+                              ContentProviderClient provider, final SyncResult syncResult) {
         Log.i(TAG, "onPerformSync start");
         int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
         Log.i(TAG, "syncType=" + syncType);
         if (syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
-        try {
-            // get last sync date. return new Date(0) if first onPerformSync
-            String lastSyncMarker = getServerSyncMarker(account);
-            Log.d(TAG, lastSyncMarker);
-            // By default, contacts from a 3rd party provider are hidden in the contacts
-            // list. So let's set the flag that causes them to be visible, so that users
-            // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
-            if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
-                ContactManager.setAccountContactsVisibility(getContext(), account, true);
+        // get last sync date. return new Date(0) if first onPerformSync
+        String lastSyncMarker = getServerSyncMarker(account);
+        Log.d(TAG, lastSyncMarker);
+        // By default, contacts from a 3rd party provider are hidden in the contacts
+        // list. So let's set the flag that causes them to be visible, so that users
+        // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
+        if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
+            ContactManager.setAccountContactsVisibility(getContext(), account, true);
+        }
+
+        //TODO may need to check authToken, or block other's getAuthToken.
+        //final String authtoken = mAccountManager.blockingGetAuthToken(account,
+        //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
+
+
+        // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
+        final Observable<XWikiUserFull> observable = XWikiHttp.getSyncData(syncType);
+
+        // Update the local contacts database with the last modified changes. updateContact()
+        ContactManager.updateContacts(mContext, account.name, observable);
+
+        final Object[] sync = new Object[]{null};
+
+        observable.subscribe(
+            new Observer<XWikiUserFull>() {
+                @Override
+                public void onCompleted() {
+                    // Save off the new sync date. On our next sync, we only want to receive
+                    // contacts that have changed since this sync...
+                    setServerSyncMarker(account, StringUtils.dateToIso8601String(new Date()));
+                    synchronized (sync) {
+                        sync[0] = new Object();
+                        sync.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    syncResult.stats.numIoExceptions++;
+                    synchronized (sync) {
+                        sync[0] = new Object();
+                        sync.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onNext(XWikiUserFull xWikiUserFull) {
+                    syncResult.stats.numEntries++;
+                }
             }
+        );
 
-            //TODO may need to check authToken, or block other's getAuthToken.
-            //final String authtoken = mAccountManager.blockingGetAuthToken(account,
-            //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
-
-
-            // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-            XWikiHttp.SyncData syncData = XWikiHttp.getSyncData(lastSyncMarker, syncType);
-            Log.i(TAG, syncData != null ? syncData.toString() : "syncData null");
-
-            // Update the local contacts database with the last modified changes. updateContact()
-            ContactManager.updateContacts(mContext, account.name, syncData);
-
-            //Update the contacts' photo. Separately add photos because of TransactionTooLargeException
-            ContactManager.updateAvatars(mContext, syncData.getUpdateUserList());
-
-            // Save off the new sync date. On our next sync, we only want to receive
-            // contacts that have changed since this sync...
-            setServerSyncMarker(account, StringUtils.dateToIso8601String(new Date()));
-
-        } catch (final IOException e) {
-            Log.e(TAG, "IOException", e);
-            syncResult.stats.numIoExceptions++;
-        } catch (XmlPullParserException e) {
-            Log.e(TAG, "XmlPullParserException", e);
-            syncResult.stats.numParseExceptions++;
+        synchronized (observable) {
+            observable.notifyAll();
+        }
+        synchronized (sync) {
+            while (sync[0] == null) {
+                try {
+                    sync.wait();
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "Can't await end of sync", e);
+                }
+            }
         }
     }
-
 
     /**
      * This helper function fetches the last known high-water-mark

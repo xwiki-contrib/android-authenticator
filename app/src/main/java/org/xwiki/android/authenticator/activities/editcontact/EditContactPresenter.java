@@ -22,9 +22,9 @@ package org.xwiki.android.authenticator.activities.editcontact;
 import android.content.Context;
 import android.util.Base64;
 
+import org.xwiki.android.authenticator.AppContext;
 import org.xwiki.android.authenticator.activities.base.BasePresenter;
 import org.xwiki.android.authenticator.bean.UserPayload;
-import org.xwiki.android.authenticator.rest.DataManager;
 
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
@@ -37,12 +37,10 @@ import rx.subscriptions.CompositeSubscription;
 
 public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
 
-    private final DataManager dataManager;
     private CompositeSubscription subscriptions;
 
     public EditContactPresenter(Context context) {
         super(context);
-        dataManager = new DataManager();
         subscriptions = new CompositeSubscription();
     }
 
@@ -64,10 +62,16 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
     public void updateUser(String wiki, String space, String pageName, UserPayload userPayload) {
         checkViewAttached();
         getMvpView().showProgress();
-        subscriptions.add(dataManager.updateUser(wiki, space, pageName, userPayload)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<ResponseBody>() {
+        subscriptions.add(
+            AppContext.getApiManager().getXwikiServicesApi().updateUser(
+                wiki,
+                space,
+                pageName,
+                userPayload
+            ).observeOn(
+                AndroidSchedulers.mainThread()
+            ).subscribe(
+                new Subscriber<ResponseBody>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -92,7 +96,8 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
                         getMvpView().hideProgress();
                         getMvpView().showContactUpdateSuccessfully();
                     }
-                })
+                }
+            )
         );
     }
 
@@ -107,10 +112,13 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
         getMvpView().showProgress();
         String basicAuth = username + ":" + password;
         basicAuth = "Basic " + Base64.encodeToString(basicAuth.getBytes(), Base64.NO_WRAP);
-        subscriptions.add(dataManager.login(basicAuth)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<Response<ResponseBody>>() {
+        subscriptions.add(
+            AppContext.getApiManager().getXwikiServicesApi().login(
+                basicAuth
+            ).observeOn(
+                AndroidSchedulers.mainThread()
+            ).subscribe(
+                new Subscriber<Response<ResponseBody>>() {
                     @Override
                     public void onCompleted() {
 
@@ -127,8 +135,8 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
                         getMvpView().hideProgress();
                         getMvpView().showLoginSuccessfully(responseBodyResponse);
                     }
-                })
-
+                }
+            )
         );
     }
 
