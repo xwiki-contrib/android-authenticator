@@ -29,7 +29,7 @@
     <string name="sign_up_authenticating">Sign Up…</string>
 
     <!-- menu -->
-    <string name="menu_save">Save</string>
+    <string name="save">Save</string>
     <string name="menu_ok" translatable="false">@android:string/ok</string>
 
     <!--Activity label-->

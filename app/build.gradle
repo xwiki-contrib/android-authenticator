@@ -36,11 +36,6 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.1.0'
     implementation 'io.reactivex:rxjava:1.3.0'
 
-    //Butter Knife
-    implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
-    implementation "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-
     // For Local Unit Tests
 
     // Required -- JUnit 4 framework
