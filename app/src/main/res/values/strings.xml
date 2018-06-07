@@ -1,19 +1,21 @@
 <resources>
-    <string name="app_name">XWiki Authenticator</string>
+    <string name="app_name" translatable="false">XWiki Authenticator</string>
     <string name="label">XWiki</string>
-    <string name="login_label">Log in</string>
+    <string name="login_label">@string/log_in</string>
 
-    <!--Progress Dialog or Bar-->
-    <string name="dialog_message_working">working</string>
+    <string name="signIn">Sign in</string>
+    <string name="signUp">Sign up</string>
+
+    <string name="logIn">Log in</string>
 
     <!-- edit -->
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="user_id">User Id (Required)</string>
     <string name="phone">Cell Phone</string>
-    <string name="email">Email</string>
-    <string name="password">Password(Required)</string>
-    <string name="confirm_password">Confirm Password(Required)</string>
+    <string name="email">E-Mail</string>
+    <string name="password">Password (Required)</string>
+    <string name="confirm_password">Confirm Password (Required)</string>
     <string name="captcha_textview">Input the captcha</string>
 
     <!-- login Label username password server-->
@@ -21,32 +23,27 @@
     <string name="login_activity_password_label">Password</string>
     <string name="login_activity_server_label">Server</string>
     <string name="login_activity_port_label">Port</string>
-    <string name="login_activity_ok_button">Sign in</string>
-    <string name="login_activity_register_button">Sign up</string>
-    <string name="sign_in_authenticating">Sign In... ...</string>
-    <string name="sign_up_authenticating">Sign Up... ...</string>
+    <string name="login_activity_ok_button">@string/signIn</string>
+    <string name="login_activity_register_button">@string/signUp</string>
+    <string name="sign_in_authenticating">Sign In…</string>
+    <string name="sign_up_authenticating">Sign Up…</string>
 
     <!-- menu -->
     <string name="menu_save">Save</string>
-    <string name="menu_refresh">Refresh</string>
-    <string name="menu_ok">OK</string>
+    <string name="menu_ok">@android:string/ok</string>
 
     <!--Activity label-->
     <string name="title_activity_edit_contact">Edit Contact</string>
-    <string name="title_activity_sign_up">Sign Up</string>
+    <string name="title_activity_sign_up">@string/signUp</string>
     <string name="title_activity_authorize">Authorize</string>
     <string name="title_activity_select_groups">Select Groups</string>
     <string name="title_activity_setting">Settings</string>
 
     <!--error msg-->
     <string name="error_invalid_server">This server address is invalid</string>
-    <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="error_confirm_password">The passwords do not match</string>
-    <string name="error_userid_password">This userId is incorrect</string>
-    <string name="error_invalid_captcha">This captcha is invalid</string>
 
     <!--contacts.xml-->
     <string name="view_group_action_label">Show sample group details</string>
@@ -62,21 +59,19 @@
     <string name="account_name">Account Name</string>
     <string name="cancel">Cancel</string>
     <string name="grant_permission_button">Authorize</string>
-    <string name="server_url">http://www.xwiki.org/xwiki</string>
+    <string name="server_url" translatable="false" formatted="false">http://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Login to your XWiki Instance.</string>
     <string name="learn_more_dialog">Learn More</string>
-    <string name="log_in">Log in</string>
+    <string name="log_in">@string/logIn</string>
     <string name="don_t_have_a_account">Don\'t Have a XWiki Account?</string>
     <string name="create_one">Create One</string>
-    <string name="error_message">error message</string>
-    <string name="register">Register</string>
     <string name="next">Next</string>
     <string name="about_version">About Version</string>
     <string name="version">Version 1.0</string>
     <string name="complete">Complete</string>
     <string name="cantGetAllUsers">Can\'t get all users, try again</string>
     <string name="cantGetGroups">Can\'t get groups</string>
-    <string name="loginError">Can\'t login: check server url and credentials</string>
+    <string name="loginError">Wrong server URL or credentials</string>
     <string name="userExists">User exists</string>
 
 

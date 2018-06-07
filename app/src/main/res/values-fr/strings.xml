@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources><string name="app_name">Authentificateur XWiki</string>
+<resources>
     <string name="label">XWiki</string>
     <string name="login_label">Connexion</string>
 
