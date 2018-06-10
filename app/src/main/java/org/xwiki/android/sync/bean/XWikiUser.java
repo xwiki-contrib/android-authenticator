@@ -167,6 +167,10 @@ public class XWikiUser {
                 result[2] = strs2[1];
                 return result;
             }
+        } else {
+            if (strs.length == 3) {
+                return strs;
+            }
         }
         return null;
     }
