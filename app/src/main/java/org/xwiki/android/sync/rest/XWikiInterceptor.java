@@ -19,9 +19,7 @@
  */
 package org.xwiki.android.sync.rest;
 
-
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
@@ -40,12 +38,7 @@ public class XWikiInterceptor implements Interceptor {
     public static final String HEADER_CONTENT_TYPE = "Content-type";
     public static final String HEADER_ACCEPT = "Accept";
 
-    public String cookie;
-
-    public XWikiInterceptor() {
-        cookie = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(),
-                Constants.COOKIE, "");
-    }
+    private String cookie = null;
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -61,11 +54,24 @@ public class XWikiInterceptor implements Interceptor {
                 .header(HEADER_ACCEPT, "application/json")
                 .url(url);
 
+        String cookie = getCookie();
+
         if (!TextUtils.isEmpty(cookie)) {
             builder.addHeader("Cookie", cookie);
         }
 
         Request request = builder.build();
         return chain.proceed(request);
+    }
+
+    private String getCookie() {
+        if (TextUtils.isEmpty(cookie)) {
+            cookie = SharedPrefsUtils.getValue(
+                AppContext.getInstance().getApplicationContext(),
+                Constants.COOKIE,
+                ""
+            );
+        }
+        return cookie;
     }
 }
