@@ -79,7 +79,13 @@ public class XWikiHttp {
                 @Override
                 public void call(Response<ResponseBody> responseBodyResponse) {
                     if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
-                        authTokenSubject.onNext(responseBodyResponse.headers().get("Set-Cookie"));
+                        String cookie = responseBodyResponse.headers().get("Set-Cookie");
+                        SharedPrefsUtils.putValue(
+                            AppContext.getInstance().getApplicationContext(),
+                            Constants.COOKIE,
+                            cookie
+                        );
+                        authTokenSubject.onNext(cookie);
                     } else {
                         authTokenSubject.onNext(null);
                     }
