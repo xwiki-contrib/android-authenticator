@@ -17,30 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authdemo;
+package org.xwiki.android.sync.syncadapter;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+
 
 /**
- * @version $Id: $
+ * Service to handle Account sync. This is invoked with an intent with action
+ * ACTION_AUTHENTICATOR_INTENT. It instantiates the syncadapter and returns its
+ * IBinder.
  */
-public class Constants {
-    /**
-     * Server
-     */
-    public static final String SERVER_ADDRESS = "requestUrl";
+public class SyncService extends Service {
 
-    /**
-     * Account type id
-     */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.sync";
+    private static final Object sSyncAdapterLock = new Object();
+    private static SyncAdapter sSyncAdapter = null;
 
-    /**
-     * Auth token types
-     */
-    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
-    public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
+    @Override
+    public void onCreate() {
+        synchronized (sSyncAdapterLock) {
+            if (sSyncAdapter == null) {
+                sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
+            }
+        }
+    }
 
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
-
-
+    @Override
+    public IBinder onBind(Intent intent) {
+        return sSyncAdapter.getSyncAdapterBinder();
+    }
 }

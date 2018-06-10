@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.xwiki.android.authenticator">
+    package="org.xwiki.android.sync">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -67,7 +67,7 @@
 
         <provider
             android:name=".syncadapter.EmptyProvider"
-            android:authorities="org.xwiki.android.authenticator"
+            android:authorities="org.xwiki.android.sync"
             android:exported="false" />
 
         <service

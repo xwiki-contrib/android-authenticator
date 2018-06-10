@@ -17,30 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authdemo;
+package org.xwiki.android.sync.activities.editcontact;
 
-/**
- * @version $Id: $
- */
-public class Constants {
-    /**
-     * Server
-     */
-    public static final String SERVER_ADDRESS = "requestUrl";
+import org.xwiki.android.sync.activities.base.MVPView;
 
-    /**
-     * Account type id
-     */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.sync";
-
-    /**
-     * Auth token types
-     */
-    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
-    public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
-
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
 
+public interface EditContactMvpView extends MVPView {
+
+    void showContactUpdateSuccessfully();
+
+    void showErrorOnUpdatingContact();
+
+    void showLoginSuccessfully(Response<ResponseBody> response);
+
+    void showErrorLogin();
+
+    void onProgressDialogCancel();
 }

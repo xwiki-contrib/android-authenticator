@@ -17,30 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authdemo;
+package org.xwiki.android.sync.contactdb;
 
-/**
- * @version $Id: $
+import android.provider.ContactsContract.Data;
+
+/*
+ * The standard columns representing contact's info from social apps.
  */
-public class Constants {
-    /**
-     * Server
-     */
-    public static final String SERVER_ADDRESS = "requestUrl";
+public final class ContactColumns {
+
+    private ContactColumns() {
+    }
 
     /**
-     * Account type id
+     * MIME-type used when storing a profile {@link android.provider.ContactsContract.Data} entry.
      */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.sync";
+    public static final String MIME_PROFILE = "vnd.android.cursor.item/vnd.xwikiedit.profile";
 
-    /**
-     * Auth token types
-     */
-    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
-    public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
+    public static final String DATA_PID = Data.DATA1;
 
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+    public static final String DATA_SUMMARY = Data.DATA2;
 
-
+    public static final String DATA_DETAIL = Data.DATA3;
 }

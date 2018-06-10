@@ -21,7 +21,7 @@
 -->
 
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="org.xwiki.android.authenticator"
+    android:accountType="org.xwiki.android.sync"
     android:icon="@drawable/logo"
     android:smallIcon="@drawable/logo"
     android:label="@string/label"

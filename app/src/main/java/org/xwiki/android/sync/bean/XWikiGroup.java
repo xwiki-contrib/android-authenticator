@@ -17,30 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authdemo;
+package org.xwiki.android.sync.bean;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
- * @version $Id: $
+ * XWikiGroup
  */
-public class Constants {
+public class XWikiGroup {
     /**
-     * Server
+     * curriki:XWiki.XWikiAdminGroup
      */
-    public static final String SERVER_ADDRESS = "requestUrl";
+    public String id;
 
-    /**
-     * Account type id
-     */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.sync";
+    public String wiki;
 
-    /**
-     * Auth token types
-     */
-    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
-    public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
+    public String space;
 
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+    public String pageName;
 
+    @SerializedName("modified")
+    public String lastModifiedDate;
 
+    public String version;
+
+    @Override
+    public String toString() {
+        return "XWikiGroup{" +
+                "id='" + id + '\'' +
+                ", wiki='" + wiki + '\'' +
+                ", space='" + space + '\'' +
+                ", pageName='" + pageName + '\'' +
+                ", lastModifiedDate='" + lastModifiedDate + '\'' +
+                '}';
+    }
 }

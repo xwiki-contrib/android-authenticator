@@ -27,7 +27,7 @@
         android:title="Settings"
         android:summary="Configure the synchronization of your account">
         <intent android:action="android.intent.action.VIEW"
-            android:targetPackage="org.xwiki.android.authenticator"
-            android:targetClass="org.xwiki.android.authenticator.auth.AuthenticatorActivity" />
+            android:targetPackage="org.xwiki.android.sync"
+            android:targetClass="org.xwiki.android.sync.auth.AuthenticatorActivity" />
     </PreferenceScreen>
 </PreferenceScreen>
