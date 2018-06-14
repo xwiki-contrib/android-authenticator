@@ -29,8 +29,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.contactdb.ContactManager;
@@ -38,15 +36,10 @@ import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.Future;
 
 import rx.Observable;
 import rx.Observer;
-import rx.functions.Action0;
-import rx.subjects.PublishSubject;
 
 /**
  * SyncAdapter

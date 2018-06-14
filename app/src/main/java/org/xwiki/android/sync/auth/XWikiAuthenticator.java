@@ -33,7 +33,6 @@ import android.util.Log;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
-import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import java.util.List;

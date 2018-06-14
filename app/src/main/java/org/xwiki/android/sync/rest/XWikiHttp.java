@@ -19,30 +19,23 @@
  */
 package org.xwiki.android.sync.rest;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.ObjectSummary;
-import org.xwiki.android.sync.bean.RegisterForm;
 import org.xwiki.android.sync.bean.SearchResult;
 import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -52,10 +45,8 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 import static org.xwiki.android.sync.AppContext.getApiManager;
 

@@ -34,7 +34,6 @@ import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.auth.AuthenticatorActivity;
-import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StatusBarColorCompat;
 

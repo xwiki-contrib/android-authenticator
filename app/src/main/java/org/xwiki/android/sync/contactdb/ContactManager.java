@@ -35,10 +35,8 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 
-import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUser;
@@ -47,16 +45,11 @@ import org.xwiki.android.sync.bean.XWikiUserFull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 
 /**
  * Class for managing contacts sync related mOperations
