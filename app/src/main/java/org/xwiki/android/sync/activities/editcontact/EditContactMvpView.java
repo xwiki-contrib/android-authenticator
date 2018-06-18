@@ -24,16 +24,39 @@ import org.xwiki.android.sync.activities.base.MVPView;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-
+/**
+ * Interface which represent EditContact as {@link MVPView}. Implementers must provide work with
+ * view as with edit contact view - in fact, contains only basic methods such as callback for
+ * auth and other.
+ *
+ * @version $Id$
+ */
 public interface EditContactMvpView extends MVPView {
 
+    /**
+     * Show to user that contact was successfully updated.
+     */
     void showContactUpdateSuccessfully();
 
+    /**
+     * Show to user that contact was not updated for the some reason.
+     */
     void showErrorOnUpdatingContact();
 
+    /**
+     * Actually update cookie and restart update contact.
+     *
+     * @param response Body which must contains new cookies
+     */
     void showLoginSuccessfully(Response<ResponseBody> response);
 
+    /**
+     * Show to user that authorisation was failed.
+     */
     void showErrorLogin();
 
-    void onProgressDialogCancel();
+    /**
+     * Call this method for init progress dialog cancel listener.
+     */
+    void initOnProgressDialogCancel();
 }

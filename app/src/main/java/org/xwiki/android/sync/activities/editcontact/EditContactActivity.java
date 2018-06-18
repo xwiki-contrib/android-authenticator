@@ -25,7 +25,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -45,7 +44,6 @@ import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.contactdb.BatchOperation;
 import org.xwiki.android.sync.contactdb.ContactManager;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StatusBarColorCompat;
 import org.xwiki.android.sync.utils.StringUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -259,7 +257,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     @Override
     public void showProgress() {
         showProgressDialog();
-        onProgressDialogCancel();
+        initOnProgressDialogCancel();
     }
 
     /**
@@ -333,7 +331,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
      * Call this method for init progress dialog cancel listener.
      */
     @Override
-    public void onProgressDialogCancel() {
+    public void initOnProgressDialogCancel() {
         getProgressDialog().setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
                 editContactPresenter.clearSubscription();
