@@ -19,7 +19,6 @@
  */
 package org.xwiki.android.sync.auth;
 
-import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -29,31 +28,27 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
-import org.xwiki.android.sync.activities.SettingIpViewFlipper;
+import org.xwiki.android.sync.activities.SettingServerIpViewFlipper;
 import org.xwiki.android.sync.activities.SettingSyncViewFlipper;
 import org.xwiki.android.sync.activities.SignInViewFlipper;
 import org.xwiki.android.sync.utils.IntentUtils;
 import org.xwiki.android.sync.utils.PermissionsUtils;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StatusBarColorCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +70,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     public final static String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
     public final static String IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE";
 
-    private SettingIpViewFlipper settingsIpViewFlipper;
+    private SettingServerIpViewFlipper settingsIpViewFlipper;
     private SignInViewFlipper signInViewFlipper;
     private SettingSyncViewFlipper settingSyncViewFlipper;
 
@@ -178,7 +173,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
                 if (settingsIpViewFlipper == null) {
-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
+                    settingsIpViewFlipper = new SettingServerIpViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 if (next) {
                     settingsIpViewFlipper.doNext();
@@ -243,7 +238,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         switch (id) {
             case ViewFlipperLayoutId.SETTING_IP:
                 if (settingsIpViewFlipper == null) {
-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
+                    settingsIpViewFlipper = new SettingServerIpViewFlipper(this, mViewFlipper.getChildAt(id));
                 }
                 toolbar.setTitle("XWiki Account");
 
