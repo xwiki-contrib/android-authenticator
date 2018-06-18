@@ -82,6 +82,7 @@
     <string name="updateSuccess">Update Successfully</string>
     <string name="haveNoPermission">You have no permission</string>
     <string name="authenticationError">Authentication error</string>
+    <string name="xwikiAccount">XWiki Account</string>
 
 
     <!--select setting-->

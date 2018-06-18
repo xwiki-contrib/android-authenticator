@@ -45,6 +45,8 @@ import static org.xwiki.android.sync.AppContext.currentBaseUrl;
  * A grant permission activity.
  * input your count's password and verify by comparing with local account's info
  * or sending password to server to verify according the response.
+ *
+ * @version $Id$
  */
 public class GrantPermissionActivity extends AccountAuthenticatorActivity {
 
@@ -62,8 +64,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_grant_permission);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("XWiki Account");
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+        toolbar.setTitle(R.string.xwikiAccount);
 
         //get data from intent
         uid = getIntent().getIntExtra("uid", 0);
