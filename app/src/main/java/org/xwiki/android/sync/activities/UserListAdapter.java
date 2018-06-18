@@ -75,8 +75,11 @@ public class UserListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void refresh(List<SearchResult> searchs) {
-        this.searchResults = searchs;
+    public void refresh(List<SearchResult> results) {
+        if (searchResults.equals(results)) {
+            return;
+        }
+        searchResults = results;
         notifyDataSetChanged();
     }
 

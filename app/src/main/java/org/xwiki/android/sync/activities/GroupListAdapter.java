@@ -123,7 +123,10 @@ public class GroupListAdapter extends BaseAdapter {
     }
 
     public void refresh(List<XWikiGroup> groups) {
-        this.groupList = groups;
+        if (groupList.equals(groups)) {
+            return;
+        }
+        groupList = groups;
         initSelectedGroup();
         notifyDataSetChanged();
     }

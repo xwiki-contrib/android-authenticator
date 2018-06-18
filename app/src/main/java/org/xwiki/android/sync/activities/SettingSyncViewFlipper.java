@@ -27,17 +27,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.widget.AppCompatSpinner;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xwiki.android.sync.Constants;
@@ -60,40 +59,90 @@ import rx.schedulers.Schedulers;
 import static org.xwiki.android.sync.AppContext.getApiManager;
 
 /**
- * SettingSyncViewFlipper
+ * Flipper which contains setting of synchronization.
+ *
+ * @version $Id$
  */
 public class SettingSyncViewFlipper extends BaseViewFlipper {
+
+    /**
+     * Tag which will be used for logging.
+     */
     private static final String TAG = "SettingSyncViewFlipper";
 
-    ListView mListView = null;
-    GroupListAdapter mGroupAdapter;
-    UserListAdapter mUsersAdapter;
-    private List<XWikiGroup> groupList;
-    private List<SearchResult> searchResults;
+    /**
+     * {@link View} for presenting items.
+     */
+    private ListView mListView = null;
+
+    /**
+     * Adapter for groups
+     */
+    private GroupListAdapter mGroupAdapter;
+
+    /**
+     * Adapter for users.
+     */
+    private UserListAdapter mUsersAdapter;
+
+    /**
+     * List of received groups.
+     */
+    private List<XWikiGroup> groups;
+
+    /**
+     * List of received all users.
+     */
+    private List<SearchResult> allUsers;
+
+    /**
+     * Currently chosen sync type.
+     */
     private int SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC;
 
+    /**
+     * Flag of currently loading groups.
+     */
     private volatile Boolean groupsAreLoading = false;
-    private volatile Boolean allAreLoading = false;
 
+    /**
+     * Flag of currently loading all users.
+     */
+    private volatile Boolean allUsersAreLoading = false;
+
+    /**
+     * Standard constructor.
+     *
+     * @param activity Current activity
+     * @param contentRootView Root view for flipper
+     */
     public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
         initView();
     }
 
+    /**
+     * Calling when user push "Complete".
+     */
     @Override
     public void doNext() {
         syncSettingComplete();
         mActivity.finish();
-        //mActivity.checkPermissions();
     }
 
+    /**
+     * Calling when user push back.
+     */
     @Override
     public void doPrevious() {
         mActivity.finish();
     }
 
+    /**
+     * Init current view.
+     */
     private void initView(){
-        Button versionCheckButton = (Button) findViewById(R.id.version_check);
+        Button versionCheckButton = findViewById(R.id.version_check);
         versionCheckButton.setText(
             String.format(
                 mContext.getString(R.string.versionTemplate),
@@ -116,14 +165,14 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         );
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        mListView = findViewById(R.id.list_view);
         mListView.setEmptyView(
             findViewById(R.id.syncTypeGetErrorContainer)
         );
-        groupList = new ArrayList<>();
-        searchResults = new ArrayList<>();
-        mGroupAdapter = new GroupListAdapter(mContext, groupList);
-        mUsersAdapter = new UserListAdapter(mContext, searchResults);
+        groups = new ArrayList<>();
+        allUsers = new ArrayList<>();
+        mGroupAdapter = new GroupListAdapter(mContext, groups);
+        mUsersAdapter = new UserListAdapter(mContext, allUsers);
         initData();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
@@ -131,23 +180,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         selectSyncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == Constants.SYNC_TYPE_NO_NEED_SYNC){
-                    mListView.setVisibility(View.GONE);
-                }else {
-                    if(position == Constants.SYNC_TYPE_SELECTED_GROUPS){
-                        mListView.setVisibility(View.VISIBLE);
-                        mListView.setAdapter(mGroupAdapter);
-                        mGroupAdapter.refresh(groupList);
-                        refreshProgressBar();
-                    }else{
-                        mListView.setVisibility(View.VISIBLE);
-                        mListView.setAdapter(mUsersAdapter);
-                        mUsersAdapter.refresh(searchResults);
-                        refreshProgressBar();
-                    }
-                }
                 SYNC_TYPE = position;
-                ((TextView) view).setTextColor(Color.BLACK);
+                updateListView();
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -155,37 +189,37 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         });
 
-
         SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
     }
 
+    /**
+     * @return Spinner for sync type
+     */
     private AppCompatSpinner getSelectSyncSpinner() {
-        return (AppCompatSpinner) findViewById(R.id.select_spinner);
+        return findViewById(R.id.select_spinner);
     }
 
+    /**
+     * @return Progress bar view
+     */
     private ProgressBar getProgressBar() {
-        return (ProgressBar) findViewById(R.id.list_viewProgressBar);
+        return findViewById(R.id.list_viewProgressBar);
     }
 
+    /**
+     * @return Container of {@link #mListView}
+     */
     private View getListViewContainer() {
         return findViewById(R.id.settingsSyncListViewContainer);
     }
 
+    /**
+     * Show progress bar if need or hide otherwise.
+     */
     private void refreshProgressBar() {
-        Integer selectedSyncType = getSelectSyncSpinner().getSelectedItemPosition();
-        final Boolean progressBarVisible;
-        switch (selectedSyncType) {
-            case Constants.SYNC_TYPE_SELECTED_GROUPS:
-                progressBarVisible = groupsAreLoading;
-            break;
-            case Constants.SYNC_TYPE_ALL_USERS:
-                progressBarVisible = allAreLoading;
-            break;
-            default:
-                progressBarVisible = false;
-            break;
-        }
+        final Boolean progressBarVisible = (syncGroups() && groupsAreLoading)
+            || (syncAllUsers() && allUsersAreLoading);
         mActivity.runOnUiThread(
             new Runnable() {
                 @Override
@@ -202,8 +236,11 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         );
     }
 
+    /**
+     * Load data to groups and all users lists.
+     */
     private void initData() {
-        if (groupList.isEmpty()) {
+        if (groups.isEmpty()) {
             groupsAreLoading = true;
             getApiManager().getXwikiServicesApi().availableGroups(
                 Constants.LIMIT_MAX_SYNC_USERS
@@ -214,17 +251,13 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     new Action1<CustomSearchResultContainer<XWikiGroup>>() {
                         @Override
                         public void call(CustomSearchResultContainer<XWikiGroup> xWikiGroupCustomSearchResultContainer) {
+                            groupsAreLoading = false;
                             List<XWikiGroup> searchResults = xWikiGroupCustomSearchResultContainer.searchResults;
                             if (searchResults != null) {
-                                groupList.clear();
-                                groupList.addAll(searchResults);
-                                if (getSelectSyncSpinner().getSelectedItemPosition() == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                    mListView.setAdapter(mGroupAdapter);
-                                    mGroupAdapter.refresh(groupList);
-                                }
+                                groups.clear();
+                                groups.addAll(searchResults);
+                                updateListView();
                             }
-                            groupsAreLoading = false;
-                            refreshProgressBar();
                         }
                     },
                     new Action1<Throwable>() {
@@ -248,8 +281,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     }
                 );
         }
-        if (searchResults.isEmpty()) {
-            allAreLoading = true;
+        if (allUsers.isEmpty()) {
+            allUsersAreLoading = true;
             getApiManager().getXwikiServicesApi().getAllUsersPreview()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -257,19 +290,16 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     new Action1<SearchResultContainer>() {
                         @Override
                         public void call(SearchResultContainer searchResultContainer) {
-                            searchResults.clear();
-                            searchResults.addAll(searchResultContainer.searchResults);
-                            if (getSelectSyncSpinner().getSelectedItemPosition() == Constants.SYNC_TYPE_ALL_USERS) {
-                                mListView.setAdapter(mUsersAdapter);
-                                mUsersAdapter.refresh(searchResults);
-                            }
-                            allAreLoading = false;
-                            refreshProgressBar();
+                            allUsersAreLoading = false;
+                            allUsers.clear();
+                            allUsers.addAll(searchResultContainer.searchResults);
+                            updateListView();
                         }
                     },
                     new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
+                            allUsersAreLoading = false;
                             mActivity.runOnUiThread(
                                 new Runnable() {
                                     @Override
@@ -282,34 +312,81 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                                     }
                                 }
                             );
-                            allAreLoading = false;
                             refreshProgressBar();
                         }
                     }
                 );
         }
+    }
+
+    /**
+     * Will be called when not enough given permissions.
+     */
+    public void noPermissions(){
+        Toast.makeText(mContext, R.string.askToGrantPermissions, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * @return true if currently selected to sync groups or false otherwise
+     */
+    private Boolean syncGroups() {
+        return SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS;
+    }
+
+    /**
+     * @return true if currently selected to sync all users or false otherwise
+     */
+    private Boolean syncAllUsers() {
+        return SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS;
+    }
+
+    /**
+     * @return true if currently selected to sync not or false otherwise
+     */
+    private Boolean syncNothing() {
+        return SYNC_TYPE == Constants.SYNC_TYPE_NO_NEED_SYNC;
+    }
+
+    /**
+     * Update list view and hide/show view from {@link #getListViewContainer()}
+     */
+    private void updateListView() {
+        if(syncNothing()){
+            getListViewContainer().setVisibility(View.GONE);
+        } else {
+            getListViewContainer().setVisibility(View.VISIBLE);
+            BaseAdapter adapter;
+            if(syncGroups()){
+                adapter = mGroupAdapter;
+                mGroupAdapter.refresh(groups);
+            } else {
+                adapter = mUsersAdapter;
+                mUsersAdapter.refresh(allUsers);
+            }
+            if (adapter != mListView.getAdapter()) {
+                mListView.setAdapter(adapter);
+            }
+        }
         refreshProgressBar();
     }
 
-    public void noPermissions(){
-        Toast.makeText(mContext, "Please grant the permission in the app settings", Toast.LENGTH_SHORT).show();
-    }
-
-
+    /**
+     * Save settings of synchronization.
+     */
     public void syncSettingComplete() {
         //check changes. if no change, directly return
         int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, -1);
-        if(oldSyncType == SYNC_TYPE && SYNC_TYPE != Constants.SYNC_TYPE_SELECTED_GROUPS){
+        if(oldSyncType == SYNC_TYPE && !syncGroups()){
             return;
         }
         //if has changes, set sync
-        if(SYNC_TYPE == Constants.SYNC_TYPE_NO_NEED_SYNC){
+        if(syncNothing()){
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
-            resetSync(false);
-        } else if (SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS) {
+            setSync(false);
+        } else if (syncAllUsers()) {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
-            resetSync(true);
-        } else if(SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS){
+            setSync(true);
+        } else if(syncGroups()){
             //compare to see if there are some changes.
             if(oldSyncType == SYNC_TYPE && compareSelectGroups()){
                 return;
@@ -325,22 +402,25 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
             }
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
-            resetSync(true);
+            setSync(true);
         }
         mActivity.finish();
     }
 
-    private void resetSync(boolean flag) {
+    /**
+     * Enable/disable synchronization depending on syncEnabled.
+     *
+     * @param syncEnabled Flag to enable (if true) / disable (if false) synchronization
+     */
+    private void setSync(boolean syncEnabled) {
         AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
-        if (flag) {
-            //reset sync
+        if (syncEnabled) {
             mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
-            //Turn on periodic syncing
             ContentResolver.addPeriodicSync(
                     account,
                     ContactsContract.AUTHORITY,
@@ -348,12 +428,14 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     Constants.SYNC_INTERVAL);
             ContentResolver.requestSync(account, ContactsContract.AUTHORITY, Bundle.EMPTY);
         } else {
-            //don't sync
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 0);
         }
     }
 
+    /**
+     * @return true if old list is not equal to new list of groups
+     */
     private boolean compareSelectGroups(){
         //new
         List<XWikiGroup> newList = mGroupAdapter.getSelectGroups();
@@ -377,11 +459,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         }
     }
 
-
-
-
-
-    private  void openAppMarket(Context context) {
+    /**
+     * Open market with application page.
+     *
+     * @param context Context to know where from to open market
+     */
+    private static void openAppMarket(Context context) {
         Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
         boolean marketFound = false;
         // find all applications able to handle our rateIntent

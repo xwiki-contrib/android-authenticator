@@ -83,6 +83,7 @@
     <string name="haveNoPermission">You have no permission</string>
     <string name="authenticationError">Authentication error</string>
     <string name="xwikiAccount">XWiki Account</string>
+    <string name="askToGrantPermissions">Please grant the permission in the app settings</string>
 
 
     <!--select setting-->
