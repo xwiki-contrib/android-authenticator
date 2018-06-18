@@ -79,6 +79,9 @@
     <string name="syncTypeGetListErrorMessage">Something went wrong when we try to get list for current sync type</string>
     <string name="tryAgain">Try again</string>
     <string name="versionTemplate" formatted="false">Version %s</string>
+    <string name="updateSuccess">Update Successfully</string>
+    <string name="haveNoPermission">You have no permission</string>
+    <string name="authenticationError">Authentication error</string>
 
 
     <!--select setting-->
