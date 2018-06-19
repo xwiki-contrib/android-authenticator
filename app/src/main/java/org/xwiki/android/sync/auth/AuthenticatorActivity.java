@@ -53,6 +53,8 @@ import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Subscription;
+
 import static org.xwiki.android.sync.AppContext.currentBaseUrl;
 
 
@@ -314,7 +316,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
     }
 
 
-    public void showProgress(CharSequence message, final AsyncTask asyncTask) {
+    public void showProgress(CharSequence message, final Subscription subscription) {
         // To avoid repeatedly create
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             return;
@@ -326,9 +328,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
                 Log.i(TAG, "user cancelling authentication");
-                if (asyncTask != null) {
-                    asyncTask.cancel(true);
-                }
+                subscription.unsubscribe();
             }
         });
         // We save off the progress dialog in a field so that we can dismiss

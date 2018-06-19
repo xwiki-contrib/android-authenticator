@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -35,68 +36,99 @@ import org.xwiki.android.sync.auth.AuthenticatorActivity;
 import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 /**
- * SignInViewFlipper.
+ * Main auth flipper.
+ *
+ * @version $Id$
  */
 public class SignInViewFlipper extends BaseViewFlipper {
+
+    /**
+     * Tag for logging.
+     */
     private static final String TAG = "SignInViewFlipper";
 
-    private CharSequence accountName = null;
-    private CharSequence accountPassword = null;
+    /**
+     * Typed username.
+     */
+    private String accountName = null;
 
-    private AsyncTask mAuthTask = null;
+    /**
+     * Typed password.
+     */
+    private String accountPassword = null;
 
-    public SignInViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+    /**
+     * Standard constructor
+     *
+     * @param activity Current activity
+     * @param contentRootView Root view of this flipper
+     */
+    public SignInViewFlipper(
+        @NonNull AuthenticatorActivity activity,
+        @NonNull View contentRootView
+    ) {
         super(activity, contentRootView);
     }
 
+    /**
+     * Calling when user push "login".
+     */
     @Override
     public void doNext() {
         if (checkInput()) {
-            mActivity.showProgress(mContext.getText(R.string.sign_in_authenticating), mAuthTask);
-            submit();
+            mActivity.showProgress(
+                mContext.getText(R.string.sign_in_authenticating),
+                submit()
+            );
         }
     }
 
+    /**
+     * Return to setting server ip address, calling by pressing "back".
+     */
     @Override
     public void doPrevious() {
         mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_IP);
     }
 
+    /**
+     * @return true if current input correct and variables {@link #accountName} and
+     * {@link #accountPassword} was correctly set
+     */
     private boolean checkInput() {
-        EditText nameEditText = (EditText) findViewById(R.id.accountName);
-        EditText passwordEditText = (EditText) findViewById(R.id.accountPassword);
+        EditText nameEditText = findViewById(R.id.accountName);
+        EditText passwordEditText = findViewById(R.id.accountPassword);
         nameEditText.setError(null);
         passwordEditText.setError(null);
-        accountName = nameEditText.getText();
-        accountPassword = passwordEditText.getText();
-        View focusView = null;
-        boolean cancel = false;
+        accountName = nameEditText.getText().toString();
+        accountPassword = passwordEditText.getText().toString();
         if (TextUtils.isEmpty(accountName)) {
-            focusView = nameEditText;
+            nameEditText.requestFocus();
             nameEditText.setError(mContext.getString(R.string.error_field_required));
-            cancel = true;
-        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length() < 5) {
-            focusView = passwordEditText;
-            passwordEditText.setError(mContext.getString(R.string.error_invalid_password));
-            cancel = true;
-        }
-        if (cancel) {
-            focusView.requestFocus();
             return false;
-        } else {
-            return true;
+        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length() < 5) {
+            passwordEditText.requestFocus();
+            passwordEditText.setError(mContext.getString(R.string.error_invalid_password));
+            return false;
         }
+        return true;
     }
 
-    public void submit() {
-        final String userName = accountName.toString();
-        final String userPass = accountPassword.toString();
+    /**
+     * Start login procedure.
+     *
+     * @return Subscription which can be unsubscribed for preventing log in if user cancel it
+     */
+    private Subscription submit() {
+        final String userName = accountName;
+        final String userPass = accountPassword;
 
-        XWikiHttp.login(
+        return XWikiHttp.login(
             userName,
             userPass
         )
@@ -127,7 +159,19 @@ public class SignInViewFlipper extends BaseViewFlipper {
             );
     }
 
-    private Intent prepareIntent(String authtoken, String username, String password) {
+    /**
+     * Prepare log in intent which will contains credentials and other data.
+     *
+     * @param authtoken Authtoken (or session cookie) which was set by response
+     * @param username Account username to save
+     * @param password Account password to save
+     * @return Prepared intent
+     */
+    private Intent prepareIntent(
+        @NonNull String authtoken,
+        @NonNull String username,
+        @NonNull String password
+    ) {
         String userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null);
 
         String accountType = mActivity.getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
@@ -144,7 +188,18 @@ public class SignInViewFlipper extends BaseViewFlipper {
         return intent;
     }
 
-    private void signedIn(String authtoken, String username, String password) {
+    /**
+     * Must be called if user successfully logged in.
+     *
+     * @param authtoken Authtoken (or session cookie) which was set by response
+     * @param username Account username to save
+     * @param password Account password to save
+     */
+    private void signedIn(
+        @NonNull String authtoken,
+        @NonNull String username,
+        @NonNull String password
+    ) {
         final Intent signedIn = prepareIntent(
                 authtoken,
                 username,
@@ -164,17 +219,24 @@ public class SignInViewFlipper extends BaseViewFlipper {
         );
     }
 
+    /**
+     * Must be called to show user that something went wrong.
+     *
+     * @param error String which must be shown in error message
+     */
     private void showErrorMessage(String error){
-        //Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show();
-        final TextView errorTextView = (TextView) findViewById(R.id.error_msg);
+        final TextView errorTextView = findViewById(R.id.error_msg);
         errorTextView.setVisibility(View.VISIBLE);
         errorTextView.setText(error);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                errorTextView.setVisibility(View.GONE);
-            }
-        }, 2000);
+        new Handler().postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    errorTextView.setVisibility(View.GONE);
+                }
+            },
+            2000
+        );
     }
 
 }
