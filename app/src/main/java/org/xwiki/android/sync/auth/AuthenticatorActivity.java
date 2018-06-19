@@ -67,6 +67,17 @@ import static org.xwiki.android.sync.AppContext.currentBaseUrl;
  * @version $Id$
  */
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
+
+    /**
+     * Contains order of flippers in authorisation progress.
+     *
+     * <p>
+     *     All flippers must support constructor
+     *     {@link BaseViewFlipper#BaseViewFlipper(AuthenticatorActivity, View)}, because
+     *     all instances will be created automatically using reflection in
+     *     {@link #showViewFlipper(int)}
+     * </p>
+     */
     private static final List<Class<? extends BaseViewFlipper>> orderOfFlippers;
 
     static {
@@ -88,31 +99,52 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public static final String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
     public static final String IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE";
 
+    /**
+     * List of flippers or nulls.
+     * <p>
+     *     Danger, can contains nulls, not recommended to use it directly
+     * </p>
+     *
+     * @see #showViewFlipper(int)
+     */
     private final List<BaseViewFlipper> flippers = new ArrayList<>();
 
     /**
-     * Will be used for managing of user account
+     * Will be used for managing of user account.
      */
     private AccountManager mAccountManager;
+
     /**
-     * Builder for alert dialogs. Stored because can be reused with different custom params
-     */
-    private AlertDialog.Builder builder;
-    /**
-     * Flippers root
+     * Flippers root.
      */
     private ViewFlipper mViewFlipper;
+
     /**
-     * Toolbar of current activity
+     * Toolbar of current activity.
      */
     private Toolbar toolbar;
+
     /**
-     * Current progress dialog
+     * Current progress dialog.
      */
     private Dialog mProgressDialog = null;
 
+    /**
+     * Code which await to returns for requesting permissions
+     */
     private static final int REQUEST_PERMISSIONS_CODE = 1;
 
+    /**
+     * <ol>
+     *     <li>Init view</li>
+     *     <li>Init {@link #toolbar}</li>
+     *     <li>Init {@link #mViewFlipper}</li>
+     *     <li>Init action (settings or full auth)</li>
+     * </ol>
+     *
+     * @param savedInstanceState Used by default
+     * @see Activity#onCreate(Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +158,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.xwikiAccount);
 
+        AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
         } else {
@@ -162,17 +195,26 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     /**
-     * Intercept back button pressing and remap it to flipper if current flipper child is not settings
+     * Intercept back button pressing and remap it to flipper if current flipper child is
+     * not settings.
      */
     @Override
     public void onBackPressed() {
         if(mViewFlipper.getDisplayedChild() == orderOfFlippers.indexOf(SettingServerIpViewFlipper.class)) {
             super.onBackPressed();
         } else {
-            doPrevious(mViewFlipper.getCurrentView());
+            doPrevious(
+                mViewFlipper.getCurrentView()
+            );
         }
     }
 
+    /**
+     * Must be called when current flipper must receive calling of
+     * {@link BaseViewFlipper#doPrevious()} and be changed to previous.
+     *
+     * @param view View, which trigger action
+     */
     public void doPrevious(View view) {
         Integer position = mViewFlipper.getDisplayedChild();
         chooseAnimation(position == orderOfFlippers.indexOf(SettingServerIpViewFlipper.class));
@@ -182,6 +224,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         showViewFlipper(position - 1);
     }
 
+    /**
+     * Must be called when current flipper must receive calling of
+     * {@link BaseViewFlipper#doNext()} and be changed to next.
+     *
+     * @param view View, which trigger action
+     */
     public void doNext(View view) {
         Integer position = mViewFlipper.getDisplayedChild();
         chooseAnimation(true);
@@ -191,6 +239,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         showViewFlipper(position + 1);
     }
 
+    /**
+     * Util method, choose animation in dependency to toNext.
+     *
+     * @param toNext If true - will be used animation right-to-left (<-),
+     *               left-to-right otherwise (->)
+     */
     private void chooseAnimation(@NonNull Boolean toNext) {
         if (toNext) {
             mViewFlipper.setInAnimation(
@@ -221,6 +275,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
+    //TODO:: Replace by normal registration
+    /**
+     * Will be called when user push to "Create one" button.
+     *
+     * @param view View which trigger action
+     */
     public void signUp(View view) {
         String url = currentBaseUrl();
         if (url.endsWith("/")) {
@@ -234,6 +294,23 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         startActivity(intent);
     }
 
+    /**
+     * Set current visible element and init flipper if it needed.
+     *
+     * <p>
+     *     Procedure of initialisation:
+     * </p>
+     *
+     * <ol>
+     *     <li> Get class of flipper </li>
+     *     <li> Get constructor which signature duplicate
+     *          {@link BaseViewFlipper#BaseViewFlipper(AuthenticatorActivity, View)}
+     *     </li>
+     *     <li> Create instance using "this" and {@link #mViewFlipper}</li>
+     * </ol>
+     *
+     * @param position Position of item which must be shown
+     */
     public void showViewFlipper(int position) {
         mViewFlipper.setDisplayedChild(position);
         while (flippers.size() <= position) {
@@ -278,7 +355,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         );
     }
 
-
+    /**
+     * Clear data for creating new account
+     */
     public void clearOldAccount(){
         //TODO: clear current user url
         //clear SharePreference
@@ -288,6 +367,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     //TODO: Replace this logic to another place
+    /**
+     * Save account in system and credentials in app.
+     *
+     * @param intent Intent must contains all data for saving:
+     *               <ol>
+     *                  <li>{@link AccountManager#KEY_ACCOUNT_NAME} for username</li>
+     *                  <li>{@link #PARAM_USER_PASS} for password</li>
+     *                  <li>{@link #PARAM_USER_SERVER} for server address</li>
+     *               </ol>
+     */
     public void finishLogin(Intent intent) {
         Log.d(TAG, "> finishLogin");
 
@@ -332,7 +421,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         // in SettingSyncViewFlipper this activity finish;
     }
 
-
+    /**
+     * Must show progress and call {@link Subscription#unsubscribe()} on subscription object
+     * in case of cancelling dialog.
+     *
+     * @param message Message to show to user
+     * @param subscription Subscription to
+     */
     public void showProgress(CharSequence message, final Subscription subscription) {
         // To avoid repeatedly create
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
@@ -364,6 +459,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
     }
 
+    /**
+     * Hide keyboard or other input method.
+     */
     public void hideInputMethod(){
         View view = this.getCurrentFocus();
         if(view != null) {
