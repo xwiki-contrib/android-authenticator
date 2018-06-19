@@ -20,6 +20,7 @@
 package org.xwiki.android.sync.activities;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,28 +33,66 @@ import org.xwiki.android.sync.bean.SearchResult;
 
 import java.util.List;
 
+/**
+ * {@link android.widget.Adapter} which can be used to show {@link SearchResult} as users.
+ *
+ * @version $Id$
+ */
 public class UserListAdapter extends BaseAdapter {
-    private Context mContext;
+
+    /**
+     * Context which will be used for operations.
+     */
+    private final Context mContext;
+
+    /**
+     * List which currently shows.
+     */
     private List<SearchResult> searchResults;
 
-    public UserListAdapter(Context context, List<SearchResult> searchResults) {
+    /**
+     * Standard constructor.
+     *
+     * @param context Initial context
+     * @param searchResults Initial list
+     */
+    public UserListAdapter(@NonNull Context context, @NonNull List<SearchResult> searchResults) {
         super();
         mContext = context;
         this.searchResults = searchResults;
     }
 
+    /**
+     * @return Size of {@link #searchResults}
+     */
     public int getCount() {
         return searchResults.size();
     }
 
-    public Object getItem(int position) {
+    /**
+     * @param position Position of item
+     * @return Item fron {@link #searchResults} by position
+     */
+    public SearchResult getItem(int position) {
         return searchResults.get(position);
     }
 
+    /**
+     * @param position Position of item
+     * @return position
+     */
     public long getItemId(int position) {
         return position;
     }
 
+    /**
+     * Prepare and return view.
+     *
+     * @param position Position of item
+     * @param convertView Previous {@link View}
+     * @param parent Parent where view will be placed
+     * @return Result view
+     */
     public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
         if (convertView == null) {
@@ -65,7 +104,7 @@ public class UserListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final SearchResult item = (SearchResult) getItem(position);
+        final SearchResult item = getItem(position);
         viewHolder.groupNameTextView.setText(item.pageName);
         viewHolder.lastModifiedTime.setText(item.modified.substring(0,10));
         viewHolder.versionTextView.setText(item.wiki);
@@ -75,19 +114,27 @@ public class UserListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void refresh(List<SearchResult> results) {
-        if (searchResults.equals(results)) {
+    /**
+     * Update current list of showing items.
+     *
+     * @param results New list
+     */
+    public void refresh(@NonNull List<SearchResult> results) {
+        if (searchResults == null || searchResults.equals(results)) {
             return;
         }
         searchResults = results;
         notifyDataSetChanged();
     }
 
-    static class ViewHolder {
-        public TextView groupNameTextView;
-        public TextView lastModifiedTime;
-        public TextView versionTextView;
-        public CheckBox checkBox;
+    /**
+     * Help ViewHolder.
+     */
+    private static class ViewHolder {
+        public final TextView groupNameTextView;
+        public final TextView lastModifiedTime;
+        public final TextView versionTextView;
+        public final CheckBox checkBox;
 
         public ViewHolder(View view) {
             groupNameTextView = view.findViewById(R.id.groupName);
