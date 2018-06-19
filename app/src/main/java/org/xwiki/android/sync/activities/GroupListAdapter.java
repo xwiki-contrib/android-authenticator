@@ -20,6 +20,7 @@
 package org.xwiki.android.sync.activities;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,29 +36,71 @@ import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link android.widget.Adapter} which can be used to show groups.
+ *
+ * @version $Id$
+ */
 public class GroupListAdapter extends BaseAdapter {
-    private Context mContext;
-    private List<XWikiGroup> groupList;
-    List<XWikiGroup> selected = new ArrayList<>();
 
-    public GroupListAdapter(Context context, List<XWikiGroup> groupList) {
+    /**
+     * Current context.
+     */
+    private final Context mContext;
+
+    /**
+     * Current list of items.
+     */
+    private List<XWikiGroup> groupList;
+
+    /**
+     * List of selected items.
+     */
+    private final List<XWikiGroup> selected = new ArrayList<>();
+
+    /**
+     * Standard constructor which save context and groups.
+     *
+     * @param context Context for all operations
+     * @param groupList Initial group list
+     */
+    public GroupListAdapter(@NonNull Context context, @NonNull List<XWikiGroup> groupList) {
         super();
-        mContext = context;
+        this.mContext = context;
         this.groupList = groupList;
     }
 
+    /**
+     * @return Count of items
+     */
     public int getCount() {
         return groupList.size();
     }
 
-    public Object getItem(int position) {
+    /**
+     * @param position Position of object (must be 0 <= position < {@link #getCount()}
+     * @return Object ({@link XWikiGroup} if be exactly)
+     */
+    public XWikiGroup getItem(int position) {
         return groupList.get(position);
     }
 
+    /**
+     * @param position Position of object (must be 0 <= position < {@link #getCount()}
+     * @return position
+     */
     public long getItemId(int position) {
         return position;
     }
 
+    /**
+     * Create and set up view.
+     *
+     * @param position Position of object (must be 0 <= position < {@link #getCount()}
+     * @param convertView Old {@link View}
+     * @param parent Parent view where result will be placed
+     * @return Result {@link View}
+     */
     public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
         if (convertView == null) {
@@ -69,11 +112,10 @@ public class GroupListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final XWikiGroup group = (XWikiGroup) getItem(position);
+        final XWikiGroup group = getItem(position);
         viewHolder.groupNameTextView.setText(group.pageName);
         viewHolder.lastModifiedTime.setText(group.lastModifiedDate.substring(0,10));
         viewHolder.versionTextView.setText(group.wiki);
-//        viewHolder.checkBox.setChecked(mSparseBooleanArray.get(position));
         viewHolder.checkBox.setChecked(selected.contains(group));
 
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -102,28 +144,37 @@ public class GroupListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void initSelectedGroup() {
+    /**
+     * Init groups which was selected in previous time.
+     */
+    private void initSelectedGroup() {
         List<String> groupIds = SharedPrefsUtils.getArrayList(mContext, Constants.SELECTED_GROUPS);
-        if (groupIds == null || groupIds.size() == 0) return;
-        List<XWikiGroup> selectedGroups = new ArrayList<>();
+        if (groupIds == null || groupIds.size() == 0) {
+            return;
+        }
+        selected.clear();
         for (XWikiGroup item : groupList) {
             if (groupIds.contains(item.id)) {
-                selectedGroups.add(item);
+                selected.add(item);
             }
         }
-        this.selected = selectedGroups;
     }
 
+    /**
+     * @return {@link #selected}
+     */
+    @NonNull
     public List<XWikiGroup> getSelectGroups() {
         return selected;
     }
 
-    public void setSelectGroups(List<XWikiGroup> groups) {
-        selected = groups;
-    }
-
-    public void refresh(List<XWikiGroup> groups) {
-        if (groupList.equals(groups)) {
+    /**
+     * Update groups if new groups have new objects.
+     *
+     * @param groups new list
+     */
+    public void refresh(@NonNull List<XWikiGroup> groups) {
+        if (groupList == null || groupList.equals(groups)) {
             return;
         }
         groupList = groups;
@@ -131,11 +182,14 @@ public class GroupListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    static class ViewHolder {
-        public TextView groupNameTextView;
-        public TextView lastModifiedTime;
-        public TextView versionTextView;
-        public CheckBox checkBox;
+    /**
+     * Help view holder class.
+     */
+    private static class ViewHolder {
+        public final TextView groupNameTextView;
+        public final TextView lastModifiedTime;
+        public final TextView versionTextView;
+        public final CheckBox checkBox;
 
         public ViewHolder(View view) {
             groupNameTextView = view.findViewById(R.id.groupName);
