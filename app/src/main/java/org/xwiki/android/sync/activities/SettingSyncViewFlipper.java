@@ -127,7 +127,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     @Override
     public void doNext() {
         syncSettingComplete();
-        mActivity.finish();
     }
 
     /**
@@ -317,6 +316,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                     }
                 );
         }
+        if (allUsersAreLoading || groupsAreLoading) {
+            refreshProgressBar();
+        }
     }
 
     /**
@@ -366,6 +368,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             if (adapter != mListView.getAdapter()) {
                 mListView.setAdapter(adapter);
             }
+            adapter.notifyDataSetChanged();
         }
         refreshProgressBar();
     }

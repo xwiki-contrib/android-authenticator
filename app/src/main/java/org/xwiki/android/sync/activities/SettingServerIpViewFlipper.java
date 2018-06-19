@@ -58,7 +58,6 @@ public class SettingServerIpViewFlipper extends BaseViewFlipper {
         String serverAddress = checkInput();
         if (serverAddress != null) {
             SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddress);
-            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
         }
     }
 

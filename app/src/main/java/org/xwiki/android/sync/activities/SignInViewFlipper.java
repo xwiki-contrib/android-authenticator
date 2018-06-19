@@ -21,7 +21,6 @@ package org.xwiki.android.sync.activities;
 
 import android.accounts.AccountManager;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -73,28 +72,32 @@ public class SignInViewFlipper extends BaseViewFlipper {
         @NonNull View contentRootView
     ) {
         super(activity, contentRootView);
+        findViewById(R.id.signInButton).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (checkInput()) {
+                        mActivity.showProgress(
+                            mContext.getText(R.string.sign_in_authenticating),
+                            submit()
+                        );
+                    }
+                }
+            }
+        );
     }
 
     /**
      * Calling when user push "login".
      */
     @Override
-    public void doNext() {
-        if (checkInput()) {
-            mActivity.showProgress(
-                mContext.getText(R.string.sign_in_authenticating),
-                submit()
-            );
-        }
-    }
+    public void doNext() { }
 
     /**
      * Return to setting server ip address, calling by pressing "back".
      */
     @Override
-    public void doPrevious() {
-        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_IP);
-    }
+    public void doPrevious() { }
 
     /**
      * @return true if current input correct and variables {@link #accountName} and
@@ -213,7 +216,7 @@ public class SignInViewFlipper extends BaseViewFlipper {
                         mActivity.hideProgress();
                         mActivity.finishLogin(signedIn);
                         mActivity.hideInputMethod();
-                        mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SETTING_SYNC);
+                        mActivity.doNext(mContentRootView);
                     }
                 }
         );
