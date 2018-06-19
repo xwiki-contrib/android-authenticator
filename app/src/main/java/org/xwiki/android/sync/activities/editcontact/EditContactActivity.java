@@ -275,8 +275,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     @Override
     public void showContactUpdateSuccessfully() {
         //update local
-        BatchOperation batchOperation = new BatchOperation(EditContactActivity.this,
-                getContentResolver());
+        BatchOperation batchOperation = new BatchOperation(getContentResolver());
         //TODO:: URGENT!!! UPDATE USER CONTACT
 //        ContactManager.updateContact(EditContactActivity.this, getContentResolver(),
 //                wikiUser, false, false, false, true, wikiUser.rawId, batchOperation);

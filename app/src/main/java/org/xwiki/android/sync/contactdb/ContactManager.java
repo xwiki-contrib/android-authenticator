@@ -109,7 +109,7 @@ public class ContactManager {
         final Observable<XWikiUserFull> observable
     ) {
         final ContentResolver resolver = context.getContentResolver();
-        final BatchOperation batchOperation = new BatchOperation(context, resolver);
+        final BatchOperation batchOperation = new BatchOperation(resolver);
         final HashMap<String, Long> localUserMaps = getAllContactsIdMap(context, account);
 
         observable.subscribeOn(
