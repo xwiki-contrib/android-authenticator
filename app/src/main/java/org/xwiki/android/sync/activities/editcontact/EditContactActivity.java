@@ -175,7 +175,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         //getXWikiUser
         if (rawContactId > 0) {
             //first, lastName, email, phone, serverId=id.
-            return ContactManager.getXWikiUser(context, rawContactId);
+            return ContactManager.getXWikiUser(context.getContentResolver(), rawContactId);
         }
         return null;
     }

@@ -77,7 +77,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // list. So let's set the flag that causes them to be visible, so that users
         // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
         if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
-            ContactManager.setAccountContactsVisibility(getContext(), account, true);
+            ContactManager.setAccountContactsVisibility(
+                getContext().getContentResolver(),
+                account,
+                true
+            );
         }
 
         //TODO may need to check authToken, or block other's getAuthToken.
