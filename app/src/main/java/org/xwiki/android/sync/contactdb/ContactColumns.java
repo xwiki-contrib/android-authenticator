@@ -21,11 +21,17 @@ package org.xwiki.android.sync.contactdb;
 
 import android.provider.ContactsContract.Data;
 
-/*
+/**
  * The standard columns representing contact's info from social apps.
+ *
+ * @see ContactOperations
+ * @see ContactManager
  */
 public final class ContactColumns {
 
+    /**
+     * Non creatable instances constructor
+     */
     private ContactColumns() {
     }
 
@@ -34,9 +40,18 @@ public final class ContactColumns {
      */
     public static final String MIME_PROFILE = "vnd.android.cursor.item/vnd.xwikiedit.profile";
 
+    /**
+     * Field name, value by this field name must contains user id
+     */
     public static final String DATA_PID = Data.DATA1;
 
+    /**
+     * Field name, value by this field name must contains summary about some operation
+     */
     public static final String DATA_SUMMARY = Data.DATA2;
 
+    /**
+     * Field name, value by this field name must contains details about some operation
+     */
     public static final String DATA_DETAIL = Data.DATA3;
 }
