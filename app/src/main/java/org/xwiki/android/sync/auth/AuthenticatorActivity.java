@@ -403,7 +403,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         Log.d(TAG, packaName + ", " + getPackageName());
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
         if (!packaName.contains("android.uid.system")) {
-            AppContext.addAuthorizedApp(uid, packaName);
+            AppContext.addAuthorizedApp(packaName);
             String authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             if (!TextUtils.isEmpty(authToken)) {
                 String authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE);

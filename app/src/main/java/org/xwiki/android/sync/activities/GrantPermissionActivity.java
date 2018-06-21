@@ -87,7 +87,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
     }
 
     public void onHandleAuthorize(View view){
-        AppContext.addAuthorizedApp(uid, packageName);
+        AppContext.addAuthorizedApp(packageName);
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
         String authToken = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);
