@@ -37,11 +37,6 @@ public class PermissionsUtils {
     private String[] mRequiredPermissions;
     private List<String> mPermissionsToRequest = new ArrayList<>();
 
-    public PermissionsUtils(Activity context, String... requiredPermissions) {
-        mContext = context;
-        mRequiredPermissions = requiredPermissions;
-    }
-
     public PermissionsUtils(Activity activity) throws IllegalArgumentException {
         mContext = activity;
         try {
@@ -69,11 +64,7 @@ public class PermissionsUtils {
             }
         }
 
-        if (mPermissionsToRequest.isEmpty()) {
-            return true;
-        }
-
-        return false;
+        return mPermissionsToRequest.isEmpty();
     }
 
     /**
@@ -99,26 +90,4 @@ public class PermissionsUtils {
 
         ActivityCompat.requestPermissions(mContext, request, requestCode);
     }
-
-    /**
-     * Method to call inside
-     * {@link Activity#onRequestPermissionsResult(int, String[], int[])}, to check if the
-     * required permissions are granted.
-     * @param grantResults results
-     * @return true if all the required permissions are granted, otherwise false
-     */
-    public boolean areAllRequiredPermissionsGranted(int[] grantResults) {
-        if (grantResults == null || grantResults.length == 0) {
-            return false;
-        }
-
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 }
