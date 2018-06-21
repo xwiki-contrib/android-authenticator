@@ -21,6 +21,7 @@ package org.xwiki.android.sync.rest;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.xwiki.android.sync.utils.ImageUtils;
@@ -36,18 +37,42 @@ import okhttp3.Response;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
+/**
+ * This manager can be used for downloading and managing photos
+ *
+ * @version $Id$
+ */
 public class XWikiPhotosManager {
+
+    /**
+     * Client context
+     */
     private final OkHttpClient client;
+
+    /**
+     * Requests base url
+     */
     private final String baseUrl;
 
+    /**
+     * @param client will be set to {@link #client}
+     * @param baseUrl will be set to {@link #baseUrl}
+     */
     public XWikiPhotosManager(OkHttpClient client, String baseUrl) {
         this.client = client;
         this.baseUrl = baseUrl;
     }
 
+    /**
+     * Download avatar from XWiki and prepare it by {@link #prepareAvatar(byte[])}.
+     *
+     * @param name username
+     * @param avatarName user avatar name (identifier)
+     * @return Object which can be used for subscribe to get avatar bytes
+     */
     public Observable<byte[]> downloadAvatar(
-        String name,
-        String avatarName
+        @NonNull String name,
+        @NonNull String avatarName
     ) {
         Request request = new Request.Builder()
             .url(baseUrl + "bin/download/XWiki/" + name + "/" + avatarName)
@@ -84,6 +109,11 @@ public class XWikiPhotosManager {
         return subject;
     }
 
+    /**
+     * Provide downloading of captcha and sending on returned observable
+     *
+     * @return Object which can be used for subscribe to get avatar bytes
+     */
     public Observable<byte[]> downloadCaptcha() {
         String captchaUrl = baseUrl + "bin/imagecaptcha/XWiki/Registration";
         if (captchaUrl.contains("www.xwiki.org")) {
@@ -119,6 +149,14 @@ public class XWikiPhotosManager {
         return subject;
     }
 
+    /**
+     * Prepare downloaded avatar, resize and scale it to use less image.
+     *
+     * @param bytes bytes of downloaded avatar
+     * @return resized and scaled avatar
+     *
+     * @since 0.4
+     */
     private byte[] prepareAvatar(byte[] bytes) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
