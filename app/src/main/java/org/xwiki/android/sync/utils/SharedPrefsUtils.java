@@ -29,44 +29,102 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * SharedPreferences Util
+ * Utils for shared preferences
+ *
+ * @version $Id$
  */
 public class SharedPrefsUtils {
-    public final static String SETTING = "Setting";
 
+    /**
+     * Settings shared preferences name.
+     */
+    private final static String SETTING = "Setting";
+
+    /**
+     * Put value into shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key to add
+     * @param value Value to add
+     */
     public static void putValue(Context context, String key, int value) {
         Editor sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit();
         sp.putInt(key, value);
         sp.apply();
     }
 
+    /**
+     * Put value into shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key to add
+     * @param value Value to add
+     */
     public static void putValue(Context context, String key, boolean value) {
         Editor sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit();
         sp.putBoolean(key, value);
         sp.apply();
     }
 
+    /**
+     * Put value into shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key to add
+     * @param value Value to add
+     */
     public static void putValue(Context context, String key, String value) {
         Editor sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit();
         sp.putString(key, value);
         sp.apply();
     }
 
+    /**
+     * Get value from shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key for getting
+     * @param defValue Value which will be returned if value by key is absent
+     * @return int value if exists or defValue
+     */
     public static int getValue(Context context, String key, int defValue) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         return sp.getInt(key, defValue);
     }
 
+    /**
+     * Get value from shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key for getting
+     * @param defValue Value which will be returned if value by key is absent
+     * @return boolean value if exists or defValue
+     */
     public static boolean getValue(Context context, String key, boolean defValue) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         return sp.getBoolean(key, defValue);
     }
 
+    /**
+     * Get value from shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key for getting
+     * @param defValue Value which will be returned if value by key is absent
+     * @return String value if exists or defValue
+     */
     public static String getValue(Context context, String key, String defValue) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         return sp.getString(key, defValue);
     }
 
+    /**
+     * Put value into shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key to add
+     * @param list Value to add
+     */
     public static void putArrayList(Context context, String key, List<String> list) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         Editor edit = sp.edit();
@@ -75,6 +133,13 @@ public class SharedPrefsUtils {
         edit.apply();
     }
 
+    /**
+     * Get value from shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key for getting
+     * @return List value if exists or null
+     */
     public static List<String> getArrayList(Context context, String key) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         Set<String> set = sp.getStringSet(key, null);
@@ -82,11 +147,22 @@ public class SharedPrefsUtils {
         return new ArrayList<>(set);
     }
 
+    /**
+     * Clear all data from shared preferences.
+     *
+     * @param context Context for getting shared preferences
+     */
     public static void clearAll(Context context) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         sp.edit().clear().apply();
     }
 
+    /**
+     * Remove value from shared preferences by key.
+     *
+     * @param context Context for getting shared preferences
+     * @param key Key for removing
+     */
     public static void removeKeyValue(Context context, String key) {
         SharedPreferences sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE);
         sp.edit().remove(key).apply();
