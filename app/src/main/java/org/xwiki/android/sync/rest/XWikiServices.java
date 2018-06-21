@@ -41,6 +41,14 @@ import rx.Observable;
 
 import static org.xwiki.android.sync.rest.ApiEndPoints.SPACES;
 
+/**
+ * Interface for interacting with XWiki services
+ *
+ * @see retrofit2.Retrofit#create(Class)
+ * @see <a href="http://square.github.io/retrofit/">Retrofit docs</a>
+ *
+ * @version $Id$
+ */
 public interface XWikiServices {
 
     @POST("bin/login/XWiki/XWikiLogin")
@@ -54,11 +62,17 @@ public interface XWikiServices {
             @Body UserPayload userPayload
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/query?q=object:XWiki.XWikiGroups")
     Observable<CustomSearchResultContainer<XWikiGroup>> availableGroups(
             @Query("number") Integer number
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
             ApiEndPoints.REST +
                     ApiEndPoints.WIKIS +
@@ -74,6 +88,9 @@ public interface XWikiServices {
             @Path("name") String name
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
             ApiEndPoints.REST +
                     ApiEndPoints.WIKIS +
@@ -88,6 +105,9 @@ public interface XWikiServices {
             @Path("name") String name
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
         ApiEndPoints.REST +
             ApiEndPoints.WIKIS +
@@ -102,6 +122,9 @@ public interface XWikiServices {
         @Path("name") String name
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
         ApiEndPoints.REST +
             ApiEndPoints.WIKIS +
@@ -117,6 +140,9 @@ public interface XWikiServices {
         @Path("name") String name
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
         ApiEndPoints.REST +
             ApiEndPoints.WIKIS +
@@ -124,6 +150,9 @@ public interface XWikiServices {
     )
     Observable<SearchResultContainer> getAllUsersPreview();
 
+    /**
+     * @since 0.4
+     */
     @GET(
         ApiEndPoints.REST +
             ApiEndPoints.WIKIS +
@@ -136,6 +165,9 @@ public interface XWikiServices {
         @Query("start") Integer offset
     );
 
+    /**
+     * @since 0.4
+     */
     @GET(
             ApiEndPoints.REST +
                     ApiEndPoints.WIKIS +
