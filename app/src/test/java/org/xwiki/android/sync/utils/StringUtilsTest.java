@@ -38,36 +38,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void getDataTime() throws Exception {
-        assertNotNull(StringUtils.getDataTime("yyyy-MM-dd'T'HH:mm:ssZ"));
-    }
-
-    @Test
-    public void isIpAddress() throws Exception {
-        assertTrue(StringUtils.isIpAddress("192.168.0.1"));
-        assertTrue(StringUtils.isIpAddress("1.1.0.255"));
-        assertFalse(StringUtils.isIpAddress("192."));
-        assertFalse(StringUtils.isIpAddress("192.168"));
-        assertFalse(StringUtils.isIpAddress("192.168.0"));
-        assertFalse(StringUtils.isIpAddress("outlook.com"));
-        assertFalse(StringUtils.isIpAddress("aa"));
-        assertFalse(StringUtils.isIpAddress(""));
-        assertFalse(StringUtils.isIpAddress(null));
-    }
-
-    @Test
-    public void isDomainAddress() throws Exception {
-        assertTrue(StringUtils.isDomainAddress("xwiki.org"));
-        assertTrue(StringUtils.isDomainAddress("www.xwiki.org"));
-        assertTrue(StringUtils.isDomainAddress("www.abc.co.uk"));
-        assertFalse(StringUtils.isDomainAddress("z"));
-        assertFalse(StringUtils.isDomainAddress(".com"));
-        assertFalse(StringUtils.isDomainAddress("a."));
-        assertFalse(StringUtils.isDomainAddress(""));
-        assertFalse(StringUtils.isDomainAddress(null));
-    }
-
-    @Test
     public void iso8601ToDate() throws Exception {
         //assertNotNull(StringUtils.iso8601ToDate("2011-09-24T19:45:31+02:00"));
         assertNotNull(StringUtils.iso8601ToDate("2016-05-20T13:11:48+0200"));
