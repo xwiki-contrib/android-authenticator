@@ -19,8 +19,16 @@
  */
 package org.xwiki.android.sync.rest;
 
+/**
+ * Collection of XWiki API endpoints
+ *
+ * @see <a href="https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiRESTfulAPI">
+ *     XWiki RESTful API
+ *     </a>
+ *
+ * @version $Id$
+ */
 public class ApiEndPoints {
-
     public static final String REST = "rest/";
     public static final String WIKIS = "wikis";
     public static final String SPACES = "spaces";
