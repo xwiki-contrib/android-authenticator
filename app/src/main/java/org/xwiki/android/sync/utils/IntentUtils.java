@@ -23,7 +23,20 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
+/**
+ * Utils for simple work with intents
+ *
+ * @version $Id$
+ */
 public class IntentUtils {
+
+    /**
+     * Check url (warning, url must start with "https://" or other protocol if you want not use
+     * http) and open browser or other application which can open that url.
+     *
+     * @param url Url to prepare
+     * @return NOT STARTED, but prepared intent
+     */
     public static Intent openLink(String url) {
         // if protocol isn't defined use http by default
         if (!TextUtils.isEmpty(url) && !url.contains("://")) {
