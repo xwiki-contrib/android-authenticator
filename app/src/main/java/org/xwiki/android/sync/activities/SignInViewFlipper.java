@@ -169,6 +169,8 @@ public class SignInViewFlipper extends BaseViewFlipper {
      * @param username Account username to save
      * @param password Account password to save
      * @return Prepared intent
+     *
+     * @since 0.4
      */
     private Intent prepareIntent(
         @NonNull String authtoken,
@@ -197,6 +199,8 @@ public class SignInViewFlipper extends BaseViewFlipper {
      * @param authtoken Authtoken (or session cookie) which was set by response
      * @param username Account username to save
      * @param password Account password to save
+     *
+     * @since 0.4
      */
     private void signedIn(
         @NonNull String authtoken,

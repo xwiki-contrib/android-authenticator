@@ -194,6 +194,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     /**
      * @return Spinner for sync type
+     *
+     * @since 0.4.2
      */
     private AppCompatSpinner getSelectSyncSpinner() {
         return findViewById(R.id.select_spinner);
@@ -201,6 +203,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     /**
      * @return Progress bar view
+     *
+     * @since 0.4.2
      */
     private ProgressBar getProgressBar() {
         return findViewById(R.id.list_viewProgressBar);
@@ -208,6 +212,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     /**
      * @return Container of {@link #mListView}
+     *
+     * @since 0.4.2
      */
     private View getListViewContainer() {
         return findViewById(R.id.settingsSyncListViewContainer);
@@ -215,6 +221,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     /**
      * Show progress bar if need or hide otherwise.
+     *
+     * @since 0.4.2
      */
     private void refreshProgressBar() {
         final Boolean progressBarVisible = (syncGroups() && groupsAreLoading)
@@ -237,6 +245,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
     /**
      * Load data to groups and all users lists.
+     *
+     * @since 0.4
      */
     private void initData() {
         if (groups.isEmpty()) {

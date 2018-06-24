@@ -244,6 +244,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      *
      * @param toNext If true - will be used animation right-to-left (<-),
      *               left-to-right otherwise (->)
+     *
+     * @since 0.4.2
      */
     private void chooseAnimation(@NonNull Boolean toNext) {
         if (toNext) {
@@ -310,6 +312,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      * </ol>
      *
      * @param position Position of item which must be shown
+     *
+     * @since 0.4.2
      */
     public void showViewFlipper(int position) {
         mViewFlipper.setDisplayedChild(position);
@@ -427,6 +431,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      *
      * @param message Message to show to user
      * @param subscription Subscription to
+     *
+     * @since 0.4.2
      */
     public void showProgress(CharSequence message, final Subscription subscription) {
         // To avoid repeatedly create

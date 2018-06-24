@@ -57,6 +57,8 @@ public class PermissionsUtils {
      *
      * @param activity Will be set to {@link #activity} and used to get permissions
      * @throws IllegalArgumentException Will be thrown when activity can't be used
+     *
+     * @since 0.4
      */
     public PermissionsUtils(Activity activity) throws IllegalArgumentException {
         this.activity = activity;
