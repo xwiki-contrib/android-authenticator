@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">XWiki Authenticator</string>
-    <string name="label" translatable="false">XWiki</string>
+    <string name="xwiki" translatable="false">XWiki</string>
+    <string name="label" translatable="false">@string/xwiki</string>
     <string name="login_label" translatable="false">@string/log_in</string>
 
     <string name="signIn">Sign in</string>
@@ -79,6 +80,12 @@
     <string name="syncTypeGetListErrorMessage">Something went wrong when we try to get list for current sync type</string>
     <string name="tryAgain">Try again</string>
     <string name="versionTemplate" formatted="false">Version %s</string>
+    <string name="updateSuccess">Update Successfully</string>
+    <string name="haveNoPermission">You have no permission</string>
+    <string name="authenticationError">Authentication error</string>
+    <string name="xwikiAccount">XWiki Account</string>
+    <string name="askToGrantPermissions">Please grant the permission in the app settings</string>
+    <string name="signUpOfferMessage">Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps</string>
 
 
     <!--select setting-->

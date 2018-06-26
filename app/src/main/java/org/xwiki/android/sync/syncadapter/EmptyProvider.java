@@ -25,24 +25,29 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-/*
+/**
  * Define an empty implementation of ContentProvider.
  * If the sync adapter framework tries to run your sync adapter,
  * and your app doesn't have a content provider, your sync adapter crashes.
- * reference: http://developer.android.com/training/sync-adapters/creating-stub-provider.html
+ * reference: http://developer.android.com/training/sync-adapters/creating-stub-provider.html .
+ *
+ * <p>
+ * In fact this provider doing nothing.
+ *
+ * @version $Id$
  */
 public class EmptyProvider extends ContentProvider {
-    /*
-     * Always return true, indicating that the
-     * provider loaded correctly.
+
+    /**
+     * Always return true, indicating that the provider loaded correctly.
      */
     @Override
     public boolean onCreate() {
         return true;
     }
 
-    /*
-     * query() always returns no results
+    /**
+     * Always returns no results
      */
     @Override
     public Cursor query(
@@ -60,24 +65,24 @@ public class EmptyProvider extends ContentProvider {
         return null;
     }
 
-    /*
-     * insert() always returns null (no URI)
+    /**
+     * Always returns null (no URI)
      */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         return null;
     }
 
-    /*
-     * delete() always returns "no rows affected" (0)
+    /**
+     * Always returns "no rows affected" (0)
      */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
 
-    /*
-     * update() always returns "no rows affected" (0)
+    /**
+     * Always returns "no rows affected" (0)
      */
     public int update(
             Uri uri,

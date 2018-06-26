@@ -19,6 +19,12 @@
  */
 package org.xwiki.android.sync.exceptions;
 
+/**
+ * Exception which will be used when was problems with getting some data (such as
+ * IMEI or device id) throw an exception or can't be performed
+ *
+ * @version $Id$
+ */
 public class ReadPhoneStateException extends SecurityException {
     public ReadPhoneStateException() {
     }

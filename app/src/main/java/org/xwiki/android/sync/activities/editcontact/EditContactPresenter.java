@@ -32,33 +32,56 @@ import retrofit2.Response;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.plugins.RxJavaPlugins;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+/**
+ * {@link BasePresenter} realisation which provide work with MVP. Contains logic for login (in fact
+ * - relogin) and update contact info for current user.
+ *
+ * @version $Id$
+ */
 public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
 
+    /**
+     * Subscription for aggregate all subscriptions and unsubscribe them when it will be need
+     * (for example, before destroy)
+     */
     private CompositeSubscription subscriptions;
 
+    /**
+     * Standard constructor
+     * @param context Context for this presenter
+     * @see BasePresenter#BasePresenter(Context)
+     */
     public EditContactPresenter(Context context) {
         super(context);
         subscriptions = new CompositeSubscription();
     }
 
-    @Override
-    public void attachView(EditContactMvpView mvpView) {
-        super.attachView(mvpView);
-    }
-
+    /**
+     * Override for unsubscribe all subscriptions which was added to {@link #subscriptions}
+     */
     @Override
     public void detachView() {
         super.detachView();
         subscriptions.unsubscribe();
     }
 
+    /**
+     * Safely clear {@link #subscriptions} list.
+     */
     public void clearSubscription() {
         subscriptions.clear();
     }
 
+    /**
+     * Init calling to update contact info on server.
+     *
+     * @param wiki Wiki context
+     * @param space Wiki space
+     * @param pageName In fact - username of contact on wiki
+     * @param userPayload Data to update
+     */
     public void updateUser(String wiki, String space, String pageName, UserPayload userPayload) {
         checkViewAttached();
         getMvpView().showProgress();
@@ -102,7 +125,7 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
     }
 
     /**
-     * login
+     * login.
      *
      * @param username user's name
      * @param password user's password

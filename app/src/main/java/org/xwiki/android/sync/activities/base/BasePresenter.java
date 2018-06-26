@@ -20,43 +20,84 @@
 package org.xwiki.android.sync.activities.base;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+/**
+ * Base presenter for use MVP pattern.
+ *
+ * @param <T> Type of target Class for set exactly {@link MVPView} child
+ *
+ * @version $Id$
+ */
 public abstract class BasePresenter<T extends MVPView> implements Presenter<T> {
 
+    /**
+     * Android {@link Context} to know where this presenter is work.
+     */
     protected Context context;
+    /**
+     * Current target.
+     */
     private T mMvpView;
 
-    protected BasePresenter(Context context) {
+    /**
+     * Base constructor to create base instance of presenter.
+     *
+     * @param context Context, can't be changed by default.
+     */
+    protected BasePresenter(@NonNull Context context) {
         this.context = context;
     }
 
+    /**
+     * Attach mvpView to to current presenter.
+     *
+     * @param mvpView {@link MVPView} which will be attached to presenter.
+     */
     @Override
-    public void attachView(T mvpView) {
+    public void attachView(@NonNull T mvpView) {
         mMvpView = mvpView;
     }
 
+    /**
+     * Detach {@link #mMvpView} from presenter.
+     */
     @Override
     public void detachView() {
         mMvpView = null;
     }
 
+    /**
+     * @return true if {@link #mMvpView} was correctly set up by {@link #attachView(MVPView)} and
+     * not detached by {@link #detachView()}.
+     */
     public boolean isViewAttached() {
         return mMvpView != null;
     }
 
+    /**
+     * @return {@link #mMvpView}
+     */
+    @Nullable
     public T getMvpView() {
         return mMvpView;
     }
 
-    public void checkViewAttached() {
+    /**
+     * @throws MvpViewNotAttachedException when view has no attached
+     */
+    public void checkViewAttached() throws MvpViewNotAttachedException {
         if (!isViewAttached()) throw new MvpViewNotAttachedException();
     }
 
+    /**
+     * Exception which must be thrown if {@link android.view.View} was not attached.
+     */
     public static class MvpViewNotAttachedException extends RuntimeException {
         public MvpViewNotAttachedException() {
             super("Please call Presenter.attachView(MvpView) before" +
                     " requesting data to the Presenter");
         }
     }
-
 }

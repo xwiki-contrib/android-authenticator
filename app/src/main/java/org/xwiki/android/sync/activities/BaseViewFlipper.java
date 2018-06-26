@@ -21,30 +21,73 @@
 package org.xwiki.android.sync.activities;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import org.xwiki.android.sync.auth.AuthenticatorActivity;
 
 /**
- * BaseViewFlipper
+ * Base class for any flipper which will be used in authenticator.
+ *
+ * @version $Id$
  */
 public abstract class BaseViewFlipper {
-    protected AuthenticatorActivity mActivity;
-    protected Context mContext;
-    private View mContentRootView;
 
-    public BaseViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+    /**
+     * Activity for operations.
+     */
+    protected AuthenticatorActivity mActivity;
+
+    /**
+     * Context of operations executing. In fact, represent {@link #mActivity}.
+     */
+    protected Context mContext;
+
+    /**
+     * Root view of flipper.
+     */
+    protected View mContentRootView;
+
+    /**
+     * All childs of this class must use only this constructor!
+     *
+     * @param activity Current activity
+     * @param contentRootView Root view of current flipper
+     */
+    public BaseViewFlipper(
+        @NonNull AuthenticatorActivity activity,
+        @NonNull View contentRootView
+    ) {
         mActivity = activity;
         mContext = mActivity;
         mContentRootView = contentRootView;
     }
 
-    public View findViewById(int id) {
+    /**
+     * @param id Resource identifier in view
+     * @param <T> Result type
+     * @return Result of calling of {@link View#findViewById(int)} as for {@link #mContentRootView}
+     */
+    public <T extends View> T findViewById(int id) {
         return mContentRootView.findViewById(id);
     }
 
+    /**
+     * Must be called when current flipper page must be slided to next.
+     */
     public abstract void doNext();
 
+    /**
+     * Must be called when current flipper page must be slided to previous.
+     */
     public abstract void doPrevious();
 
+    /**
+     * @return Title of flipper or null if have no
+     */
+    @Nullable
+    public String getTitle() {
+        return null;
+    }
 }

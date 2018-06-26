@@ -19,30 +19,24 @@
  */
 package org.xwiki.android.sync.rest;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.ObjectSummary;
-import org.xwiki.android.sync.bean.RegisterForm;
 import org.xwiki.android.sync.bean.SearchResult;
 import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -51,23 +45,46 @@ import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 import static org.xwiki.android.sync.AppContext.getApiManager;
 
 /**
- * XWikiHttp
+ * Static class which can be used as wrapper for a few requests such as login and other. It
+ * contains additional logic which was not added for requests by automatically creating
+ * requests services in {@link BaseApiManager}
+ *
+ * @see BaseApiManager
+ * @see XWikiServices
+ * @see XWikiPhotosManager
+ *
+ * @version $Id$
  */
 public class XWikiHttp {
+
+    /**
+     * Tag for logging
+     */
     private static final String TAG = "XWikiHttp";
 
+    /**
+     * Provide work with login. If be exactly - create login base credentials, send it via
+     * {@link XWikiServices#login(String)}, extract cookies as auth token as a result and send it
+     * via returned parameter
+     *
+     * @param username Username of user
+     * @param password Password of user
+     * @return Object which can be used for subscribing to results of request. As a result - auth
+     * token
+     *
+     * @since 0.4
+     */
     public static Observable<String> login(
-        String username,
-        String password
+        @NonNull String username,
+        @NonNull String password
     ) {
         final PublishSubject<String> authTokenSubject = PublishSubject.create();
         getApiManager().getXwikiServicesApi().login(
@@ -103,15 +120,17 @@ public class XWikiHttp {
     }
 
     /**
-     * getSyncData
-     * get SyncData used in SyncAdapter.onPerformSync
+     * Create and start procedure with getting full info about users based syncType
      *
-     * @param syncType     Constants.SYNC_TYPE_ALL_USERS
-     *                     Constants.SYNC_TYPE_SELECTED_GROUPS
-     * @return SyncData
-     * the SyncData can be used in updating the data.
-     * @throws IOException
-     * @throws XmlPullParserException
+     * @param syncType Will be used to understand which of methods of getting users must me used
+     * @return Observable which can be observed. In {@link Observer#onNext(Object)} you will
+     * receive each user which was correctly received. {@link Observer#onError(Throwable)} will
+     * be called on first error of getting users and receiving of users will be stopped.
+     * {@link Observer#onCompleted()} will be called when receiving of user was successfully
+     * completed
+     *
+     * @see Constants#SYNC_TYPE_ALL_USERS
+     * @see Constants#SYNC_TYPE_SELECTED_GROUPS
      */
     public static Observable<XWikiUserFull> getSyncData(final int syncType) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
@@ -154,19 +173,20 @@ public class XWikiHttp {
     }
 
     /**
-     * getSyncGroups
-     * Constants.SYNC_TYPE_SELECTED_GROUPS
-     * get the selected groups' SyncData
+     * Download and send users in subject for each group in groupIdList. Will call
+     * {@link Observer#onCompleted()} when all users from all groups was successfully received
      *
-     * @param groupIdList  the selected groups' id list.
-     * @return SyncData
-     * the SyncData can be used in updating the data.
-     * @throws IOException
-     * @throws XmlPullParserException
+     * @param groupIdList Contains ids of groups to sync
+     * @param subject Contains subject to send updates info
+     * @throws IOException Will be thrown if something went wrong
+     *
+     * @see #getDetailedInfo(List, PublishSubject)
+     *
+     * @since 0.4
      */
     private static void getSyncGroups(
-        List<String> groupIdList,
-        final PublishSubject<XWikiUserFull> subject
+        @NonNull List<String> groupIdList,
+        @NonNull final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
         final CountDownLatch groupsCountDown = new CountDownLatch(groupIdList.size());
         for (String groupId : groupIdList) {
@@ -211,12 +231,17 @@ public class XWikiHttp {
     }
 
     /**
-     * @param from Key-value pairs where key - username, value - space
-     * @return List of users
+     * Send users full info into subject using from. Will call
+     * {@link Observer#onError(Throwable)} on first error of getting user.
+     *
+     * @param from Objects which can be used to get info about users to load them
+     * @param subject Contains subject to send updates info
+     *
+     * @since 0.4
      */
     private static void getDetailedInfo(
-        List<ObjectSummary> from,
-        final PublishSubject<XWikiUserFull> subject
+        @NonNull List<ObjectSummary> from,
+        @NonNull final PublishSubject<XWikiUserFull> subject
     ) throws IOException {
 
         final CountDownLatch countDown = new CountDownLatch(from.size());
@@ -263,14 +288,13 @@ public class XWikiHttp {
     }
 
     /**
-     * getSyncAllUsers
-     * Constants.SYNC_TYPE_ALL_USERS
-     * used for getting the all users from server.
+     * Start to sync all users using {@link AppContext#getApiManager()}. In
+     * {@link Observer#onNext(Object)} you will receive each user which was correctly received.
+     * {@link Observer#onError(Throwable)} will be called on first error of getting users and
+     * receiving of users will be stopped. {@link Observer#onCompleted()} will be called when
+     * receiving of user was successfully completed.
      *
-     * @return SyncData
-     * the SyncData can be used in updating the data.
-     * @throws IOException
-     * @throws XmlPullParserException
+     * @param subject Will be used as object for events
      */
     private static void getSyncAllUsers(
         final PublishSubject<XWikiUserFull> subject

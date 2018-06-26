@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/learn_more_dialog"
-                android:onClick="next"
+                android:onClick="doNext"
                 android:id="@+id/learn_more"
                 android:textColor="@color/primary_dark"/>
         </LinearLayout>
@@ -52,12 +52,12 @@
                 />
         </android.support.design.widget.TextInputLayout>
         <Button
-            android:layout_width="@dimen/button_width"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/defaultViewMediumPadding"
             android:text="@string/next"
-            android:layout_marginTop="@dimen/button_margin_top"
-            android:onClick="doPrevious"
-            android:layout_gravity="end" />
+            android:onClick="doNext"
+            android:layout_gravity="end"/>
 
     </LinearLayout>
 

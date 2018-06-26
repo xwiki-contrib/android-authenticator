@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:text="@string/log_in"
             android:layout_margin="@dimen/defaultViewMediumPadding"
-            android:onClick="doNext"/>
+            android:id="@+id/signInButton"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

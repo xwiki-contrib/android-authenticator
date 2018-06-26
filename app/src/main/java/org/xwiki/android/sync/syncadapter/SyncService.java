@@ -28,12 +28,24 @@ import android.os.IBinder;
  * Service to handle Account sync. This is invoked with an intent with action
  * ACTION_AUTHENTICATOR_INTENT. It instantiates the syncadapter and returns its
  * IBinder.
+ *
+ * @version $Id$
  */
 public class SyncService extends Service {
 
+    /**
+     * Object which will be used for synchronized process
+     */
     private static final Object sSyncAdapterLock = new Object();
+
+    /**
+     * Instance of sync adapter
+     */
     private static SyncAdapter sSyncAdapter = null;
 
+    /**
+     * Init {@link #sSyncAdapter} if it is null.
+     */
     @Override
     public void onCreate() {
         synchronized (sSyncAdapterLock) {
@@ -43,6 +55,9 @@ public class SyncService extends Service {
         }
     }
 
+    /**
+     * @return {@link SyncAdapter#getSyncAdapterBinder()} of {@link #sSyncAdapter}
+     */
     @Override
     public IBinder onBind(Intent intent) {
         return sSyncAdapter.getSyncAdapterBinder();

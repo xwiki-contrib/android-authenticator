@@ -19,7 +19,9 @@
  */
 package org.xwiki.android.sync.activities;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -32,60 +34,62 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * SettingIpViewFlipper
+ * Flipper for setting XWiki server address.
+ *
+ * @version $Id$
  */
-public class SettingIpViewFlipper extends BaseViewFlipper {
+public class SettingServerIpViewFlipper extends BaseViewFlipper {
 
-    CharSequence serverAddr = null;
-
-    public SettingIpViewFlipper(AuthenticatorActivity activity, View contentRootView) {
+    /**
+     * Standard constructor.
+     *
+     * @param activity Actual {@link AuthenticatorActivity}
+     * @param contentRootView Root {@link View} of that flipper (not activity)
+     */
+    public SettingServerIpViewFlipper(AuthenticatorActivity activity, View contentRootView) {
         super(activity, contentRootView);
     }
 
+    /**
+     * Check typed server address and call sign in if all is ok.
+     */
     @Override
     public void doNext() {
-        if (checkInput()) {
-            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
-            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
+        String serverAddress = checkInput();
+        if (serverAddress != null) {
+            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddress);
         }
     }
 
+    /**
+     * Do nothing (Setting server IP is first operation of adding account.
+     */
     @Override
-    public void doPrevious() {
-        if (checkInput()) {
-            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddr.toString());
-            mActivity.showViewFlipper(AuthenticatorActivity.ViewFlipperLayoutId.SIGN_IN);
-        }
-    }
+    public void doPrevious() { }
 
-    public boolean checkInput() {
-        EditText serverEditText = (EditText) findViewById(R.id.accountServer);
+    /**
+     * @return Valid server address or null
+     */
+    @Nullable
+    private String checkInput() {
+        EditText serverEditText = findViewById(R.id.accountServer);
         serverEditText.setError(null);
-        serverAddr = serverEditText.getText();
-        View focusView = null;
-        boolean cancel = false;
+        String serverAddress = serverEditText.getText().toString();
 
-        if (TextUtils.isEmpty(serverAddr)) {
-            focusView = serverEditText;
+        if (TextUtils.isEmpty(serverAddress)) {
             serverEditText.setError(mContext.getString(R.string.error_field_required));
-            cancel = true;
-        }else{
+            serverEditText.requestFocus();
+            return null;
+        } else {
             try {
-                URL url = new URL(serverAddr.toString());
+                new URL(serverAddress);
+                return serverAddress;
             } catch (MalformedURLException e) {
-                e.printStackTrace();
-                focusView = serverEditText;
+                Log.e(SettingServerIpViewFlipper.class.getSimpleName(), "Wrong url", e);
                 serverEditText.setError(mContext.getString(R.string.error_invalid_server));
-                cancel = true;
+                serverEditText.requestFocus();
+                return null;
             }
         }
-
-        if (cancel) {
-            focusView.requestFocus();
-            return false;
-        } else {
-            return true;
-        }
     }
-
 }

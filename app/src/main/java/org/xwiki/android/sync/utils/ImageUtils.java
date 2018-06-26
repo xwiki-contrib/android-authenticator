@@ -28,17 +28,21 @@ import java.io.ByteArrayOutputStream;
 
 
 /**
- * Image Util
- * Compressing the image by quality
- * recycle the bitmap
+ * Static class with utils for images.
+ *
+ * @version $Id$
  */
 public class ImageUtils {
+
+    /**
+     * Logs tag
+     */
     private static final String TAG = "ImageUtils";
 
     /**
-     * compress bitmap by quality
+     * compress bitmap by quality.
      *
-     * @param bitmap  the bitmap
+     * @param bitmap Source bitmap
      * @param maxSize the maxsize after compressing, KB
      * @return bitmap
      */
@@ -60,25 +64,10 @@ public class ImageUtils {
         if (isCompressed) {
             Bitmap compressedBitmap = BitmapFactory.decodeByteArray(
                     baos.toByteArray(), 0, baos.toByteArray().length);
-            recycleBitmap(bitmap);
+            bitmap.recycle();
             return compressedBitmap;
         } else {
             return bitmap;
         }
     }
-
-
-    /**
-     * recycle bitmap
-     *
-     * @param bitmap
-     */
-    public static void recycleBitmap(Bitmap bitmap) {
-        if (bitmap != null && !bitmap.isRecycled()) {
-            bitmap.recycle();
-            System.gc();
-            bitmap = null;
-        }
-    }
-
 }

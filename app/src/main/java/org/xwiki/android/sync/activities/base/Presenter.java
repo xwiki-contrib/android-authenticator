@@ -19,10 +19,27 @@
  */
 package org.xwiki.android.sync.activities.base;
 
+import android.support.annotation.NonNull;
+
+/**
+ * Presenter interface for use MVP pattern.
+ *
+ * @param <V> Type of target Class for set exactly {@link MVPView} child.
+ *
+ * @version $Id$
+ */
 public interface Presenter<V extends MVPView> {
 
-    void attachView(V mvpView);
+    /**
+     * Attach mvpView to to current presenter.
+     *
+     * @param mvpView {@link MVPView} which will be attached to presenter.
+     */
+    void attachView(@NonNull V mvpView);
 
+    /**
+     * Detach {@link android.view.View} from presenter.
+     */
     void detachView();
 
 }

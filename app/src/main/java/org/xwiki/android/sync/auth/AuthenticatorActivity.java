@@ -19,7 +19,6 @@
  */
 package org.xwiki.android.sync.auth;
 
-import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -29,68 +28,123 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
-import org.xwiki.android.sync.activities.SettingIpViewFlipper;
+import org.xwiki.android.sync.activities.BaseViewFlipper;
+import org.xwiki.android.sync.activities.SettingServerIpViewFlipper;
 import org.xwiki.android.sync.activities.SettingSyncViewFlipper;
 import org.xwiki.android.sync.activities.SignInViewFlipper;
 import org.xwiki.android.sync.utils.IntentUtils;
 import org.xwiki.android.sync.utils.PermissionsUtils;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StatusBarColorCompat;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Subscription;
 
 import static org.xwiki.android.sync.AppContext.currentBaseUrl;
 
 
 /**
- * @version $Id: $
+ * Most important activity in authorisation process
+ *
+ * @version $Id$
  */
-public class AuthenticatorActivity extends AccountAuthenticatorActivity{
+public class AuthenticatorActivity extends AccountAuthenticatorActivity {
+
+    /**
+     * Contains order of flippers in authorisation progress.
+     *
+     * <p>
+     *     All flippers must support constructor
+     *     {@link BaseViewFlipper#BaseViewFlipper(AuthenticatorActivity, View)}, because
+     *     all instances will be created automatically using reflection in
+     *     {@link #showViewFlipper(int)}
+     * </p>
+     */
+    private static final List<Class<? extends BaseViewFlipper>> orderOfFlippers;
+
+    static {
+        orderOfFlippers = new ArrayList<>();
+        orderOfFlippers.add(SettingServerIpViewFlipper.class);
+        orderOfFlippers.add(SignInViewFlipper.class);
+        orderOfFlippers.add(SettingSyncViewFlipper.class);
+    }
+
+    /**
+     * Tag which will be used for logging
+     */
     private static final String TAG = "AuthenticatorActivity";
 
     public static final String KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE";
-    public static final String KEY_ERROR_MESSAGE = "ERR_MSG";
-    public final static String PARAM_USER_SERVER = "XWIKI_USER_SERVER";
-    public final static String PARAM_USER_PASS = "XWIKI_USER_PASS";
-    public final static String PARAM_APP_UID = "PARAM_APP_UID";
-    public final static String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
-    public final static String IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE";
+    public static final String PARAM_USER_SERVER = "XWIKI_USER_SERVER";
+    public static final String PARAM_USER_PASS = "XWIKI_USER_PASS";
+    public static final String PARAM_APP_UID = "PARAM_APP_UID";
+    public static final String PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME";
+    public static final String IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE";
 
-    private SettingIpViewFlipper settingsIpViewFlipper;
-    private SignInViewFlipper signInViewFlipper;
-    private SettingSyncViewFlipper settingSyncViewFlipper;
+    /**
+     * List of flippers or nulls.
+     * <p>
+     *     Danger, can contains nulls, not recommended to use it directly
+     * </p>
+     *
+     * @see #showViewFlipper(int)
+     */
+    private final List<BaseViewFlipper> flippers = new ArrayList<>();
 
+    /**
+     * Will be used for managing of user account.
+     */
     private AccountManager mAccountManager;
-    AlertDialog.Builder builder;
-    private ViewFlipper mViewFlipper;
-    private Toolbar toolbar;
-    //show progress dialog
-    private Dialog mProgressDialog = null;
-    //add all asyncTask and clear all tasks when calling showViewFlipper and onDestroy
-    private List<AsyncTask<Void, Void, Object>> mAsyncTasks = new ArrayList<>();
 
-    private PermissionsUtils mPermissions;
+    /**
+     * Flippers root.
+     */
+    private ViewFlipper mViewFlipper;
+
+    /**
+     * Toolbar of current activity.
+     */
+    private Toolbar toolbar;
+
+    /**
+     * Current progress dialog.
+     */
+    private Dialog mProgressDialog = null;
+
+    /**
+     * Code which await to returns for requesting permissions
+     */
     private static final int REQUEST_PERMISSIONS_CODE = 1;
 
+    /**
+     * <ol>
+     *     <li>Init view</li>
+     *     <li>Init {@link #toolbar}</li>
+     *     <li>Init {@link #mViewFlipper}</li>
+     *     <li>Init action (settings or full auth)</li>
+     * </ol>
+     *
+     * @param savedInstanceState Used by default
+     * @see Activity#onCreate(Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,123 +156,133 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         }
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("XWiki Account");
+        toolbar.setTitle(R.string.xwikiAccount);
 
+        AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(AuthenticatorActivity.this);
         }
-        builder.setTitle("XWiki")
+        builder.setTitle(R.string.xwiki)
                 .setIcon(getResources().getDrawable(R.drawable.logo))
-                .setMessage("Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps" )
-                .setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                .setMessage(R.string.signUpOfferMessage)
+                .setPositiveButton(
+                    android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
                     }
-                });
+                );
         mViewFlipper = findViewById(R.id.view_flipper);
+        Integer position;
         boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
         if (is_set_sync) {
-            //just set sync
-            showViewFlipper(ViewFlipperLayoutId.SETTING_SYNC);
+            position = orderOfFlippers.indexOf(SettingSyncViewFlipper.class);
         } else {
-            //add new contact
-            //check if there'is already a user, finish and return, keep only one user.
             mAccountManager = AccountManager.get(getApplicationContext());
             Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+            position = 0;
             if (availableAccounts.length > 0) {
                 Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             }
         }
-    }
-    @Override
-    public void onBackPressed() {
-        if(mViewFlipper.getDisplayedChild()==ViewFlipperLayoutId.SETTING_IP)
-            super.onBackPressed();
-        doPreviousNext(false);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        clearAsyncTask();
+        showViewFlipper(position);
     }
 
     /**
-     * now it's useless because of compile sdk 22
+     * Intercept back button pressing and remap it to flipper if current flipper child is
+     * not settings.
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(mPermissions.areAllRequiredPermissionsGranted(grantResults)){
-            settingSyncViewFlipper.syncSettingComplete();
-        }else{
-            settingSyncViewFlipper.noPermissions();
+    public void onBackPressed() {
+        if(mViewFlipper.getDisplayedChild() == orderOfFlippers.indexOf(SettingServerIpViewFlipper.class)) {
+            super.onBackPressed();
+        } else {
+            doPrevious(
+                mViewFlipper.getCurrentView()
+            );
         }
     }
 
-    private void doPreviousNext(boolean next) {
-        int id = mViewFlipper.getDisplayedChild();
-        //set animation for view flipper (left right)
-        if(next || id == ViewFlipperLayoutId.SETTING_IP){
-            mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_left_in));
-            mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_left_out));
-        }else{
-            mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_right_in));
-            mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_right_out));
-        }
-        switch (id) {
-            case ViewFlipperLayoutId.SETTING_IP:
-                if (settingsIpViewFlipper == null) {
-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                if (next) {
-                    settingsIpViewFlipper.doNext();
-                } else {
-                    settingsIpViewFlipper.doPrevious();
-                }
-                break;
-            case ViewFlipperLayoutId.SIGN_IN:
-                if (next) {
-                    signInViewFlipper.doNext();
-                } else {
-                    signInViewFlipper.doPrevious();
-                }
-                break;
-            case ViewFlipperLayoutId.SETTING_SYNC:
-                if (next) {
-                    settingSyncViewFlipper.doNext();
-                } else {
-                    settingSyncViewFlipper.doPrevious();
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
+    /**
+     * Must be called when current flipper must receive calling of
+     * {@link BaseViewFlipper#doPrevious()} and be changed to previous.
+     *
+     * @param view View, which trigger action
+     */
     public void doPrevious(View view) {
-        doPreviousNext(false);
+        Integer position = mViewFlipper.getDisplayedChild();
+        chooseAnimation(position == orderOfFlippers.indexOf(SettingServerIpViewFlipper.class));
+        flippers.get(
+            position
+        ).doPrevious();
+        showViewFlipper(position - 1);
     }
 
+    /**
+     * Must be called when current flipper must receive calling of
+     * {@link BaseViewFlipper#doNext()} and be changed to next.
+     *
+     * @param view View, which trigger action
+     */
     public void doNext(View view) {
-        doPreviousNext(true);
+        Integer position = mViewFlipper.getDisplayedChild();
+        chooseAnimation(true);
+        flippers.get(
+            position
+        ).doNext();
+        showViewFlipper(position + 1);
     }
 
-
-
-    public void next(View view) {
-        AlertDialog dialog=builder.create();
-        dialog.show();
+    /**
+     * Util method, choose animation in dependency to toNext.
+     *
+     * @param toNext If true - will be used animation right-to-left (<-),
+     *               left-to-right otherwise (->)
+     *
+     * @since 0.4.2
+     */
+    private void chooseAnimation(@NonNull Boolean toNext) {
+        if (toNext) {
+            mViewFlipper.setInAnimation(
+                AnimationUtils.loadAnimation(
+                    this,
+                    R.anim.push_left_in
+                )
+            );
+            mViewFlipper.setOutAnimation(
+                AnimationUtils.loadAnimation(
+                    this,
+                    R.anim.push_left_out
+                )
+            );
+        } else {
+            mViewFlipper.setInAnimation(
+                AnimationUtils.loadAnimation(
+                    this,
+                    R.anim.push_right_in
+                )
+            );
+            mViewFlipper.setOutAnimation(
+                AnimationUtils.loadAnimation(
+                    this,
+                    R.anim.push_right_out
+                )
+            );
+        }
     }
+
+    //TODO:: Replace by normal registration
+    /**
+     * Will be called when user push to "Create one" button.
+     *
+     * @param view View which trigger action
+     */
     public void signUp(View view) {
         String url = currentBaseUrl();
         if (url.endsWith("/")) {
@@ -231,41 +295,73 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         );
         startActivity(intent);
     }
-    public interface ViewFlipperLayoutId {
-        int SETTING_IP = 0;
-        int SIGN_IN = 1;
-        int SETTING_SYNC = 2;
-    }
 
-    public void showViewFlipper(int id) {
-        clearAsyncTask();
-        mViewFlipper.setDisplayedChild(id);
-        switch (id) {
-            case ViewFlipperLayoutId.SETTING_IP:
-                if (settingsIpViewFlipper == null) {
-                    settingsIpViewFlipper = new SettingIpViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("XWiki Account");
-
-                break;
-            case ViewFlipperLayoutId.SIGN_IN:
-                if (signInViewFlipper == null) {
-                    signInViewFlipper = new SignInViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Sign In");
-
-                break;
-            case ViewFlipperLayoutId.SETTING_SYNC:
-                if (settingSyncViewFlipper == null) {
-                    settingSyncViewFlipper = new SettingSyncViewFlipper(this, mViewFlipper.getChildAt(id));
-                }
-                toolbar.setTitle("Setting Sync");
-
-                break;
+    /**
+     * Set current visible element and init flipper if it needed.
+     *
+     * <p>
+     *     Procedure of initialisation:
+     * </p>
+     *
+     * <ol>
+     *     <li> Get class of flipper </li>
+     *     <li> Get constructor which signature duplicate
+     *          {@link BaseViewFlipper#BaseViewFlipper(AuthenticatorActivity, View)}
+     *     </li>
+     *     <li> Create instance using "this" and {@link #mViewFlipper}</li>
+     * </ol>
+     *
+     * @param position Position of item which must be shown
+     *
+     * @since 0.4.2
+     */
+    public void showViewFlipper(int position) {
+        mViewFlipper.setDisplayedChild(position);
+        while (flippers.size() <= position) {
+            flippers.add(null);
         }
+        BaseViewFlipper flipper = flippers.get(position);
+        if (flipper == null) {
+            try {
+                flipper = orderOfFlippers.get(
+                    position
+                ).getConstructor(
+                    AuthenticatorActivity.class,
+                    View.class
+                ).newInstance(
+                    this,
+                    mViewFlipper.getChildAt(position)
+                );
+                flippers.set(
+                    position,
+                    flipper
+                );
+            } catch (InstantiationException e) {
+                Log.e(TAG, "View flipper must contains constructor with activity and view", e);
+            } catch (IllegalAccessException e) {
+                Log.e(TAG, "View flipper must contains constructor with activity and view", e);
+            } catch (InvocationTargetException e) {
+                Log.e(TAG, "View flipper must contains constructor with activity and view", e);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG, "View flipper must contains constructor with activity and view", e);
+            } finally {
+                if (flipper == null) {
+                    return;
+                }
+            }
+        }
+        String title = flipper.getTitle();
+        if (title == null) {
+            title = getString(R.string.app_name);
+        }
+        toolbar.setTitle(
+            title
+        );
     }
 
-
+    /**
+     * Clear data for creating new account
+     */
     public void clearOldAccount(){
         //TODO: clear current user url
         //clear SharePreference
@@ -274,6 +370,17 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         SharedPrefsUtils.removeKeyValue(this, Constants.SYNC_TYPE);
     }
 
+    //TODO: Replace this logic to another place
+    /**
+     * Save account in system and credentials in app.
+     *
+     * @param intent Intent must contains all data for saving:
+     *               <ol>
+     *                  <li>{@link AccountManager#KEY_ACCOUNT_NAME} for username</li>
+     *                  <li>{@link #PARAM_USER_PASS} for password</li>
+     *                  <li>{@link #PARAM_USER_SERVER} for server address</li>
+     *               </ol>
+     */
     public void finishLogin(Intent intent) {
         Log.d(TAG, "> finishLogin");
 
@@ -300,7 +407,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         Log.d(TAG, packaName + ", " + getPackageName());
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
         if (!packaName.contains("android.uid.system")) {
-            AppContext.addAuthorizedApp(uid, packaName);
+            AppContext.addAuthorizedApp(packaName);
             String authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             if (!TextUtils.isEmpty(authToken)) {
                 String authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE);
@@ -318,8 +425,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         // in SettingSyncViewFlipper this activity finish;
     }
 
-
-    public void showProgress(CharSequence message, final AsyncTask asyncTask) {
+    /**
+     * Must show progress and call {@link Subscription#unsubscribe()} on subscription object
+     * in case of cancelling dialog.
+     *
+     * @param message Message to show to user
+     * @param subscription Subscription to
+     *
+     * @since 0.4.2
+     */
+    public void showProgress(CharSequence message, final Subscription subscription) {
         // To avoid repeatedly create
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             return;
@@ -331,9 +446,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
                 Log.i(TAG, "user cancelling authentication");
-                if (asyncTask != null) {
-                    asyncTask.cancel(true);
-                }
+                subscription.unsubscribe();
             }
         });
         // We save off the progress dialog in a field so that we can dismiss
@@ -352,19 +465,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity{
         }
     }
 
-    public void putAsyncTask(AsyncTask<Void, Void, Object> asyncTask) {
-        mAsyncTasks.add(asyncTask.execute());
-    }
-
-    private void clearAsyncTask() {
-        for (AsyncTask<Void, Void, Object> asyncTask : mAsyncTasks) {
-            if (asyncTask != null && !asyncTask.isCancelled()) {
-                asyncTask.cancel(true);
-            }
-        }
-        mAsyncTasks.clear();
-    }
-
+    /**
+     * Hide keyboard or other input method.
+     */
     public void hideInputMethod(){
         View view = this.getCurrentFocus();
         if(view != null) {

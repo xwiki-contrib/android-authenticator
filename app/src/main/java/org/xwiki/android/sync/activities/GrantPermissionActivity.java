@@ -23,7 +23,6 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -34,9 +33,7 @@ import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.auth.AuthenticatorActivity;
-import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StatusBarColorCompat;
 
 import static org.xwiki.android.sync.AppContext.currentBaseUrl;
 
@@ -45,6 +42,8 @@ import static org.xwiki.android.sync.AppContext.currentBaseUrl;
  * A grant permission activity.
  * input your count's password and verify by comparing with local account's info
  * or sending password to server to verify according the response.
+ *
+ * @version $Id$
  */
 public class GrantPermissionActivity extends AccountAuthenticatorActivity {
 
@@ -62,8 +61,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_grant_permission);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("XWiki Account");
-        StatusBarColorCompat.compat(this, Color.parseColor("#0077D9"));
+        toolbar.setTitle(R.string.xwikiAccount);
 
         //get data from intent
         uid = getIntent().getIntExtra("uid", 0);
@@ -89,7 +87,7 @@ public class GrantPermissionActivity extends AccountAuthenticatorActivity {
     }
 
     public void onHandleAuthorize(View view){
-        AppContext.addAuthorizedApp(uid, packageName);
+        AppContext.addAuthorizedApp(packageName);
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
         String authToken = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.COOKIE, null);

@@ -27,21 +27,40 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * String Time Utils
+ * String Utils
+ *
+ * @version $Id$
  */
 public class StringUtils {
-    private final static Pattern emailer = Pattern
-            .compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*");
 
     /**
-     * isEmpty
-     * whether input is '', null,'\t' '\r' '\n'  or not.
-     * '', null, return ture
-     * many '\t' '\r' '\n' return true;
-     * other false
+     * Email pattern.
+     */
+    private final static Pattern emailer = Pattern.compile(
+        "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"
+    );
+
+    /**
+     * Date format for parse/print dates from/to strings
+     *
+     * @since 0.4.2
+     */
+    private final static SimpleDateFormat sdf = new SimpleDateFormat(
+        "yyyy-MM-dd'T'HH:mm:ssZ"
+    );
+
+    static {
+        sdf.setTimeZone(
+            TimeZone.getTimeZone("GMT")
+        );
+    }
+
+    /**
+     * @param input Source char sequence
+     * @return true if input is null or contains only space symbols (space, newlines, tabs) or empty
      */
     public static boolean isEmpty(CharSequence input) {
-        if (input == null || "".equals(input))
+        if (input == null || input.length() == 0)
             return true;
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
@@ -53,66 +72,24 @@ public class StringUtils {
     }
 
     /**
-     * whether email is valid or not
-     */
-    public static boolean isEmail(CharSequence email) {
-        if (isEmpty(email))
-            return false;
-        return emailer.matcher(email).matches();
-    }
-
-    /**
-     * return system time with format
-     */
-    public static String getDataTime(String format) {
-        SimpleDateFormat df = new SimpleDateFormat(format);
-        return df.format(new Date());
-    }
-
-    /**
-     * isIpAddress
-     * whether a charSequence is a valid ip address.
-     * @param addr
-     * @return
-     */
-    public static boolean isIpAddress(CharSequence addr) {
-        if (addr == null) return false;
-        if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
-            return false;
-        }
-        String rexp = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
-        Pattern pat = Pattern.compile(rexp);
-        Matcher mat = pat.matcher(addr);
-        return mat.find();
-    }
-
-    /**
-     * isDomainAddress
-     * whether a charSequence is a valid domain address
+     * Check that input is email.
      *
-     * @param addr
-     * @return
+     * @param input Char sequence which can be email
+     * @return true if input is not empty and match to {@link #emailer} pattern
      */
-    public static boolean isDomainAddress(CharSequence addr) {
-        if (addr == null || addr.length() < 3) return false;
-        String rexp = "^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
-        Pattern pat = Pattern.compile(rexp);
-        Matcher mat = pat.matcher(addr);
-        return mat.find();
+    public static boolean isEmail(CharSequence input) {
+        return !isEmpty(input) && emailer.matcher(input).matches();
     }
 
     /**
-     * iso8601ToDate
-     * Iso8601 String To Date
+     * Convert date from Iso8601 format to {@link Date}. Example of Iso8601:
      * 2011-09-24T19:45:31+02:00
+     *
+     * @param iso8601 Input with date in Iso8601 format
+     * @return Date from iso8601 or null if iso8601 is incorrect
      */
     public static Date iso8601ToDate(String iso8601) {
         if(isEmpty(iso8601)) return null;
-        //TODO it's a problem
-        // in android need "yyyy-MM-dd'T'HH:mm:ssZ"
-        // in junit4 need  "yyyy-MM-dd'T'HH:mm:ssX" iso8601
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             return sdf.parse(iso8601);
         } catch (ParseException e) {
@@ -122,16 +99,13 @@ public class StringUtils {
     }
 
     /**
-     * dateToIso8601String
-     *   Date to Iso8601 String
-     *   2011-09-24T19:45:31+02:00
-     * @param date
-     * @return String
+     * Convert date from {@link Date} to Iso8601. Example of Iso8601:
+     * 2011-09-24T19:45:31+02:00
+     *
+     * @param date Date to format
+     * @return String of date in iso8601 format
      */
     public static String dateToIso8601String(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         return sdf.format(date);
     }
-
 }

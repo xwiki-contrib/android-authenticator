@@ -19,6 +19,11 @@
  */
 package org.xwiki.android.sync.activities.base;
 
+/**
+ * Implement this interface if your view must work in mvp pattern in authenticator bounds
+ *
+ * @version $Id$
+ */
 public interface MVPView {
 
     /**
@@ -27,8 +32,8 @@ public interface MVPView {
      * sort of progress bar or animation so that the user knows that the app is
      * doing some work and has not stalled.
      *
-     * For example: a network request to the API is made for authenticating
-     * the user.
+     * <p>For example: a network request to the API is made for authenticating
+     * the user.</p>
      */
     void showProgress();
 

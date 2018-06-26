@@ -20,6 +20,7 @@
 package org.xwiki.android.sync.utils;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -30,20 +31,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PermissionsCheck.
+ * Util class for helping with permissions
+ *
+ * @version $Id$
  */
 public class PermissionsUtils {
-    private Activity mContext;
+
+    /**
+     * Context of permission operations
+     */
+    private Activity activity;
+
+    /**
+     * Array of permissions which this application required
+     */
     private String[] mRequiredPermissions;
+
+    /**
+     * Permissions which was not given
+     */
     private List<String> mPermissionsToRequest = new ArrayList<>();
 
-    public PermissionsUtils(Activity context, String... requiredPermissions) {
-        mContext = context;
-        mRequiredPermissions = requiredPermissions;
-    }
-
+    /**
+     * Standard constructor. Fill {@link #mRequiredPermissions} from {@link PackageInfo}.
+     *
+     * @param activity Will be set to {@link #activity} and used to get permissions
+     * @throws IllegalArgumentException Will be thrown when activity can't be used
+     *
+     * @since 0.4
+     */
     public PermissionsUtils(Activity activity) throws IllegalArgumentException {
-        mContext = activity;
+        this.activity = activity;
         try {
             PackageInfo info = activity
                     .getPackageManager()
@@ -60,30 +78,25 @@ public class PermissionsUtils {
 
     /**
      * Checks if all the required permissions are granted.
+     *
      * @return true if all the required permissions are granted, otherwise false
      */
     public boolean checkPermissions() {
         for (String permission : mRequiredPermissions) {
-            if (ContextCompat.checkSelfPermission(mContext, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
                 mPermissionsToRequest.add(permission);
             }
         }
 
-        if (mPermissionsToRequest.isEmpty()) {
-            return true;
-        }
-
-        return false;
+        return mPermissionsToRequest.isEmpty();
     }
 
     /**
      * Requests the missing permissions.
-     * The activity from which this method is called has to implement
-     * {@link Activity#onRequestPermissionsResult(int, String[], int[])}
-     * and then, inside it, it has to call the method
-     * {@link PermissionsUtils#areAllRequiredPermissionsGranted(int[])} to check that all the
-     * requested permissions are granted by the user
      * @param requestCode request code used by the activity
+     *
+     * @see Activity#onActivityResult(int, int, Intent)
+     * @see ActivityCompat#requestPermissions(Activity, String[], int)
      */
     public void requestPermissions(int requestCode) {
         String[] request = mPermissionsToRequest.toArray(new String[mPermissionsToRequest.size()]);
@@ -97,28 +110,6 @@ public class PermissionsUtils {
 
         Log.i(getClass().getSimpleName(), log.toString());
 
-        ActivityCompat.requestPermissions(mContext, request, requestCode);
+        ActivityCompat.requestPermissions(activity, request, requestCode);
     }
-
-    /**
-     * Method to call inside
-     * {@link Activity#onRequestPermissionsResult(int, String[], int[])}, to check if the
-     * required permissions are granted.
-     * @param grantResults results
-     * @return true if all the required permissions are granted, otherwise false
-     */
-    public boolean areAllRequiredPermissionsGranted(int[] grantResults) {
-        if (grantResults == null || grantResults.length == 0) {
-            return false;
-        }
-
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 }

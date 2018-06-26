@@ -29,8 +29,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.xmlpull.v1.XmlPullParserException;
-import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.contactdb.ContactManager;
@@ -38,43 +36,78 @@ import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.Future;
 
 import rx.Observable;
 import rx.Observer;
-import rx.functions.Action0;
-import rx.subjects.PublishSubject;
 
 /**
- * SyncAdapter
+ * Adapter which will be used for synchronization.
+ *
+ * @version $Id$
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    private static final String TAG = "SyncAdapter";
-    private static final boolean NOTIFY_AUTH_FAILURE = true;
 
+    /**
+     * Tag for logging.
+     */
+    private static final String TAG = "SyncAdapter";
+
+    /**
+     * Account manager to manage synchronization.
+     */
     private final AccountManager mAccountManager;
+
+    /**
+     * Context for all operations.
+     */
     private final Context mContext;
 
+    /**
+     * @param context will be set to {@link #mContext}
+     * @param autoInitialize auto initialization sync
+     * @param allowParallelSyncs flag about paralleling of sync
+     */
     public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
         mContext = context;
         mAccountManager = AccountManager.get(context);
     }
 
+    /**
+     * @param context will be set to {@link #mContext}
+     * @param autoInitialize auto initialization sync
+     */
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
         mAccountManager = AccountManager.get(context);
     }
 
+    /**
+     * Perform all sync process.
+     *
+     * @param account the account that should be synced
+     * @param extras SyncAdapter-specific parameters
+     * @param authority the authority of this sync request
+     * @param provider a ContentProviderClient that points to the ContentProvider for this
+     *   authority
+     * @param syncResult SyncAdapter-specific parameters
+     */
     @Override
-    public void onPerformSync(final Account account, Bundle extras, String authority,
-                              ContentProviderClient provider, final SyncResult syncResult) {
+    public void onPerformSync(
+        final Account account,
+        Bundle extras,
+        String authority,
+        ContentProviderClient provider,
+        final SyncResult syncResult)
+    {
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+        int syncType = SharedPrefsUtils.getValue(
+            mContext,
+            Constants.SYNC_TYPE,
+            Constants.SYNC_TYPE_NO_NEED_SYNC
+        );
         Log.i(TAG, "syncType=" + syncType);
         if (syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
         // get last sync date. return new Date(0) if first onPerformSync
@@ -84,13 +117,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // list. So let's set the flag that causes them to be visible, so that users
         // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
         if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
-            ContactManager.setAccountContactsVisibility(getContext(), account, true);
+            ContactManager.setAccountContactsVisibility(
+                getContext().getContentResolver(),
+                account,
+                true
+            );
         }
-
-        //TODO may need to check authToken, or block other's getAuthToken.
-        //final String authtoken = mAccountManager.blockingGetAuthToken(account,
-        //        AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, NOTIFY_AUTH_FAILURE);
-
 
         // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
         final Observable<XWikiUserFull> observable = XWikiHttp.getSyncData(syncType);

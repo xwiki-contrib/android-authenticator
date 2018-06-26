@@ -23,7 +23,6 @@ import android.app.Application;
 import android.util.Log;
 
 import org.xwiki.android.sync.rest.BaseApiManager;
-import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import java.util.AbstractMap;
@@ -32,22 +31,44 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AppContext.
+ * Application class for authenticator
+ *
+ * @version $Id$
  */
 public class AppContext extends Application {
+
+    /**
+     * Entry pair Server address - Base Api Manager
+     */
     private static Map.Entry<String, BaseApiManager> baseApiManager;
+
+    /**
+     * Logging tag
+     */
     private static final String TAG = "AppContext";
 
+    /**
+     * Instance of context to use it in static methods
+     */
     private static AppContext instance;
 
+    /**
+     * @return known AppContext instance
+     */
     public static AppContext getInstance() {
         return instance;
     }
 
+    /**
+     * @return actual base url
+     */
     public static String currentBaseUrl() {
         return SharedPrefsUtils.getValue(instance, Constants.SERVER_ADDRESS, null);
     }
 
+    /**
+     * Set {@link #instance} to this object.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -55,8 +76,13 @@ public class AppContext extends Application {
         Log.d(TAG, "on create");
     }
 
-    public static void addAuthorizedApp(int uid, String packageName) {
-        Log.d(TAG, "packageName=" + packageName + ", uid=" + uid);
+    /**
+     * Add app as authorized
+     *
+     * @param packageName Application package name to add as authorized
+     */
+    public static void addAuthorizedApp(String packageName) {
+        Log.d(TAG, "packageName=" + packageName);
         List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
         if (packageList == null) {
             packageList = new ArrayList<>();
@@ -65,14 +91,25 @@ public class AppContext extends Application {
         SharedPrefsUtils.putArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST, packageList);
     }
 
+    /**
+     * Check that application with packageName is authorised.
+     *
+     * @param packageName Application package name
+     * @return true if application was authorized
+     */
     public static boolean isAuthorizedApp(String packageName) {
-        List<String> packageList = SharedPrefsUtils.getArrayList(instance.getApplicationContext(), Constants.PACKAGE_LIST);
-        if (packageList != null && packageList.contains(packageName)) {
-            return true;
-        }
-        return false;
+        List<String> packageList = SharedPrefsUtils.getArrayList(
+            instance.getApplicationContext(),
+            Constants.PACKAGE_LIST
+        );
+        return packageList != null && packageList.contains(packageName);
     }
 
+    /**
+     * @return Current {@link #baseApiManager} value or create new and return
+     *
+     * @since 0.4
+     */
     public static BaseApiManager getApiManager() {
         String url = currentBaseUrl();
         if (baseApiManager == null || !baseApiManager.getKey().equals(url)) {

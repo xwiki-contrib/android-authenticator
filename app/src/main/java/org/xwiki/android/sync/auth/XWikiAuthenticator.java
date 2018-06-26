@@ -33,7 +33,6 @@ import android.util.Log;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
-import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import java.util.List;
@@ -52,19 +51,46 @@ import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY;
 import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
 
 /**
- * @version $Id: $
+ * Realisation of authenticator for XWiki account. Full required management of XWiki account
+ *
+ * @version $Id$
  */
 public class XWikiAuthenticator extends AbstractAccountAuthenticator {
+
+    /**
+     * Tag fr logging.
+     */
     private static final String TAG = "XWikiAuthenticator";
+
+    /**
+     * Current session context.
+     */
     private final Context mContext;
 
+    /**
+     * Standard constructor.
+     *
+     * @param context Context which will be set to {@link #mContext}
+     */
     public XWikiAuthenticator(Context context) {
         super(context);
         this.mContext = context;
     }
 
+    /**
+     * Add account into system. In fact just refill data from parameters into new bundle. All
+     * details you can get from parent documentations.
+     *
+     * @return Bundle with filled data: account type, auth token type, sync type, etc.
+     */
     @Override
-    public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
+    public Bundle addAccount(
+        AccountAuthenticatorResponse response,
+        String accountType,
+        String authTokenType,
+        String[] requiredFeatures,
+        Bundle options
+    ) {
         Log.d("xwiki", TAG + "> addAccount");
 
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
@@ -86,13 +112,23 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         return bundle;
     }
 
+    /**
+     * Refresh auth token of current account. All parameters info you can look in parent
+     * documentations.
+     *
+     * @return Bundle with error if auth token type not supported, getting auth token is impossible
+     * (interrupted in long-time operations or received package from server contains not auth token)
+     */
     @Override
-    public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle getAuthToken(
+        AccountAuthenticatorResponse response,
+        Account account,
+        String authTokenType,
+        Bundle options
+    ) {
 
         Log.d("xwiki", TAG + "> getAuthToken");
 
-        // Extract the username and password from the Account Manager, and ask
-        // the server for an appropriate AuthToken.
         final AccountManager am = AccountManager.get(mContext);
         String accountName = am.getUserData(account, AccountManager.KEY_USERDATA);
         String accountPassword = am.getUserData(account, AccountManager.KEY_PASSWORD);
@@ -100,8 +136,6 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
         String packageName = mContext.getPackageManager().getNameForUid(uid);
 
-        // If the caller requested an authToken type we don't support, then
-        // return an error  if checking validity tokenType != TYPE+PackegeName
         if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
@@ -126,6 +160,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         // Auth token array because it can be modified in parallel threads or world.
         // In this case we will need to change it, but string immutable what we can't say
         // about array items
+        // TODO::fix and rewrite by using XwikiHttp#login
         final String[] authToken = {am.peekAuthToken(account, authTokenType)};
         Log.d("xwiki", TAG + "> peekAuthToken returned - " + authToken[0]);
 
@@ -183,7 +218,13 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         }
     }
 
-
+    /**
+     * @param authTokenType Identifier for label
+     * @return {@link Constants#AUTHTOKEN_TYPE_FULL_ACCESS_LABEL} for
+     * {@link Constants#AUTHTOKEN_TYPE_FULL_ACCESS},
+     * {@link Constants#AUTHTOKEN_TYPE_READ_ONLY_LABEL} for
+     * {@link Constants#AUTHTOKEN_TYPE_READ_ONLY_LABEL} or "authTokenType + (Label)" otherwise
+     */
     @Override
     public String getAuthTokenLabel(String authTokenType) {
         Log.d(TAG, "getAuthTokenLabel," + authTokenType);
@@ -195,30 +236,69 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             return authTokenType + " (Label)";
     }
 
+    /**
+     * Answer that this account have no features
+     */
     @Override
-    public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) throws NetworkErrorException {
+    public Bundle hasFeatures(
+        AccountAuthenticatorResponse response,
+        Account account,
+        String[] features
+    ) {
         final Bundle result = new Bundle();
         result.putBoolean(KEY_BOOLEAN_RESULT, false);
         return result;
     }
 
+    /**
+     * Do nothing
+     * @return null
+     */
     @Override
     public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
         return null;
     }
 
+    /**
+     * Do nothing
+     * @return null
+     */
     @Override
-    public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) throws NetworkErrorException {
+    public Bundle confirmCredentials(
+        AccountAuthenticatorResponse response,
+        Account account,
+        Bundle options
+    ) {
         return null;
     }
 
+    /**
+     * Do nothing
+     * @return null
+     */
     @Override
-    public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle updateCredentials(
+        AccountAuthenticatorResponse response,
+        Account account,
+        String authTokenType,
+        Bundle options
+    ) {
         return null;
     }
 
-    public static void refreshAllAuthTokenType(AccountManager am, Account account, String authToken) {
-        List<String> packageList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.PACKAGE_LIST);
+    /**
+     * Refresh auth tokens for all packages which can be got by field
+     * {@link Constants#PACKAGE_LIST}.
+     */
+    public static void refreshAllAuthTokenType(
+        AccountManager am,
+        Account account,
+        String authToken
+    ) {
+        List<String> packageList = SharedPrefsUtils.getArrayList(
+            AppContext.getInstance().getApplicationContext(),
+            Constants.PACKAGE_LIST
+        );
         if (packageList == null || packageList.size() == 0) return;
         for (String item : packageList) {
             String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;

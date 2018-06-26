@@ -25,10 +25,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
@@ -44,7 +44,6 @@ import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.contactdb.BatchOperation;
 import org.xwiki.android.sync.contactdb.ContactManager;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-import org.xwiki.android.sync.utils.StatusBarColorCompat;
 import org.xwiki.android.sync.utils.StringUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,29 +55,65 @@ import retrofit2.Response;
 /**
  * A Edit Contact Activity. You can modify your own information and
  * the administrator can modify all the users according the http response.
+ *
+ * @version $Id$
  */
 public class EditContactActivity extends BaseActivity implements EditContactMvpView {
 
+    /**
+     * Tag which will be used for logging.
+     */
     private static final String TAG = EditContactActivity.class.getSimpleName();
 
-    // UI references.
-    EditText mFirstNameView;
+    /**
+     * {@link EditText} for first name.
+     */
+    private EditText mFirstNameView;
 
-    EditText mEmailView;
+    /**
+     * {@link EditText} for email.
+     */
+    private EditText mEmailView;
 
-    EditText mCellPhoneView;
+    /**
+     * {@link EditText} for cell phone.
+     */
+    private EditText mCellPhoneView;
 
-    EditText mLastNameView;
+    /**
+     * {@link EditText} for last name.
+     */
+    private EditText mLastNameView;
 
-    Toolbar toolbar;
+    /**
+     * User which will be edited.
+     */
+    private XWikiUser wikiUser = null;
 
-    XWikiUser wikiUser = null;
-
+    /**
+     * Presenter.
+     */
     private EditContactPresenter editContactPresenter;
+
     private AtomicInteger atomicInteger;
+
+    /**
+     * Android account manager.
+     */
     private AccountManager accountManager;
+
+    /**
+     * User account which will be used for operations with contact edition.
+     */
     private Account account;
 
+    /**
+     * Init variables, set click handlers.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}. <b><i>Note: Otherwise it is null.</i></b>
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +123,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         mLastNameView = findViewById(R.id.last_name);
         mEmailView = findViewById(R.id.email);
         mCellPhoneView = findViewById(R.id.cell_phone);
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
         atomicInteger = new AtomicInteger(0);
@@ -119,7 +154,13 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         );
     }
 
-    private XWikiUser getXWikiUser(Context context, Uri uri) {
+    /**
+     * @param context Context for getting {@link ContentResolver}
+     * @param uri Uri to find the user
+     * @return user which was found or null
+     */
+    @Nullable
+    private static XWikiUser getXWikiUser(Context context, Uri uri) {
         ContentResolver cr = context.getContentResolver();
         Cursor cursor = cr.query(uri, null, null, null, null);
         //getRawContactId
@@ -134,12 +175,15 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         //getXWikiUser
         if (rawContactId > 0) {
             //first, lastName, email, phone, serverId=id.
-            return ContactManager.getXWikiUser(context, rawContactId);
+            return ContactManager.getXWikiUser(context.getContentResolver(), rawContactId);
         }
         return null;
     }
 
-    public void updateContact() {
+    /**
+     * Init update user procedure.
+     */
+    private void updateContact() {
         String[] idArray = XWikiUser.splitId(wikiUser.getId());
         UserPayload userPayload = new UserPayload();
         userPayload.setClassName("XWiki.XWikiUsers");
@@ -153,7 +197,7 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
     }
 
     /**
-     * Attempts to check input
+     * Attempts to check input.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no server checking is made.
      */
@@ -201,30 +245,48 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         }
     }
 
+    /**
+     * Should be called when a time taking process starts and we want the user
+     * to wait for the process to finish. The UI should gracefully display some
+     * sort of progress bar or animation so that the user knows that the app is
+     * doing some work and has not stalled.
+     *
+     * <p>For example: a network request to the API is made for authenticating
+     * the user.</p>
+     */
     @Override
     public void showProgress() {
         showProgressDialog();
-        onProgressDialogCancel();
+        initOnProgressDialogCancel();
     }
 
+    /**
+     * Should be called when a time taking process ends and we have some result
+     * for the user.
+     */
     @Override
     public void hideProgress() {
         hideProgressDialog();
     }
 
+    /**
+     * Show to user that contact was successfully updated
+     */
     @Override
     public void showContactUpdateSuccessfully() {
         //update local
-        BatchOperation batchOperation = new BatchOperation(EditContactActivity.this,
-                getContentResolver());
+        BatchOperation batchOperation = new BatchOperation(getContentResolver());
         //TODO:: URGENT!!! UPDATE USER CONTACT
 //        ContactManager.updateContact(EditContactActivity.this, getContentResolver(),
 //                wikiUser, false, false, false, true, wikiUser.rawId, batchOperation);
         batchOperation.execute();
-        showToast("Update Successfully.");
+        showToast(getString(R.string.updateSuccess));
         finish();
     }
 
+    /**
+     * Show to user that contact was not updated for the some reason.
+     */
     @Override
     public void showErrorOnUpdatingContact() {
         if (atomicInteger.intValue() == 0) {
@@ -238,10 +300,15 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
             SharedPrefsUtils.putValue(AppContext.getInstance().getApplicationContext(),
                     Constants.COOKIE, null);
         } else {
-            showToast("You have no permission !!!");
+            showToast(getString(R.string.haveNoPermission));
         }
     }
 
+    /**
+     * Actually update cookie and restart update contact.
+     *
+     * @param responseBody Body which must contains new cookies
+     */
     @Override
     public void showLoginSuccessfully(Response<ResponseBody> responseBody) {
         String authToken = responseBody.headers().get("Set-Cookie");
@@ -251,13 +318,19 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         updateContact();
     }
 
+    /**
+     * Show to user that authorisation was failed.
+     */
     @Override
     public void showErrorLogin() {
-        showToast("Authentication Error");
+        showToast(getString(R.string.authenticationError));
     }
 
+    /**
+     * Call this method for init progress dialog cancel listener.
+     */
     @Override
-    public void onProgressDialogCancel() {
+    public void initOnProgressDialogCancel() {
         getProgressDialog().setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface dialog) {
                 editContactPresenter.clearSubscription();
@@ -265,6 +338,9 @@ public class EditContactActivity extends BaseActivity implements EditContactMvpV
         });
     }
 
+    /**
+     * Detach presenter.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -34,42 +34,72 @@ import java.util.List;
 
 /**
  * This class handles execution of batch mOperations on Contacts provider.
+ *
+ * @version $Id$
  */
 final public class BatchOperation {
 
-    private final String TAG = "BatchOperation";
+    /**
+     * Tag for logging.
+     */
+    private static final String TAG = "BatchOperation";
 
+    /**
+     * Variable for executing operations.
+     */
     private final ContentResolver mResolver;
 
-    // List for storing the batch mOperations
+    /**
+     * Currently actual operations list.
+     */
     private final ArrayList<ContentProviderOperation> mOperations;
 
-    public BatchOperation(Context context, ContentResolver resolver) {
+    /**
+     * Standard constructor.
+     *
+     * @param resolver Will be set to {@link #mResolver}
+     */
+    public BatchOperation(ContentResolver resolver) {
         mResolver = resolver;
-        mOperations = new ArrayList<ContentProviderOperation>();
+        mOperations = new ArrayList<>();
     }
 
-    public int size() {
+    /**
+     * @return Currently not executed operations
+     */
+    public synchronized int size() {
         return mOperations.size();
     }
 
-    public void add(ContentProviderOperation cpo) {
+    /**
+     * Add operation to the list for future executing.
+     *
+     * @param cpo Operation for adding
+     */
+    public synchronized void add(ContentProviderOperation cpo) {
         mOperations.add(cpo);
     }
 
-    public List<Uri> execute() {
-        List<Uri> resultUris = new ArrayList<Uri>();
+    /**
+     * Execute operations which are stored in {@link #mOperations}.
+     *
+     * @return Result of executing {@link Uri}'s list
+     */
+    public synchronized List<Uri> execute() {
+        List<Uri> resultUris = new ArrayList<>();
 
         if (mOperations.size() == 0) {
             return resultUris;
         }
-        // Apply the mOperations to the content provider
+
         try {
-            ContentProviderResult[] results = mResolver.applyBatch(ContactsContract.AUTHORITY,
-                    mOperations);
-            if ((results != null) && (results.length > 0)) {
-                for (int i = 0; i < results.length; i++) {
-                    resultUris.add(results[i].uri);
+            ContentProviderResult[] results = mResolver.applyBatch(
+                ContactsContract.AUTHORITY,
+                mOperations
+            );
+            if (results.length > 0) {
+                for (ContentProviderResult result : results) {
+                    resultUris.add(result.uri);
                 }
             }
         } catch (final OperationApplicationException e1) {
@@ -77,6 +107,7 @@ final public class BatchOperation {
         } catch (final RemoteException e2) {
             Log.e(TAG, "storing contact data failed", e2);
         }
+
         mOperations.clear();
         return resultUris;
     }

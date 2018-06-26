@@ -17,35 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.utils;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
 /**
- * CryptoUtils.
+ * This package contains beans which will be automatically converted to/from json
+ * or some other formats. Recommended to watch
+ *     <a href="https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiRESTfulAPI">
+ *         XWiki RESTful API
+ *     </a>
+ * documentation.
+ *
+ * @see com.google.gson.Gson
+ * @see com.google.gson.Gson#toJson(java.lang.Object)
+ * @see com.google.gson.Gson#fromJson(java.lang.String, java.lang.reflect.Type)
+ * @see <a href="https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiRESTfulAPI">XWiki RESTful API</a>
  */
-public class CryptoUtils {
-
-    private static byte[] generateKey() {
-
-        return null;
-    }
-
-    private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-        byte[] encrypted = cipher.doFinal(clear);
-        return encrypted;
-    }
-
-    private static byte[] decrypt(byte[] raw, byte[] encrypted) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-        byte[] decrypted = cipher.doFinal(encrypted);
-        return decrypted;
-    }
-
-}
+package org.xwiki.android.sync.bean;

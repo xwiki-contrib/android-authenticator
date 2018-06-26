@@ -20,9 +20,7 @@
 package org.xwiki.android.sync.activities.base;
 
 import android.app.ProgressDialog;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -30,11 +28,29 @@ import android.widget.Toast;
 
 import org.xwiki.android.sync.R;
 
+/**
+ * Base class for any activity in project (must be).
+ *
+ * @version $Id$
+ */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    /**
+     * Currently used toolbar.
+     */
     protected Toolbar toolbar;
+
+    /**
+     * Dialog which will be called and changed by {@link #hideProgressDialog()},
+     * {@link #showProgressDialog()}, {@link #showProgressDialog(String)}, {@link #getProgressDialog()}
+     */
     private ProgressDialog progress;
 
+    /**
+     * Work as {@link super#setContentView(int)}, but also prepare other components
+     *
+     * @param layoutResID Resource which will be used for {@link super#setContentView(int)}.
+     */
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
@@ -44,13 +60,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     /**
-     * This method is use to provide back button feature in the toolbar of activities
+     * This method is use to provide back button feature in the toolbar of activities.
      */
     protected void showBackButton() {
         if (getSupportActionBar() != null) {
@@ -84,10 +95,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         Toast.makeText(BaseActivity.this, message, toastType).show();
     }
 
+    /**
+     * Show progress dialog with default message.
+     */
     public void showProgressDialog() {
         showProgressDialog(getString(R.string.pleaseWait));
     }
 
+    /**
+     * Show progress dialog with message which was in params.
+     *
+     * @param message Message which will be shown with dialog
+     */
     public void showProgressDialog(String message) {
         if (progress == null) {
             progress = new ProgressDialog(this, ProgressDialog.STYLE_SPINNER);
@@ -97,6 +116,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         progress.show();
     }
 
+    /**
+     * Hide progress dialog if it currently visible.
+     */
     public void hideProgressDialog() {
         if (progress != null && progress.isShowing()) {
             progress.dismiss();
@@ -104,10 +126,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @return {@link #progress}
+     */
     public ProgressDialog getProgressDialog() {
         return progress;
     }
 
+    /**
+     * Check selected item and if it was home button - call {@link #onBackPressed()}.
+     *
+     * @param item The menu item which was selected.
+     * @return super# {@link android.app.Activity#onOptionsItemSelected(MenuItem)}
+     * @see #onCreateOptionsMenu
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
