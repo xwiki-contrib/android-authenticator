@@ -367,6 +367,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     private void updateListView() {
         if(syncNothing()){
             getListViewContainer().setVisibility(View.GONE);
+            getProgressBar().setVisibility(View.GONE);
         } else {
             getListViewContainer().setVisibility(View.VISIBLE);
             BaseAdapter adapter;
@@ -381,8 +382,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 mListView.setAdapter(adapter);
             }
             adapter.notifyDataSetChanged();
+            refreshProgressBar();
         }
-        refreshProgressBar();
     }
 
     /**
