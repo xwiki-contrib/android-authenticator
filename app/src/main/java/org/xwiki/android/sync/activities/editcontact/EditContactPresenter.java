@@ -91,7 +91,10 @@ public class EditContactPresenter extends BasePresenter<EditContactMvpView> {
                 wiki,
                 space,
                 pageName,
-                userPayload
+                userPayload.getFirstName(),
+                userPayload.getLastName(),
+                userPayload.getEmail(),
+                userPayload.getPhone()
             ).subscribeOn(
                 Schedulers.computation()
             ).observeOn(

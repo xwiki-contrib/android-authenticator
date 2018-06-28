@@ -31,6 +31,8 @@ import org.xwiki.android.sync.bean.XWikiUserFull;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -54,12 +56,16 @@ public interface XWikiServices {
     @POST("bin/login/XWiki/XWikiLogin")
     Observable<Response<ResponseBody>> login(@Header("Authorization") String basicAuth);
 
+    @FormUrlEncoded
     @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
     Observable<ResponseBody> updateUser(
             @Path("wiki") String wiki,
             @Path("space") String space,
             @Path("pageName") String pageName,
-            @Body UserPayload userPayload
+            @Field("property#first_name") String firstName,
+            @Field("property#last_name") String lastName,
+            @Field("property#email") String email,
+            @Field("property#phone") String phone
     );
 
     /**

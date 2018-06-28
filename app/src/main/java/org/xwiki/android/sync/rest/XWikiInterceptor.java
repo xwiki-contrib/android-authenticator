@@ -96,13 +96,10 @@ public class XWikiInterceptor implements Interceptor {
      * @since 0.4
      */
     private String getCookie() {
-        if (TextUtils.isEmpty(cookie)) {
-            cookie = SharedPrefsUtils.getValue(
-                AppContext.getInstance().getApplicationContext(),
-                Constants.COOKIE,
-                ""
-            );
-        }
-        return cookie;
+        return SharedPrefsUtils.getValue(
+            AppContext.getInstance().getApplicationContext(),
+            Constants.COOKIE,
+            ""
+        );
     }
 }
