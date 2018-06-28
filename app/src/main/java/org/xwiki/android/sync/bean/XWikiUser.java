@@ -159,7 +159,7 @@ public class XWikiUser {
     public static String[] splitId(String id) {
         String[] result = new String[3];
         String[] strs = id.split(":");
-        if (strs.length == 2) {
+        if (id.contains(".")) {
             result[0] = strs[0];
             String[] strs2 = strs[1].split("\\.");
             if (strs2.length == 2) {

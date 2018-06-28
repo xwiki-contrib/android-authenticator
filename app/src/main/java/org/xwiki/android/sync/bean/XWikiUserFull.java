@@ -37,49 +37,79 @@ public class XWikiUserFull {
     public String headline;
 
     //to be sure that here will be at least empty list
-    public List<Property> properties = new ArrayList<>();
+    private List<Property> properties = new ArrayList<>();
 
     public Boolean isActive() {
         String value = searchValue("active");
-        if (value != null && value.equals("1")) {
-            return true;
-        } else {
-            return false;
-        }
+        return value != null && value.equals("1");
     }
 
     public String getCountry() {
         return searchValue("country");
     }
 
+    public void setCountry(String country) {
+        setValue("country", country);
+    }
+
     public String getCity() {
         return searchValue("city");
+    }
+
+    public void setCity(String city) {
+        setValue("city", city);
     }
 
     public String getEmail() {
         return searchValue("email");
     }
 
+    public void setEmail(String email) {
+        setValue("email", email);
+    }
+
     public String getFirstName() {
         return searchValue("first_name");
+    }
+
+    public void setFirstName(String firstName) {
+        setValue("first_name", firstName);
     }
 
     public String getLastName() {
         return searchValue("last_name");
     }
 
+    public void setLastName(String lastName) {
+        setValue("last_name", lastName);
+    }
+
     public String getFullName() {
         return searchValue("fullname");
+    }
+
+    public void setFullName(String fullName) {
+        setValue("fullname", fullName);
     }
 
     public String getPhone() {
         return searchValue("phone");
     }
 
+    public void setPhone(String phone) {
+        setValue("phone", phone);
+    }
+
     public String getAvatar() {
         return searchValue("avatar");
     }
 
+    /**
+     * Search value in {@link #properties}
+     *
+     * @param key Key to search property
+     * @return Value or null
+     */
     private String searchValue(String key) {
         for (Property property : properties) {
             if (property.name != null && property.name.equals(key)) {
@@ -87,5 +117,53 @@ public class XWikiUserFull {
             }
         }
         return null;
+    }
+
+    /**
+     * Representtion of {@link #setValue(String, String, String)} where type is "string"
+     * @param key Key to search property or insert new
+     * @param value Value of property
+     */
+    private void setValue(String key, String value) {
+        setValue(key, value, "string");
+    }
+
+    /**
+     * Set value for existing property or create new
+     *
+     * @param key Key to search property or insert new
+     * @param value Value of property
+     * @param type Type of property
+     */
+    private void setValue(String key, String value, String type) {
+        for (Property property : properties) {
+            if (property.name != null && property.name.equals(key)) {
+                property.value = value;
+                return;
+            }
+        }
+        Property property = new Property();
+        property.name = key;
+        property.value = value;
+        property.type = type;
+
+        KeyValueObject nameKeyValue = new KeyValueObject();
+        nameKeyValue.key = "name";
+        nameKeyValue.value = property.name;
+        property.attributes.add(nameKeyValue);
+
+        KeyValueObject valueKeyValue = new KeyValueObject();
+        valueKeyValue.key = "value";
+        valueKeyValue.value = property.value;
+        property.attributes.add(valueKeyValue);
+
+        KeyValueObject typeKeyValue = new KeyValueObject();
+        typeKeyValue.key = "type";
+        typeKeyValue.value = property.type;
+        property.attributes.add(typeKeyValue);
+
+        properties.add(
+            property
+        );
     }
 }

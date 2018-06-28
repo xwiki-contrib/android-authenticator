@@ -107,7 +107,11 @@ public class ContactManager {
                         userRawId = localUserMaps.get(xWikiUserFull.id);
                         updateContact(
                             context,
-                            xWikiUserFull,
+                            xWikiUserFull.id,
+                            xWikiUserFull.getFirstName(),
+                            xWikiUserFull.getLastName(),
+                            xWikiUserFull.getEmail(),
+                            xWikiUserFull.getPhone(),
                             userRawId,
                             batchOperation
                         );
@@ -270,15 +274,23 @@ public class ContactManager {
      * "add" operations to create new rows for those fields.
      *
      * @param context Context to execute operations
-     * @param user Information about contact which must be saved
+     * @param id Id of contact
+     * @param firstName First name of contact
+     * @param lastName Last name of contact
+     * @param email Email of contact
+     * @param phone Phone of contact
      * @param rawContactId   the unique Id for this user in contacts provider
      * @param batchOperation BatchOperation to add operation and execute later
      *
      * @since 0.4
      */
-    private static void updateContact(
+    public static void updateContact(
         Context context,
-        XWikiUserFull user,
+        String id,
+        String firstName,
+        String lastName,
+        String email,
+        String phone,
         long rawContactId,
         BatchOperation batchOperation
     ) {
@@ -310,9 +322,9 @@ public class ContactManager {
 
         try {
             while (c.moveToNext()) {
-                final long id = c.getLong(DataQuery.COLUMN_ID);
+                final long rawId = c.getLong(DataQuery.COLUMN_ID);
                 final String mimeType = c.getString(DataQuery.COLUMN_MIMETYPE);
-                final Uri uri = ContentUris.withAppendedId(Data.CONTENT_URI, id);
+                final Uri uri = ContentUris.withAppendedId(Data.CONTENT_URI, rawId);
                 switch (mimeType) {
                     case StructuredName.CONTENT_ITEM_TYPE:
                         contactOp.updateName(
@@ -320,8 +332,8 @@ public class ContactManager {
                             c.getString(DataQuery.COLUMN_GIVEN_NAME),
                             c.getString(DataQuery.COLUMN_FAMILY_NAME),
                             c.getString(DataQuery.COLUMN_FULL_NAME),
-                            user.getFirstName(),
-                            user.getLastName(),
+                            firstName,
+                            lastName,
                             null
                         );
                         break;
@@ -333,7 +345,7 @@ public class ContactManager {
                                     c.getString(
                                         DataQuery.COLUMN_PHONE_NUMBER
                                     ),
-                                    user.getPhone(),
+                                    phone,
                                     uri
                                 );
                             break;
@@ -341,7 +353,7 @@ public class ContactManager {
                                 existingHomePhone = true;
                                 contactOp.updatePhone(
                                     c.getString(DataQuery.COLUMN_PHONE_NUMBER),
-                                    user.getPhone(),
+                                    phone,
                                     uri
                                 );
                             break;
@@ -351,7 +363,7 @@ public class ContactManager {
                                     c.getString(
                                         DataQuery.COLUMN_PHONE_NUMBER
                                     ),
-                                    user.getPhone(),
+                                    phone,
                                     uri
                                 );
                             break;
@@ -363,7 +375,7 @@ public class ContactManager {
                         int type = c.getInt(DataQuery.COLUMN_EMAIL_TYPE);
                         if (type == ContactsContract.CommonDataKinds.Email.TYPE_WORK) {
                             contactOp.updateEmail(
-                                user.getEmail(),
+                                email,
                                 c.getString(DataQuery.COLUMN_EMAIL_ADDRESS),
                                 uri
                             );
@@ -378,26 +390,25 @@ public class ContactManager {
 
         // Add the cell phone, if present and not updated above
         if (!existingCellPhone) {
-            contactOp.addPhone(user.getPhone(), Phone.TYPE_MOBILE);
+            contactOp.addPhone(phone, Phone.TYPE_MOBILE);
         }
         // Add the home phone, if present and not updated above
         if (!existingHomePhone) {
-            contactOp.addPhone(user.getPhone(), Phone.TYPE_HOME);
+            contactOp.addPhone(phone, Phone.TYPE_HOME);
         }
 
         // Add the work phone, if present and not updated above
         if (!existingWorkPhone) {
-            contactOp.addPhone(user.getPhone(), Phone.TYPE_WORK);
+            contactOp.addPhone(phone, Phone.TYPE_WORK);
         }
         // Add the email address, if present and not updated above
         if (!existingEmail) {
-            contactOp.addEmail(user.getEmail());
+            contactOp.addEmail(email);
         }
 
-        final String serverId = user.id;
-        final long profileId = lookupProfile(resolver, serverId);
+        final long profileId = lookupProfile(resolver, id);
         if (profileId <= 0) {
-            contactOp.addProfileAction(serverId);
+            contactOp.addProfileAction(id);
         }
     }
 

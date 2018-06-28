@@ -42,8 +42,10 @@ import android.widget.Toast;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.auth.AuthenticatorActivity;
+import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SearchResult;
 import org.xwiki.android.sync.bean.SearchResultContainer;
+import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.sync.bean.XWikiGroup;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
@@ -93,7 +95,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     /**
      * List of received all users.
      */
-    private List<SearchResult> allUsers;
+    private List<ObjectSummary> allUsers;
 
     /**
      * Currently chosen sync type.
@@ -296,12 +298,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    new Action1<SearchResultContainer>() {
+                    new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                         @Override
-                        public void call(SearchResultContainer searchResultContainer) {
+                        public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
                             allUsersAreLoading = false;
                             allUsers.clear();
-                            allUsers.addAll(searchResultContainer.searchResults);
+                            allUsers.addAll(summaries.objectSummaries);
                             updateListView();
                         }
                     },

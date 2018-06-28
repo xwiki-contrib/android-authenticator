@@ -146,9 +146,9 @@ public interface XWikiServices {
     @GET(
         ApiEndPoints.REST +
             ApiEndPoints.WIKIS +
-            "/query?q=wiki:xwiki%20and%20object:XWiki.XWikiUsers&number=" + Integer.MAX_VALUE
+            "/xwiki/classes/XWiki.XWikiUsers/objects"
     )
-    Observable<SearchResultContainer> getAllUsersPreview();
+    Observable<CustomObjectsSummariesContainer<ObjectSummary>> getAllUsersPreview();
 
     /**
      * @since 0.4

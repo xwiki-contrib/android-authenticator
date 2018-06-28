@@ -29,6 +29,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import org.xwiki.android.sync.R;
+import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SearchResult;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class UserListAdapter extends BaseAdapter {
     /**
      * List which currently shows.
      */
-    private List<SearchResult> searchResults;
+    private List<ObjectSummary> searchResults;
 
     /**
      * Standard constructor.
@@ -56,7 +57,7 @@ public class UserListAdapter extends BaseAdapter {
      * @param context Initial context
      * @param searchResults Initial list
      */
-    public UserListAdapter(@NonNull Context context, @NonNull List<SearchResult> searchResults) {
+    public UserListAdapter(@NonNull Context context, @NonNull List<ObjectSummary> searchResults) {
         super();
         mContext = context;
         this.searchResults = searchResults;
@@ -73,7 +74,7 @@ public class UserListAdapter extends BaseAdapter {
      * @param position Position of item
      * @return Item fron {@link #searchResults} by position
      */
-    public SearchResult getItem(int position) {
+    public ObjectSummary getItem(int position) {
         return searchResults.get(position);
     }
 
@@ -104,9 +105,8 @@ public class UserListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final SearchResult item = getItem(position);
+        final ObjectSummary item = getItem(position);
         viewHolder.groupNameTextView.setText(item.pageName);
-        viewHolder.lastModifiedTime.setText(item.modified.substring(0,10));
         viewHolder.versionTextView.setText(item.wiki);
         viewHolder.checkBox.setVisibility(View.INVISIBLE);
         convertView.setOnClickListener(null);
@@ -119,7 +119,7 @@ public class UserListAdapter extends BaseAdapter {
      *
      * @param results New list
      */
-    public void refresh(@NonNull List<SearchResult> results) {
+    public void refresh(@NonNull List<ObjectSummary> results) {
         if (searchResults == null || searchResults.equals(results)) {
             return;
         }

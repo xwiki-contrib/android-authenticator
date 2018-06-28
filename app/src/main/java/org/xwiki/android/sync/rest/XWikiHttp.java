@@ -299,15 +299,15 @@ public class XWikiHttp {
     private static void getSyncAllUsers(
         final PublishSubject<XWikiUserFull> subject
     ) {
-        final List<SearchResult> searchList = new ArrayList<>();
+        final List<ObjectSummary> searchList = new ArrayList<>();
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
             getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
-                new Action1<SearchResultContainer>() {
+                new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
-                    public void call(SearchResultContainer searchResultContainer) {
-                        searchList.addAll(searchResultContainer.searchResults);
+                    public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
+                        searchList.addAll(summaries.objectSummaries);
                         semaphore.release();
                     }
                 },
@@ -329,18 +329,14 @@ public class XWikiHttp {
         }
 
         final CountDownLatch countDown = new CountDownLatch(searchList.size());
-        for (final SearchResult item : searchList) {
+        for (final ObjectSummary item : searchList) {
             if (subject.getThrowable() != null) {// was was not error in sync
                 return;
             }
-            String[] splitted = XWikiUser.splitId(item.id);
-            String wiki = splitted[0];
-            String space = splitted[1];
-            String pageName = splitted[2];
             getApiManager().getXwikiServicesApi().getFullUserDetails(
-                wiki,
-                space,
-                pageName
+                item.wiki,
+                item.space,
+                item.pageName
             ).subscribe(
                 new Action1<XWikiUserFull>() {
                     @Override
