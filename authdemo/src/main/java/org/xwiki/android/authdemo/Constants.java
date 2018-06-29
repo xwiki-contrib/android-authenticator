@@ -20,7 +20,7 @@
 package org.xwiki.android.authdemo;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class Constants {
     /**

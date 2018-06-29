@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.os.IBinder;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiAuthenticatorService extends Service {
 

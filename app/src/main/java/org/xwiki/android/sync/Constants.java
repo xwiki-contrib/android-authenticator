@@ -20,7 +20,7 @@
 package org.xwiki.android.sync;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class Constants {
 
