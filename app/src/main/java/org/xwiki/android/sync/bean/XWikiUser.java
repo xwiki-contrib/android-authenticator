@@ -19,6 +19,8 @@
  */
 package org.xwiki.android.sync.bean;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.AbstractMap;
@@ -157,38 +159,30 @@ public class XWikiUser {
      * @return 0:wiki 1:space 2:pageName
      */
     public static String[] splitId(String id) {
-        String[] result = new String[3];
-        String[] strs = id.split(":");
-        if (id.contains(".")) {
-            result[0] = strs[0];
-            String[] strs2 = strs[1].split("\\.");
-            if (strs2.length == 2) {
-                result[1] = strs2[0];
-                result[2] = strs2[1];
-                return result;
-            }
+        String wiki = null;
+        String space = null;
+        String pageName = null;
+        if (id.contains(":")) {
+            String[] splittedWithWiki = id.split(":");
+            wiki = splittedWithWiki[0];
+            String[] spaceAndPageName = splittedWithWiki[1].split("\\.");
+            space = spaceAndPageName[0];
+            pageName = spaceAndPageName[1];
         } else {
-            if (strs.length == 3) {
-                return strs;
-            }
+            String[] spaceAndPageName = id.split("\\.");
+            space = spaceAndPageName[0];
+            pageName = spaceAndPageName[1];
         }
-        return null;
+        return new String[]{wiki, space, pageName};
     }
 
+    @Nullable
     public static Map.Entry<String, String> spaceAndPage(String id) {
-        if (id.contains(":")) {
-            id = id.substring(
-                    id.indexOf(":") + 1//substring with position of ":" will return string from ":" sign
-            );
+        String[] splitted = splitId(id);
+        if (splitted != null) {
+            return new AbstractMap.SimpleEntry<>(splitted[1], splitted[2]);
+        } else {
+            return null;
         }
-        // If still contains ":"
-        if (id.contains(":")) {
-            id = id.substring(
-                0,
-                id.indexOf(":")//substring with position of ":" will return string from ":" sign
-            );
-        }
-        String[] splitted = id.split("\\.");
-        return new AbstractMap.SimpleEntry<>(splitted[0], splitted[1]);
     }
 }

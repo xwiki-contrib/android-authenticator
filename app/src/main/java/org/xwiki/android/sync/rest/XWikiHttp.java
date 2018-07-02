@@ -228,6 +228,12 @@ public class XWikiHttp {
                 }
             );
         }
+        try {
+            groupsCountDown.await();
+            subject.onCompleted();
+        } catch (InterruptedException e) {
+            subject.onError(e);
+        }
     }
 
     /**
@@ -252,6 +258,9 @@ public class XWikiHttp {
             }
             try {
                 Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
+                if (spaceAndName == null) {
+                    continue;
+                }
                 getApiManager().getXwikiServicesApi().getFullUserDetails(
                     spaceAndName.getKey(),
                     spaceAndName.getValue()
