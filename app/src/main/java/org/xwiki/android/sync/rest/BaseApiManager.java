@@ -26,6 +26,7 @@ import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -64,9 +65,15 @@ public class BaseApiManager {
      */
     public BaseApiManager(String baseUrl) {
 
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(
+            HttpLoggingInterceptor.Level.BODY
+        );
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new XWikiInterceptor())
-                .build();
+            .addInterceptor(new XWikiInterceptor())
+            .addInterceptor(loggingInterceptor)
+            .build();
 
         // Check that url ends with `/` and put it if not
         if (!baseUrl.endsWith("/")) {

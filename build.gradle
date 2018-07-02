@@ -33,6 +33,7 @@ ext {
     // App dependencies
     supportLibraryVersion = '27.1.1'
     retrofitVersion = '2.2.0'
-    okHttp3Version = '3.6.0'
+    okHttp3Version = '3.8.0'
+    loggingInterceptorVersion = okHttp3Version
     butterKnifeVersion = '8.0.1'
 }
