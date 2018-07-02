@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -19,6 +20,15 @@ android {
     lintOptions {
         abortOnError false
     }
+    packagingOptions {
+        exclude 'META-INF/main.kotlin_module'
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }
 
 dependencies {
@@ -32,6 +42,11 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava:$rootProject.retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.loggingInterceptorVersion"
 
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version"
+    implementation "androidx.core:core-ktx:$kotlin_android_extensions_version"
 
     //rxjava Dependencies
     implementation 'io.reactivex:rxandroid:1.1.0'
