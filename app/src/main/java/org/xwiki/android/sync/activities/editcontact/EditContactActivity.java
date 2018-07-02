@@ -41,8 +41,8 @@ import org.xwiki.android.sync.activities.base.BaseActivity;
 import org.xwiki.android.sync.auth.XWikiAuthenticator;
 import org.xwiki.android.sync.bean.UserPayload;
 import org.xwiki.android.sync.bean.XWikiUser;
-import org.xwiki.android.sync.contactdb.BatchOperation;
-import org.xwiki.android.sync.contactdb.ContactManager;
+import org.xwiki.android.sync.contactdb.deprecated.BatchOperation;
+import org.xwiki.android.sync.contactdb.deprecated.ContactManager;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
 

@@ -31,7 +31,7 @@ import android.util.Log;
 
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.contactdb.ContactManager;
+import org.xwiki.android.sync.contactdb.deprecated.ContactManager;
 import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;

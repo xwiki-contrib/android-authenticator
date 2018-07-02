@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.contactdb;
+package org.xwiki.android.sync.contactdb.deprecated;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @version $Id$
  */
+@Deprecated
 final public class BatchOperation {
 
     /**

@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.contactdb;
+package org.xwiki.android.sync.contactdb.deprecated;
 
 import android.accounts.Account;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -32,9 +33,7 @@ import android.os.CancellationSignal;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Settings;
 import android.util.Log;
@@ -47,17 +46,21 @@ import org.xwiki.android.sync.bean.XWikiUserFull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static org.xwiki.android.sync.contactdb.ContactOperationsKt.toContentProviderOperations;
+
 /**
  * Class for managing contacts sync related mOperations.
  *
  * @version $Id$
  */
+@Deprecated
 public class ContactManager {
     private static final String TAG = "ContactManager";
 
@@ -87,7 +90,6 @@ public class ContactManager {
                 public void onCompleted() {
                     for (String id : localUserMaps.keySet()) {
                         long rawId = localUserMaps.get(id);
-                        deleteContact(rawId, batchOperation);
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute();
                         }
@@ -102,38 +104,50 @@ public class ContactManager {
 
                 @Override
                 public void onNext(XWikiUserFull xWikiUserFull) {
-                    long userRawId = -1L;
-                    if (localUserMaps.containsKey(xWikiUserFull.id)) {
-                        userRawId = localUserMaps.get(xWikiUserFull.id);
-                        updateContact(
-                            context,
-                            xWikiUserFull.id,
-                            xWikiUserFull.getFirstName(),
-                            xWikiUserFull.getLastName(),
-                            xWikiUserFull.getEmail(),
-                            xWikiUserFull.getPhone(),
-                            userRawId,
-                            batchOperation
-                        );
-                        if (batchOperation.size() >= 100) {
-                            batchOperation.execute();
-                        }
-                        localUserMaps.remove(xWikiUserFull.id);
-                    } else {
-                        addContact(
-                            context,
-                            account,
-                            xWikiUserFull,
-                            batchOperation
-                        );
-                        batchOperation.execute();// refresh for get user raw id
-                        userRawId = lookupRawContact(resolver, xWikiUserFull.id);
+                    List<ContentProviderOperation> operationList = toContentProviderOperations(
+                        xWikiUserFull,
+                        resolver,
+                        account
+                    );
+                    for (ContentProviderOperation operation : operationList) {
+                        batchOperation.add(operation);
+                    }
+                    if (batchOperation.size() >= 100) {
+                        batchOperation.execute();
                     }
                     updateAvatar(
                         resolver,
-                        userRawId,
+                        lookupRawContact(resolver, xWikiUserFull.id),
                         xWikiUserFull
                     );
+//                    if (localUserMaps.containsKey(xWikiUserFull.id)) {
+//                        userRawId = localUserMaps.get(xWikiUserFull.id);
+//                        updateContact(
+//                            context,
+//                            xWikiUserFull.id,
+//                            xWikiUserFull.getFirstName(),
+//                            xWikiUserFull.getLastName(),
+//                            xWikiUserFull.getEmail(),
+//                            xWikiUserFull.getPhone(),
+//                            userRawId,
+//                            batchOperation
+//                        );
+//                        localUserMaps.remove(xWikiUserFull.id);
+//                    } else {
+//                        addContact(
+//                            context,
+//                            account,
+//                            xWikiUserFull,
+//                            batchOperation
+//                        );
+//                        batchOperation.execute();// refresh for get user raw id
+//                        userRawId = lookupRawContact(resolver, xWikiUserFull.id);
+//                    }
+//                    updateAvatar(
+//                        resolver,
+//                        userRawId,
+//                        xWikiUserFull
+//                    );
                 }
             }
         );
@@ -157,7 +171,7 @@ public class ContactManager {
         XWikiUserFull xwikiUser
     ) {
         AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
-            xwikiUser.pageName, xwikiUser.getAvatar()
+            xwikiUser.getAvatar()
         ).subscribe(
             new Action1<byte[]>() {
                 @Override
@@ -211,25 +225,7 @@ public class ContactManager {
         XWikiUserFull user,
         BatchOperation batchOperation
     ) {
-        final ContactOperations contactOp = ContactOperations.createNewContact(
-            context,
-            user.id,
-            accountName,
-            true,
-            batchOperation
-        );
 
-        contactOp.addName(
-            user.getFullName(),
-            user.getFirstName(),
-            user.getLastName()
-        )
-            .addEmail(user.getEmail())
-            .addPhone(user.getPhone(), Phone.TYPE_MOBILE);
-
-        if (user.id != null) {
-            contactOp.addProfileAction(user.id);
-        }
     }
 
 
@@ -593,7 +589,7 @@ public class ContactManager {
      *
      * @since 0.4
      */
-    private static long lookupRawContact(ContentResolver resolver, String serverContactId) {
+    public static long lookupRawContact(ContentResolver resolver, String serverContactId) {
         long rawContactId = 0;
         final Cursor c = resolver.query(
                 UserIdQuery.CONTENT_URI,

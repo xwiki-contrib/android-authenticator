@@ -66,16 +66,14 @@ public class XWikiPhotosManager {
     /**
      * Download avatar from XWiki and prepare it by {@link #prepareAvatar(byte[])}.
      *
-     * @param name username
-     * @param avatarName user avatar name (identifier)
+     * @param url user avatar name (identifier)
      * @return Object which can be used for subscribe to get avatar bytes
      */
     public Observable<byte[]> downloadAvatar(
-        @NonNull String name,
-        @NonNull String avatarName
+        @NonNull String url
     ) {
         Request request = new Request.Builder()
-            .url(baseUrl + "bin/download/XWiki/" + name + "/" + avatarName)
+            .url(baseUrl + url)
             .build();
 
         final PublishSubject<byte[]> subject = PublishSubject.create();

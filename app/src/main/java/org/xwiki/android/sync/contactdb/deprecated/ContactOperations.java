@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.contactdb;
+package org.xwiki.android.sync.contactdb.deprecated;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -25,7 +25,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
@@ -40,6 +39,7 @@ import org.xwiki.android.sync.R;
  *
  * @version $Id$
  */
+@Deprecated
 public class ContactOperations {
 
     /**
