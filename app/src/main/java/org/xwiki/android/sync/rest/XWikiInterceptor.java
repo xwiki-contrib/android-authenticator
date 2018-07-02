@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.sync.rest;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import org.xwiki.android.sync.AppContext;
@@ -47,11 +48,6 @@ public class XWikiInterceptor implements Interceptor {
     private static final String HEADER_COOKIE = "Cookie";
 
     private static final String CONTENT_TYPE = "application/json";
-
-    /**
-     * Contains cached coolie value.
-     */
-    private String cookie = null;
 
     /**
      * Add query parameter <b>media=json</b>, headers {@link #HEADER_ACCEPT}={@link #CONTENT_TYPE}
@@ -88,10 +84,8 @@ public class XWikiInterceptor implements Interceptor {
     }
 
     /**
-     * If {@link #cookie} is null or empty will check shared preferences
-     * and if cookies available - set {@link #cookie}
-     *
-     * @return {@link #cookie} after checking on not null/empty
+     * @return {@link SharedPrefsUtils#getValue(Context, String, String)} with key
+     * {@link Constants#COOKIE} and def value <b>empty string</b>
      *
      * @since 0.4
      */

@@ -118,6 +118,7 @@ public class ContactManager {
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute();
                         }
+                        localUserMaps.remove(xWikiUserFull.id);
                     } else {
                         addContact(
                             context,
