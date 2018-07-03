@@ -116,8 +116,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
             mapOf(
                 ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME to firstName,
-                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME to lastName,
-                ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME to fullName
+                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME to lastName
             )
         )
     },

@@ -105,14 +105,6 @@ public class XWikiUserFull {
         setValue("last_name", lastName);
     }
 
-    public String getFullName() {
-        return searchValue("fullname");
-    }
-
-    public void setFullName(String fullName) {
-        setValue("fullname", fullName);
-    }
-
     public String getPhone() {
         return searchValue("phone");
     }
