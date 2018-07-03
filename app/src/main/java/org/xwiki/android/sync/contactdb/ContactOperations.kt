@@ -20,7 +20,7 @@ import android.content.ContentValues
  * @param account the Account who's visibility we're changing
  * @param visible true if we want the contacts visible, false for hidden
  *
- * @since 0.4
+ * @since 0.5
  */
 fun setAccountContactsVisibility(
     resolver: ContentResolver,
