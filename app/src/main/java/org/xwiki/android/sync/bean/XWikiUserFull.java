@@ -19,22 +19,19 @@
  */
 package org.xwiki.android.sync.bean;
 
+import org.xwiki.android.sync.AppContext;
+import org.xwiki.android.sync.rest.ApiEndPoints;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class XWikiUserFull {
     public String id;
-    public String guid;
-    public String pageId;
-    public String pageVersion;
+    public String pageName;
     public String wiki;
     public String space;
-    public String pageName;
-    public String pageAuthor;
-    public String pageAuthorName;
-    public String className;
+    public String pageId;
     public Integer number;
-    public String headline;
 
     //to be sure that here will be at least empty list
     private List<Property> properties = new ArrayList<>();
@@ -58,6 +55,30 @@ public class XWikiUserFull {
 
     public void setCity(String city) {
         setValue("city", city);
+    }
+
+    public String getAddress() {
+        return searchValue("address");
+    }
+
+    public void setAddress(String address) {
+        setValue("address", address);
+    }
+
+    public String getCompany() {
+        return searchValue("company");
+    }
+
+    public void setCompany(String company) {
+        setValue("company", company);
+    }
+
+    public String getComment() {
+        return searchValue("comment");
+    }
+
+    public void setComment(String comment) {
+        setValue("comment", comment);
     }
 
     public String getEmail() {
@@ -100,6 +121,9 @@ public class XWikiUserFull {
         setValue("phone", phone);
     }
 
+    /**
+     * @return Avatar URL
+     */
     public String getAvatar() {
         return searchValue("avatar");
     }

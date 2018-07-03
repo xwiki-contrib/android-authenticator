@@ -22,12 +22,16 @@ package org.xwiki.android.sync.rest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xwiki.android.sync.utils.ImageUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -70,13 +74,26 @@ public class XWikiPhotosManager {
      * @param avatarName user avatar name (identifier)
      * @return Object which can be used for subscribe to get avatar bytes
      */
+    @Nullable
     public Observable<byte[]> downloadAvatar(
         @NonNull String name,
         @NonNull String avatarName
     ) {
-        Request request = new Request.Builder()
-            .url(baseUrl + "bin/download/XWiki/" + name + "/" + avatarName)
-            .build();
+        Request request = null;
+        try {
+            request = new Request.Builder()
+                .url(baseUrl + "bin/download/XWiki/"
+                    + URLEncoder.encode(name, "UTF-8") + "/"
+                    + URLEncoder.encode(avatarName, "UTF-8"))
+                .build();
+        } catch (UnsupportedEncodingException e) {
+            Log.e(
+                XWikiPhotosManager.class.getSimpleName(),
+                "Can't encode user data for getting his avatar",
+                e
+            );
+            return null;
+        }
 
         final PublishSubject<byte[]> subject = PublishSubject.create();
 

@@ -30,6 +30,8 @@ package org.xwiki.android.sync.rest;
  */
 public class ApiEndPoints {
     public static final String REST = "rest/";
+    public static final String BIN = "bin/";
+    public static final String DOWNLOAD = "download/";
     public static final String WIKIS = "wikis";
     public static final String SPACES = "spaces";
     public static final String PAGES = "pages";
