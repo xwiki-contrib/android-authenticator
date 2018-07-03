@@ -20,6 +20,7 @@
 package org.xwiki.android.sync.bean;
 
 import org.xwiki.android.sync.AppContext;
+import org.xwiki.android.sync.rest.ApiEndPoints;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ import java.util.List;
 public class XWikiUserFull {
     public String id;
     public String pageName;
+    public String wiki;
+    public String space;
+    public String pageId;
     public Integer number;
 
     //to be sure that here will be at least empty list
@@ -121,7 +125,8 @@ public class XWikiUserFull {
      * @return Avatar URL without base url
      */
     public String getAvatar() {
-        return "bin/download/XWiki/" + pageName
+        return ApiEndPoints.BIN + ApiEndPoints.DOWNLOAD
+            + space + "/" + pageName
             + "/" + searchValue("avatar");
     }
 
