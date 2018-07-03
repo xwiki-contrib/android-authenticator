@@ -139,37 +139,43 @@ public class ContactManager {
         final long rawId,
         XWikiUserFull xwikiUser
     ) {
-        AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
-            xwikiUser.pageName,
-            xwikiUser.getAvatar()
-        ).subscribe(
-            new Action1<byte[]>() {
-                @Override
-                public void call(byte[] bytes) {
-                    if (bytes != null) {
-                        try {
-                            writeDisplayPhoto(contentResolver, rawId, bytes);
-                        } catch (IOException e) {
-                            Log.e(
-                                TAG,
-                                "Can't update avatar of user",
-                                e
-                            );
+        Observable<byte[]> gettingAvatarObservable = AppContext
+            .getApiManager()
+            .getXWikiPhotosManager()
+            .downloadAvatar(
+                xwikiUser.pageName,
+                xwikiUser.getAvatar()
+            );
+        if (gettingAvatarObservable != null) {
+            gettingAvatarObservable.subscribe(
+                new Action1<byte[]>() {
+                    @Override
+                    public void call(byte[] bytes) {
+                        if (bytes != null) {
+                            try {
+                                writeDisplayPhoto(contentResolver, rawId, bytes);
+                            } catch (IOException e) {
+                                Log.e(
+                                    TAG,
+                                    "Can't update avatar of user",
+                                    e
+                                );
+                            }
                         }
                     }
+                },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e(
+                            TAG,
+                            "Can't update avatar of user",
+                            throwable
+                        );
+                    }
                 }
-            },
-            new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                    Log.e(
-                        TAG,
-                        "Can't update avatar of user",
-                        throwable
-                    );
-                }
-            }
-        );
+            );
+        }
     }
 
 
