@@ -140,6 +140,7 @@ public class ContactManager {
         XWikiUserFull xwikiUser
     ) {
         AppContext.getApiManager().getXWikiPhotosManager().downloadAvatar(
+            xwikiUser.pageName,
             xwikiUser.getAvatar()
         ).subscribe(
             new Action1<byte[]>() {

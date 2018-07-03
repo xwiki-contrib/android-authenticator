@@ -122,12 +122,10 @@ public class XWikiUserFull {
     }
 
     /**
-     * @return Avatar URL without base url
+     * @return Avatar URL
      */
     public String getAvatar() {
-        return ApiEndPoints.BIN + ApiEndPoints.DOWNLOAD
-            + space + "/" + pageName
-            + "/" + searchValue("avatar");
+        return searchValue("avatar");
     }
 
     /**
