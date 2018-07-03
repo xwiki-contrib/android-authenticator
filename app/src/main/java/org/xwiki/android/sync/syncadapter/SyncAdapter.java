@@ -31,7 +31,7 @@ import android.util.Log;
 
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.contactdb.deprecated.ContactManager;
+import org.xwiki.android.sync.contactdb.ContactManager;
 import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
@@ -40,6 +40,8 @@ import java.util.Date;
 
 import rx.Observable;
 import rx.Observer;
+
+import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
 
 /**
  * Adapter which will be used for synchronization.
@@ -117,7 +119,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // list. So let's set the flag that causes them to be visible, so that users
         // can actually see these contacts. date format: "1980-09-24T19:45:31+02:00"
         if (lastSyncMarker.equals(StringUtils.dateToIso8601String(new Date(0)))) {
-            ContactManager.setAccountContactsVisibility(
+            setAccountContactsVisibility(
                 getContext().getContentResolver(),
                 account,
                 true

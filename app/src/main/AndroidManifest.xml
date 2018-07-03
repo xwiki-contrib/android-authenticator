@@ -47,24 +47,6 @@
             android:label="@string/title_activity_authorize">
         </activity>
 
-        <activity
-            android:noHistory="true"
-            android:excludeFromRecents="true"
-            android:name=".activities.editcontact.EditContactActivity"
-            android:label="@string/title_activity_edit_contact">
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.xwikiedit.profile" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <provider
             android:name=".syncadapter.EmptyProvider"
             android:authorities="org.xwiki.android.sync"

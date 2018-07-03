@@ -1,5 +1,6 @@
 package org.xwiki.android.sync.contactdb
 
+import android.accounts.Account
 import android.content.ContentProviderOperation
 import android.content.ContentResolver
 import android.content.ContentUris
@@ -7,7 +8,32 @@ import android.provider.ContactsContract
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
-import android.util.Log
+
+
+/**
+ * When we first add a sync adapter to the system, the contacts from that
+ * sync adapter will be hidden unless they're merged/grouped with an existing
+ * contact.  But typically we want to actually show those contacts, so we
+ * need to mess with the Settings table to get them to show up.
+ *
+ * @param resolver Will need to insert new data into system db
+ * @param account the Account who's visibility we're changing
+ * @param visible true if we want the contacts visible, false for hidden
+ *
+ * @since 0.4
+ */
+fun setAccountContactsVisibility(
+    resolver: ContentResolver,
+    account: Account,
+    visible: Boolean
+) {
+    val values = ContentValues()
+    values.put(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
+    values.put(ContactsContract.RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE)
+    values.put(ContactsContract.Settings.UNGROUPED_VISIBLE, if (visible) 1 else 0)
+
+    resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
+}
 
 fun XWikiUserFull.rowId(
     resolver: ContentResolver,
@@ -41,6 +67,17 @@ fun XWikiUserFull.rowId(
     } ?: throw IllegalStateException("Can't get or create row id for user")
 }
 
+/**
+ * Create new insert operation with pairs
+ *
+ * @param rowId Contact row id
+ * @param mimeType Type mime such as {@link ContactsContract.CommonDataKinds.StructuredName#CONTENT_ITEM_TYPE}
+ * @param dataPairs Pairs of data to insert
+ *
+ * @see {@link #rowId(ContentResolver, String)}
+ *
+ * @since 0.5
+ */
 private fun createContentProviderOperation(
     rowId: Long,
     mimeType: String,
@@ -129,6 +166,11 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
     }
 )
 
+/**
+ * Will create contact or update existing using context user
+ *
+ * @since 0.5
+ */
 fun XWikiUserFull.toContentProviderOperations(
     resolver: ContentResolver,
     accountName: String
