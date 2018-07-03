@@ -35,6 +35,16 @@ fun setAccountContactsVisibility(
     resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
 }
 
+/**
+ * Search user raw in android contacts. If not exists - will create new one and return this rowId
+ *
+ * @param resolver Will be used to search exist user or create new one
+ * @param accountName Account name for search
+ *
+ * @return Row id of user
+ *
+ * @since 0.5
+ */
 fun XWikiUserFull.rowId(
     resolver: ContentResolver,
     accountName: String
