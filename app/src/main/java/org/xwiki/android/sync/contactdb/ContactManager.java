@@ -40,12 +40,14 @@ import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.contactdb.BatchOperation;
+import org.xwiki.android.sync.rest.XWikiHttp;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.HttpException;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
@@ -96,7 +98,17 @@ public class ContactManager {
 
                 @Override
                 public void onError(Throwable e) {
-                    Log.e(TAG, "Can't synchronize users", e);
+                    try {
+                        HttpException asHttpException = (HttpException) e;
+                        if (asHttpException.code() == 401) {//Unauthorized
+                            XWikiHttp.relogin(
+                                context,
+                                account
+                            );
+                        }
+                    } catch (ClassCastException e1) {
+                        Log.e(TAG, "Can't synchronize users", e);
+                    }
                 }
 
                 @Override

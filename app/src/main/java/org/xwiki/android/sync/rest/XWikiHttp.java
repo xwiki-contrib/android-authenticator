@@ -19,7 +19,11 @@
  */
 package org.xwiki.android.sync.rest;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -117,6 +121,50 @@ public class XWikiHttp {
             }
         );
         return authTokenSubject;
+    }
+
+    /**
+     * Relogin for account
+     *
+     * @param context Context to get {@link AccountManager} and other data
+     * @param accountName Name of account to know which user must be relogged in
+     * @return Observable to know when already authorized
+     *
+     * @since 0.5
+     */
+    @Nullable
+    public static Observable<String> relogin(
+        Context context,
+        String accountName
+    ) {
+        AccountManager accountManager = AccountManager.get(context);
+
+        Account account = null;
+
+        for (Account current : accountManager.getAccounts()) {
+            if (current.name.equals(accountName)) {
+                account = current;
+                break;
+            }
+        }
+
+        if (account == null) {
+            return null;
+        } else {
+            Observable<String> loginObservable = login(
+                accountName,
+                accountManager.getPassword(account)
+            );
+            loginObservable.subscribe(
+                new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        Log.d("XWikiHttp", "Relogged in");
+                    }
+                }
+            );
+            return loginObservable;
+        }
     }
 
     /**
