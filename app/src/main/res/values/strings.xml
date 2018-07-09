@@ -59,7 +59,7 @@
     <string name="account_name">Account Name</string>
     <string name="cancel">Cancel</string>
     <string name="grant_permission_button">Authorize</string>
-    <string name="defaultServerUrl" translatable="false">http://www.xwiki.org/xwiki</string>
+    <string name="defaultServerUrl" translatable="false">https://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Login to your XWiki Instance.</string>
     <string name="learn_more_dialog">Learn More</string>
     <string name="log_in" translatable="false">@string/logIn</string>
