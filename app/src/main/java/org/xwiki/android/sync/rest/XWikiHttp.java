@@ -38,9 +38,11 @@ import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -180,7 +182,10 @@ public class XWikiHttp {
      * @see Constants#SYNC_TYPE_ALL_USERS
      * @see Constants#SYNC_TYPE_SELECTED_GROUPS
      */
-    public static Observable<XWikiUserFull> getSyncData(final int syncType) {
+    public static Observable<XWikiUserFull> getSyncData(
+        final int syncType,
+        final String accountName
+    ) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
         final Semaphore semaphore = new Semaphore(1);
         try {
@@ -200,7 +205,10 @@ public class XWikiHttp {
                                 }
                             }
                             if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
-                                getSyncAllUsers(subject);
+                                getSyncAllUsers(
+                                    subject,
+                                    accountName
+                                );
                             } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
                                 List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
                                 getSyncGroups(groupIdList, subject);
@@ -354,9 +362,10 @@ public class XWikiHttp {
      * @param subject Will be used as object for events
      */
     private static void getSyncAllUsers(
-        final PublishSubject<XWikiUserFull> subject
+        final PublishSubject<XWikiUserFull> subject,
+        final String account
     ) {
-        final List<ObjectSummary> searchList = new ArrayList<>();
+        final Queue<ObjectSummary> searchList = new ArrayDeque<>();
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
@@ -376,17 +385,24 @@ public class XWikiHttp {
                     }
                 }
             );
-            semaphore.acquire();
         } catch (InterruptedException e) {
             Log.e(TAG, "Can't await synchronize all users", e);
         }
 
-        if (subject.hasThrowable()) {
-            return;
+        try {
+            semaphore.acquire();
+
+            if (subject.hasThrowable()) {
+                return;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Can't await synchronize all users", e);
         }
 
-        final CountDownLatch countDown = new CountDownLatch(searchList.size());
-        for (final ObjectSummary item : searchList) {
+        while (subject.getThrowable() == null && !searchList.isEmpty()) {
+            final ObjectSummary item = searchList.poll();
+
             if (subject.getThrowable() != null) {// was was not error in sync
                 return;
             }
@@ -395,21 +411,55 @@ public class XWikiHttp {
                 item.space,
                 item.pageName
             ).subscribe(
-                new Action1<XWikiUserFull>() {
+                new Observer<XWikiUserFull>() {
                     @Override
-                    public void call(XWikiUserFull xWikiUser) {
-                        subject.onNext(xWikiUser);
-                        countDown.countDown();
+                    public void onCompleted() {
+                        semaphore.release();
                     }
-                },
-                new Action1<Throwable>() {
+
                     @Override
-                    public void call(Throwable e) {
+                    public void onError(Throwable e) {
                         Log.e(TAG, "Can't get user", e);
-                        if (!HttpException.class.isInstance(e) || ((HttpException) e).code() != 404) {
-                            subject.onError(e);
+                        try {
+                            HttpException asHttpException = (HttpException) e;
+                            if (asHttpException.code() == 401) {//Unauthorized
+                                XWikiHttp.relogin(
+                                    AppContext.getInstance(),
+                                    account
+                                ).subscribe(
+                                    new Observer<String>() {
+                                        @Override
+                                        public void onCompleted() {
+                                            searchList.offer(item);
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            subject.onError(e);
+                                            semaphore.release();
+                                        }
+
+                                        @Override
+                                        public void onNext(String s) {
+                                            Log.d(TAG, "Relogged in");
+                                        }
+                                    }
+                                );
+                            } else {
+                                if (asHttpException.code() == 404) {
+                                    return;
+                                }
+                            }
+                        } catch (ClassCastException e1) {
+                            Log.e(TAG, "Can't cast exception to HttpException", e1);
                         }
-                        countDown.countDown();
+                        subject.onError(e);
+                        semaphore.release();
+                    }
+
+                    @Override
+                    public void onNext(XWikiUserFull userFull) {
+                        subject.onNext(userFull);
                     }
                 }
             );
@@ -424,7 +474,7 @@ public class XWikiHttp {
             }
         }
         try {
-            countDown.await();
+            semaphore.acquire();
             if (!subject.hasThrowable()) {
                 subject.onCompleted();
             }
