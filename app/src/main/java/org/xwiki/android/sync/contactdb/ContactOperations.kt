@@ -78,6 +78,24 @@ fun XWikiUserFull.rowId(
 }
 
 /**
+ * Create new delete operation for contact
+ *
+ * @param rowId Contact row id
+ *
+ * @see {@link #rowId(ContentResolver, String)}
+ *
+ * @since 0.5
+ */
+private fun clearOldUserData(
+    rowId: Long
+): ContentProviderOperation {
+    return ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI).run {
+        withSelection("${ContactsContract.Data.RAW_CONTACT_ID}=?", arrayOf(rowId.toString()))
+        build()
+    }
+}
+
+/**
  * Create new insert operation with pairs
  *
  * @param rowId Contact row id
@@ -186,7 +204,10 @@ fun XWikiUserFull.toContentProviderOperations(
 ): List<ContentProviderOperation> {
     val rowId: Long = rowId(resolver, accountName)
     
-    return propertiesToContentProvider.map {
-        it(rowId)
-    }
+    return listOf(
+        clearOldUserData(rowId),
+        *propertiesToContentProvider.map {
+            it(rowId)
+        }.toTypedArray()
+    )
 }
