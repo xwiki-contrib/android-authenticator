@@ -176,7 +176,6 @@ public class XWikiUser {
         return new String[]{wiki, space, pageName};
     }
 
-    @Nullable
     public static Map.Entry<String, String> spaceAndPage(String id) {
         String[] splitted = splitId(id);
         if (splitted != null) {

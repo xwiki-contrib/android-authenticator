@@ -211,7 +211,11 @@ public class XWikiHttp {
                                 );
                             } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
                                 List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
-                                getSyncGroups(groupIdList, subject);
+                                getSyncGroups(
+                                    groupIdList,
+                                    subject,
+                                    accountName
+                                );
                             } else {
                                 throw new IOException(TAG + "syncType error, SyncType=" + syncType);
                             }
@@ -234,15 +238,18 @@ public class XWikiHttp {
      *
      * @param groupIdList Contains ids of groups to sync
      * @param subject Contains subject to send updates info
+     * @param account Account which used for sync
      * @throws IOException Will be thrown if something went wrong
      *
-     * @see #getDetailedInfo(List, PublishSubject)
+     * @see #getDetailedInfo(List, PublishSubject, String)
      *
      * @since 0.4
      */
     private static void getSyncGroups(
         @NonNull List<String> groupIdList,
-        @NonNull final PublishSubject<XWikiUserFull> subject
+        @NonNull final PublishSubject<XWikiUserFull> subject,
+        @NonNull final String account
+
     ) throws IOException {
         final CountDownLatch groupsCountDown = new CountDownLatch(groupIdList.size());
         for (String groupId : groupIdList) {
@@ -263,15 +270,11 @@ public class XWikiHttp {
                 new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
-                        try {
-                            getDetailedInfo(
-                                summaries.objectSummaries,
-                                subject
-                            );
-                        } catch (IOException e) {
-                            Log.e(TAG, "Can't get users info", e);
-                            subject.onError(e);
-                        }
+                        getDetailedInfo(
+                            summaries.objectSummaries,
+                            subject,
+                            account
+                        );
                         groupsCountDown.countDown();
                     }
                 },
@@ -298,20 +301,29 @@ public class XWikiHttp {
      *
      * @param from Objects which can be used to get info about users to load them
      * @param subject Contains subject to send updates info
+     * @param account Account which used for sync
      *
      * @since 0.4
      */
     private static void getDetailedInfo(
         @NonNull List<ObjectSummary> from,
-        @NonNull final PublishSubject<XWikiUserFull> subject
-    ) throws IOException {
+        @NonNull final PublishSubject<XWikiUserFull> subject,
+        @NonNull final String account
+    ) {
 
-        final CountDownLatch countDown = new CountDownLatch(from.size());
+        final Semaphore semaphore = new Semaphore(1);
 
-        for (final ObjectSummary summary : from) {
-            if (subject.getThrowable() != null) {
-                throw new IOException("Can't synchronize users info: " + from);
-            }
+        final Queue<ObjectSummary> queueOfSummaries = new ArrayDeque<>(from);
+
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Can't acquire semaphore", e);
+        }
+
+        while (subject.getThrowable() == null && !queueOfSummaries.isEmpty()) {
+            final ObjectSummary summary = queueOfSummaries.poll();
+
             try {
                 Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
                 if (spaceAndName == null) {
@@ -321,32 +333,64 @@ public class XWikiHttp {
                     spaceAndName.getKey(),
                     spaceAndName.getValue()
                 ).subscribe(
-                    new Action1<XWikiUserFull>() {
+                    new Observer<XWikiUserFull>() {
                         @Override
-                        public void call(XWikiUserFull xWikiUser) {
-                            subject.onNext(xWikiUser);
-                            countDown.countDown();
+                        public void onCompleted() {
+                            semaphore.release();
                         }
-                    },
-                    new Action1<Throwable>() {
+
                         @Override
-                        public void call(Throwable throwable) {
-                            Log.e(TAG, "Can't get user info: " + summary.headline, throwable);
-                            if (!HttpException.class.isInstance(throwable) || ((HttpException)throwable).code() != 404) {
-                                subject.onError(throwable);
+                        public void onError(Throwable e) {
+                            try {
+                                HttpException asHttpException = (HttpException) e;
+                                if (asHttpException.code() == 401) {//Unauthorized
+                                    XWikiHttp.relogin(
+                                        AppContext.getInstance(),
+                                        account
+                                    ).subscribe(
+                                        new Observer<String>() {
+                                            @Override
+                                            public void onCompleted() {
+                                                queueOfSummaries.offer(summary);
+                                            }
+
+                                            @Override
+                                            public void onError(Throwable e) {
+                                                subject.onError(e);
+                                                semaphore.release();
+                                            }
+
+                                            @Override
+                                            public void onNext(String s) {
+                                                Log.d(TAG, "Relogged in");
+                                            }
+                                        }
+                                    );
+                                } else {
+                                    if (asHttpException.code() == 404) {
+                                        return;
+                                    }
+                                }
+                            } catch (ClassCastException e1) {
+                                Log.e(TAG, "Can't cast exception to HttpException", e1);
                             }
-                            countDown.countDown();
+                            subject.onError(e);
+                            semaphore.release();
+                        }
+
+                        @Override
+                        public void onNext(XWikiUserFull userFull) {
+                            subject.onNext(userFull);
                         }
                     }
                 );
             } catch (Exception e) {
-                countDown.countDown();
                 Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
             }
         }
 
         try {
-            countDown.await();
+            semaphore.acquire();
         } catch (InterruptedException e) {
             Log.e(TAG, "Can't await completing of getting user detailed info", e);
         }
