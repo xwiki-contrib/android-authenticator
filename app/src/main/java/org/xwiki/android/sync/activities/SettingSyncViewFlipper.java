@@ -417,7 +417,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
             setSync(true);
         }
-        mActivity.finish();
     }
 
     /**

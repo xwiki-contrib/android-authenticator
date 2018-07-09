@@ -236,6 +236,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         flippers.get(
             position
         ).doNext();
+        if (position + 1 >= orderOfFlippers.size()) {
+            finish();
+        }
         showViewFlipper(position + 1);
     }
 
