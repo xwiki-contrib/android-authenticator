@@ -335,13 +335,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     /**
-     * Will be called when not enough given permissions.
-     */
-    public void noPermissions(){
-        Toast.makeText(mContext, R.string.askToGrantPermissions, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
      * @return true if currently selected to sync groups or false otherwise
      */
     private Boolean syncGroups() {
@@ -382,7 +375,6 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             if (adapter != mListView.getAdapter()) {
                 mListView.setAdapter(adapter);
             }
-            adapter.notifyDataSetChanged();
             refreshProgressBar();
         }
     }
@@ -419,16 +411,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             if(oldSyncType == SYNC_TYPE && compareSelectGroups()){
                 return;
             }
-            List<XWikiGroup> list = mGroupAdapter.getSelectGroups();
-            if (list != null && list.size() > 0) {
-                List<String> groupIdList = new ArrayList<>();
-                for (XWikiGroup iGroup : list) {
-                    groupIdList.add(iGroup.id);
-                }
-                SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, groupIdList);
-            } else {
-                SharedPrefsUtils.putArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS, new ArrayList<String>());
-            }
+
+            mGroupAdapter.saveSelectedGroups();
+
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
             setSync(true);
         }
@@ -462,7 +447,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     }
 
     /**
-     * @return true if old list is not equal to new list of groups
+     * @return true if old list equal to new list of groups
      */
     private boolean compareSelectGroups(){
         //new

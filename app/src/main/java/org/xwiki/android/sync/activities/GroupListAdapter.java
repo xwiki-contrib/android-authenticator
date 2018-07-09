@@ -169,15 +169,27 @@ public class GroupListAdapter extends BaseAdapter {
     }
 
     /**
+     * Save current state of selected groups for future use
+     */
+    public void saveSelectedGroups() {
+        List<String> selectedStrings = new ArrayList<>();
+
+        for (XWikiGroup group : selected) {
+            selectedStrings.add(group.id);
+        }
+
+        SharedPrefsUtils.putArrayList(mContext, Constants.SELECTED_GROUPS, selectedStrings);
+    }
+
+    /**
      * Update groups if new groups have new objects.
      *
      * @param groups new list
      */
     public void refresh(@NonNull List<XWikiGroup> groups) {
-        if (groupList == null || groupList.equals(groups)) {
-            return;
+        if (groupList != null && !groupList.equals(groups)) {
+            groupList = groups;
         }
-        groupList = groups;
         initSelectedGroup();
         notifyDataSetChanged();
     }

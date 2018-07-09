@@ -120,10 +120,9 @@ public class UserListAdapter extends BaseAdapter {
      * @param results New list
      */
     public void refresh(@NonNull List<ObjectSummary> results) {
-        if (searchResults == null || searchResults.equals(results)) {
-            return;
+        if (searchResults != null && !searchResults.equals(results)) {
+            searchResults = results;
         }
-        searchResults = results;
         notifyDataSetChanged();
     }
 
