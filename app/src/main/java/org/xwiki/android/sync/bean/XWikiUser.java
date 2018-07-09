@@ -20,6 +20,7 @@
 package org.xwiki.android.sync.bean;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -158,7 +159,11 @@ public class XWikiUser {
      * @param id
      * @return 0:wiki 1:space 2:pageName
      */
+    @Nullable
     public static String[] splitId(String id) {
+        if (TextUtils.isEmpty(id)) {
+            return null;
+        }
         String wiki = null;
         String space = null;
         String pageName = null;
@@ -176,6 +181,7 @@ public class XWikiUser {
         return new String[]{wiki, space, pageName};
     }
 
+    @Nullable
     public static Map.Entry<String, String> spaceAndPage(String id) {
         String[] splitted = splitId(id);
         if (splitted != null) {

@@ -35,6 +35,25 @@ fun setAccountContactsVisibility(
     resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
 }
 
+fun clearOldAccountContacts(
+    resolver: ContentResolver,
+    account: Account
+) {
+    resolver.applyBatch(
+        ContactsContract.AUTHORITY,
+        ArrayList<ContentProviderOperation>().also {
+            it.add(
+                ContentProviderOperation.newDelete(
+                    ContactsContract.RawContacts.CONTENT_URI
+                ).run {
+                    withSelection("${ContactsContract.RawContacts.ACCOUNT_NAME}=?", arrayOf(account.name))
+                    build()
+                }
+            )
+        }
+    )
+}
+
 /**
  * Search user raw in android contacts. If not exists - will create new one and return this rowId
  *

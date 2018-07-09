@@ -311,15 +311,7 @@ public class XWikiHttp {
         @NonNull final String account
     ) {
 
-        final Semaphore semaphore = new Semaphore(1);
-
         final Queue<ObjectSummary> queueOfSummaries = new ArrayDeque<>(from);
-
-        try {
-            semaphore.acquire();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Can't acquire semaphore", e);
-        }
 
         while (subject.getThrowable() == null && !queueOfSummaries.isEmpty()) {
             final ObjectSummary summary = queueOfSummaries.poll();
@@ -335,9 +327,7 @@ public class XWikiHttp {
                 ).subscribe(
                     new Observer<XWikiUserFull>() {
                         @Override
-                        public void onCompleted() {
-                            semaphore.release();
-                        }
+                        public void onCompleted() { }
 
                         @Override
                         public void onError(Throwable e) {
@@ -357,7 +347,6 @@ public class XWikiHttp {
                                             @Override
                                             public void onError(Throwable e) {
                                                 subject.onError(e);
-                                                semaphore.release();
                                             }
 
                                             @Override
@@ -366,6 +355,7 @@ public class XWikiHttp {
                                             }
                                         }
                                     );
+                                    return;
                                 } else {
                                     if (asHttpException.code() == 404) {
                                         return;
@@ -375,7 +365,6 @@ public class XWikiHttp {
                                 Log.e(TAG, "Can't cast exception to HttpException", e1);
                             }
                             subject.onError(e);
-                            semaphore.release();
                         }
 
                         @Override
@@ -387,12 +376,6 @@ public class XWikiHttp {
             } catch (Exception e) {
                 Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
             }
-        }
-
-        try {
-            semaphore.acquire();
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Can't await completing of getting user detailed info", e);
         }
     }
 
@@ -457,9 +440,7 @@ public class XWikiHttp {
             ).subscribe(
                 new Observer<XWikiUserFull>() {
                     @Override
-                    public void onCompleted() {
-                        semaphore.release();
-                    }
+                    public void onCompleted() { }
 
                     @Override
                     public void onError(Throwable e) {
@@ -480,7 +461,6 @@ public class XWikiHttp {
                                         @Override
                                         public void onError(Throwable e) {
                                             subject.onError(e);
-                                            semaphore.release();
                                         }
 
                                         @Override
@@ -489,6 +469,7 @@ public class XWikiHttp {
                                         }
                                     }
                                 );
+                                return;
                             } else {
                                 if (asHttpException.code() == 404) {
                                     return;
@@ -498,7 +479,6 @@ public class XWikiHttp {
                             Log.e(TAG, "Can't cast exception to HttpException", e1);
                         }
                         subject.onError(e);
-                        semaphore.release();
                     }
 
                     @Override
@@ -517,13 +497,8 @@ public class XWikiHttp {
                 subject.onError(exception);
             }
         }
-        try {
-            semaphore.acquire();
-            if (!subject.hasThrowable()) {
-                subject.onCompleted();
-            }
-        } catch (InterruptedException e) {
-            subject.onError(e);
+        if (!subject.hasThrowable()) {
+            subject.onCompleted();
         }
     }
 }

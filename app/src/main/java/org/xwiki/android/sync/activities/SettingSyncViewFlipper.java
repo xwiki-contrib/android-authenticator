@@ -59,6 +59,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import static org.xwiki.android.sync.AppContext.getApiManager;
+import static org.xwiki.android.sync.contactdb.ContactOperationsKt.clearOldAccountContacts;
 
 /**
  * Flipper which contains setting of synchronization.
@@ -395,6 +396,17 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         if(oldSyncType == SYNC_TYPE && !syncGroups()){
             return;
         }
+
+        //TODO:: fix when will separate to different accounts
+        AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+        Account account = availableAccounts[0];
+
+        clearOldAccountContacts(
+            mContext.getContentResolver(),
+            account
+        );
+
         //if has changes, set sync
         if(syncNothing()){
             SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
