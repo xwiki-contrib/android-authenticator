@@ -1,6 +1,13 @@
 package org.xwiki.android.sync.activities.EditContact
 
-import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import org.xwiki.android.sync.R
+import org.xwiki.android.sync.activities.base.BaseActivity
 
-class EditContactActivity : AppCompatActivity() {
+class EditContactActivity : BaseActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_edit_contact)
+    }
 }

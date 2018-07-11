@@ -46,6 +46,8 @@
             android:exported="true"
             android:label="@string/title_activity_authorize">
         </activity>
+        <activity
+            android:name=".activities.EditContact.EditContactActivity" />
 
         <provider
             android:name=".syncadapter.EmptyProvider"

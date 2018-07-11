@@ -86,6 +86,15 @@
     <string name="xwikiAccount">XWiki Account</string>
     <string name="askToGrantPermissions">Please grant the permission in the app settings</string>
     <string name="signUpOfferMessage">Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps</string>
+    <string name="userName">User name</string>
+    <string name="userPlaces">User places</string>
+    <string name="country">Country</string>
+    <string name="city">City</string>
+    <string name="address">Address</string>
+    <string name="userContactInfo">User contact info</string>
+    <string name="additionalInfo">Additional info</string>
+    <string name="company">Company</string>
+    <string name="note">Note</string>
 
 
     <!--select setting-->
