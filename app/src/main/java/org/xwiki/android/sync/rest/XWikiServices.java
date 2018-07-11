@@ -65,7 +65,12 @@ public interface XWikiServices {
             @Field("property#first_name") String firstName,
             @Field("property#last_name") String lastName,
             @Field("property#email") String email,
-            @Field("property#phone") String phone
+            @Field("property#phone") String phone,
+            @Field("property#country") String country,
+            @Field("property#city") String city,
+            @Field("property#address") String address,
+            @Field("property#company") String company,
+            @Field("property#comment") String comment
     );
 
     /**

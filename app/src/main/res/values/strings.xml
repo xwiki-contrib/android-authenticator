@@ -95,6 +95,9 @@
     <string name="additionalInfo">Additional info</string>
     <string name="company">Company</string>
     <string name="note">Note</string>
+    <string name="wrongEmail">Email must look like "it-is@email-example.proof"</string>
+    <string name="wrongPhone">Phone must look like "+123-(456)-789"</string>
+    <string name="checkErrors">Check errors</string>
 
 
     <!--select setting-->
