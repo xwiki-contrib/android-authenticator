@@ -26,11 +26,15 @@ private const val EDIT_CONTACT_MIME_TYPE = "vnd.android.cursor.item/vnd.xwikiedi
 
 /**
  * Field which will contains user id
+ *
+ * @since 0.5
  */
 private const val EDIT_CONTACT_USER_ID_FIELD = ContactsContract.Data.DATA1
 
 /**
  * Field which will contains text for edit contact button
+ *
+ * @since 0.5
  */
 private const val EDIT_CONTACT_TEXT_FIELD = ContactsContract.Data.DATA3
 
@@ -59,6 +63,9 @@ fun setAccountContactsVisibility(
     resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
 }
 
+/**
+ * Clear all account contacts
+ */
 fun clearOldAccountContacts(
     resolver: ContentResolver,
     account: Account
@@ -241,12 +248,20 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             EDIT_CONTACT_MIME_TYPE,
             mapOf(
                 EDIT_CONTACT_USER_ID_FIELD to convertId(),
-                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance().getString(R.string.edit)
+                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance().getString(R.string.editXWikiContactInfo)
             )
         )
     }
 )
 
+/**
+ * @param resolver Resolver to make the query
+ * @param from Uri which will be used to get info
+ *
+ * @return Row contact id from database if available
+ *
+ * @since 0.5
+ */
 fun getContactRowId(
     resolver: ContentResolver,
     from: Uri
@@ -270,6 +285,16 @@ fun getContactRowId(
     }
 }
 
+/**
+ * @param resolver Resolver to make the query
+ * @param rowId Id of contact for get info
+ *
+ * @return user id if available
+ *
+ * @see getContactRowId
+ *
+ * @since 0.5
+ */
 fun getContactUserId(
     resolver: ContentResolver,
     rowId: Long
@@ -296,6 +321,16 @@ fun getContactUserId(
     }
 }
 
+/**
+ * @param resolver Resolver to make the query
+ * @param rowId Id of contact for get info
+ *
+ * @return account name of contact which has create this contact
+ *
+ * @see getContactRowId
+ *
+ * @since 0.5
+ */
 fun getContactAccountName(
     resolver: ContentResolver,
     rowId: Long
@@ -317,6 +352,11 @@ fun getContactAccountName(
     }
 }
 
+/**
+ * Helpers which fill object by info from database
+ *
+ * @since 0.5
+ */
 private val userDatabaseInfoHelpers = listOf<MutableInternalXWikiUserInfo.(c: Cursor, mimetype: String) -> Unit>(
     {
         c, mimetype ->
@@ -359,6 +399,17 @@ private val userDatabaseInfoHelpers = listOf<MutableInternalXWikiUserInfo.(c: Cu
     }
 )
 
+/**
+ * Create and fill object
+ *
+ * @param resolver Resolver to make the query
+ * @param rowId Id of contact for get info
+ * @param splittedId "wiki:space.pageName" splitted example
+ *
+ * @see XWikiUserFull.splitId
+ *
+ * @since 0.5
+ */
 fun getUserInfo(
     resolver: ContentResolver,
     rowId: Long,
