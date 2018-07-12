@@ -31,9 +31,16 @@ private const val reloginTryes = 3
  * Activity for work with editing of contact
  *
  * @version: $Id$
+ *
+ * @since 0.5
  */
 class EditContactActivity : BaseActivity() {
 
+    /**
+     * Lazy initialized contact row id
+     *
+     * @see getContactRowId
+     */
     private val rowId: Long? by lazy {
         getContactRowId(
             contentResolver,
@@ -41,6 +48,12 @@ class EditContactActivity : BaseActivity() {
         )
     }
 
+    /**
+     * Lazy initialized contact user id
+     *
+     * @see getContactUserId
+     * @see XWikiUserFull.id
+     */
     private val userId: String? by lazy {
         rowId ?.let {
             getContactUserId(
@@ -50,6 +63,11 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Lazy initialized contact account name
+     *
+     * @see getContactAccountName
+     */
     private val accountName: String? by lazy {
         rowId ?.let {
             getContactAccountName(
@@ -59,46 +77,78 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Lazy initialized splitted {@link #userId}
+     */
     private val splittedUserId: Array<String>? by lazy {
         userId ?.let {
             XWikiUserFull.splitId(it)
         }
     }
 
+    /**
+     * Lazy initialized EditText which contains first name
+     */
     private val firstNameEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactFirstNameEditText)
     }
+
+    /**
+     * Lazy initialized EditText which contains last name
+     */
     private val lastNameEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactLastNameEditText)
     }
 
+    /**
+     * Lazy initialized EditText which contains phone
+     */
     private val phoneEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactPhoneEditText)
     }
+
+    /**
+     * Lazy initialized EditText which contains email
+     */
     private val emailEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactEmailEditText)
     }
 
+    /**
+     * Lazy initialized EditText which contains address
+     */
     private val addressEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactAddressEditText)
     }
 
+    /**
+     * Lazy initialized EditText which contains company name
+     */
     private val companyEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactCompanyEditText)
     }
+
+    /**
+     * Lazy initialized EditText which contains note text
+     */
     private val noteEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactNoteEditText)
     }
 
+    /**
+     * Lazy initialized EditText which contains all edit texts
+     */
     private val container: ViewGroup by lazy {
         findViewById<ViewGroup>(R.id.editContactDataLayout)
     }
 
+    /**
+     * Base initialization of fields and callbacks. Here will be added callback to
+     * floating action button and called {@link #refillData}.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
-
-        Log.i(TAG, "Row id: $rowId; User id: $userId")
 
         findViewById<FloatingActionButton>(R.id.editContactSaveButton).setOnClickListener {
             view ->
@@ -108,6 +158,15 @@ class EditContactActivity : BaseActivity() {
         refillData()
     }
 
+    /**
+     * Init save data from form into server and local database. Check form data, send to server,
+     * resync contact data and refill form. Will be recalled if need authorization. If will
+     * be called more than {@link #reloginTryes} times - think that user have no permissions
+     * to edit this contact
+     *
+     * @param view View to show snackbar
+     * @param count Count of tryes, analog of ttl in network
+     */
     private fun saveData(view: View, count: Int = 0) {
         formDataToUserInfo() ?.also {
             if (count == 0) {
@@ -246,6 +305,9 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * @return true if form is correct and data can be saved, false otherwise
+     */
     private fun isCorrect(): Boolean {
         return emailEditText.let {
             (isEmpty(it.text) || isEmail(it.text)).also {
@@ -262,6 +324,11 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * @return Filled object from form or null if form is incorrect
+     *
+     * @see EditContactActivity.isCorrect
+     */
     private fun formDataToUserInfo(): MutableInternalXWikiUserInfo? {
         return if (isCorrect()) {
             splittedUserId ?.let {
@@ -285,6 +352,9 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Update form data from database and enable container
+     */
     private fun refillData() {
         getUserInfo(
             contentResolver,
@@ -325,6 +395,9 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Disable all possible to add data (prohibit input)
+     */
     private fun disableContainer() {
         launch (UI) {
             container.isEnabled = false
@@ -334,6 +407,9 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Enable all possible to add data (permit input)
+     */
     private fun enableContainer() {
         launch (UI) {
             container.isEnabled = true
