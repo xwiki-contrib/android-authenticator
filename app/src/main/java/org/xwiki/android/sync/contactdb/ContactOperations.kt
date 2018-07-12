@@ -296,6 +296,27 @@ fun getContactUserId(
     }
 }
 
+fun getContactAccountName(
+    resolver: ContentResolver,
+    rowId: Long
+): String? {
+    return resolver.query(
+        ContactsContract.RawContacts.CONTENT_URI,
+        arrayOf(ContactsContract.RawContacts.ACCOUNT_NAME),
+        "${ContactsContract.Data._ID}=?",
+        arrayOf(
+            rowId.toString()
+        ),
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getString(ContactsContract.RawContacts.ACCOUNT_NAME)
+        } else {
+            null
+        }
+    }
+}
+
 private val userDatabaseInfoHelpers = listOf<MutableInternalXWikiUserInfo.(c: Cursor, mimetype: String) -> Unit>(
     {
         c, mimetype ->

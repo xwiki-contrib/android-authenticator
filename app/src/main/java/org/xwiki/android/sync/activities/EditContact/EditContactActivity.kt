@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.view.get
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import okhttp3.ResponseBody
@@ -13,11 +16,11 @@ import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
-import org.xwiki.android.sync.contactdb.getContactRowId
-import org.xwiki.android.sync.contactdb.getContactUserId
-import org.xwiki.android.sync.contactdb.getUserInfo
+import org.xwiki.android.sync.contactdb.*
+import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.StringUtils.*
 import org.xwiki.android.sync.utils.extensions.TAG
+import org.xwiki.android.sync.utils.extensions.unauthorized
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -45,6 +48,15 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
+    private val accountName: String? by lazy {
+        rowId ?.let {
+            getContactAccountName(
+                contentResolver,
+                it
+            )
+        }
+    }
+
     private val splittedUserId: Array<String>? by lazy {
         userId ?.let {
             XWikiUserFull.splitId(it)
@@ -65,12 +77,6 @@ class EditContactActivity : BaseActivity() {
         findViewById<EditText>(R.id.editContactEmailEditText)
     }
 
-    private val countryEditText: EditText by lazy {
-        findViewById<EditText>(R.id.editContactCountryEditText)
-    }
-    private val cityEditText: EditText by lazy {
-        findViewById<EditText>(R.id.editContactCityEditText)
-    }
     private val addressEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactAddressEditText)
     }
@@ -82,6 +88,10 @@ class EditContactActivity : BaseActivity() {
         findViewById<EditText>(R.id.editContactNoteEditText)
     }
 
+    private val container: ViewGroup by lazy {
+        findViewById<ViewGroup>(R.id.editContactDataLayout)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
@@ -90,45 +100,135 @@ class EditContactActivity : BaseActivity() {
 
         findViewById<FloatingActionButton>(R.id.editContactSaveButton).setOnClickListener {
             view ->
-            formDataToUserInfo() ?.also {
-                Snackbar.make(view, getString(R.string.pleaseWait), Snackbar.LENGTH_INDEFINITE).show()
-
-                AppContext.getApiManager().xwikiServicesApi.updateUser(
-                    it.wiki,
-                    it.space,
-                    it.pageName,
-                    it.firstName,
-                    it.lastName,
-                    it.email,
-                    it.phone,
-                    it.country,
-                    it.city,
-                    it.address,
-                    it.company,
-                    it.comment
-                ).observeOn(
-                    AndroidSchedulers.mainThread()
-                ).subscribeOn(
-                    Schedulers.newThread()
-                ).subscribe(
-                    object : Observer<ResponseBody> {
-                        override fun onError(e: Throwable?) {
-                            Snackbar.make(view, e?.message ?: "Something went wrong", Snackbar.LENGTH_LONG).show()
-                        }
-
-                        override fun onNext(t: ResponseBody?) {
-                            Snackbar.make(view, "Success", Snackbar.LENGTH_SHORT).show()
-                        }
-
-                        override fun onCompleted() {}
-                    }
-                )
-            } ?:also {
-                Snackbar.make(view, getString(R.string.checkErrors), Snackbar.LENGTH_SHORT).show()
-            }
+            saveData(view)
         }
 
         refillData()
+    }
+
+    private fun saveData(view: View) {
+        formDataToUserInfo() ?.also {
+            Snackbar.make(view, getString(R.string.pleaseWait), Snackbar.LENGTH_INDEFINITE).show()
+            disableContainer()
+
+            AppContext.getApiManager().xwikiServicesApi.updateUser(
+                it.wiki,
+                it.space,
+                it.pageName,
+                it.firstName,
+                it.lastName,
+                it.email,
+                it.phone,
+                it.address,
+                it.company,
+                it.comment
+            ).observeOn(
+                AndroidSchedulers.mainThread()
+            ).subscribeOn(
+                Schedulers.newThread()
+            ).subscribe(
+                object : Observer<ResponseBody> {
+                    override fun onError(e: Throwable?) {
+                        if (e ?. unauthorized == true) {
+                            XWikiHttp.relogin(
+                                this@EditContactActivity,
+                                accountName
+                            ) ?.subscribe {
+                                saveData(view)
+                            }
+                        } else {
+                            Snackbar.make(
+                                view,
+                                e?.message ?: getString(R.string.somethingWentWrong),
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    override fun onNext(t: ResponseBody?) {
+                        Snackbar.make(
+                            view,
+                            getString(R.string.success),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    override fun onCompleted() {
+                        Snackbar.make(
+                            view,
+                            getString(R.string.syncContactInfoWithServer),
+                            Snackbar.LENGTH_INDEFINITE
+                        ).show()
+
+                        AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
+                            it.wiki,
+                            it.space,
+                            it.pageName
+                        ).subscribeOn(
+                            Schedulers.newThread()
+                        ).subscribe(
+                            object : Observer<XWikiUserFull> {
+                                private var synchronized: Boolean = false
+                                override fun onError(e: Throwable?) {
+                                    Snackbar.make(
+                                        view,
+                                        getString(R.string.cantSyncContact),
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+
+                                    finish()
+                                }
+
+                                override fun onNext(t: XWikiUserFull?) {
+                                    synchronized = t ?.let {
+                                        user ->
+                                        accountName ?.let {
+                                            val batchOperation = BatchOperation(
+                                                contentResolver
+                                            )
+                                            user.toContentProviderOperations(
+                                                contentResolver,
+                                                it
+                                            ).forEach {
+                                                batchOperation.add(it)
+                                            }
+                                            batchOperation.execute()
+                                            true
+                                        }
+                                    } ?:let {
+                                        false
+                                    }
+                                }
+
+                                override fun onCompleted() {
+                                    launch (UI) {
+                                        if (synchronized) {
+                                            Snackbar.make(
+                                                view,
+                                                getString(R.string.success),
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+
+                                            refillData()
+                                        } else {
+                                            Snackbar.make(
+                                                view,
+                                                getString(R.string.cantSyncContact),
+                                                Snackbar.LENGTH_LONG
+                                            ).show()
+
+                                            finish()
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            )
+        } ?:also {
+            Snackbar.make(view, getString(R.string.checkErrors), Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     private fun isCorrect(): Boolean {
@@ -158,8 +258,8 @@ class EditContactActivity : BaseActivity() {
                     lastNameEditText.text.toString(),
                     phoneEditText.text.toString(),
                     emailEditText.text.toString(),
-                    countryEditText.text.toString(),
-                    cityEditText.text.toString(),
+                    null,
+                    null,
                     addressEditText.text.toString(),
                     companyEditText.text.toString(),
                     noteEditText.text.toString()
@@ -193,14 +293,6 @@ class EditContactActivity : BaseActivity() {
                     clear()
                     insert(0, it.email ?: "")
                 }
-                countryEditText.text.apply {
-                    clear()
-                    insert(0, it.country ?: "")
-                }
-                cityEditText.text.apply {
-                    clear()
-                    insert(0, it.city ?: "")
-                }
                 addressEditText.text.apply {
                     clear()
                     insert(0, it.address ?: "")
@@ -213,6 +305,25 @@ class EditContactActivity : BaseActivity() {
                     clear()
                     insert(0, it.comment ?: "")
                 }
+                enableContainer()
+            }
+        }
+    }
+
+    private fun disableContainer() {
+        launch (UI) {
+            container.isEnabled = false
+            (0 until container.childCount).forEach {
+                container[it].isEnabled = false
+            }
+        }
+    }
+
+    private fun enableContainer() {
+        launch (UI) {
+            container.isEnabled = true
+            (0 until container.childCount).forEach {
+                container[it].isEnabled = true
             }
         }
     }

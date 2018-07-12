@@ -99,6 +99,10 @@
     <string name="wrongPhone">Phone must look like "+123-(456)-789"</string>
     <string name="checkErrors">Check errors</string>
     <string name="edit">Edit</string>
+    <string name="somethingWentWrong">Something went wrong</string>
+    <string name="success">Success</string>
+    <string name="syncContactInfoWithServer">Sync contact info with server</string>
+    <string name="cantSyncContact">Can\'t sync contact data. It will be synchronized by system</string>
 
 
     <!--select setting-->
