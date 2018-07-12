@@ -59,7 +59,7 @@
     <string name="account_name">Account Name</string>
     <string name="cancel">Cancel</string>
     <string name="grant_permission_button">Authorize</string>
-    <string name="defaultServerUrl" translatable="false">http://www.xwiki.org/xwiki</string>
+    <string name="defaultServerUrl" translatable="false">https://www.xwiki.org/xwiki</string>
     <string name="login_sub_head">Login to your XWiki Instance.</string>
     <string name="learn_more_dialog">Learn More</string>
     <string name="log_in" translatable="false">@string/logIn</string>
@@ -87,9 +87,7 @@
     <string name="askToGrantPermissions">Please grant the permission in the app settings</string>
     <string name="signUpOfferMessage">Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps</string>
     <string name="userName">User name</string>
-    <string name="userPlaces">User places</string>
     <string name="country">Country</string>
-    <string name="city">City</string>
     <string name="address">Address</string>
     <string name="userContactInfo">User contact info</string>
     <string name="additionalInfo">Additional info</string>
@@ -98,7 +96,6 @@
     <string name="wrongEmail">Email must look like "it-is@email-example.proof"</string>
     <string name="wrongPhone">Phone must look like "+123-(456)-789"</string>
     <string name="checkErrors">Check errors</string>
-    <string name="edit">Edit</string>
     <string name="somethingWentWrong">Something went wrong</string>
     <string name="success">Success</string>
     <string name="syncContactInfoWithServer">Sync contact info with server</string>
