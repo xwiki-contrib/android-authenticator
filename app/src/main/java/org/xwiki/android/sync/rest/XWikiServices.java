@@ -23,14 +23,11 @@ import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer;
-import org.xwiki.android.sync.bean.UserPayload;
 import org.xwiki.android.sync.bean.XWikiGroup;
-import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
-import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -79,41 +76,6 @@ public interface XWikiServices {
     @GET(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/query?q=object:XWiki.XWikiGroups")
     Observable<CustomSearchResultContainer<XWikiGroup>> availableGroups(
             @Query("number") Integer number
-    );
-
-    /**
-     * @since 0.4
-     */
-    @GET(
-            ApiEndPoints.REST +
-                    ApiEndPoints.WIKIS +
-                    "/{wiki}/" +
-                    ApiEndPoints.SPACES +
-                    "/{space}/" +
-                    ApiEndPoints.PAGES +
-                    "/{name}"
-    )
-    Observable<XWikiUser> getUserDetails(
-            @Path("wiki") String wiki,
-            @Path("space") String space,
-            @Path("name") String name
-    );
-
-    /**
-     * @since 0.4
-     */
-    @GET(
-            ApiEndPoints.REST +
-                    ApiEndPoints.WIKIS +
-                    "/xwiki/" +
-                    ApiEndPoints.SPACES +
-                    "/{space}/" +
-                    ApiEndPoints.PAGES +
-                    "/{name}"
-    )
-    Observable<XWikiUser> getUserDetails(
-            @Path("space") String space,
-            @Path("name") String name
     );
 
     /**

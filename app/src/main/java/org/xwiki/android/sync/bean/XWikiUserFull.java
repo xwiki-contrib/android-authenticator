@@ -19,11 +19,16 @@
  */
 package org.xwiki.android.sync.bean;
 
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.rest.ApiEndPoints;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class XWikiUserFull {
     public String id;
@@ -181,5 +186,56 @@ public class XWikiUserFull {
         properties.add(
             property
         );
+    }
+
+    /**
+     * @return Converted present of "{@link #wiki}:{@link #space}.{@link #pageName}" which have
+     * backward compatibility with {@link #splitId(String)}
+     */
+    public String convertId() {
+        return String.format(
+            "%s:%s.%s",
+            wiki,
+            space,
+            pageName
+        );
+    }
+
+    /**
+     * id(curriki:XWiki.Luisafan)->[wiki,space,pageName]
+     *
+     * @param id
+     * @return 0:wiki 1:space 2:pageName
+     */
+    @Nullable
+    public static String[] splitId(String id) {
+        if (TextUtils.isEmpty(id)) {
+            return null;
+        }
+        String wiki = null;
+        String space = null;
+        String pageName = null;
+        if (id.contains(":")) {
+            String[] splittedWithWiki = id.split(":");
+            wiki = splittedWithWiki[0];
+            String[] spaceAndPageName = splittedWithWiki[1].split("\\.");
+            space = spaceAndPageName[0];
+            pageName = spaceAndPageName[1];
+        } else {
+            String[] spaceAndPageName = id.split("\\.");
+            space = spaceAndPageName[0];
+            pageName = spaceAndPageName[1];
+        }
+        return new String[]{wiki, space, pageName};
+    }
+
+    @Nullable
+    public static Map.Entry<String, String> spaceAndPage(String id) {
+        String[] splitted = splitId(id);
+        if (splitted != null) {
+            return new AbstractMap.SimpleEntry<>(splitted[1], splitted[2]);
+        } else {
+            return null;
+        }
     }
 }

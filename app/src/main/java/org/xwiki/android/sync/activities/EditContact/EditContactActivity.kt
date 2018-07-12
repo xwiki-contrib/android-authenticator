@@ -9,6 +9,10 @@ import okhttp3.ResponseBody
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
+import org.xwiki.android.sync.bean.InternalXWikiUserInfo
+import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.contactdb.getContactRowId
+import org.xwiki.android.sync.contactdb.getContactUserId
 import org.xwiki.android.sync.utils.StringUtils.*
 import org.xwiki.android.sync.utils.extensions.TAG
 import rx.Observer
@@ -22,10 +26,27 @@ import rx.schedulers.Schedulers
  */
 class EditContactActivity : BaseActivity() {
 
-    private val rowId: Long
-        get() {
-            return intent.data.pathSegments.last().toLong()
+    private val rowId: Long? by lazy {
+        getContactRowId(
+            contentResolver,
+            intent.data
+        )
+    }
+
+    private val userId: String? by lazy {
+        rowId ?.let {
+            getContactUserId(
+                contentResolver,
+                it
+            )
         }
+    }
+
+    private val splittedUserId: Array<String>? by lazy {
+        userId ?.let {
+            XWikiUserFull.splitId(it)
+        }
+    }
 
     private val firstNameEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactFirstNameEditText)
@@ -62,26 +83,26 @@ class EditContactActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
 
-        Log.i(TAG, "Row id: $rowId")
+        Log.i(TAG, "Row id: $rowId; User id: $userId")
 
         findViewById<FloatingActionButton>(R.id.editContactSaveButton).setOnClickListener {
             view ->
-            if (isCorrect()) {
+            formDataToUserInfo() ?.also {
                 Snackbar.make(view, getString(R.string.pleaseWait), Snackbar.LENGTH_INDEFINITE).show()
 
                 AppContext.getApiManager().xwikiServicesApi.updateUser(
-                    "",
-                    "",
-                    "",
-                    nonEmptyOrNull(firstNameEditText.text),
-                    nonEmptyOrNull(lastNameEditText.text),
-                    nonEmptyOrNull(emailEditText.text),
-                    nonEmptyOrNull(phoneEditText.text),
-                    nonEmptyOrNull(countryEditText.text),
-                    nonEmptyOrNull(cityEditText.text),
-                    nonEmptyOrNull(addressEditText.text),
-                    nonEmptyOrNull(companyEditText.text),
-                    nonEmptyOrNull(noteEditText.text)
+                    it.wiki,
+                    it.space,
+                    it.pageName,
+                    it.firstName,
+                    it.lastName,
+                    it.email,
+                    it.phone,
+                    it.country,
+                    it.city,
+                    it.address,
+                    it.company,
+                    it.comment
                 ).observeOn(
                     AndroidSchedulers.mainThread()
                 ).subscribeOn(
@@ -99,8 +120,7 @@ class EditContactActivity : BaseActivity() {
                         override fun onCompleted() {}
                     }
                 )
-
-            } else {
+            } ?:also {
                 Snackbar.make(view, getString(R.string.checkErrors), Snackbar.LENGTH_SHORT).show()
             }
         }
@@ -119,6 +139,29 @@ class EditContactActivity : BaseActivity() {
                     phoneEditText.error = getString(R.string.wrongPhone)
                 }
             }
+        }
+    }
+
+    private fun formDataToUserInfo(): InternalXWikiUserInfo? {
+        return if (isCorrect()) {
+            splittedUserId ?.let {
+                InternalXWikiUserInfo(
+                    it[0],
+                    it[1],
+                    it[2],
+                    nonEmptyOrNull(firstNameEditText.text),
+                    nonEmptyOrNull(lastNameEditText.text),
+                    nonEmptyOrNull(phoneEditText.text),
+                    nonEmptyOrNull(emailEditText.text),
+                    nonEmptyOrNull(countryEditText.text),
+                    nonEmptyOrNull(cityEditText.text),
+                    nonEmptyOrNull(addressEditText.text),
+                    nonEmptyOrNull(companyEditText.text),
+                    nonEmptyOrNull(noteEditText.text)
+                )
+            }
+        } else {
+            null
         }
     }
 }

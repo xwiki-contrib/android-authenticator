@@ -8,6 +8,7 @@ import android.provider.ContactsContract
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
+import android.net.Uri
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 
@@ -17,12 +18,17 @@ import org.xwiki.android.sync.R
  *
  * @since 0.5
  */
-private const val editContactMimeType = "vnd.android.cursor.item/vnd.xwikiedit.profile"
+private const val EDIT_CONTACT_MIME_TYPE = "vnd.android.cursor.item/vnd.xwikiedit.profile"
+
+/**
+ * Field which will contains user id
+ */
+private const val EDIT_CONTACT_USER_ID_FIELD = ContactsContract.Data.DATA1
 
 /**
  * Field which will contains text for edit contact button
  */
-private val EDIT_CONTACT_TEXT_FIELD = ContactsContract.Data.DATA3
+private const val EDIT_CONTACT_TEXT_FIELD = ContactsContract.Data.DATA3
 
 /**
  * When we first add a sync adapter to the system, the contacts from that
@@ -228,15 +234,63 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
         rowId ->
         createContentProviderOperation(
             rowId,
-            editContactMimeType,
+            EDIT_CONTACT_MIME_TYPE,
             mapOf(
-                ContactsContract.Data.DATA1 to id,
-                ContactsContract.Data.DATA2 to "Summary",
+                EDIT_CONTACT_USER_ID_FIELD to convertId(),
                 EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance().getString(R.string.edit)
             )
         )
     }
 )
+
+fun getContactRowId(
+    resolver: ContentResolver,
+    from: Uri
+): Long? {
+    return resolver.query(
+        from,
+        arrayOf(ContactsContract.Contacts.Data.RAW_CONTACT_ID),
+        null,
+        null,
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getLong(
+                it.getColumnIndex(
+                    ContactsContract.Contacts.Data.RAW_CONTACT_ID
+                )
+            )
+        } else {
+            null
+        }
+    }
+}
+
+fun getContactUserId(
+    resolver: ContentResolver,
+    rowId: Long
+): String? {
+    return resolver.query(
+        ContactsContract.Data.CONTENT_URI,
+        arrayOf(EDIT_CONTACT_USER_ID_FIELD),
+        "${ContactsContract.Data.RAW_CONTACT_ID}=? AND ${ContactsContract.Data.MIMETYPE}=?",
+        arrayOf(
+            rowId.toString(),
+            EDIT_CONTACT_MIME_TYPE
+        ),
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getString(
+                it.getColumnIndex(
+                    EDIT_CONTACT_USER_ID_FIELD
+                )
+            )
+        } else {
+            null
+        }
+    }
+}
 
 /**
  * Will create contact or update existing using context user

@@ -26,20 +26,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.xmlpull.v1.XmlPullParserException;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.ObjectSummary;
-import org.xwiki.android.sync.bean.SearchResult;
-import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
-import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -256,7 +251,7 @@ public class XWikiHttp {
             if (subject.getThrowable() != null) {
                 return;
             }
-            String[] split = XWikiUser.splitId(groupId);
+            String[] split = XWikiUserFull.splitId(groupId);
             if (split == null) {
                 IOException exception = new IOException(TAG + ",in getSyncGroups, groupId error");
                 subject.onError(exception);
@@ -317,7 +312,7 @@ public class XWikiHttp {
             final ObjectSummary summary = queueOfSummaries.poll();
 
             try {
-                Map.Entry<String, String> spaceAndName = XWikiUser.spaceAndPage(summary.headline);
+                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.headline);
                 if (spaceAndName == null) {
                     continue;
                 }
