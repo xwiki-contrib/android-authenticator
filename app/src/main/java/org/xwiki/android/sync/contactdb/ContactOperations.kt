@@ -8,7 +8,21 @@ import android.provider.ContactsContract
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
+import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.R
 
+/**
+ * Mime type for insert in database to let android OS know which filter must be activated
+ * for editing contact of XWiki account
+ *
+ * @since 0.5
+ */
+private const val editContactMimeType = "vnd.android.cursor.item/vnd.xwikiedit.profile"
+
+/**
+ * Field which will contains text for edit contact button
+ */
+private val EDIT_CONTACT_TEXT_FIELD = ContactsContract.Data.DATA3
 
 /**
  * When we first add a sync adapter to the system, the contacts from that
@@ -207,6 +221,18 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE,
             mapOf(
                 ContactsContract.CommonDataKinds.Note.NOTE to comment
+            )
+        )
+    },
+    {
+        rowId ->
+        createContentProviderOperation(
+            rowId,
+            editContactMimeType,
+            mapOf(
+                ContactsContract.Data.DATA1 to id,
+                ContactsContract.Data.DATA2 to "Summary",
+                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance().getString(R.string.edit)
             )
         )
     }

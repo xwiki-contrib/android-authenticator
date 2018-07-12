@@ -47,7 +47,16 @@
             android:label="@string/title_activity_authorize">
         </activity>
         <activity
-            android:name=".activities.EditContact.EditContactActivity" />
+            android:name=".activities.EditContact.EditContactActivity"
+            android:noHistory="true"
+            android:excludeFromRecents="true">
+
+            <intent-filter>
+                <data android:mimeType="vnd.android.cursor.item/vnd.xwikiedit.profile" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name=".syncadapter.EmptyProvider"

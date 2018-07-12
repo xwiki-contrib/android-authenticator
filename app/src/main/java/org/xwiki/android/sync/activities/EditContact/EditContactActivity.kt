@@ -3,12 +3,14 @@ package org.xwiki.android.sync.activities.EditContact
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
+import android.util.Log
 import android.widget.EditText
 import okhttp3.ResponseBody
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.utils.StringUtils.*
+import org.xwiki.android.sync.utils.extensions.TAG
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -19,6 +21,11 @@ import rx.schedulers.Schedulers
  * @version: $Id$
  */
 class EditContactActivity : BaseActivity() {
+
+    private val rowId: Long
+        get() {
+            return intent.data.pathSegments.last().toLong()
+        }
 
     private val firstNameEditText: EditText by lazy {
         findViewById<EditText>(R.id.editContactFirstNameEditText)
@@ -54,6 +61,8 @@ class EditContactActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
+
+        Log.i(TAG, "Row id: $rowId")
 
         findViewById<FloatingActionButton>(R.id.editContactSaveButton).setOnClickListener {
             view ->
