@@ -5,14 +5,17 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.util.Log
 import android.widget.EditText
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import okhttp3.ResponseBody
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
-import org.xwiki.android.sync.bean.InternalXWikiUserInfo
+import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.getContactRowId
 import org.xwiki.android.sync.contactdb.getContactUserId
+import org.xwiki.android.sync.contactdb.getUserInfo
 import org.xwiki.android.sync.utils.StringUtils.*
 import org.xwiki.android.sync.utils.extensions.TAG
 import rx.Observer
@@ -124,6 +127,8 @@ class EditContactActivity : BaseActivity() {
                 Snackbar.make(view, getString(R.string.checkErrors), Snackbar.LENGTH_SHORT).show()
             }
         }
+
+        refillData()
     }
 
     private fun isCorrect(): Boolean {
@@ -142,26 +147,73 @@ class EditContactActivity : BaseActivity() {
         }
     }
 
-    private fun formDataToUserInfo(): InternalXWikiUserInfo? {
+    private fun formDataToUserInfo(): MutableInternalXWikiUserInfo? {
         return if (isCorrect()) {
             splittedUserId ?.let {
-                InternalXWikiUserInfo(
+                MutableInternalXWikiUserInfo(
                     it[0],
                     it[1],
                     it[2],
-                    nonEmptyOrNull(firstNameEditText.text),
-                    nonEmptyOrNull(lastNameEditText.text),
-                    nonEmptyOrNull(phoneEditText.text),
-                    nonEmptyOrNull(emailEditText.text),
-                    nonEmptyOrNull(countryEditText.text),
-                    nonEmptyOrNull(cityEditText.text),
-                    nonEmptyOrNull(addressEditText.text),
-                    nonEmptyOrNull(companyEditText.text),
-                    nonEmptyOrNull(noteEditText.text)
+                    firstNameEditText.text.toString(),
+                    lastNameEditText.text.toString(),
+                    phoneEditText.text.toString(),
+                    emailEditText.text.toString(),
+                    countryEditText.text.toString(),
+                    cityEditText.text.toString(),
+                    addressEditText.text.toString(),
+                    companyEditText.text.toString(),
+                    noteEditText.text.toString()
                 )
             }
         } else {
             null
+        }
+    }
+
+    private fun refillData() {
+        getUserInfo(
+            contentResolver,
+            rowId ?: return,
+            splittedUserId ?: return
+        ).also {
+            launch (UI) {
+                firstNameEditText.text.apply {
+                    clear()
+                    insert(0, it.firstName ?: "")
+                }
+                lastNameEditText.text.apply {
+                    clear()
+                    insert(0, it.lastName ?: "")
+                }
+                phoneEditText.text.apply {
+                    clear()
+                    insert(0, it.phone ?: "")
+                }
+                emailEditText.text.apply {
+                    clear()
+                    insert(0, it.email ?: "")
+                }
+                countryEditText.text.apply {
+                    clear()
+                    insert(0, it.country ?: "")
+                }
+                cityEditText.text.apply {
+                    clear()
+                    insert(0, it.city ?: "")
+                }
+                addressEditText.text.apply {
+                    clear()
+                    insert(0, it.address ?: "")
+                }
+                companyEditText.text.apply {
+                    clear()
+                    insert(0, it.company ?: "")
+                }
+                noteEditText.text.apply {
+                    clear()
+                    insert(0, it.comment ?: "")
+                }
+            }
         }
     }
 }

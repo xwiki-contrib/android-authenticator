@@ -8,9 +8,13 @@ import android.provider.ContactsContract
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
+import android.database.Cursor
 import android.net.Uri
+import androidx.core.database.getString
+import androidx.core.database.getStringOrNull
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 
 /**
  * Mime type for insert in database to let android OS know which filter must be activated
@@ -291,6 +295,83 @@ fun getContactUserId(
         }
     }
 }
+
+private val userDatabaseInfoHelpers = listOf<MutableInternalXWikiUserInfo.(c: Cursor, mimetype: String) -> Unit>(
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE) {
+            firstName = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+            lastName = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE) {
+            country = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY)
+            city = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.CITY)
+            address = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.STREET)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+            phone = c.getStringOrNull(ContactsContract.CommonDataKinds.Phone.NUMBER)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE) {
+            email = c.getStringOrNull(ContactsContract.CommonDataKinds.Email.ADDRESS)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE) {
+            company = c.getStringOrNull(ContactsContract.CommonDataKinds.Organization.COMPANY)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE) {
+            comment = c.getStringOrNull(ContactsContract.CommonDataKinds.Note.NOTE)
+        }
+    }
+)
+
+fun getUserInfo(
+    resolver: ContentResolver,
+    rowId: Long,
+    splittedId: Array<String>
+): MutableInternalXWikiUserInfo {
+    val result = MutableInternalXWikiUserInfo(
+        splittedId[0],
+        splittedId[1],
+        splittedId[2]
+    )
+
+    resolver.query(
+        ContactsContract.Data.CONTENT_URI,
+        null,
+        "${ContactsContract.Data.RAW_CONTACT_ID}=?",
+        arrayOf(rowId.toString()),
+        null
+    ).use {
+        c ->
+        while (c.moveToNext()) {
+            val mimeType = c.getString(ContactsContract.Data.MIMETYPE)
+            userDatabaseInfoHelpers.forEach {
+                result.it(
+                    c,
+                    mimeType
+                )
+            }
+        }
+    }
+
+    return result
+}
+
+
 
 /**
  * Will create contact or update existing using context user
