@@ -25,6 +25,8 @@ import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
+private const val reloginTryes = 3
+
 /**
  * Activity for work with editing of contact
  *
@@ -106,9 +108,22 @@ class EditContactActivity : BaseActivity() {
         refillData()
     }
 
-    private fun saveData(view: View) {
+    private fun saveData(view: View, count: Int = 0) {
         formDataToUserInfo() ?.also {
-            Snackbar.make(view, getString(R.string.pleaseWait), Snackbar.LENGTH_INDEFINITE).show()
+            if (count == 0) {
+                Snackbar.make(view, getString(R.string.pleaseWait), Snackbar.LENGTH_INDEFINITE).show()
+            } else {
+                if (count >= reloginTryes) {
+                    Snackbar.make(
+                        view,
+                        getString(R.string.prohibitedAction),
+                        Snackbar.LENGTH_LONG
+                    ).show()
+
+                    enableContainer()
+                    return
+                }
+            }
             disableContainer()
 
             AppContext.getApiManager().xwikiServicesApi.updateUser(
@@ -134,7 +149,7 @@ class EditContactActivity : BaseActivity() {
                                 this@EditContactActivity,
                                 accountName
                             ) ?.subscribe {
-                                saveData(view)
+                                saveData(view, count + 1)
                             }
                         } else {
                             Snackbar.make(

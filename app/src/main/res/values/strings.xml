@@ -103,6 +103,7 @@
     <string name="success">Success</string>
     <string name="syncContactInfoWithServer">Sync contact info with server</string>
     <string name="cantSyncContact">Can\'t sync contact data. It will be synchronized by system</string>
+    <string name="prohibitedAction">Check, that you have necessary permissions</string>
 
 
     <!--select setting-->
