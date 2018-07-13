@@ -3,15 +3,12 @@ package org.xwiki.android.sync.activities.EditContact
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
 import androidx.core.view.get
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import okhttp3.ResponseBody
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -20,7 +17,6 @@ import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.StringUtils.*
-import org.xwiki.android.sync.utils.extensions.TAG
 import org.xwiki.android.sync.utils.extensions.unauthorized
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -203,8 +199,6 @@ class EditContactActivity : BaseActivity() {
                 Schedulers.newThread()
             ).subscribe(
                 object : Observer<XWikiUserFull> {
-                    private var synchronized: Boolean = false
-
                     override fun onError(e: Throwable?) {
                         if (e ?. unauthorized == true) {
                             XWikiHttp.relogin(
@@ -228,28 +222,11 @@ class EditContactActivity : BaseActivity() {
                             getString(R.string.success),
                             Snackbar.LENGTH_SHORT
                         ).show()
-                        synchronized = t ?.let {
+                        t ?.also {
                             user ->
-                            rowId ?.let {
-                                val batchOperation = BatchOperation(
-                                    contentResolver
-                                )
-                                user.toContentProviderOperations(
-                                    it
-                                ).forEach {
-                                    batchOperation.add(it)
-                                }
-                                batchOperation.execute()
-                                true
-                            }
-                        } ?:let {
-                            false
-                        }
-                    }
+                            updateUserInDatabase(user)
 
-                    override fun onCompleted() {
-                        launch (UI) {
-                            if (synchronized) {
+                            launch (UI) {
                                 Snackbar.make(
                                     view,
                                     getString(R.string.success),
@@ -257,11 +234,13 @@ class EditContactActivity : BaseActivity() {
                                 ).show()
 
                                 refillData()
-                            } else {
-                                onError(IllegalStateException(getString(R.string.somethingWentWrong)))
                             }
+                        } ?:also {
+                            manuallyUpdateUserInfo(view)
                         }
                     }
+
+                    override fun onCompleted() {}
                 }
             )
         } ?:also {
@@ -380,6 +359,81 @@ class EditContactActivity : BaseActivity() {
             (0 until container.childCount).forEach {
                 container[it].isEnabled = true
             }
+        }
+    }
+
+    /**
+     * Update user info in database using user
+     *
+     * @param user Will be used as data source for updating
+     */
+    private fun updateUserInDatabase(user: XWikiUserFull) {
+        rowId ?.also {
+            val batchOperation = BatchOperation(
+                contentResolver
+            )
+            user.toContentProviderOperations(
+                it
+            ).forEach {
+                batchOperation.add(it)
+            }
+            batchOperation.execute()
+        }
+    }
+
+    /**
+     * Manually get user info from server and update in database
+     *
+     * @see updateUserInDatabase
+     */
+    private fun manuallyUpdateUserInfo(view: View) {
+        launch (UI) {
+            Snackbar.make(
+                view,
+                getString(R.string.syncContactInfoWithServer),
+                Snackbar.LENGTH_INDEFINITE
+            ).show()
+        }
+        splittedUserId ?.let {
+            AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
+                it[0],
+                it[1],
+                it[2]
+            ).subscribeOn(
+                Schedulers.newThread()
+            ).subscribe(
+                object : Observer<XWikiUserFull> {
+                    override fun onError(e: Throwable?) {
+                        launch (UI) {
+                            Snackbar.make(
+                                view,
+                                e ?. message ?: getString(R.string.cantSyncContact),
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    override fun onNext(t: XWikiUserFull?) {
+                        t ?.let {
+                            updateUserInDatabase(it)
+
+                            launch (UI) {
+                                Snackbar.make(
+                                    view,
+                                    getString(R.string.success),
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+
+                                refillData()
+                            }
+                        } ?:let {
+                            onError(null)
+                        }
+                    }
+
+                    override fun onCompleted() {}
+                }
+            )
         }
     }
 }
