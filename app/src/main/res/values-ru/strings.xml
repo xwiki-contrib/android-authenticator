@@ -59,4 +59,22 @@
         <item>Группы пользователей</item>
         <item>Отключено</item>
     </string-array>
+    <string name="editXWikiContactInfo">Редактировать информацию из XWiki</string>
+    <string name="prohibitedAction">Проверьте, что у вас достаточно прав</string>
+    <string name="cantSyncContact">Не могу синхронизировать контакт</string>
+    <string name="syncContactInfoWithServer">Синхронизирую внутренние данные с сервером</string>
+    <string name="success">Удачно</string>
+    <string name="somethingWentWrong">Что-то пошло не так</string>
+    <string name="edit">Редактировать</string>
+    <string name="checkErrors">Проверьте ошибки</string>
+    <string name="wrongPhone">Телефон должен быть похож на +123-(456)-789</string>
+    <string name="wrongEmail">E-Mail должен быть похож на it-is@email-example.proof</string>
+    <string name="note">Заметка</string>
+    <string name="company">Компания</string>
+    <string name="additionalInfo">Дополнительная информация</string>
+    <string name="userContactInfo">Контактная информация</string>
+    <string name="address">Адресс</string>
+    <string name="city">Город</string>
+    <string name="country">Страна</string>
+    <string name="userName">Имя и фамилия</string>
 </resources>

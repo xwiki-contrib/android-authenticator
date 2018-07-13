@@ -29,17 +29,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
-import org.xwiki.android.sync.bean.XWikiUser;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.contactdb.BatchOperation;
 import org.xwiki.android.sync.rest.XWikiHttp;
 
 import java.io.IOException;

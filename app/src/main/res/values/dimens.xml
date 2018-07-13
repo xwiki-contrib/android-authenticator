@@ -15,4 +15,5 @@
 
     <dimen name="logoPadding">@dimen/defaultViewMediumPadding</dimen>
     <dimen name="syncTypeGetListErrorWidth">180dp</dimen>
+    <dimen name="textDefaultLargeSize">22sp</dimen>
 </resources>

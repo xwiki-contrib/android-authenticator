@@ -8,7 +8,36 @@ import android.provider.ContactsContract
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
+import android.database.Cursor
+import android.net.Uri
+import android.util.Log
+import androidx.core.database.getString
+import androidx.core.database.getStringOrNull
+import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.R
+import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 
+/**
+ * Mime type for insert in database to let android OS know which filter must be activated
+ * for editing contact of XWiki account
+ *
+ * @since 0.5
+ */
+private const val EDIT_CONTACT_MIME_TYPE = "vnd.android.cursor.item/vnd.xwikiedit.profile"
+
+/**
+ * Field which will contains user id
+ *
+ * @since 0.5
+ */
+private const val EDIT_CONTACT_USER_ID_FIELD = ContactsContract.Data.DATA1
+
+/**
+ * Field which will contains text for edit contact button
+ *
+ * @since 0.5
+ */
+private const val EDIT_CONTACT_TEXT_FIELD = ContactsContract.Data.DATA3
 
 /**
  * When we first add a sync adapter to the system, the contacts from that
@@ -35,6 +64,9 @@ fun setAccountContactsVisibility(
     resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
 }
 
+/**
+ * Clear all account contacts
+ */
 fun clearOldAccountContacts(
     resolver: ContentResolver,
     account: Account
@@ -209,11 +241,214 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
                 ContactsContract.CommonDataKinds.Note.NOTE to comment
             )
         )
+    },
+    {
+        rowId ->
+        createContentProviderOperation(
+            rowId,
+            EDIT_CONTACT_MIME_TYPE,
+            mapOf(
+                EDIT_CONTACT_USER_ID_FIELD to convertId(),
+                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance().getString(R.string.editXWikiContactInfo)
+            )
+        )
     }
 )
 
 /**
- * Will create contact or update existing using context user
+ * @param resolver Resolver to make the query
+ * @param from Uri which will be used to get info
+ *
+ * @return Row contact id from database if available
+ *
+ * @since 0.5
+ */
+fun getContactRowId(
+    resolver: ContentResolver,
+    from: Uri
+): Long? {
+    return resolver.query(
+        from,
+        arrayOf(ContactsContract.Contacts.Data.RAW_CONTACT_ID),
+        null,
+        null,
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getLong(
+                it.getColumnIndex(
+                    ContactsContract.Contacts.Data.RAW_CONTACT_ID
+                )
+            )
+        } else {
+            null
+        }
+    }
+}
+
+/**
+ * @param resolver Resolver to make the query
+ * @param rowId Id of contact for get info
+ *
+ * @return user id if available
+ *
+ * @see getContactRowId
+ *
+ * @since 0.5
+ */
+fun getContactUserId(
+    resolver: ContentResolver,
+    rowId: Long
+): String? {
+    return resolver.query(
+        ContactsContract.Data.CONTENT_URI,
+        arrayOf(EDIT_CONTACT_USER_ID_FIELD),
+        "${ContactsContract.Data.RAW_CONTACT_ID}=? AND ${ContactsContract.Data.MIMETYPE}=?",
+        arrayOf(
+            rowId.toString(),
+            EDIT_CONTACT_MIME_TYPE
+        ),
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getString(
+                it.getColumnIndex(
+                    EDIT_CONTACT_USER_ID_FIELD
+                )
+            )
+        } else {
+            null
+        }
+    }
+}
+
+/**
+ * @param resolver Resolver to make the query
+ * @param userId Id of user for get info
+ *
+ * @return account name of contact which has create this contact
+ *
+ * @see getContactRowId
+ *
+ * @since 0.5
+ */
+fun getContactAccountName(
+    resolver: ContentResolver,
+    rowId: Long
+): String? {
+    return resolver.query(
+        ContactsContract.RawContacts.CONTENT_URI,
+        arrayOf(ContactsContract.RawContacts.ACCOUNT_NAME),
+        "${ContactsContract.RawContacts._ID}=? AND ${ContactsContract.RawContacts.ACCOUNT_TYPE}=?",
+        arrayOf(
+            rowId.toString(),
+            Constants.ACCOUNT_TYPE
+        ),
+        null
+    ).use {
+        if (it.moveToFirst()) {
+            it.getString(ContactsContract.RawContacts.ACCOUNT_NAME)
+        } else {
+            null
+        }
+    }
+}
+
+/**
+ * Helpers which fill object by info from database
+ *
+ * @since 0.5
+ */
+private val userDatabaseInfoHelpers = listOf<MutableInternalXWikiUserInfo.(c: Cursor, mimetype: String) -> Unit>(
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE) {
+            firstName = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+            lastName = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE) {
+            country = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY)
+            city = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.CITY)
+            address = c.getStringOrNull(ContactsContract.CommonDataKinds.StructuredPostal.STREET)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) {
+            phone = c.getStringOrNull(ContactsContract.CommonDataKinds.Phone.NUMBER)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE) {
+            email = c.getStringOrNull(ContactsContract.CommonDataKinds.Email.ADDRESS)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE) {
+            company = c.getStringOrNull(ContactsContract.CommonDataKinds.Organization.COMPANY)
+        }
+    },
+    {
+        c, mimetype ->
+        if (mimetype == ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE) {
+            comment = c.getStringOrNull(ContactsContract.CommonDataKinds.Note.NOTE)
+        }
+    }
+)
+
+/**
+ * Create and fill object
+ *
+ * @param resolver Resolver to make the query
+ * @param rowId Id of contact for get info
+ * @param splittedId "wiki:space.pageName" splitted example
+ *
+ * @see XWikiUserFull.splitId
+ *
+ * @since 0.5
+ */
+fun getUserInfo(
+    resolver: ContentResolver,
+    rowId: Long,
+    splittedId: Array<String>
+): MutableInternalXWikiUserInfo {
+    val result = MutableInternalXWikiUserInfo(
+        splittedId[0],
+        splittedId[1],
+        splittedId[2]
+    )
+
+    resolver.query(
+        ContactsContract.Data.CONTENT_URI,
+        null,
+        "${ContactsContract.Data.RAW_CONTACT_ID}=?",
+        arrayOf(rowId.toString()),
+        null
+    ).use {
+        c ->
+        while (c.moveToNext()) {
+            val mimeType = c.getString(ContactsContract.Data.MIMETYPE)
+            userDatabaseInfoHelpers.forEach {
+                result.it(
+                    c,
+                    mimeType
+                )
+            }
+        }
+    }
+
+    return result
+}
+
+
+
+/**
+ * Will create contact or update existing contact using context user
  *
  * @since 0.5
  */
@@ -222,7 +457,20 @@ fun XWikiUserFull.toContentProviderOperations(
     accountName: String
 ): List<ContentProviderOperation> {
     val rowId: Long = rowId(resolver, accountName)
-    
+
+    return toContentProviderOperations(
+        rowId
+    )
+}
+
+/**
+ * Will update existing contact using user as context
+ *
+ * @since 0.5
+ */
+fun XWikiUserFull.toContentProviderOperations(
+    rowId: Long
+): List<ContentProviderOperation> {
     return listOf(
         clearOldUserData(rowId),
         *propertiesToContentProvider.map {

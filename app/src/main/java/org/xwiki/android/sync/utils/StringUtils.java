@@ -41,6 +41,15 @@ public class StringUtils {
     );
 
     /**
+     * Phone pattern.
+     *
+     * @since 0.5
+     */
+    private final static Pattern phonePattern = Pattern.compile(
+        "\\+?(([\\d\\-]+)|(\\([\\d\\-]+\\)))+"
+    );
+
+    /**
      * Date format for parse/print dates from/to strings
      *
      * @since 0.4.2
@@ -72,6 +81,22 @@ public class StringUtils {
     }
 
     /**
+     * Make routine with convert empty string to null or return string
+     *
+     * @param input What do we work with
+     * @return input as string if {@link #isEmpty(CharSequence)} is false or null otherwise
+     *
+     * @since 0.5
+     */
+    public static String nonEmptyOrNull(CharSequence input) {
+        if (isEmpty(input)) {
+            return null;
+        } else {
+            return input.toString();
+        }
+    }
+
+    /**
      * Check that input is email.
      *
      * @param input Char sequence which can be email
@@ -79,6 +104,18 @@ public class StringUtils {
      */
     public static boolean isEmail(CharSequence input) {
         return !isEmpty(input) && emailer.matcher(input).matches();
+    }
+
+    /**
+     * Check that input is phone
+     *
+     * @param input Char sequence which can be phone
+     * @return true if not {@link #isEmpty(CharSequence)} and match to {@link #phonePattern}
+     *
+     * @since 0.5
+     */
+    public static boolean isPhone(CharSequence input) {
+        return !isEmpty(input) && phonePattern.matcher(input).matches();
     }
 
     /**

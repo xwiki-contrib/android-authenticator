@@ -86,6 +86,22 @@
     <string name="xwikiAccount">XWiki Account</string>
     <string name="askToGrantPermissions">Please grant the permission in the app settings</string>
     <string name="signUpOfferMessage">Create XWiki Account to enjoy features like synchronization of contacts and provide credentials for other android apps</string>
+    <string name="userName">User name</string>
+    <string name="country">Country</string>
+    <string name="address">Address</string>
+    <string name="userContactInfo">User contact info</string>
+    <string name="additionalInfo">Additional info</string>
+    <string name="company">Company</string>
+    <string name="note">Note</string>
+    <string name="wrongEmail">Email must look like "it-is@email-example.proof"</string>
+    <string name="wrongPhone">Phone must look like "+123-(456)-789"</string>
+    <string name="checkErrors">Check errors</string>
+    <string name="somethingWentWrong">Something went wrong</string>
+    <string name="success">Success</string>
+    <string name="syncContactInfoWithServer">Sync contact info with server</string>
+    <string name="cantSyncContact">Can\'t sync contact data with server. It will be synchronized later by system</string>
+    <string name="prohibitedAction">Check, that you have necessary permissions</string>
+    <string name="editXWikiContactInfo">Edit XWiki contact info</string>
 
 
     <!--select setting-->
