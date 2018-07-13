@@ -202,7 +202,9 @@ class EditContactActivity : BaseActivity() {
             ).subscribeOn(
                 Schedulers.newThread()
             ).subscribe(
-                object : Observer<ResponseBody> {
+                object : Observer<XWikiUserFull> {
+                    private var synchronized: Boolean = false
+
                     override fun onError(e: Throwable?) {
                         if (e ?. unauthorized == true) {
                             XWikiHttp.relogin(
@@ -220,78 +222,45 @@ class EditContactActivity : BaseActivity() {
                         }
                     }
 
-                    override fun onNext(t: ResponseBody?) {
+                    override fun onNext(t: XWikiUserFull?) {
                         Snackbar.make(
                             view,
                             getString(R.string.success),
                             Snackbar.LENGTH_SHORT
                         ).show()
+                        synchronized = t ?.let {
+                            user ->
+                            rowId ?.let {
+                                val batchOperation = BatchOperation(
+                                    contentResolver
+                                )
+                                user.toContentProviderOperations(
+                                    it
+                                ).forEach {
+                                    batchOperation.add(it)
+                                }
+                                batchOperation.execute()
+                                true
+                            }
+                        } ?:let {
+                            false
+                        }
                     }
 
                     override fun onCompleted() {
-                        Snackbar.make(
-                            view,
-                            getString(R.string.syncContactInfoWithServer),
-                            Snackbar.LENGTH_INDEFINITE
-                        ).show()
+                        launch (UI) {
+                            if (synchronized) {
+                                Snackbar.make(
+                                    view,
+                                    getString(R.string.success),
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
 
-                        AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
-                            it.wiki,
-                            it.space,
-                            it.pageName
-                        ).subscribeOn(
-                            Schedulers.newThread()
-                        ).subscribe(
-                            object : Observer<XWikiUserFull> {
-                                private var synchronized: Boolean = false
-                                override fun onError(e: Throwable?) {
-                                    Toast.makeText(
-                                        this@EditContactActivity,
-                                        getString(R.string.cantSyncContact),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-
-                                    finish()
-                                }
-
-                                override fun onNext(t: XWikiUserFull?) {
-                                    synchronized = t ?.let {
-                                        user ->
-                                        accountName ?.let {
-                                            val batchOperation = BatchOperation(
-                                                contentResolver
-                                            )
-                                            user.toContentProviderOperations(
-                                                contentResolver,
-                                                it
-                                            ).forEach {
-                                                batchOperation.add(it)
-                                            }
-                                            batchOperation.execute()
-                                            true
-                                        }
-                                    } ?:let {
-                                        false
-                                    }
-                                }
-
-                                override fun onCompleted() {
-                                    launch (UI) {
-                                        if (synchronized) {
-                                            Snackbar.make(
-                                                view,
-                                                getString(R.string.success),
-                                                Snackbar.LENGTH_SHORT
-                                            ).show()
-
-                                            refillData()
-                                        } else {
-                                            onError(IllegalStateException("Don't synchronized"))
-                                        }
-                                    }
-                                }
+                                refillData()
+                            } else {
+                                onError(IllegalStateException(getString(R.string.somethingWentWrong)))
                             }
-                        )
+                        }
                     }
                 }
             )

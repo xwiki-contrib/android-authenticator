@@ -55,7 +55,7 @@ public interface XWikiServices {
 
     @FormUrlEncoded
     @PUT(ApiEndPoints.REST + ApiEndPoints.WIKIS + "/{wiki}/" + SPACES + "/{space}/" + ApiEndPoints.PAGES + "/{pageName}/" + ApiEndPoints.XWIKI_OBJECTS)
-    Observable<ResponseBody> updateUser(
+    Observable<XWikiUserFull> updateUser(
             @Path("wiki") String wiki,
             @Path("space") String space,
             @Path("pageName") String pageName,

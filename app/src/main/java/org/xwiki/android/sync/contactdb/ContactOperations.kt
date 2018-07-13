@@ -10,6 +10,7 @@ import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 import androidx.core.database.getString
 import androidx.core.database.getStringOrNull
 import org.xwiki.android.sync.AppContext
@@ -323,7 +324,7 @@ fun getContactUserId(
 
 /**
  * @param resolver Resolver to make the query
- * @param rowId Id of contact for get info
+ * @param userId Id of user for get info
  *
  * @return account name of contact which has create this contact
  *
@@ -447,7 +448,7 @@ fun getUserInfo(
 
 
 /**
- * Will create contact or update existing using context user
+ * Will create contact or update existing contact using context user
  *
  * @since 0.5
  */
@@ -456,7 +457,20 @@ fun XWikiUserFull.toContentProviderOperations(
     accountName: String
 ): List<ContentProviderOperation> {
     val rowId: Long = rowId(resolver, accountName)
-    
+
+    return toContentProviderOperations(
+        rowId
+    )
+}
+
+/**
+ * Will update existing contact using user as context
+ *
+ * @since 0.5
+ */
+fun XWikiUserFull.toContentProviderOperations(
+    rowId: Long
+): List<ContentProviderOperation> {
     return listOf(
         clearOldUserData(rowId),
         *propertiesToContentProvider.map {
