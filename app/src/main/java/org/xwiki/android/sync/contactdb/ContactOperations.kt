@@ -338,7 +338,7 @@ fun getContactAccountName(
     return resolver.query(
         ContactsContract.RawContacts.CONTENT_URI,
         arrayOf(ContactsContract.RawContacts.ACCOUNT_NAME),
-        "${ContactsContract.Data._ID}=? AND ${ContactsContract.RawContacts.ACCOUNT_TYPE}=?",
+        "${ContactsContract.RawContacts._ID}=? AND ${ContactsContract.RawContacts.ACCOUNT_TYPE}=?",
         arrayOf(
             rowId.toString(),
             Constants.ACCOUNT_TYPE

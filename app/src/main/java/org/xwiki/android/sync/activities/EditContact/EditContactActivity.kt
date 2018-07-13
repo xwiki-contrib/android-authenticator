@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.core.view.get
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -244,10 +245,10 @@ class EditContactActivity : BaseActivity() {
                             object : Observer<XWikiUserFull> {
                                 private var synchronized: Boolean = false
                                 override fun onError(e: Throwable?) {
-                                    Snackbar.make(
-                                        view,
+                                    Toast.makeText(
+                                        this@EditContactActivity,
                                         getString(R.string.cantSyncContact),
-                                        Snackbar.LENGTH_LONG
+                                        Toast.LENGTH_LONG
                                     ).show()
 
                                     finish()
@@ -285,13 +286,7 @@ class EditContactActivity : BaseActivity() {
 
                                             refillData()
                                         } else {
-                                            Snackbar.make(
-                                                view,
-                                                getString(R.string.cantSyncContact),
-                                                Snackbar.LENGTH_LONG
-                                            ).show()
-
-                                            finish()
+                                            onError(IllegalStateException("Don't synchronized"))
                                         }
                                     }
                                 }
