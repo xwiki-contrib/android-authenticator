@@ -204,8 +204,17 @@ class EditContactActivity : BaseActivity() {
                             XWikiHttp.relogin(
                                 this@EditContactActivity,
                                 accountName
-                            ) ?.subscribe {
-                                saveData(view, count + 1)
+                            ) ?.subscribe(
+                                {
+                                    saveData(view, count + 1)
+                                }
+                            ) {
+                                Snackbar.make(
+                                    view,
+                                    it ?.message ?: getString(R.string.authenticationError),
+                                    Snackbar.LENGTH_LONG
+                                ).show()
+                                enableContainer()
                             }
                         } else {
                             Snackbar.make(
