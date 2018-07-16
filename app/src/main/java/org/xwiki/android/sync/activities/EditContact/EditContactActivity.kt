@@ -198,60 +198,54 @@ class EditContactActivity : BaseActivity() {
             ).subscribeOn(
                 Schedulers.newThread()
             ).subscribe(
-                object : Observer<XWikiUserFull> {
-                    override fun onError(e: Throwable?) {
-                        if (e ?. unauthorized == true) {
-                            XWikiHttp.relogin(
-                                this@EditContactActivity,
-                                accountName
-                            ) ?.subscribe(
-                                {
-                                    saveData(view, count + 1)
-                                }
-                            ) {
-                                Snackbar.make(
-                                    view,
-                                    it ?.message ?: getString(R.string.authenticationError),
-                                    Snackbar.LENGTH_LONG
-                                ).show()
-                                enableContainer()
-                            }
-                        } else {
+                {
+                    Snackbar.make(
+                        view,
+                        getString(R.string.success),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    it ?.also {
+                        user ->
+                        updateUserInDatabase(user)
+
+                        launch (UI) {
                             Snackbar.make(
                                 view,
-                                e?.message ?: getString(R.string.somethingWentWrong),
-                                Snackbar.LENGTH_LONG
+                                getString(R.string.success),
+                                Snackbar.LENGTH_SHORT
                             ).show()
-                        }
-                    }
 
-                    override fun onNext(t: XWikiUserFull?) {
+                            refillData()
+                        }
+                    } ?:also {
+                        manuallyUpdateUserInfo(view)
+                    }
+                }
+            ) {
+                if (it?.unauthorized == true) {
+                    XWikiHttp.relogin(
+                        this@EditContactActivity,
+                        accountName
+                    )?.subscribe(
+                        {
+                            saveData(view, count + 1)
+                        }
+                    ) {
                         Snackbar.make(
                             view,
-                            getString(R.string.success),
-                            Snackbar.LENGTH_SHORT
+                            it?.message ?: getString(R.string.authenticationError),
+                            Snackbar.LENGTH_LONG
                         ).show()
-                        t ?.also {
-                            user ->
-                            updateUserInDatabase(user)
-
-                            launch (UI) {
-                                Snackbar.make(
-                                    view,
-                                    getString(R.string.success),
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
-
-                                refillData()
-                            }
-                        } ?:also {
-                            manuallyUpdateUserInfo(view)
-                        }
+                        enableContainer()
                     }
-
-                    override fun onCompleted() {}
+                } else {
+                    Snackbar.make(
+                        view,
+                        it?.message ?: getString(R.string.somethingWentWrong),
+                        Snackbar.LENGTH_LONG
+                    ).show()
                 }
-            )
+            }
         } ?:also {
             Snackbar.make(view, getString(R.string.checkErrors), Snackbar.LENGTH_SHORT).show()
         }
