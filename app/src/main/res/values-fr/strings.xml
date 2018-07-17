@@ -64,4 +64,32 @@
         <item>Groupes d'utilisateurs</item>
         <item>Désactivé</item>
     </string-array>
+    <string name="userExists">L\'utilisateur existe</string>
+    <string name="serverAddress">Adresse du serveur</string>
+    <string name="synchronizationType">Type de synchronisation</string>
+    <string name="syncTypeGetListErrorMessage">Une erreur s\'est produite lorsque nous avons essayé d\'obtenir la liste du type de synchronisation actuel</string>
+    <string name="tryAgain">"Réessayer "</string>
+    <string name="versionTemplate" formatted="false">Version %s</string>
+    <string name="updateSuccess">Mettre à jour</string>
+    <string name="haveNoPermission">Vous n\'avez aucune permission</string>
+    <string name="authenticationError">Erreur d\'authentification</string>
+    <string name="xwikiAccount">Compte XWiki</string>
+    <string name="askToGrantPermissions">Veuillez accorder l\'autorisation dans les paramètres de l\'application</string>
+    <string name="signUpOfferMessage">Créez un compte XWiki pour profiter de fonctionnalités telles que la synchronisation des contacts et fournir des informations d\'identification pour d\'autres applications Android</string>
+    <string name="userName">Nom d\'utilisateur</string>
+    <string name="country">Pays</string>
+    <string name="address">"Adresse"</string>
+    <string name="userContactInfo">Informations de contact utilisateur</string>
+    <string name="additionalInfo">Information additionnelle</string>
+    <string name="company">Compagnie</string>
+    <string name="note">Remarque</string>
+    <string name="wrongEmail">L\'email doit ressembler à it-is@email-example.proof</string>
+    <string name="wrongPhone">Le téléphone doit ressembler à +123-(456)-789</string>
+    <string name="checkErrors">Vérifier les erreurs</string>
+    <string name="somethingWentWrong">Quelque chose s\'est mal passé</string>
+    <string name="success">Succès</string>
+    <string name="syncContactInfoWithServer">Synchroniser les informations de contact avec le serveur</string>
+    <string name="cantSyncContact">Impossible de synchroniser les données de contact avec le serveur. Il sera synchronisé plus tard par le système</string>
+    <string name="prohibitedAction">Vérifiez que vous avez les autorisations nécessaires</string>
+    <string name="editXWikiContactInfo">Modifier les coordonnées de XWiki</string>
 </resources>

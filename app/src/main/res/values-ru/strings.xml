@@ -65,7 +65,6 @@
     <string name="syncContactInfoWithServer">Синхронизирую внутренние данные с сервером</string>
     <string name="success">Удачно</string>
     <string name="somethingWentWrong">Что-то пошло не так</string>
-    <string name="edit">Редактировать</string>
     <string name="checkErrors">Проверьте ошибки</string>
     <string name="wrongPhone">Телефон должен быть похож на +123-(456)-789</string>
     <string name="wrongEmail">E-Mail должен быть похож на it-is@email-example.proof</string>
@@ -74,7 +73,18 @@
     <string name="additionalInfo">Дополнительная информация</string>
     <string name="userContactInfo">Контактная информация</string>
     <string name="address">Адресс</string>
-    <string name="city">Город</string>
-    <string name="country">Страна</string>
     <string name="userName">Имя и фамилия</string>
+    <string name="userExists">Пользователь существует</string>
+    <string name="serverAddress">Адрес сервера</string>
+    <string name="synchronizationType">Тип синхронизации</string>
+    <string name="syncTypeGetListErrorMessage">Что-то пошло не так при попытке получить данные для текущего типа синхронизации</string>
+    <string name="tryAgain">Попробуйте ещё раз</string>
+    <string name="versionTemplate" formatted="false">Версия %s</string>
+    <string name="updateSuccess">Обновление успешно</string>
+    <string name="haveNoPermission">У вас нет прав</string>
+    <string name="authenticationError">Ошибка аутентификации</string>
+    <string name="xwikiAccount">XWiki аккаунт</string>
+    <string name="askToGrantPermissions">Пожалуйста, убедитесь, что приложение имеет достаточно разрешений в настройках системы</string>
+    <string name="signUpOfferMessage">Создать XWiki аккаунт</string>
+    <string name="country">Страна</string>
 </resources>

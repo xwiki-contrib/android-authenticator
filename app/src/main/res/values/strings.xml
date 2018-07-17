@@ -80,7 +80,7 @@
     <string name="syncTypeGetListErrorMessage">Something went wrong when we try to get list for current sync type</string>
     <string name="tryAgain">Try again</string>
     <string name="versionTemplate" formatted="false">Version %s</string>
-    <string name="updateSuccess">Update Successfully</string>
+    <string name="updateSuccess">Update successfully</string>
     <string name="haveNoPermission">You have no permission</string>
     <string name="authenticationError">Authentication error</string>
     <string name="xwikiAccount">XWiki Account</string>
@@ -100,7 +100,7 @@
     <string name="success">Success</string>
     <string name="syncContactInfoWithServer">Sync contact info with server</string>
     <string name="cantSyncContact">Can\'t sync contact data with server. It will be synchronized later by system</string>
-    <string name="prohibitedAction">Check, that you have necessary permissions</string>
+    <string name="prohibitedAction">Check that you have necessary permissions</string>
     <string name="editXWikiContactInfo">Edit XWiki contact info</string>
 
 
