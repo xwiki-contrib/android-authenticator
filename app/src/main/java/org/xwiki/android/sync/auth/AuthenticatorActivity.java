@@ -46,8 +46,8 @@ import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.activities.BaseViewFlipper;
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper;
-import org.xwiki.android.sync.activities.SettingSyncViewFlipper;
 import org.xwiki.android.sync.activities.SignInViewFlipper;
+import org.xwiki.android.sync.activities.SyncSettingsActivity;
 import org.xwiki.android.sync.utils.IntentUtils;
 import org.xwiki.android.sync.utils.PermissionsUtils;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
@@ -84,7 +84,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         orderOfFlippers = new ArrayList<>();
         orderOfFlippers.add(SettingServerIpViewFlipper.class);
         orderOfFlippers.add(SignInViewFlipper.class);
-        orderOfFlippers.add(SettingSyncViewFlipper.class);
     }
 
     /**
@@ -178,18 +177,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 );
         mViewFlipper = findViewById(R.id.view_flipper);
         Integer position;
-        boolean is_set_sync = getIntent().getBooleanExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, true);
-        if (is_set_sync) {
-            position = orderOfFlippers.indexOf(SettingSyncViewFlipper.class);
-        } else {
-            mAccountManager = AccountManager.get(getApplicationContext());
-            Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
-            position = 0;
-            if (availableAccounts.length > 0) {
-                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
+        mAccountManager = AccountManager.get(getApplicationContext());
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+        position = 0;
+        if (availableAccounts.length > 0) {
+            Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
         showViewFlipper(position);
     }
@@ -409,7 +403,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         int uid = getIntent().getIntExtra(PARAM_APP_UID, 0);
         Log.d(TAG, packaName + ", " + getPackageName());
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
-        if (!packaName.contains("android.uid.system")) {
+        if (packaName != null && !packaName.contains("android.uid.system")) {
             AppContext.addAuthorizedApp(packaName);
             String authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             if (!TextUtils.isEmpty(authToken)) {
@@ -425,7 +419,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         setAccountAuthenticatorResult(intentReturn.getExtras());
         setResult(RESULT_OK, intentReturn);
         Log.d(TAG, ">" + "finish return");
-        // in SettingSyncViewFlipper this activity finish;
+        finish();
+        startActivity(
+            new Intent(this, SyncSettingsActivity.class)
+        );
     }
 
     /**

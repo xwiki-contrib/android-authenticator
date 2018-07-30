@@ -1,22 +1,3 @@
-/*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
 package org.xwiki.android.sync.activities;
 
 import android.accounts.Account;
@@ -30,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatSpinner;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,10 +23,8 @@ import android.widget.Toast;
 
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
-import org.xwiki.android.sync.auth.AuthenticatorActivity;
+import org.xwiki.android.sync.activities.base.BaseActivity;
 import org.xwiki.android.sync.bean.ObjectSummary;
-import org.xwiki.android.sync.bean.SearchResult;
-import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.sync.bean.XWikiGroup;
@@ -61,17 +41,12 @@ import rx.schedulers.Schedulers;
 import static org.xwiki.android.sync.AppContext.getApiManager;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.clearOldAccountContacts;
 
-/**
- * Flipper which contains setting of synchronization.
- *
- * @version $Id$
- */
-public class SettingSyncViewFlipper extends BaseViewFlipper {
+public class SyncSettingsActivity extends BaseActivity {
 
     /**
      * Tag which will be used for logging.
      */
-    private static final String TAG = "SettingSyncViewFlipper";
+    private static final String TAG = SyncSettingsActivity.class.getSimpleName();
 
     /**
      * {@link View} for presenting items.
@@ -114,58 +89,30 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     private volatile Boolean allUsersAreLoading = false;
 
     /**
-     * Standard constructor.
+     * Init all views and other activity objects
      *
-     * @param activity Current activity
-     * @param contentRootView Root view for flipper
-     */
-    public SettingSyncViewFlipper(AuthenticatorActivity activity, View contentRootView) {
-        super(activity, contentRootView);
-        initView();
-    }
-
-    /**
-     * Calling when user push "Complete".
+     * @param savedInstanceState
+     *
+     * @since 1.0
      */
     @Override
-    public void doNext() {
-        syncSettingComplete();
-    }
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sync_settings);
 
-    /**
-     * Calling when user push back.
-     */
-    @Override
-    public void doPrevious() {
-        mActivity.finish();
-    }
-
-    /**
-     * Init current view.
-     */
-    private void initView(){
         Button versionCheckButton = findViewById(R.id.version_check);
         versionCheckButton.setText(
             String.format(
-                mContext.getString(R.string.versionTemplate),
-                SystemTools.getAppVersionName(mContext)
+                getString(R.string.versionTemplate),
+                SystemTools.getAppVersionName(this)
             )
         );
         versionCheckButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openAppMarket(mContext);
+                openAppMarket(v.getContext());
             }
         });
-
-        findViewById(R.id.settingsSyncRefreshCurrentTypeListButton).setOnClickListener(
-            new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    initData();
-                }
-            }
-        );
 
         mListView = findViewById(R.id.list_view);
         mListView.setEmptyView(
@@ -173,9 +120,9 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         );
         groups = new ArrayList<>();
         allUsers = new ArrayList<>();
-        mGroupAdapter = new GroupListAdapter(mContext, groups);
-        mUsersAdapter = new UserListAdapter(mContext, allUsers);
-        initData();
+        mGroupAdapter = new GroupListAdapter(this, groups);
+        mUsersAdapter = new UserListAdapter(this, allUsers);
+        initData(null);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         AppCompatSpinner selectSyncSpinner = getSelectSyncSpinner();
@@ -191,7 +138,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             }
         });
 
-        SYNC_TYPE = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+        SYNC_TYPE = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
     }
 
@@ -230,7 +177,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     private void refreshProgressBar() {
         final Boolean progressBarVisible = (syncGroups() && groupsAreLoading)
             || (syncAllUsers() && allUsersAreLoading);
-        mActivity.runOnUiThread(
+        runOnUiThread(
             new Runnable() {
                 @Override
                 public void run() {
@@ -251,7 +198,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
      *
      * @since 0.4
      */
-    private void initData() {
+    public void initData(View v) {
         if (groups.isEmpty()) {
             groupsAreLoading = true;
             getApiManager().getXwikiServicesApi().availableGroups(
@@ -276,12 +223,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                         @Override
                         public void call(Throwable throwable) {
                             groupsAreLoading = false;
-                            mActivity.runOnUiThread(
+                            runOnUiThread(
                                 new Runnable() {
                                     @Override
                                     public void run() {
                                         Toast.makeText(
-                                            mActivity,
+                                            SyncSettingsActivity.this,
                                             R.string.cantGetGroups,
                                             Toast.LENGTH_SHORT
                                         ).show();
@@ -312,12 +259,12 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
                         @Override
                         public void call(Throwable throwable) {
                             allUsersAreLoading = false;
-                            mActivity.runOnUiThread(
+                            runOnUiThread(
                                 new Runnable() {
                                     @Override
                                     public void run() {
                                         Toast.makeText(
-                                            mActivity,
+                                            SyncSettingsActivity.this,
                                             R.string.cantGetAllUsers,
                                             Toast.LENGTH_SHORT
                                         ).show();
@@ -382,29 +329,29 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
     /**
      * Save settings of synchronization.
      */
-    public void syncSettingComplete() {
+    public void syncSettingComplete(View v) {
         //check changes. if no change, directly return
-        int oldSyncType = SharedPrefsUtils.getValue(mContext, Constants.SYNC_TYPE, -1);
+        int oldSyncType = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, -1);
         if(oldSyncType == SYNC_TYPE && !syncGroups()){
             return;
         }
 
         //TODO:: fix when will separate to different accounts
-        AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
+        AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
 
         clearOldAccountContacts(
-            mContext.getContentResolver(),
+            getContentResolver(),
             account
         );
 
         //if has changes, set sync
         if(syncNothing()){
-            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
             setSync(false);
         } else if (syncAllUsers()) {
-            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
             setSync(true);
         } else if(syncGroups()){
             //compare to see if there are some changes.
@@ -414,7 +361,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
 
             mGroupAdapter.saveSelectedGroups();
 
-            SharedPrefsUtils.putValue(mContext.getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
+            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
             setSync(true);
         }
     }
@@ -425,7 +372,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
      * @param syncEnabled Flag to enable (if true) / disable (if false) synchronization
      */
     private void setSync(boolean syncEnabled) {
-        AccountManager mAccountManager = AccountManager.get(mContext.getApplicationContext());
+        AccountManager mAccountManager = AccountManager.get(getApplicationContext());
         Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
         Account account = availableAccounts[0];
         if (syncEnabled) {
@@ -434,10 +381,10 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
             ContentResolver.addPeriodicSync(
-                    account,
-                    ContactsContract.AUTHORITY,
-                    Bundle.EMPTY,
-                    Constants.SYNC_INTERVAL);
+                account,
+                ContactsContract.AUTHORITY,
+                Bundle.EMPTY,
+                Constants.SYNC_INTERVAL);
             ContentResolver.requestSync(account, ContactsContract.AUTHORITY, Bundle.EMPTY);
         } else {
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
@@ -452,7 +399,7 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
         //new
         List<XWikiGroup> newList = mGroupAdapter.getSelectGroups();
         //old
-        List<String> oldList = SharedPrefsUtils.getArrayList(mContext.getApplicationContext(), Constants.SELECTED_GROUPS);
+        List<String> oldList = SharedPrefsUtils.getArrayList(getApplicationContext(), Constants.SELECTED_GROUPS);
         if(newList == null && oldList == null){
             return true;
         }else if(newList != null && oldList != null){
@@ -486,8 +433,8 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
                 ActivityInfo otherAppActivity = otherApp.activityInfo;
                 ComponentName componentName = new ComponentName(
-                        otherAppActivity.applicationInfo.packageName,
-                        otherAppActivity.name
+                    otherAppActivity.applicationInfo.packageName,
+                    otherAppActivity.name
                 );
                 rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
                 rateIntent.setComponent(componentName);
@@ -502,5 +449,4 @@ public class SettingSyncViewFlipper extends BaseViewFlipper {
             context.startActivity(webIntent);
         }
     }
-
 }
