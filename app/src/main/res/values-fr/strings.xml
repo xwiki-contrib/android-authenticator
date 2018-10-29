@@ -5,7 +5,7 @@
     <string name="last_name">Nom</string>
     <string name="user_id">Id utilisateur (Requis)</string>
     <string name="phone">Téléphone mobile</string>
-    <string name="email">Email</string>
+    <string name="email">Courriel</string>
     <string name="password">Mot de passe (Requis)</string>
     <string name="confirm_password">Confirmez le mot de passe (Requis)</string>
     <string name="captcha_textview">Entrez le captcha</string>
@@ -22,7 +22,7 @@
     <string name="title_activity_setting">Paramètres</string>
 
     <string name="error_invalid_server">L\'adresse du serveur est invalide</string>
-    <string name="error_invalid_email">Cette adresse e-mail n\'est pas valide</string>
+    <string name="error_invalid_email">Cette adresse email n\'est pas valide</string>
     <string name="error_invalid_password">Ce mot de passe est trop court</string>
     <string name="error_incorrect_password">Ce mot de passe est incorrect\t</string>
     <string name="error_field_required">Ce champ est requis</string>
@@ -50,7 +50,7 @@
     <string name="view_group_action_label">Montrer les détails du groupe d\'example</string>
 
     <string name="authorize_activity_package_label">Nom du Paquet</string>
-    <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, essayer encore</string>
+    <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, merci d\'essayer à nouveau</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
     <string name="loginError">Mauvais serveur ou utilisateur/mot de passe</string>
     <string name="signIn">Connexion</string>
