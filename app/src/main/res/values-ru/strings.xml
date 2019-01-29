@@ -31,12 +31,12 @@
     <string name="profile_action">XWiki профиль</string>
     <string name="view_profile">Редактировать</string>
 
-    <string name="authorize_activity_note">Авторизация через другие приложения</string>
+    <string name="authorize_activity_note">Авторизуйтесь через другие приложения.</string>
     <string name="authorize_activity_package_label">Имя пакета</string>
     <string name="account_name">Имя аккаунта</string>
     <string name="cancel">Отмена</string>
     <string name="grant_permission_button">Авторизовать</string>
-    <string name="login_sub_head">Вход в ваш XWiki</string>
+    <string name="login_sub_head">Вход в ваш XWiki.</string>
     <string name="learn_more_dialog">Узнать больше</string>
     <string name="don_t_have_a_account">Нет аккаунта?</string>
     <string name="create_one">Создать</string>
