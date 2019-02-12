@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources><string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
-    <string name="user_id">Пользовательский id</string>
+    <string name="user_id">ID пользователя (обязательно)</string>
     <string name="phone">Телефон</string>
     <string name="email">E-Mail</string>
     <string name="password">Пароль (обязательно)</string>
@@ -22,14 +22,14 @@
     <string name="title_activity_select_groups">Выберите группы</string>
     <string name="title_activity_setting">Настройки</string>
 
-    <string name="error_invalid_server">Не верный адрес сервера</string>
+    <string name="error_invalid_server">Неверный адрес сервера</string>
     <string name="error_invalid_password">Пароль слишком короткий</string>
-    <string name="error_incorrect_password">Не верный пароль</string>
+    <string name="error_incorrect_password">Неверный пароль</string>
     <string name="error_field_required">Это поле обязательно</string>
 
     <string name="view_group_action_label">Подробнее о группе</string>
     <string name="profile_action">XWiki профиль</string>
-    <string name="view_profile">Редактировать</string>
+    <string name="view_profile">Редактировать контакт</string>
 
     <string name="authorize_activity_note">Авторизуйтесь через другие приложения.</string>
     <string name="authorize_activity_package_label">Имя пакета</string>
@@ -38,20 +38,20 @@
     <string name="grant_permission_button">Авторизовать</string>
     <string name="login_sub_head">Вход в ваш XWiki.</string>
     <string name="learn_more_dialog">Узнать больше</string>
-    <string name="don_t_have_a_account">Нет аккаунта?</string>
+    <string name="don_t_have_a_account">Нет XWiki аккаунта\?</string>
     <string name="create_one">Создать</string>
     <string name="next">Далее</string>
     <string name="about_version">О версии</string>
     <string name="version">Версия 1.0</string>
-    <string name="complete">Принять</string>
-    <string name="cantGetAllUsers">Не могу получить пользователей</string>
+    <string name="complete">Завершить</string>
+    <string name="cantGetAllUsers">Не могу получить всех пользователей, попробуйте снова</string>
     <string name="cantGetGroups">Не могу получить группы</string>
-    <string name="loginError">Ошибка авторизации</string>
+    <string name="loginError">Неверный URL-адрес или учетные данные</string>
     <string name="signIn">Вход</string>
     <string name="signUp">Регистрация</string>
     <string name="logIn">Войти</string>
     <string name="pleaseWait">Пожалуйста, подождите</string>
-    <string name="error_invalid_email">Не верный E-Mail</string>
+    <string name="error_invalid_email">Неверный E-Mail</string>
 
     <!--select setting-->
     <string-array name="select_groups_array">
@@ -59,20 +59,20 @@
         <item>Группы пользователей</item>
         <item>Отключено</item>
     </string-array>
-    <string name="editXWikiContactInfo">Редактировать информацию из XWiki</string>
-    <string name="prohibitedAction">Проверьте, что у вас достаточно прав</string>
-    <string name="cantSyncContact">Не могу синхронизировать контакт</string>
-    <string name="syncContactInfoWithServer">Синхронизирую внутренние данные с сервером</string>
+    <string name="editXWikiContactInfo">Редактировать XWiki контактную информацию</string>
+    <string name="prohibitedAction">Убедитесь, что у вас есть необходимые разрешения</string>
+    <string name="cantSyncContact">Не удается синхронизировать контактные данные с сервером. Они будут синхронизированы системой позже</string>
+    <string name="syncContactInfoWithServer">Синхронизация внутренних данных с сервером</string>
     <string name="success">Удачно</string>
     <string name="somethingWentWrong">Что-то пошло не так</string>
     <string name="checkErrors">Проверьте ошибки</string>
-    <string name="wrongPhone">Телефон должен быть похож на +123-(456)-789</string>
-    <string name="wrongEmail">E-Mail должен быть похож на it-is@email-example.proof</string>
+    <string name="wrongPhone">Номер телефона должен соответствовать шаблону +123-(456)-789</string>
+    <string name="wrongEmail">E-Mail адрес должен соответствовать шаблону it-is@email-example.proof</string>
     <string name="note">Заметка</string>
     <string name="company">Компания</string>
     <string name="additionalInfo">Дополнительная информация</string>
     <string name="userContactInfo">Контактная информация</string>
-    <string name="address">Адресс</string>
+    <string name="address">Адрес</string>
     <string name="userName">Имя и фамилия</string>
     <string name="userExists">Пользователь существует</string>
     <string name="serverAddress">Адрес сервера</string>
@@ -84,7 +84,7 @@
     <string name="haveNoPermission">У вас нет прав</string>
     <string name="authenticationError">Ошибка аутентификации</string>
     <string name="xwikiAccount">XWiki аккаунт</string>
-    <string name="askToGrantPermissions">Пожалуйста, убедитесь, что приложение имеет достаточно разрешений в настройках системы</string>
-    <string name="signUpOfferMessage">Создать XWiki аккаунт</string>
+    <string name="askToGrantPermissions">Пожалуйста, дайте разрешение в настройках приложения</string>
+    <string name="signUpOfferMessage">Создайте учетную запись XWiki, чтобы использовать такие функции, как синхронизация контактов и предоставление учетных данных для других приложений Android</string>
     <string name="country">Страна</string>
 </resources>
