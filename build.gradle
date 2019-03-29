@@ -1,6 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    // Sdk and tools
+    ext.minSdkVersion = rootProject.minSdkVersion as Integer
+    ext.targetSdkVersion = rootProject.targetSdkVersion as Integer
+    ext.compileSdkVersion = rootProject.compileSdkVersion as Integer
+
     repositories {
         mavenLocal()
         mavenCentral()
