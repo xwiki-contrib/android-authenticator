@@ -62,8 +62,10 @@ dependencies {
 
     // For android test support (it depends on emulator)
     androidTestImplementation "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+
+// Removed Tue Apr  2 14:02:28 HKT 2019 after updating of dependencies and removing of redundant tests
+//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+//    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     // Optional -- Hamcrest library
 
