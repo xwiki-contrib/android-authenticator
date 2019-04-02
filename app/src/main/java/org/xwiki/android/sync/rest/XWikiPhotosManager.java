@@ -21,9 +21,9 @@ package org.xwiki.android.sync.rest;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import androidx.annotation.Nullable;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import okhttp3.*;
 import org.xwiki.android.sync.utils.ImageUtils;
 import rx.Observable;

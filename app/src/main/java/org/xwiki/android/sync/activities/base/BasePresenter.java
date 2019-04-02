@@ -20,8 +20,8 @@
 package org.xwiki.android.sync.activities.base;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Base presenter for use MVP pattern.

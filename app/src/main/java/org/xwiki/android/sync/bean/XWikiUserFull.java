@@ -19,8 +19,8 @@
  */
 package org.xwiki.android.sync.bean;
 
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
+import androidx.annotation.Nullable;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

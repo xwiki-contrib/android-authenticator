@@ -1,10 +1,10 @@
 package org.xwiki.android.authdemo;
 
-import java.io.IOException;
-
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+
+import java.io.IOException;
 
 /**
  * XWikiHttp.

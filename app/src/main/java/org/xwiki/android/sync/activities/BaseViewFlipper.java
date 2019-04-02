@@ -21,9 +21,9 @@
 package org.xwiki.android.sync.activities;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
 import android.view.View;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import org.xwiki.android.sync.auth.AuthenticatorActivity;
 
 /**
