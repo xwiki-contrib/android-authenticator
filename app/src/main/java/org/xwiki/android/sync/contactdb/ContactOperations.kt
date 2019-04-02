@@ -4,15 +4,15 @@ import android.accounts.Account
 import android.content.ContentProviderOperation
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.provider.ContactsContract
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import android.provider.ContactsContract
 import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
+import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.utils.extensions.getString
 import org.xwiki.android.sync.utils.extensions.getStringOrNull
 

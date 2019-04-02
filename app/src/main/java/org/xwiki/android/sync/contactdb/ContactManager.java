@@ -31,22 +31,20 @@ import android.os.CancellationSignal;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
-
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.rest.XWikiHttp;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-
 import retrofit2.HttpException;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.toContentProviderOperations;
 

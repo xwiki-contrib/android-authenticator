@@ -28,18 +28,16 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.contactdb.ContactManager;
 import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
-
-import java.util.Date;
-
 import rx.Observable;
 import rx.Observer;
+
+import java.util.Date;
 
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
 

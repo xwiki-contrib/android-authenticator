@@ -1,12 +1,12 @@
 package org.xwiki.android.sync.activities.EditContact
 
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.view.get
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

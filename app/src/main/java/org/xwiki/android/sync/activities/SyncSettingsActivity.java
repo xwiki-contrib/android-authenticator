@@ -11,16 +11,10 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatSpinner;
+import androidx.annotation.Nullable;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
+import android.widget.*;
+import androidx.appcompat.widget.AppCompatSpinner;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.activities.base.BaseActivity;
@@ -30,13 +24,12 @@ import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.sync.bean.XWikiGroup;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.SystemTools;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.xwiki.android.sync.AppContext.getApiManager;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.clearOldAccountContacts;

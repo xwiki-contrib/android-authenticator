@@ -21,25 +21,18 @@ package org.xwiki.android.sync.rest;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
-
+import androidx.annotation.NonNull;
+import okhttp3.*;
 import org.xwiki.android.sync.utils.ImageUtils;
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import rx.Observable;
-import rx.subjects.PublishSubject;
 
 /**
  * This manager can be used for downloading and managing photos
