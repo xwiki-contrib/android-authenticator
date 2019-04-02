@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.authdemo;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -34,6 +35,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -49,10 +52,16 @@ public final class SystemTools {
 
     /**
      * Get IMEI
+     *
+     * @return Device ID if application have access permissions, null otherwise
      */
+    @Nullable
     public static String getPhoneIMEI(Context cxt) {
         TelephonyManager tm = (TelephonyManager) cxt
                 .getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(cxt, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
         return tm.getDeviceId();
     }
 

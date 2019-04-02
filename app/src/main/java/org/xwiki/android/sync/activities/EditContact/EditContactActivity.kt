@@ -7,8 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.view.get
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -32,6 +33,13 @@ private const val reloginTryes = 3
  * @since 0.5
  */
 class EditContactActivity : BaseActivity() {
+
+    /**
+     * The scope of edit contact activity
+     *
+     * @since 0.6
+     */
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Lazy initialized contact row id
@@ -208,7 +216,7 @@ class EditContactActivity : BaseActivity() {
                         user ->
                         updateUserInDatabase(user)
 
-                        launch (UI) {
+                        scope.launch (Dispatchers.Main) {
                             Snackbar.make(
                                 view,
                                 getString(R.string.success),
@@ -307,7 +315,7 @@ class EditContactActivity : BaseActivity() {
             rowId ?: return,
             splittedUserId ?: return
         ).also {
-            launch (UI) {
+            scope.launch (Dispatchers.Main) {
                 firstNameEditText.text.apply {
                     clear()
                     insert(0, it.firstName ?: "")
@@ -345,7 +353,7 @@ class EditContactActivity : BaseActivity() {
      * Disable all possible to add data (prohibit input)
      */
     private fun disableContainer() {
-        launch (UI) {
+        scope.launch (Dispatchers.Main) {
             container.isEnabled = false
             (0 until container.childCount).forEach {
                 container[it].isEnabled = false
@@ -357,7 +365,7 @@ class EditContactActivity : BaseActivity() {
      * Enable all possible to add data (permit input)
      */
     private fun enableContainer() {
-        launch (UI) {
+        scope.launch (Dispatchers.Main) {
             container.isEnabled = true
             (0 until container.childCount).forEach {
                 container[it].isEnabled = true
@@ -390,7 +398,7 @@ class EditContactActivity : BaseActivity() {
      * @see updateUserInDatabase
      */
     private fun manuallyUpdateUserInfo(view: View) {
-        launch (UI) {
+        scope.launch (Dispatchers.Main) {
             Snackbar.make(
                 view,
                 getString(R.string.syncContactInfoWithServer),
@@ -407,7 +415,7 @@ class EditContactActivity : BaseActivity() {
             ).subscribe(
                 object : Observer<XWikiUserFull> {
                     override fun onError(e: Throwable?) {
-                        launch (UI) {
+                        scope.launch (Dispatchers.Main) {
                             Snackbar.make(
                                 view,
                                 e ?. message ?: getString(R.string.cantSyncContact),
@@ -420,7 +428,7 @@ class EditContactActivity : BaseActivity() {
                         t ?.let {
                             updateUserInDatabase(it)
 
-                            launch (UI) {
+                            scope.launch (Dispatchers.Main) {
                                 Snackbar.make(
                                     view,
                                     getString(R.string.success),
