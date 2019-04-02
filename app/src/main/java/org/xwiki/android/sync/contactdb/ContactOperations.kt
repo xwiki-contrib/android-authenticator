@@ -10,12 +10,11 @@ import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import android.util.Log
-import androidx.core.database.getString
-import androidx.core.database.getStringOrNull
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
+import org.xwiki.android.sync.utils.extensions.getString
+import org.xwiki.android.sync.utils.extensions.getStringOrNull
 
 /**
  * Mime type for insert in database to let android OS know which filter must be activated
