@@ -272,7 +272,7 @@ fun getContactRowId(
         null,
         null,
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getLong(
                 it.getColumnIndex(
@@ -308,7 +308,7 @@ fun getContactUserId(
             EDIT_CONTACT_MIME_TYPE
         ),
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getString(
                 it.getColumnIndex(
@@ -323,7 +323,7 @@ fun getContactUserId(
 
 /**
  * @param resolver Resolver to make the query
- * @param userId Id of user for get info
+ * @param rowId Id of user for get info
  *
  * @return account name of contact which has create this contact
  *
@@ -344,7 +344,7 @@ fun getContactAccountName(
             Constants.ACCOUNT_TYPE
         ),
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getString(ContactsContract.RawContacts.ACCOUNT_NAME)
         } else {
@@ -428,8 +428,7 @@ fun getUserInfo(
         "${ContactsContract.Data.RAW_CONTACT_ID}=?",
         arrayOf(rowId.toString()),
         null
-    ).use {
-        c ->
+    ) ?.use { c ->
         while (c.moveToNext()) {
             val mimeType = c.getString(ContactsContract.Data.MIMETYPE)
             userDatabaseInfoHelpers.forEach {

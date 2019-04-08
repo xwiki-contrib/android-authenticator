@@ -47,10 +47,12 @@ class EditContactActivity : BaseActivity() {
      * @see getContactRowId
      */
     private val rowId: Long? by lazy {
-        getContactRowId(
-            contentResolver,
-            intent.data
-        )
+        intent.data ?.let {
+            getContactRowId(
+                contentResolver,
+                it
+            )
+        }
     }
 
     /**
