@@ -87,4 +87,7 @@
     <string name="askToGrantPermissions">Пожалуйста, дайте разрешение в настройках приложения</string>
     <string name="signUpOfferMessage">Создайте учетную запись XWiki, чтобы использовать такие функции, как синхронизация контактов и предоставление учетных данных для других приложений Android</string>
     <string name="country">Страна</string>
-</resources>
+<string name="unchangedSettings">Нечего сохранять: настройки не были изменены</string>
+
+
+    </resources>
