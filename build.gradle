@@ -2,9 +2,9 @@
 
 buildscript {
     // Sdk and tools
-    ext.minSdkVersion = rootProject.minSdkVersion as Integer
-    ext.targetSdkVersion = rootProject.targetSdkVersion as Integer
-    ext.compileSdkVersion = rootProject.compileSdkVersion as Integer
+    ext.minSdkVersion = rootProject.minSdkVersion.toInteger()
+    ext.targetSdkVersion = rootProject.targetSdkVersion.toInteger()
+    ext.compileSdkVersion = rootProject.compileSdkVersion.toInteger()
 
     repositories {
         mavenLocal()
@@ -19,6 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
