@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:onClick="syncSettingComplete"
             android:id="@+id/nextButton"
-            android:text="@string/complete"
+            android:text="@string/save"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"/>

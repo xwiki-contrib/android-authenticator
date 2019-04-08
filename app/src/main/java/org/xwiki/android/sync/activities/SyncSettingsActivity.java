@@ -349,6 +349,7 @@ public class SyncSettingsActivity extends BaseActivity {
         } else if(syncGroups()){
             //compare to see if there are some changes.
             if(oldSyncType == SYNC_TYPE && compareSelectGroups()){
+                Toast.makeText(this, getString(R.string.unchangedSettings), Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -356,6 +357,7 @@ public class SyncSettingsActivity extends BaseActivity {
 
             SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
             setSync(true);
+            finish(); // TODO:: FIX IT TO CORRECT HANDLE OF COMPLETING SETTINGS
         }
     }
 
