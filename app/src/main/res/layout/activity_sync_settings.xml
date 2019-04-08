@@ -38,7 +38,7 @@
                         android:text="@string/synchronizationType"
                         android:padding="@dimen/defaultViewSmallPadding"/>
 
-                    <android.support.v7.widget.AppCompatSpinner
+                    <androidx.appcompat.widget.AppCompatSpinner
                         android:id="@+id/select_spinner"
                         android:entries="@array/select_groups_array"
                         android:padding="@dimen/defaultViewSmallPadding"/>
@@ -93,7 +93,7 @@
         </LinearLayout>
 
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="syncSettingComplete"
