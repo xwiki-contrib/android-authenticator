@@ -23,32 +23,26 @@ import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-
-import java.util.List;
-
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.functions.Action1;
+
+import java.util.List;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.sync.AppContext.currentBaseUrl;
 import static org.xwiki.android.sync.AppContext.getApiManager;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
+import static org.xwiki.android.sync.Constants.*;
 
 /**
  * Realisation of authenticator for XWiki account. Full required management of XWiki account

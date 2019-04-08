@@ -20,13 +20,11 @@
 package org.xwiki.android.sync.rest;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-
-import org.xwiki.android.sync.Constants;
-import org.xwiki.android.sync.utils.SharedPrefsUtils;
-
+import androidx.annotation.NonNull;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.xwiki.android.sync.Constants;
+import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;

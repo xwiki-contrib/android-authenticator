@@ -22,16 +22,24 @@ package org.xwiki.android.sync.rest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
+import retrofit2.HttpException;
+import retrofit2.Response;
+import rx.Observable;
+import rx.Observer;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -40,16 +48,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
-import retrofit2.HttpException;
-import retrofit2.Response;
-import rx.Observable;
-import rx.Observer;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 
 import static org.xwiki.android.sync.AppContext.getApiManager;
 

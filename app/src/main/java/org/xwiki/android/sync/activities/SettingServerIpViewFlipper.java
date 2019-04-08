@@ -19,12 +19,11 @@
  */
 package org.xwiki.android.sync.activities;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-
+import androidx.annotation.Nullable;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.auth.AuthenticatorActivity;

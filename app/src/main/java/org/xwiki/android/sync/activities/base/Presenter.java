@@ -19,7 +19,7 @@
  */
 package org.xwiki.android.sync.activities.base;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Presenter interface for use MVP pattern.
