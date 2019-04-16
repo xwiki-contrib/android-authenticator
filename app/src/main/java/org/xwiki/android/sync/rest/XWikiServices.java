@@ -19,23 +19,15 @@
  */
 package org.xwiki.android.sync.rest;
 
+import okhttp3.ResponseBody;
 import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SearchResultContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer;
 import org.xwiki.android.sync.bean.XWikiGroup;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-
-import okhttp3.ResponseBody;
 import retrofit2.Response;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 import rx.Observable;
 
 import static org.xwiki.android.sync.rest.ApiEndPoints.SPACES;

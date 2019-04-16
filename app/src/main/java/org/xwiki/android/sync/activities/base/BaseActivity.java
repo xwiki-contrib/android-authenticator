@@ -20,12 +20,11 @@
 package org.xwiki.android.sync.activities.base;
 
 import android.app.ProgressDialog;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import org.xwiki.android.sync.R;
 
 /**

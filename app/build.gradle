@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -20,15 +21,6 @@ android {
     lintOptions {
         abortOnError false
     }
-    packagingOptions {
-        exclude 'META-INF/main.kotlin_module'
-    }
-}
-
-kotlin {
-    experimental {
-        coroutines "enable"
-    }
 }
 
 dependencies {
@@ -40,7 +32,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava:$rootProject.retrofitVersion"
-    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.loggingInterceptorVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okHttp3Version"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -68,8 +60,10 @@ dependencies {
 
     // For android test support (it depends on emulator)
     androidTestImplementation "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+
+// Removed Tue Apr  2 14:02:28 HKT 2019 after updating of dependencies and removing of redundant tests
+//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+//    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     // Optional -- Hamcrest library
 

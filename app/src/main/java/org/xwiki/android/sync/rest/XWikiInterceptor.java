@@ -21,18 +21,16 @@ package org.xwiki.android.sync.rest;
 
 import android.content.Context;
 import android.text.TextUtils;
-
-import org.xwiki.android.sync.AppContext;
-import org.xwiki.android.sync.Constants;
-import org.xwiki.android.sync.utils.SharedPrefsUtils;
-
-import java.io.IOException;
-
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
+import org.xwiki.android.sync.AppContext;
+import org.xwiki.android.sync.Constants;
+import org.xwiki.android.sync.utils.SharedPrefsUtils;
+
+import java.io.IOException;
 
 /**
  * Must be used for each {@link okhttp3.OkHttpClient} which you will create in
