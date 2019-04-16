@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.xwiki.android.sync">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -27,7 +29,9 @@
         android:name=".AppContext"
         android:allowBackup="true" android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/BaseAppTheme">
+        android:theme="@style/BaseAppTheme"
+        tools:replace="android:appComponentFactory"
+        android:appComponentFactory="androidx">
 
         <activity android:name=".auth.AuthenticatorActivity"
             android:label="@string/login_label"

@@ -3,8 +3,6 @@ package org.xwiki.android.sync.rest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * HttpExecutorTest.
  */

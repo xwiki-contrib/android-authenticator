@@ -28,11 +28,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +37,8 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
@@ -51,12 +49,11 @@ import org.xwiki.android.sync.activities.SyncSettingsActivity;
 import org.xwiki.android.sync.utils.IntentUtils;
 import org.xwiki.android.sync.utils.PermissionsUtils;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
+import rx.Subscription;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import rx.Subscription;
 
 import static org.xwiki.android.sync.AppContext.currentBaseUrl;
 

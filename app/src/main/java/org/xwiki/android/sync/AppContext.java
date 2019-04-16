@@ -21,7 +21,6 @@ package org.xwiki.android.sync;
 
 import android.app.Application;
 import android.util.Log;
-
 import org.xwiki.android.sync.rest.BaseApiManager;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
 
