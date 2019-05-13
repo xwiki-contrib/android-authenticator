@@ -2,7 +2,13 @@ package org.xwiki.android.authdemo;
 
 import android.accounts.*;
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +22,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * MainActivity
@@ -80,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 showAccountPicker(Constants.AUTHTOKEN_TYPE_FULL_ACCESS, invalidate);
             }
         }
-
     }
 
     @Override
@@ -108,10 +114,33 @@ public class MainActivity extends AppCompatActivity {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    showMessage(e.getMessage());
+                    if(e.getMessage().equals("bind failure")){
+                        showAlertBox();
+                    }
                 }
             }
         }, null);
+    }
+
+    private void showAlertBox(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.app_not_found));
+        builder.setMessage(getString(R.string.click_continue_to_install_app));
+        builder.setCancelable(true);
+        builder.setPositiveButton(getString(R.string.positive_button_text), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                openAppMarket(MainActivity.this);
+
+            }
+        });
+        builder.setNegativeButton(getString(R.string.negative_button_text), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     /**
@@ -274,5 +303,37 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Open market with application page.
+     *
+     * @param context Context to know where from to open market
+     */
+    private static void openAppMarket(Context context) {
+        Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "org.xwiki.android.sync"));
+        boolean marketFound = false;
+        // find all applications able to handle our rateIntent
+        final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
+        for (ResolveInfo otherApp: otherApps) {
+            // look for Google Play application
+            if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
+                ActivityInfo otherAppActivity = otherApp.activityInfo;
+                ComponentName componentName = new ComponentName(
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
+                );
+                rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                rateIntent.setComponent(componentName);
+                context.startActivity(rateIntent);
+                marketFound = true;
+                break;
+            }
+        }
+        // if GooglePlay not present on device, open web browser
+        if (!marketFound) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            context.startActivity(webIntent);
+        }
     }
 }
