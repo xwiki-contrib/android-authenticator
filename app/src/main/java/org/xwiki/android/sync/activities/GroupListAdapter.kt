@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.TextView
-
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.XWikiGroup
@@ -37,7 +36,7 @@ import java.util.ArrayList
 /**
  * [android.widget.Adapter] which can be used to show groups.
  *
- * @version $Id: 2223f93dfe9e6ead990e750141c20057143cef8f $
+ * @version $Id: 30d07c16a715a1a4929e18f6e5c1fdc7e357a9c5 $
  */
 class GroupListAdapter
 /**
@@ -46,15 +45,16 @@ class GroupListAdapter
  * @param context Context for all operations
  * @param groupList Initial group list
  */
-(
-        /**
-         * Current context.
-         */
-        private val mContext: Context,
-        /**
-         * Current list of items.
-         */
-        private var groupList: List<XWikiGroup>?) : BaseAdapter() {
+    (
+    /**
+     * Current context.
+     */
+    private val mContext: Context,
+    /**
+     * Current list of items.
+     */
+    private var groupList: List<XWikiGroup>?
+) : BaseAdapter() {
 
     /**
      * List of selected items.

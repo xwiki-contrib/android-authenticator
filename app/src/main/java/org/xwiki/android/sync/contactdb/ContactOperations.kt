@@ -4,18 +4,17 @@ import android.accounts.Account
 import android.content.ContentProviderOperation
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.provider.ContactsContract
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.bean.XWikiUserFull
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import android.util.Log
-import androidx.core.database.getString
-import androidx.core.database.getStringOrNull
+import android.provider.ContactsContract
 import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
+import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.utils.extensions.getString
+import org.xwiki.android.sync.utils.extensions.getStringOrNull
 
 /**
  * Mime type for insert in database to let android OS know which filter must be activated
@@ -273,7 +272,7 @@ fun getContactRowId(
         null,
         null,
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getLong(
                 it.getColumnIndex(
@@ -309,7 +308,7 @@ fun getContactUserId(
             EDIT_CONTACT_MIME_TYPE
         ),
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getString(
                 it.getColumnIndex(
@@ -324,7 +323,7 @@ fun getContactUserId(
 
 /**
  * @param resolver Resolver to make the query
- * @param userId Id of user for get info
+ * @param rowId Id of user for get info
  *
  * @return account name of contact which has create this contact
  *
@@ -345,7 +344,7 @@ fun getContactAccountName(
             Constants.ACCOUNT_TYPE
         ),
         null
-    ).use {
+    ) ?.use {
         if (it.moveToFirst()) {
             it.getString(ContactsContract.RawContacts.ACCOUNT_NAME)
         } else {
@@ -429,8 +428,7 @@ fun getUserInfo(
         "${ContactsContract.Data.RAW_CONTACT_ID}=?",
         arrayOf(rowId.toString()),
         null
-    ).use {
-        c ->
+    ) ?.use { c ->
         while (c.moveToNext()) {
             val mimeType = c.getString(ContactsContract.Data.MIMETYPE)
             userDatabaseInfoHelpers.forEach {

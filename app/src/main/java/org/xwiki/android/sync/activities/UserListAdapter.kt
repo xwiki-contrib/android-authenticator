@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.TextView
-
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SearchResult
@@ -34,7 +33,7 @@ import org.xwiki.android.sync.bean.SearchResult
 /**
  * [android.widget.Adapter] which can be used to show [SearchResult] as users.
  *
- * @version $Id: 0cabe70f0606e7023db92bef1ae7d404f59909e5 $
+ * @version $Id: dcb077b86ade7b7121d3cb21886f740b09534fc5 $
  */
 class UserListAdapter
 /**
@@ -43,15 +42,16 @@ class UserListAdapter
  * @param context Initial context
  * @param searchResults Initial list
  */
-(
-        /**
-         * Context which will be used for operations.
-         */
-        private val mContext: Context,
-        /**
-         * List which currently shows.
-         */
-        private var searchResults: List<ObjectSummary>?) : BaseAdapter() {
+    (
+    /**
+     * Context which will be used for operations.
+     */
+    private val mContext: Context,
+    /**
+     * List which currently shows.
+     */
+    private var searchResults: List<ObjectSummary>?
+) : BaseAdapter() {
 
     /**
      * @return Size of [.searchResults]

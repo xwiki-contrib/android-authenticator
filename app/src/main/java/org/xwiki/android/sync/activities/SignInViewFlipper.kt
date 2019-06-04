@@ -27,13 +27,11 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.SharedPrefsUtils
-
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -41,7 +39,7 @@ import rx.functions.Action1
 /**
  * Main auth flipper.
  *
- * @version $Id: 63be66edc87bf60706b614f26eef745ca9ec4c2e $
+ * @version $Id: cc56e12004e2982133afa0c17258b164b8203a15 $
  */
 class SignInViewFlipper
 /**
@@ -50,9 +48,9 @@ class SignInViewFlipper
  * @param activity Current activity
  * @param contentRootView Root view of this flipper
  */
-(
-        activity: AuthenticatorActivity,
-        contentRootView: View
+    (
+    activity: AuthenticatorActivity,
+    contentRootView: View
 ) : BaseViewFlipper(activity, contentRootView) {
 
     /**
@@ -69,8 +67,8 @@ class SignInViewFlipper
         findViewById<View>(R.id.signInButton).setOnClickListener {
             if (checkInput()) {
                 mActivity.showProgress(
-                        mContext.getText(R.string.sign_in_authenticating),
-                        submit()
+                    mContext.getText(R.string.sign_in_authenticating),
+                    submit()
                 )
             }
         }
@@ -119,28 +117,28 @@ class SignInViewFlipper
         val userPass = accountPassword
 
         return XWikiHttp.login(
-                userName!!,
-                userPass!!
+            userName!!,
+            userPass!!
         )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { authtoken ->
-                            mActivity.hideProgress()
-                            if (authtoken == null) {
-                                showErrorMessage(mContext.getString(R.string.loginError))
-                            } else {
-                                signedIn(
-                                        authtoken,
-                                        userName,
-                                        userPass
-                                )
-                            }
-                        },
-                        {
-                            mActivity.hideProgress()
-                            showErrorMessage(mContext.getString(R.string.loginError))
-                        }
-                )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { authtoken ->
+                    mActivity.hideProgress()
+                    if (authtoken == null) {
+                        showErrorMessage(mContext.getString(R.string.loginError))
+                    } else {
+                        signedIn(
+                            authtoken,
+                            userName,
+                            userPass
+                        )
+                    }
+                },
+                {
+                    mActivity.hideProgress()
+                    showErrorMessage(mContext.getString(R.string.loginError))
+                }
+            )
     }
 
     /**
@@ -154,11 +152,11 @@ class SignInViewFlipper
      * @since 0.4
      */
     private fun prepareIntent(
-            authtoken: String,
-            username: String,
-            password: String
+        authtoken: String,
+        username: String,
+        password: String
     ): Intent {
-        val userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, "")
+        val userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null)
 
         val accountType = mActivity.intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
 
@@ -184,14 +182,14 @@ class SignInViewFlipper
      * @since 0.4
      */
     private fun signedIn(
-            authtoken: String,
-            username: String,
-            password: String
+        authtoken: String,
+        username: String,
+        password: String
     ) {
         val signedIn = prepareIntent(
-                authtoken,
-                username,
-                password
+            authtoken,
+            username,
+            password
         )
 
         mActivity.runOnUiThread {
@@ -212,8 +210,8 @@ class SignInViewFlipper
         errorTextView.visibility = View.VISIBLE
         errorTextView.text = error
         Handler().postDelayed(
-                { errorTextView.visibility = View.GONE },
-                2000
+            { errorTextView.visibility = View.GONE },
+            2000
         )
     }
 

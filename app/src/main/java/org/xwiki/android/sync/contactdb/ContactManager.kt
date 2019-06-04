@@ -31,27 +31,24 @@ import android.os.CancellationSignal
 import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
-
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.rest.XWikiHttp
-
-import java.io.IOException
-import java.io.OutputStream
-import java.util.HashMap
-
 import retrofit2.HttpException
 import rx.Observable
 import rx.Observer
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 
+import java.io.IOException
+import java.io.OutputStream
+import java.util.HashMap
 
 /**
  * Class for managing contacts sync related mOperations.
  *
- * @version $Id: 641f37b54ac31ad4bfdf26205fb6fa2fb098a79f $
+ * @version $Id: be8481217cc0fc4ab1ff4ab9e6f1b9d1fb4f5fc3 $
  */
 object ContactManager {
     private val TAG = "ContactManager"
@@ -67,61 +64,61 @@ object ContactManager {
      */
     @Synchronized @JvmStatic
     fun updateContacts(
-            context: Context,
-            account: String,
-            observable: Observable<XWikiUserFull>
+        context: Context,
+        account: String,
+        observable: Observable<XWikiUserFull>
     ) {
         val resolver = context.contentResolver
         val batchOperation = BatchOperation(resolver)
         val localUserMaps = getAllContactsIdMap(resolver, account)
 
         observable.subscribeOn(
-                Schedulers.newThread()
+            Schedulers.newThread()
         ).subscribe(
-                object : Observer<XWikiUserFull> {
-                    override fun onCompleted() {
-                        for (id in localUserMaps.keys) {
-                            val rawId = localUserMaps[id]
-                            if (batchOperation.size() >= 100) {
-                                batchOperation.execute()
-                            }
-                        }
-                        batchOperation.execute()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        try {
-                            val asHttpException = e as HttpException
-                            if (asHttpException.code() == 401) {//Unauthorized
-                                XWikiHttp.relogin(
-                                        context,
-                                        account
-                                )
-                            }
-                        } catch (e1: ClassCastException) {
-                            Log.e(TAG, "Can't synchronize users", e)
-                        }
-
-                    }
-
-                    override fun onNext(xWikiUserFull: XWikiUserFull) {
-                        val operationList = xWikiUserFull.toContentProviderOperations(
-                                resolver,
-                                account
-                        )
-                        for (operation in operationList) {
-                            batchOperation.add(operation)
-                        }
+            object : Observer<XWikiUserFull> {
+                override fun onCompleted() {
+                    for (id in localUserMaps.keys) {
+                        val rawId = localUserMaps[id]!!
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute()
                         }
-                        updateAvatar(
-                                resolver,
-                                lookupRawContact(resolver, xWikiUserFull.id!!),
-                                xWikiUserFull
-                        )
                     }
+                    batchOperation.execute()
                 }
+
+                override fun onError(e: Throwable) {
+                    try {
+                        val asHttpException = e as HttpException
+                        if (asHttpException.code() == 401) {//Unauthorized
+                            XWikiHttp.relogin(
+                                context,
+                                account
+                            )
+                        }
+                    } catch (e1: ClassCastException) {
+                        Log.e(TAG, "Can't synchronize users", e)
+                    }
+
+                }
+
+                override fun onNext(xWikiUserFull: XWikiUserFull) {
+                    val operationList = xWikiUserFull.toContentProviderOperations(
+                        resolver,
+                        account
+                    )
+                    for (operation in operationList) {
+                        batchOperation.add(operation)
+                    }
+                    if (batchOperation.size() >= 100) {
+                        batchOperation.execute()
+                    }
+                    updateAvatar(
+                        resolver,
+                        lookupRawContact(resolver, xWikiUserFull.id),
+                        xWikiUserFull
+                    )
+                }
+            }
         )
     }
 
@@ -137,40 +134,40 @@ object ContactManager {
      * @since 0.4
      */
     fun updateAvatar(
-            contentResolver: ContentResolver,
-            rawId: Long,
-            xwikiUser: XWikiUserFull
+        contentResolver: ContentResolver,
+        rawId: Long,
+        xwikiUser: XWikiUserFull
     ) {
-        val gettingAvatarObservable = AppContext
-                .apiManager
-                .xWikiPhotosManager
-                .downloadAvatar(
-                        xwikiUser.pageName!!,
-                        xwikiUser.avatar!!
-                )
-        gettingAvatarObservable?.subscribe(
-                { bytes ->
+        val gettingAvatarObservable = AppContext.apiManager.xWikiPhotosManager
+            .downloadAvatar(
+                xwikiUser.pageName,
+                xwikiUser.avatar
+            )
+        if (gettingAvatarObservable != null) {
+            gettingAvatarObservable!!.subscribe(
+                Action1<ByteArray> { bytes ->
                     if (bytes != null) {
                         try {
                             writeDisplayPhoto(contentResolver, rawId, bytes)
                         } catch (e: IOException) {
                             Log.e(
-                                    TAG,
-                                    "Can't update avatar of user",
-                                    e
+                                TAG,
+                                "Can't update avatar of user",
+                                e
                             )
                         }
 
                     }
                 },
-                { throwable ->
+                Action1<Throwable> { throwable ->
                     Log.e(
-                            TAG,
-                            "Can't update avatar of user",
-                            throwable
+                        TAG,
+                        "Can't update avatar of user",
+                        throwable
                     )
                 }
-        )
+            )
+        }
     }
 
 
@@ -187,20 +184,20 @@ object ContactManager {
      */
     @Throws(IOException::class)
     private fun writeDisplayPhoto(
-            contentResolver: ContentResolver,
-            rawContactId: Long,
-            photo: ByteArray?
+        contentResolver: ContentResolver,
+        rawContactId: Long,
+        photo: ByteArray?
     ) {
         val rawContactPhotoUri = Uri.withAppendedPath(
-                ContentUris.withAppendedId(
-                        RawContacts.CONTENT_URI,
-                        rawContactId
-                ),
-                RawContacts.DisplayPhoto.CONTENT_DIRECTORY
+            ContentUris.withAppendedId(
+                RawContacts.CONTENT_URI,
+                rawContactId
+            ),
+            RawContacts.DisplayPhoto.CONTENT_DIRECTORY
         )
         val fd = contentResolver.openAssetFileDescriptor(rawContactPhotoUri, "rw")
         val os = fd!!.createOutputStream()
-        os.write(photo!!)
+        os.write(photo)
         os.close()
         fd.close()
     }
@@ -215,15 +212,15 @@ object ContactManager {
      * @since 0.4
      */
     private fun getAllContactsIdMap(
-            resolver: ContentResolver,
-            accountName: String
+        resolver: ContentResolver,
+        accountName: String
     ): HashMap<String, Long> {
         val allMaps = HashMap<String, Long>()
         val c = resolver.query(
-                AllQuery.CONTENT_URI,
-                AllQuery.PROJECTION,
-                AllQuery.SELECTION,
-                arrayOf(accountName), null
+            AllQuery.CONTENT_URI,
+            AllQuery.PROJECTION,
+            AllQuery.SELECTION,
+            arrayOf(accountName), null
         )
         try {
             while (c!!.moveToNext()) {
@@ -252,10 +249,11 @@ object ContactManager {
     private fun lookupRawContact(resolver: ContentResolver, serverContactId: String): Long {
         var rawContactId: Long = 0
         val c = resolver.query(
-                UserIdQuery.CONTENT_URI,
-                UserIdQuery.PROJECTION,
-                UserIdQuery.SELECTION,
-                arrayOf(serverContactId), null)
+            UserIdQuery.CONTENT_URI,
+            UserIdQuery.PROJECTION,
+            UserIdQuery.SELECTION,
+            arrayOf(serverContactId), null
+        )
         try {
             if (c != null && c.moveToFirst()) {
                 rawContactId = c.getLong(UserIdQuery.COLUMN_RAW_CONTACT_ID)
@@ -347,12 +345,12 @@ object ContactManager {
          * @see ContentResolver.query
          */
         internal val CONTENT_URI = RawContacts.CONTENT_URI
-                .buildUpon()
-                .appendQueryParameter(
-                        ContactsContract.CALLER_IS_SYNCADAPTER,
-                        "true"
-                )
-                .build()
+            .buildUpon()
+            .appendQueryParameter(
+                ContactsContract.CALLER_IS_SYNCADAPTER,
+                "true"
+            )
+            .build()
 
         /**
          * Selection for getting data by [Constants.ACCOUNT_TYPE] and account name

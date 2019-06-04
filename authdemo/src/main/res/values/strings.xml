@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Authdemo</string>
+
+    <string name="app_not_found">XWiki app not installed</string>
+    <string name="click_continue_to_install_app">Please click continue to install the app.</string>
+    <string name="positive_button_text">Continue</string>
+    <string name="negative_button_text">Cancel</string>
 </resources>

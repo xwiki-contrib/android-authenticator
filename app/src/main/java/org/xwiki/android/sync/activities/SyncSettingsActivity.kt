@@ -11,15 +11,9 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.support.v7.widget.AppCompatSpinner
 import android.view.View
-import android.widget.AdapterView
-import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.ProgressBar
-import android.widget.Toast
-
+import android.widget.*
+import androidx.appcompat.widget.AppCompatSpinner
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
@@ -30,13 +24,10 @@ import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.SystemTools
-
-import java.util.ArrayList
-
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
-
+import java.util.ArrayList
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 
 class SyncSettingsActivity : BaseActivity() {
@@ -120,8 +111,8 @@ class SyncSettingsActivity : BaseActivity() {
 
         val versionCheckButton = findViewById<Button>(R.id.version_check)
         versionCheckButton.text = String.format(
-                getString(R.string.versionTemplate),
-                SystemTools.getAppVersionName(this)
+            getString(R.string.versionTemplate),
+            SystemTools.getAppVersionName(this)
         )
         versionCheckButton.setOnClickListener { v -> openAppMarket(v.context) }
 
@@ -130,7 +121,7 @@ class SyncSettingsActivity : BaseActivity() {
         groups = ArrayList()
         allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(this, groups)
-        mUsersAdapter = UserListAdapter(this, allUsers)
+        mUsersAdapter = UserListAdapter(this, allUsers!!)
         initData(null)
         mListView!!.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
@@ -176,58 +167,58 @@ class SyncSettingsActivity : BaseActivity() {
     fun initData(v: View?) {
         if (groups!!.isEmpty()) {
             groupsAreLoading = true
-            org.xwiki.android.sync.AppContext.apiManager.xwikiServicesApi.availableGroups(
-                    Constants.LIMIT_MAX_SYNC_USERS
+            AppContext.apiManager.xwikiServicesApi.availableGroups(
+                Constants.LIMIT_MAX_SYNC_USERS
             )
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { xWikiGroupCustomSearchResultContainer ->
-                                groupsAreLoading = false
-                                val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                                if (searchResults != null) {
-                                    groups!!.clear()
-                                    groups!!.addAll(searchResults)
-                                    updateListView()
-                                }
-                            },
-                            {
-                                groupsAreLoading = false
-                                runOnUiThread {
-                                    Toast.makeText(
-                                            this@SyncSettingsActivity,
-                                            R.string.cantGetGroups,
-                                            Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                refreshProgressBar()
-                            }
-                    )
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
+                        groupsAreLoading = false
+                        val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
+                        if (searchResults != null) {
+                            groups!!.clear()
+                            groups!!.addAll(searchResults)
+                            updateListView()
+                        }
+                    },
+                    Action1<Throwable> {
+                        groupsAreLoading = false
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@SyncSettingsActivity,
+                                R.string.cantGetGroups,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        refreshProgressBar()
+                    }
+                )
         }
         if (allUsers!!.isEmpty()) {
             allUsersAreLoading = true
-            org.xwiki.android.sync.AppContext.apiManager.xwikiServicesApi.allUsersPreview
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { summaries ->
-                                allUsersAreLoading = false
-                                allUsers!!.clear()
-                                allUsers!!.addAll(summaries.objectSummaries)
-                                updateListView()
-                            },
-                            {
-                                allUsersAreLoading = false
-                                runOnUiThread {
-                                    Toast.makeText(
-                                            this@SyncSettingsActivity,
-                                            R.string.cantGetAllUsers,
-                                            Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                                refreshProgressBar()
-                            }
-                    )
+            AppContext.apiManager.xwikiServicesApi.allUsersPreview
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
+                        allUsersAreLoading = false
+                        allUsers!!.clear()
+                        allUsers!!.addAll(summaries.objectSummaries)
+                        updateListView()
+                    },
+                    Action1<Throwable> {
+                        allUsersAreLoading = false
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@SyncSettingsActivity,
+                                R.string.cantGetAllUsers,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        refreshProgressBar()
+                    }
+                )
         }
         if (allUsersAreLoading!! || groupsAreLoading!!) {
             refreshProgressBar()
@@ -295,8 +286,8 @@ class SyncSettingsActivity : BaseActivity() {
         val account = availableAccounts[0]
 
         clearOldAccountContacts(
-                contentResolver,
-                account
+            contentResolver,
+            account
         )
 
         //if has changes, set sync
@@ -309,6 +300,7 @@ class SyncSettingsActivity : BaseActivity() {
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == SYNC_TYPE && compareSelectGroups()) {
+                Toast.makeText(this, getString(R.string.unchangedSettings), Toast.LENGTH_LONG).show()
                 return
             }
 
@@ -316,6 +308,7 @@ class SyncSettingsActivity : BaseActivity() {
 
             SharedPrefsUtils.putValue(applicationContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS)
             setSync(true)
+            finish() // TODO:: FIX IT TO CORRECT HANDLE OF COMPLETING SETTINGS
         }
     }
 
@@ -334,10 +327,11 @@ class SyncSettingsActivity : BaseActivity() {
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1)
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true)
             ContentResolver.addPeriodicSync(
-                    account,
-                    ContactsContract.AUTHORITY,
-                    Bundle.EMPTY,
-                    Constants.SYNC_INTERVAL.toLong())
+                account,
+                ContactsContract.AUTHORITY,
+                Bundle.EMPTY,
+                Constants.SYNC_INTERVAL.toLong()
+            )
             ContentResolver.requestSync(account, ContactsContract.AUTHORITY, Bundle.EMPTY)
         } else {
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY)
@@ -393,8 +387,8 @@ class SyncSettingsActivity : BaseActivity() {
                 if (otherApp.activityInfo.applicationInfo.packageName == "com.android.vending") {
                     val otherAppActivity = otherApp.activityInfo
                     val componentName = ComponentName(
-                            otherAppActivity.applicationInfo.packageName,
-                            otherAppActivity.name
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
                     )
                     rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
                     rateIntent.component = componentName
@@ -405,7 +399,10 @@ class SyncSettingsActivity : BaseActivity() {
             }
             // if GooglePlay not present on device, open web browser
             if (!marketFound) {
-                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName))
+                val webIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
+                )
                 context.startActivity(webIntent)
             }
         }

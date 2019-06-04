@@ -28,19 +28,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
 import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
 import org.xwiki.android.sync.utils.SharedPrefsUtils;
-
-import java.util.List;
-
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.functions.Action1;
-
+import java.util.List;
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 
 /**

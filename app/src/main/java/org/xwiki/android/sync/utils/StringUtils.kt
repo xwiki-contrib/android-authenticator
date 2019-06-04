@@ -19,12 +19,12 @@
  */
 package org.xwiki.android.sync.utils
 
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * String Utils

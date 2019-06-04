@@ -28,10 +28,8 @@ import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -39,8 +37,9 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import android.widget.ViewFlipper
-
+import androidx.appcompat.widget.Toolbar
 import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.AppContext.Companion.currentBaseUrl
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.BaseViewFlipper
@@ -50,16 +49,14 @@ import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.utils.IntentUtils
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.SharedPrefsUtils
-
+import rx.Subscription
 import java.lang.reflect.InvocationTargetException
 import java.util.ArrayList
-
-import rx.Subscription
 
 /**
  * Most important activity in authorisation process
  *
- * @version $Id: 4c1aedb4a48ae76f205c9a00fbd19d75225c7e83 $
+ * @version $Id: a16cb1867e9a1bfdae941273c24a77b95df1456a $
  */
 class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
@@ -119,16 +116,17 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            builder = AlertDialog.Builder(this@AuthenticatorActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
+            builder =
+                AlertDialog.Builder(this@AuthenticatorActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
         } else {
             builder = AlertDialog.Builder(this@AuthenticatorActivity)
         }
         builder.setTitle(R.string.xwiki)
-                .setIcon(resources.getDrawable(R.drawable.logo))
-                .setMessage(R.string.signUpOfferMessage)
-                .setPositiveButton(
-                        android.R.string.ok
-                ) { dialog, which -> dialog.dismiss() }
+            .setIcon(resources.getDrawable(R.drawable.logo))
+            .setMessage(R.string.signUpOfferMessage)
+            .setPositiveButton(
+                android.R.string.ok
+            ) { dialog, which -> dialog.dismiss() }
         mViewFlipper = findViewById(R.id.view_flipper)
         val position: Int?
         mAccountManager = AccountManager.get(applicationContext)
@@ -151,7 +149,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             super.onBackPressed()
         } else {
             doPrevious(
-                    mViewFlipper!!.currentView
+                mViewFlipper!!.currentView
             )
         }
     }
@@ -196,21 +194,21 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     private fun chooseAnimation(toNext: Boolean) {
         if (toNext) {
             mViewFlipper!!.inAnimation = AnimationUtils.loadAnimation(
-                    this,
-                    R.anim.push_left_in
+                this,
+                R.anim.push_left_in
             )
             mViewFlipper!!.outAnimation = AnimationUtils.loadAnimation(
-                    this,
-                    R.anim.push_left_out
+                this,
+                R.anim.push_left_out
             )
         } else {
             mViewFlipper!!.inAnimation = AnimationUtils.loadAnimation(
-                    this,
-                    R.anim.push_right_in
+                this,
+                R.anim.push_right_in
             )
             mViewFlipper!!.outAnimation = AnimationUtils.loadAnimation(
-                    this,
-                    R.anim.push_right_out
+                this,
+                R.anim.push_right_out
             )
         }
     }
@@ -222,14 +220,14 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View which trigger action
      */
     fun signUp(view: View) {
-        var url = AppContext.currentBaseUrl()
+        var url = currentBaseUrl()
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration"
         } else {
             url += "/bin/view/XWiki/Registration"
         }
         val intent = IntentUtils.openLink(
-                url
+            url
         )
         startActivity(intent)
     }
@@ -263,11 +261,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         if (flipper == null) {
             try {
                 flipper = orderOfFlippers[position].getConstructor(
-                        AuthenticatorActivity::class.java,
-                        View::class.java
+                    AuthenticatorActivity::class.java,
+                    View::class.java
                 ).newInstance(
-                        this,
-                        mViewFlipper!!.getChildAt(position)
+                    this,
+                    mViewFlipper!!.getChildAt(position)
                 )
                 flippers[position] = flipper
             } catch (e: InstantiationException) {
@@ -356,7 +354,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         Log.d(TAG, ">" + "finish return")
         finish()
         startActivity(
-                Intent(this, SyncSettingsActivity::class.java)
+            Intent(this, SyncSettingsActivity::class.java)
         )
     }
 

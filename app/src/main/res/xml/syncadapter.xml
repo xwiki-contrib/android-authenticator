@@ -37,5 +37,5 @@
     android:accountType="org.xwiki.android.sync"
     android:supportsUploading="false"
     android:userVisible="true"
-    android:isAlwaysSyncable="false"
+    android:isAlwaysSyncable="true"
 />

@@ -21,7 +21,6 @@ package org.xwiki.android.sync
 
 import android.app.Application
 import android.util.Log
-
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 
@@ -31,7 +30,7 @@ import java.util.ArrayList
 /**
  * Application class for authenticator
  *
- * @version $Id: 248b2c392240dff0a83ba90e924a5d9f26e316ff $
+ * @version $Id: c3a5996b1bce14d5c105a55f085115347c39c035 $
  */
 class AppContext : Application() {
 
@@ -95,8 +94,8 @@ class AppContext : Application() {
          */
         fun isAuthorizedApp(packageName: String): Boolean {
             val packageList = SharedPrefsUtils.getArrayList(
-                    instance!!.applicationContext,
-                    Constants.PACKAGE_LIST
+                instance!!.applicationContext,
+                Constants.PACKAGE_LIST
             )
             return packageList != null && packageList.contains(packageName)
         }
@@ -111,8 +110,8 @@ class AppContext : Application() {
                 val url = currentBaseUrl()
                 if (baseApiManager == null || baseApiManager!!.key != url) {
                     baseApiManager = AbstractMap.SimpleEntry(
-                            url,
-                            BaseApiManager(url)
+                        url,
+                        BaseApiManager(url)
                     )
                 }
                 return baseApiManager!!.value

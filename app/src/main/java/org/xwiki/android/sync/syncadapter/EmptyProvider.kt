@@ -19,10 +19,11 @@
  */
 package org.xwiki.android.sync.syncadapter
 
-import android.content.ContentProvider
-import android.content.ContentValues
-import android.database.Cursor
-import android.net.Uri
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+import androidx.annotation.Nullable;
 
 /**
  * Define an empty implementation of ContentProvider.

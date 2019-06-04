@@ -20,12 +20,10 @@
 package org.xwiki.android.sync.rest
 
 import android.content.Context
-
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.xwiki.android.sync.Constants
+import org.xwiki.android.sync.utils.SharedPrefsUtils
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,23 +31,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 /**
  * Will help to contain and separate functionality of working with API
  *
- * @version $Id: 25876386ced46ea5ec336fb45aebe66de9af6875 $
+ * @version $Id: 5f6167ab1821c765e6c4f42549b4447481e37cbc $
  */
-class BaseApiManager
-/**
- * Base constructor which create [OkHttpClient] with [XWikiInterceptor] which will
- * be used in [Retrofit] for correct handling of requests.
- *
- * @param baseUrl Url which will be used as base for all requests in this manager. Can be:
- *
- *  * http://www.xwiki.org/xwiki/
- *  * http://some.site.url/xwiki/
- *  * http://123.231.213.132/xwiki/
- *  * http://123.231.213.132:123456/xwiki/
- *
- * Strongly recommended to end url with **/
-
-(baseUrl:String) {
+class BaseApiManager {
 
     /**
      * Main services which provide work with auth, getting groups/users and other
@@ -57,7 +41,7 @@ class BaseApiManager
     /**
      * @return [.xWikiServices]
      */
-    var xwikiServicesApi: XWikiServices
+    val xwikiServicesApi: XWikiServices
 
     /**
      * Helper which work with downloading and managing of photos
@@ -69,30 +53,43 @@ class BaseApiManager
      *
      * @since 0.4
      */
-    var xWikiPhotosManager: XWikiPhotosManager
+    val xWikiPhotosManager: XWikiPhotosManager
 
-    init {
+    /**
+     * Base constructor which create [OkHttpClient] with [XWikiInterceptor] which will
+     * be used in [Retrofit] for correct handling of requests.
+     *
+     * @param baseUrl Url which will be used as base for all requests in this manager. Can be:
+     *
+     *  * http://www.xwiki.org/xwiki/
+     *  * http://some.site.url/xwiki/
+     *  * http://123.231.213.132/xwiki/
+     *  * http://123.231.213.132:123456/xwiki/
+     *
+     * Strongly recommended to end url with **/
+
+    constructor(baseUrl: String) {
         var baseUrl = baseUrl
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(XWikiInterceptor())
-                .addInterceptor(loggingInterceptor)
-                .build()
+            .addInterceptor(XWikiInterceptor())
+            .addInterceptor(loggingInterceptor)
+            .build()
 
         // Check that url ends with `/` and put it if not
         if (!baseUrl.endsWith("/")) {
-            baseUrl = baseUrl + "/"
+            baseUrl = "$baseUrl/"
         }
 
         val retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(okHttpClient)
-                .build()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+            .client(okHttpClient)
+            .build()
 
         xwikiServicesApi = initXWikiServices(retrofit)
         xWikiPhotosManager = initXWikiPhotosManager(okHttpClient, baseUrl)
@@ -104,7 +101,7 @@ class BaseApiManager
      *
      * @param context Will be used to get info from shared preferences
      */
-    constructor(context:Context) : this(SharedPrefsUtils.getValue(context, Constants.SERVER_ADDRESS, null)) {}
+    constructor(context: Context) : this(SharedPrefsUtils.getValue(context, Constants.SERVER_ADDRESS, null)) {}
 
     /**
      * Create [XWikiServices] using given [Retrofit] instance
@@ -115,7 +112,7 @@ class BaseApiManager
      * @since 0.4
      */
     private fun initXWikiServices(
-            retrofit: Retrofit
+        retrofit: Retrofit
     ): XWikiServices {
         return retrofit.create(XWikiServices::class.java)
     }
@@ -130,8 +127,8 @@ class BaseApiManager
      * @since 0.4
      */
     private fun initXWikiPhotosManager(
-            client: OkHttpClient,
-            baseUrl: String
+        client: OkHttpClient,
+        baseUrl: String
     ): XWikiPhotosManager {
         return XWikiPhotosManager(client, baseUrl)
     }

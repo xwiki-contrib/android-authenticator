@@ -1,21 +1,13 @@
 package org.xwiki.android.sync.auth;
 
-import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
-
 import com.robotium.solo.Solo;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.android.sync.Constants;
-import org.xwiki.android.sync.R;
-
-import static org.junit.Assert.*;
 
 /**
  * AuthenticatorActivityTest

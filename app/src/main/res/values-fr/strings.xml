@@ -61,7 +61,7 @@
     <!--select setting-->
     <string-array name="select_groups_array">
         <item>Tous les utilisateurs</item>
-        <item>Groupes d'utilisateurs</item>
+        <item>Groupes d\'utilisateurs</item>
         <item>Désactivé</item>
     </string-array>
     <string name="userExists">L\'utilisateur existe</string>

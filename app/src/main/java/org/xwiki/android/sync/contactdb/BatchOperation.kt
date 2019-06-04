@@ -22,7 +22,6 @@ package org.xwiki.android.sync.contactdb
 import android.content.ContentProviderOperation
 import android.content.ContentProviderResult
 import android.content.ContentResolver
-import android.content.Context
 import android.content.OperationApplicationException
 import android.net.Uri
 import android.os.RemoteException
@@ -34,7 +33,7 @@ import java.util.ArrayList
 /**
  * This class handles execution of batch mOperations on Contacts provider.
  *
- * @version $Id: ffaa4c03825a7f134d5e9af8af51190d7065a2d5 $
+ * @version $Id: ee2b72a85bf367d574d8910e4cc22db931c20841 $
  */
 class BatchOperation
 /**
@@ -42,11 +41,12 @@ class BatchOperation
  *
  * @param resolver Will be set to [.mResolver]
  */
-(
-        /**
-         * Variable for executing operations.
-         */
-        private val mResolver: ContentResolver) {
+    (
+    /**
+     * Variable for executing operations.
+     */
+    private val mResolver: ContentResolver
+) {
 
     /**
      * Currently actual operations list.
@@ -90,8 +90,8 @@ class BatchOperation
 
         try {
             val results = mResolver.applyBatch(
-                    ContactsContract.AUTHORITY,
-                    mOperations
+                ContactsContract.AUTHORITY,
+                mOperations
             )
             if (results.size > 0) {
                 for (result in results) {

@@ -25,12 +25,12 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-
+import androidx.appcompat.widget.Toolbar
 import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.AppContext.Companion.currentBaseUrl
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.auth.AuthenticatorActivity
@@ -41,7 +41,7 @@ import org.xwiki.android.sync.utils.SharedPrefsUtils
  * input your count's password and verify by comparing with local account's info
  * or sending password to server to verify according the response.
  *
- * @version $Id: 1e9a2e510c1d9d8425e73c9bd7efcf5ec34dfc74 $
+ * @version $Id: 84beda489e82810e3a8fb6ca67a7681c7ab0240a $
  */
 class GrantPermissionActivity : AccountAuthenticatorActivity() {
 
@@ -52,7 +52,7 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
 
     //get third-party app's informations from getIntent.
     private var uid = 0
-    private var packgName: String? = null
+    private var pkgName: String? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +62,7 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
 
         //get data from intent
         uid = intent.getIntExtra("uid", 0)
-        packgName = intent.getStringExtra("packageName")
+        pkgName = intent.getStringExtra("packageName")
         accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         accountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         authTokenType = intent.getStringExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE)
@@ -83,16 +83,17 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
     }
 
     fun onHandleAuthorize(view: View) {
-        AppContext.addAuthorizedApp(packageName!!)
+        AppContext.addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, Constants.ACCOUNT_TYPE)
-        val authToken = SharedPrefsUtils.getValue(AppContext.Companion.instance!!.applicationContext, Constants.COOKIE, "")
+        val authToken =
+            SharedPrefsUtils.getValue(AppContext.Companion.instance!!.getApplicationContext(), Constants.COOKIE, null)
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType)
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
-        intent.putExtra(Constants.SERVER_ADDRESS, AppContext.currentBaseUrl())
+        intent.putExtra(Constants.SERVER_ADDRESS, currentBaseUrl())
         setAccountAuthenticatorResult(intent.extras)
         setResult(Activity.RESULT_OK, intent)
         finish()

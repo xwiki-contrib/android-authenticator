@@ -22,42 +22,36 @@ package org.xwiki.android.sync.rest
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-
+import okhttp3.*
 import org.xwiki.android.sync.utils.ImageUtils
+import rx.Observable
+import rx.subjects.PublishSubject
 
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
-import java.nio.charset.Charset
-
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import rx.Observable
-import rx.subjects.PublishSubject
 
 /**
  * This manager can be used for downloading and managing photos
  *
- * @version $Id: 7189ad448a42e0b6afb12511234adb1f1213682a $
+ * @version $Id: 02ad2d651acca4af822779592856a2ac2be7cc8e $
  */
 class XWikiPhotosManager
 /**
  * @param client will be set to [.client]
  * @param baseUrl will be set to [.baseUrl]
  */
-(
-        /**
-         * Client context
-         */
-        private val client: OkHttpClient,
-        /**
-         * Requests base url
-         */
-        private val baseUrl: String) {
+    (
+    /**
+     * Client context
+     */
+    private val client: OkHttpClient,
+    /**
+     * Requests base url
+     */
+    private val baseUrl: String
+) {
 
     /**
      * Download avatar from XWiki and prepare it by [.prepareAvatar].
@@ -67,21 +61,23 @@ class XWikiPhotosManager
      * @return Object which can be used for subscribe to get avatar bytes
      */
     fun downloadAvatar(
-            name: String,
-            avatarName: String
+        name: String,
+        avatarName: String
     ): Observable<ByteArray>? {
         var request: Request? = null
         try {
             request = Request.Builder()
-                    .url(baseUrl + "bin/download/XWiki/"
+                .url(
+                    baseUrl + "bin/download/XWiki/"
                             + URLEncoder.encode(name, "UTF-8") + "/"
-                            + URLEncoder.encode(avatarName, "UTF-8"))
-                    .build()
+                            + URLEncoder.encode(avatarName, "UTF-8")
+                )
+                .build()
         } catch (e: UnsupportedEncodingException) {
             Log.e(
-                    XWikiPhotosManager::class.java.simpleName,
-                    "Can't encode user data for getting his avatar",
-                    e
+                XWikiPhotosManager::class.java.simpleName,
+                "Can't encode user data for getting his avatar",
+                e
             )
             return null
         }
@@ -106,7 +102,7 @@ class XWikiPhotosManager
                 }
 
                 val avatarBytes = prepareAvatar(
-                        response.body()!!.bytes()
+                    response.body()!!.bytes()
                 )
 
                 subject.onNext(avatarBytes)
@@ -128,8 +124,8 @@ class XWikiPhotosManager
         }
 
         val request = Request.Builder()
-                .url(captchaUrl)
-                .build()
+            .url(captchaUrl)
+            .build()
 
 
         val subject = PublishSubject.create<ByteArray>()
@@ -189,7 +185,7 @@ class XWikiPhotosManager
         }
         avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
         //ensure < 1M.  avoid transactionException when storing in local database.
-        avatar = ImageUtils.compressByQuality(avatar!!, 960)
+        avatar = ImageUtils.compressByQuality(avatar, 960)
         // Take the image we received from the server, whatever format it
         // happens to be in, and convert it to a JPEG image. Note: we're
         // not resizing the avatar - we assume that the image we get from

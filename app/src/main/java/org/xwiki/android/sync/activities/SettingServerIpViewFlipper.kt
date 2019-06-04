@@ -23,7 +23,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.auth.AuthenticatorActivity
@@ -35,7 +34,7 @@ import java.net.URL
 /**
  * Flipper for setting XWiki server address.
  *
- * @version $Id: 6d46bc79b82b2d032877e60ece24c6fb86c813d8 $
+ * @version $Id: 1764429bc21ab6d1aaa331ae01d81ac5b9afd1f2 $
  */
 class SettingServerIpViewFlipper
 /**
@@ -44,7 +43,7 @@ class SettingServerIpViewFlipper
  * @param activity Actual [AuthenticatorActivity]
  * @param contentRootView Root [View] of that flipper (not activity)
  */
-(activity: AuthenticatorActivity, contentRootView: View) : BaseViewFlipper(activity, contentRootView) {
+    (activity: AuthenticatorActivity, contentRootView: View) : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Check typed server address and call sign in if all is ok.

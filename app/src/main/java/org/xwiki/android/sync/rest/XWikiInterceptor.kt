@@ -21,38 +21,36 @@ package org.xwiki.android.sync.rest
 
 import android.content.Context
 import android.text.TextUtils
-
+import okhttp3.HttpUrl
+import okhttp3.Interceptor
+import okhttp3.Request
+import okhttp3.Request.Builder
+import okhttp3.Response
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 
 import java.io.IOException
 
-import okhttp3.HttpUrl
-import okhttp3.Interceptor
-import okhttp3.Request
-import okhttp3.Request.Builder
-import okhttp3.Response
-
 /**
  * Must be used for each [okhttp3.OkHttpClient] which you will create in
  * [BaseApiManager] bounds.
  *
- * @version $Id: cc8dc74971bdd601a90f30d68102c0f042d71cb3 $
+ * @version $Id: 374209a130ca477ae567048f6f4a129ace2ea0d1 $
  */
 class XWikiInterceptor : Interceptor {
 
     /**
-     * @return [] with key
-     * [#COOKIE()][Constants] and def value **empty string**
+     * @return [SharedPrefsUtils.getValue] with key
+     * [Constants.COOKIE] and def value **empty string**
      *
      * @since 0.4
      */
     private val cookie: String
         get() = SharedPrefsUtils.getValue(
-                AppContext.instance!!.applicationContext,
-                Constants.COOKIE,
-                ""
+            AppContext.instance!!.getApplicationContext(),
+            Constants.COOKIE,
+            ""
         )
 
     /**
@@ -71,13 +69,13 @@ class XWikiInterceptor : Interceptor {
 
         val originalHttpUrl = chainRequest.url()
         val url = originalHttpUrl.newBuilder()
-                .addQueryParameter("media", "json")
-                .build()
+            .addQueryParameter("media", "json")
+            .build()
 
         val builder = chainRequest.newBuilder()
-                .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
-                .header(HEADER_ACCEPT, CONTENT_TYPE)
-                .url(url)
+            .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
+            .header(HEADER_ACCEPT, CONTENT_TYPE)
+            .url(url)
 
         val cookie = cookie
 

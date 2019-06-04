@@ -2,32 +2,24 @@
 
 buildscript {
     // Sdk and tools
-    ext.minSdkVersion = 16
-    ext.targetSdkVersion = 27
-    ext.compileSdkVersion = 27
-    ext.buildToolsVersion = '27.0.3'
-
-    // App dependencies
-    ext.supportLibraryVersion = '27.1.1'
-    ext.retrofitVersion = '2.2.0'
-    ext.okHttp3Version = '3.8.0'
-    ext.loggingInterceptorVersion = okHttp3Version
-    ext.butterKnifeVersion = '8.0.1'
-
-    // Kotlin
-    ext.kotlin_version = '1.2.50'
-    ext.kotlin_coroutines_version = '0.23.0'
-    ext.kotlin_android_extensions_version = '0.3'
+    ext.minSdkVersion = rootProject.minSdkVersion.toInteger()
+    ext.targetSdkVersion = rootProject.targetSdkVersion.toInteger()
+    ext.compileSdkVersion = rootProject.compileSdkVersion.toInteger()
 
     repositories {
+        mavenLocal()
+        mavenCentral()
         jcenter()
-        //for JakeWharton sdk automatically installing
-        maven { url 'https://jitpack.io' }
+        maven {
+            url "https://jitpack.io"
+            name "Jitpack"
+        }
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -36,16 +28,13 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         mavenLocal()
         mavenCentral()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        jcenter()
         maven {
             url "https://jitpack.io"
             name "Jitpack"
         }
+        google()
     }
 }

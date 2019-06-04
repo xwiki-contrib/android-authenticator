@@ -23,16 +23,16 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 import java.util.ArrayList
 
 /**
  * Util class for helping with permissions
  *
- * @version $Id: 46c51c56032373e08702ba78e482815e6ff638b2 $
+ * @version $Id: 52495bcbfec076477f51bf0a65539a83bd0c6d6b $
  */
 class PermissionsUtils
 /**
@@ -45,10 +45,11 @@ class PermissionsUtils
  */
 @Throws(IllegalArgumentException::class)
 constructor(
-        /**
-         * Context of permission operations
-         */
-        private val activity: Activity) {
+    /**
+     * Context of permission operations
+     */
+    private val activity: Activity
+) {
 
     /**
      * Array of permissions which this application required
@@ -63,11 +64,11 @@ constructor(
     init {
         try {
             val info = activity
-                    .packageManager
-                    .getPackageInfo(
-                            activity.packageName,
-                            PackageManager.GET_PERMISSIONS
-                    )
+                .packageManager
+                .getPackageInfo(
+                    activity.packageName,
+                    PackageManager.GET_PERMISSIONS
+                )
             mRequiredPermissions = info.requestedPermissions
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e(PermissionsUtils::class.java.simpleName, "Can't get package of input activity")
