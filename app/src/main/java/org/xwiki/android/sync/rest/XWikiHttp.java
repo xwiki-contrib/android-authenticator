@@ -310,7 +310,7 @@ public class XWikiHttp {
             final ObjectSummary summary = queueOfSummaries.poll();
 
             try {
-                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.headline);
+                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.getHeadline());
                 if (spaceAndName == null) {
                     continue;
                 }
@@ -367,7 +367,7 @@ public class XWikiHttp {
                     }
                 );
             } catch (Exception e) {
-                Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
+                Log.e(TAG, "Can't synchronize object with id: " + summary.getHeadline(), e);
             }
         }
     }
@@ -427,9 +427,9 @@ public class XWikiHttp {
                 return;
             }
             AppContext.Companion.getApiManager().getXwikiServicesApi().getFullUserDetails(
-                item.wiki,
-                item.space,
-                item.space
+                item.getWiki(),
+                item.getSpace(),
+                item.getPageName()
             ).subscribe(
                 new Observer<XWikiUserFull>() {
                     @Override

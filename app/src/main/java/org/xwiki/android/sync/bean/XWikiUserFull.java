@@ -133,8 +133,8 @@ public class XWikiUserFull {
      */
     private String searchValue(String key) {
         for (Property property : properties) {
-            if (property.name != null && property.name.equals(key)) {
-                return property.value;
+            if (property.getName() != null && property.getName().equals(key)) {
+                return property.getValue();
             }
         }
         return null;
@@ -158,30 +158,30 @@ public class XWikiUserFull {
      */
     private void setValue(String key, String value, String type) {
         for (Property property : properties) {
-            if (property.name != null && property.name.equals(key)) {
-                property.value = value;
+            if (property.getName() != null && property.getName().equals(key)) {
+                property.setValue(value);
                 return;
             }
         }
         Property property = new Property();
-        property.name = key;
-        property.value = value;
-        property.type = type;
+        property.setValue(key);
+        property.setValue(value);
+        property.setType(type);
 
         KeyValueObject nameKeyValue = new KeyValueObject();
-        nameKeyValue.key = "name";
-        nameKeyValue.value = property.name;
-        property.attributes.add(nameKeyValue);
+        nameKeyValue.setKey("name");
+        nameKeyValue.setValue(property.getValue());
+        property.getAttributes().add(nameKeyValue);
 
         KeyValueObject valueKeyValue = new KeyValueObject();
-        valueKeyValue.key = "value";
-        valueKeyValue.value = property.value;
-        property.attributes.add(valueKeyValue);
+        valueKeyValue.setKey("value");
+        valueKeyValue.setValue(property.getValue());
+        property.getAttributes().add(valueKeyValue);
 
         KeyValueObject typeKeyValue = new KeyValueObject();
-        typeKeyValue.key = "type";
-        typeKeyValue.value = property.type;
-        property.attributes.add(typeKeyValue);
+        typeKeyValue.setKey(type);
+        typeKeyValue.setValue(property.getType());
+        property.getAttributes().add(typeKeyValue);
 
         properties.add(
             property

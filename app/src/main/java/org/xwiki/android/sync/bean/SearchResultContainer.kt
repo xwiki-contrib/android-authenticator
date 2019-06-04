@@ -17,13 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.bean;
+package org.xwiki.android.sync.bean
 
-import java.util.List;
-
-public class Property {
-    public List<KeyValueObject> attributes;
-    public String name;
-    public String value;
-    public String type;
+class SearchResultContainer {
+    var links: Array<String>? = null
+    var searchResults: List<SearchResult>? = null
 }

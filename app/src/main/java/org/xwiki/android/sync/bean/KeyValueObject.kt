@@ -17,24 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.bean;
+package org.xwiki.android.sync.bean
 
-/**
- * Page
- */
-public class Page {
-    public String id;
-
-    public String name;
-
-    public String lastModified;
-
-    @Override
-    public String toString() {
-        return "Page{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", lastModified='" + lastModified + '\'' +
-                '}';
-    }
+class KeyValueObject {
+    var key: String? = null
+    var value: String? = null
 }

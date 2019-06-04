@@ -117,7 +117,7 @@ object ContactManager {
                         }
                         updateAvatar(
                                 resolver,
-                                lookupRawContact(resolver, xWikiUserFull.id),
+                                lookupRawContact(resolver, xWikiUserFull.id!!),
                                 xWikiUserFull
                         )
                     }
@@ -145,8 +145,8 @@ object ContactManager {
                 .apiManager
                 .xWikiPhotosManager
                 .downloadAvatar(
-                        xwikiUser.pageName,
-                        xwikiUser.avatar
+                        xwikiUser.pageName!!,
+                        xwikiUser.avatar!!
                 )
         gettingAvatarObservable?.subscribe(
                 { bytes ->

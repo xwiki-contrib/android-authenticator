@@ -17,38 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.bean;
-
-import com.google.gson.annotations.SerializedName;
+package org.xwiki.android.sync.bean
 
 /**
- * XWikiGroup
+ * Page
  */
-public class XWikiGroup {
-    /**
-     * curriki:XWiki.XWikiAdminGroup
-     */
-    public String id;
+class Page {
+    var id: String? = null
 
-    public String wiki;
+    var name: String? = null
 
-    public String space;
+    var lastModified: String? = null
 
-    public String pageName;
-
-    @SerializedName("modified")
-    public String lastModifiedDate;
-
-    public String version;
-
-    @Override
-    public String toString() {
-        return "XWikiGroup{" +
-                "id='" + id + '\'' +
-                ", wiki='" + wiki + '\'' +
-                ", space='" + space + '\'' +
-                ", pageName='" + pageName + '\'' +
-                ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                '}';
+    override fun toString(): String {
+        return "Page{" +
+                "id='" + id + '\''.toString() +
+                ", name='" + name + '\''.toString() +
+                ", lastModified='" + lastModified + '\''.toString() +
+                '}'.toString()
     }
 }
