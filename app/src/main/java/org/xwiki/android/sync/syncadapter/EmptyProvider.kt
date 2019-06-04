@@ -17,13 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.syncadapter;
+package org.xwiki.android.sync.syncadapter
 
-import android.content.ContentProvider;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.support.annotation.Nullable;
+import android.content.ContentProvider
+import android.content.ContentValues
+import android.database.Cursor
+import android.net.Uri
 
 /**
  * Define an empty implementation of ContentProvider.
@@ -31,64 +30,59 @@ import android.support.annotation.Nullable;
  * and your app doesn't have a content provider, your sync adapter crashes.
  * reference: http://developer.android.com/training/sync-adapters/creating-stub-provider.html .
  *
- * <p>
+ *
+ *
  * In fact this provider doing nothing.
  *
- * @version $Id$
+ * @version $Id: 2b5aa90b98bde32af5f432238154ba15ea56521d $
  */
-public class EmptyProvider extends ContentProvider {
+class EmptyProvider : ContentProvider() {
 
     /**
      * Always return true, indicating that the provider loaded correctly.
      */
-    @Override
-    public boolean onCreate() {
-        return true;
+    override fun onCreate(): Boolean {
+        return true
     }
 
     /**
      * Always returns no results
      */
-    @Override
-    public Cursor query(
-            Uri uri,
-            String[] projection,
-            String selection,
-            String[] selectionArgs,
-            String sortOrder) {
-        return null;
+    override fun query(
+            uri: Uri,
+            projection: Array<String>?,
+            selection: String?,
+            selectionArgs: Array<String>?,
+            sortOrder: String?): Cursor? {
+        return null
     }
 
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        return null;
+    override fun getType(uri: Uri): String? {
+        return null
     }
 
     /**
      * Always returns null (no URI)
      */
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        return null;
+    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        return null
     }
 
     /**
      * Always returns "no rows affected" (0)
      */
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
+        return 0
     }
 
     /**
      * Always returns "no rows affected" (0)
      */
-    public int update(
-            Uri uri,
-            ContentValues values,
-            String selection,
-            String[] selectionArgs) {
-        return 0;
+    override fun update(
+            uri: Uri,
+            values: ContentValues?,
+            selection: String?,
+            selectionArgs: Array<String>?): Int {
+        return 0
     }
 }

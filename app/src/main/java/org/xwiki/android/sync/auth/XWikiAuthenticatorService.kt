@@ -17,29 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.auth;
+package org.xwiki.android.sync.auth
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 
 /**
- * @version $Id$
+ * @version $Id: fabb53ef3f7c6da17bdf95ae93ec998f6f95377d $
  */
-public class XWikiAuthenticatorService extends Service {
+class XWikiAuthenticatorService : Service() {
 
-    private XWikiAuthenticator authenticator = null;
+    private var authenticator: XWikiAuthenticator? = null
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    override fun onCreate() {
+        super.onCreate()
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
+    override fun onBind(intent: Intent): IBinder? {
         if (authenticator == null) {
-            authenticator = new XWikiAuthenticator(this);
+            authenticator = XWikiAuthenticator(this)
         }
-        return authenticator.getIBinder();
+        return authenticator!!.iBinder
     }
 }

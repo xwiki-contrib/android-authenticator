@@ -188,13 +188,13 @@ class EditContactActivity : BaseActivity() {
                 it.wiki,
                 it.space,
                 it.pageName,
-                it.firstName,
-                it.lastName,
-                it.email,
-                it.phone,
-                it.address,
-                it.company,
-                it.comment
+                it.firstName!!,
+                it.lastName!!,
+                it.email!!,
+                it.phone!!,
+                it.address!!,
+                it.company!!,
+                it.comment!!
             ).observeOn(
                 AndroidSchedulers.mainThread()
             ).subscribeOn(

@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.syncadapter;
+package org.xwiki.android.sync.syncadapter
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 
 
 /**
@@ -29,37 +29,38 @@ import android.os.IBinder;
  * ACTION_AUTHENTICATOR_INTENT. It instantiates the syncadapter and returns its
  * IBinder.
  *
- * @version $Id$
+ * @version $Id: 291666b3aeb724f517ab554e331df8a0962b9e09 $
  */
-public class SyncService extends Service {
+class SyncService : Service() {
 
     /**
-     * Object which will be used for synchronized process
+     * Init [.sSyncAdapter] if it is null.
      */
-    private static final Object sSyncAdapterLock = new Object();
-
-    /**
-     * Instance of sync adapter
-     */
-    private static SyncAdapter sSyncAdapter = null;
-
-    /**
-     * Init {@link #sSyncAdapter} if it is null.
-     */
-    @Override
-    public void onCreate() {
-        synchronized (sSyncAdapterLock) {
+    override fun onCreate() {
+        synchronized(sSyncAdapterLock) {
             if (sSyncAdapter == null) {
-                sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
+                sSyncAdapter = SyncAdapter(applicationContext, true)
             }
         }
     }
 
     /**
-     * @return {@link SyncAdapter#getSyncAdapterBinder()} of {@link #sSyncAdapter}
+     * @return [SyncAdapter.getSyncAdapterBinder] of [.sSyncAdapter]
      */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return sSyncAdapter.getSyncAdapterBinder();
+    override fun onBind(intent: Intent): IBinder? {
+        return sSyncAdapter!!.syncAdapterBinder
+    }
+
+    companion object {
+
+        /**
+         * Object which will be used for synchronized process
+         */
+        private val sSyncAdapterLock = Any()
+
+        /**
+         * Instance of sync adapter
+         */
+        private var sSyncAdapter: SyncAdapter? = null
     }
 }

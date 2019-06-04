@@ -92,13 +92,13 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         //just for passing some param
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
+        intent.putExtra(AuthenticatorActivity.Companion.getKEY_AUTH_TOKEN_TYPE(), authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         //for granting permission
-        intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
-        intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
+        intent.putExtra(AuthenticatorActivity.Companion.getPARAM_APP_UID(), uid);
+        intent.putExtra(AuthenticatorActivity.Companion.getPARAM_APP_PACKAGENAME(), packageName);
         //true: if from XWiki Account Preference, false:if from adding account.
-        intent.putExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
+        intent.putExtra(AuthenticatorActivity.Companion.getIS_SETTING_SYNC_TYPE(), false);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -141,7 +141,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             intent.putExtra("packageName", packageName);
             intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
             intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
+            intent.putExtra(AuthenticatorActivity.Companion.getKEY_AUTH_TOKEN_TYPE(), authTokenType);
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 
             Bundle bundle = new Bundle();

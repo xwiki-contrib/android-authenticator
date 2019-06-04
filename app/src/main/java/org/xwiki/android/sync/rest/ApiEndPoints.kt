@@ -17,24 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.rest;
+package org.xwiki.android.sync.rest
 
 /**
  * Collection of XWiki API endpoints
  *
- * @see <a href="https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiRESTfulAPI">
- *     XWiki RESTful API
- *     </a>
+ * @see [
+ * XWiki RESTful API
+](https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiRESTfulAPI) *
  *
- * @version $Id$
+ *
+ * @version $Id: 39b96e9fd983dd9bda2652f60da9c7d82b2e94f2 $
  */
-public class ApiEndPoints {
-    public static final String REST = "rest/";
-    public static final String BIN = "bin/";
-    public static final String DOWNLOAD = "download/";
-    public static final String WIKIS = "wikis";
-    public static final String SPACES = "spaces";
-    public static final String PAGES = "pages";
-    public static final String XWIKI_OBJECTS = "objects/XWiki.XWikiUsers/0";
+object ApiEndPoints {
+    const val REST = "rest/"
+    const val BIN = "bin/"
+    const val DOWNLOAD = "download/"
+    const val WIKIS = "wikis"
+    const val SPACES = "spaces"
+    const val PAGES = "pages"
+    const val XWIKI_OBJECTS = "objects/XWiki.XWikiUsers/0"
 
 }
