@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.xwiki.android.sync.AppContext;
 import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.R;
 import org.xwiki.android.sync.activities.base.BaseActivity;
@@ -104,7 +105,7 @@ public class SyncSettingsActivity extends BaseActivity {
         versionCheckButton.setText(
             String.format(
                 getString(R.string.versionTemplate),
-                SystemTools.getAppVersionName(this)
+                SystemTools.Companion.getAppVersionName(this)
             )
         );
         versionCheckButton.setOnClickListener(new View.OnClickListener() {

@@ -16,7 +16,9 @@ import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.utils.StringUtils.*
+import org.xwiki.android.sync.utils.StringUtils.isEmail
+import org.xwiki.android.sync.utils.StringUtils.isEmpty
+import org.xwiki.android.sync.utils.StringUtils.isPhone
 import org.xwiki.android.sync.utils.extensions.unauthorized
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers

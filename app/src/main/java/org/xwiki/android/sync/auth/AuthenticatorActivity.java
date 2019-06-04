@@ -58,9 +58,6 @@ import java.util.List;
 
 import rx.Subscription;
 
-import static org.xwiki.android.sync.AppContext.currentBaseUrl;
-
-
 /**
  * Most important activity in authorisation process
  *
@@ -281,13 +278,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      * @param view View which trigger action
      */
     public void signUp(View view) {
-        String url = currentBaseUrl();
+        String url = AppContext.currentBaseUrl();
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration";
         } else {
             url += "/bin/view/XWiki/Registration";
         }
-        Intent intent = IntentUtils.openLink(
+        Intent intent = IntentUtils.Companion.openLink(
             url
         );
         startActivity(intent);

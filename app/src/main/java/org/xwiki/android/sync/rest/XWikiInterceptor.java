@@ -84,8 +84,8 @@ public class XWikiInterceptor implements Interceptor {
     }
 
     /**
-     * @return {@link SharedPrefsUtils#getValue(Context, String, String)} with key
-     * {@link Constants#COOKIE} and def value <b>empty string</b>
+     * @return {@link SharedPrefsUtils.getValue(Context, String, String)} with key
+     * {@link Constants #COOKIE()} and def value <b>empty string</b>
      *
      * @since 0.4
      */

@@ -200,7 +200,7 @@ public class XWikiPhotosManager {
         }
         avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         //ensure < 1M.  avoid transactionException when storing in local database.
-        avatar = ImageUtils.compressByQuality(avatar, 960);
+        avatar = ImageUtils.Companion.compressByQuality(avatar, 960);
         // Take the image we received from the server, whatever format it
         // happens to be in, and convert it to a JPEG image. Note: we're
         // not resizing the avatar - we assume that the image we get from

@@ -51,8 +51,6 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-import static org.xwiki.android.sync.AppContext.getApiManager;
-
 /**
  * Static class which can be used as wrapper for a few requests such as login and other. It
  * contains additional logic which was not added for requests by automatically creating
@@ -88,7 +86,7 @@ public class XWikiHttp {
         @NonNull String password
     ) {
         final PublishSubject<String> authTokenSubject = PublishSubject.create();
-        getApiManager().getXwikiServicesApi().login(
+        AppContext.getApiManager().getXwikiServicesApi().login(
             Credentials.basic(username, password)
         ).subscribeOn(
             Schedulers.newThread()
@@ -257,7 +255,7 @@ public class XWikiHttp {
                 subject.onError(exception);
                 throw exception;
             }
-            getApiManager().getXwikiServicesApi().getGroupMembers(
+            AppContext.getApiManager().getXwikiServicesApi().getGroupMembers(
                 split[0],
                 split[1],
                 split[2]
@@ -316,7 +314,7 @@ public class XWikiHttp {
                 if (spaceAndName == null) {
                     continue;
                 }
-                getApiManager().getXwikiServicesApi().getFullUserDetails(
+                AppContext.getApiManager().getXwikiServicesApi().getFullUserDetails(
                     spaceAndName.getKey(),
                     spaceAndName.getValue()
                 ).subscribe(
@@ -391,7 +389,7 @@ public class XWikiHttp {
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
-            getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
+            AppContext.getApiManager().getXwikiServicesApi().getAllUsersPreview().subscribe(
                 new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
@@ -428,10 +426,10 @@ public class XWikiHttp {
             if (subject.getThrowable() != null) {// was was not error in sync
                 return;
             }
-            getApiManager().getXwikiServicesApi().getFullUserDetails(
+            AppContext.getApiManager().getXwikiServicesApi().getFullUserDetails(
                 item.wiki,
                 item.space,
-                item.pageName
+                item.space
             ).subscribe(
                 new Observer<XWikiUserFull>() {
                     @Override

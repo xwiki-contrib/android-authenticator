@@ -23,7 +23,6 @@ import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,12 +42,6 @@ import retrofit2.Response;
 import rx.functions.Action1;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static org.xwiki.android.sync.AppContext.currentBaseUrl;
-import static org.xwiki.android.sync.AppContext.getApiManager;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_FULL_ACCESS;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY;
-import static org.xwiki.android.sync.Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
 
 /**
  * Realisation of authenticator for XWiki account. Full required management of XWiki account
@@ -172,7 +165,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 authToken[0] = null;
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 final Object sync = new Object();
-                getApiManager().getXwikiServicesApi().login(
+                AppContext.getApiManager().getXwikiServicesApi().login(
                         Credentials.basic(accountName, accountPassword)
                 ).subscribe(
                         new Action1<Response<ResponseBody>>() {
@@ -213,7 +206,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(Constants.SERVER_ADDRESS, currentBaseUrl());
+            result.putString(Constants.SERVER_ADDRESS, AppContext.currentBaseUrl());
             return result;
         }
     }
@@ -228,10 +221,10 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public String getAuthTokenLabel(String authTokenType) {
         Log.d(TAG, "getAuthTokenLabel," + authTokenType);
-        if (AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
-            return AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
-        else if (AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
-            return AUTHTOKEN_TYPE_READ_ONLY_LABEL;
+        if (Constants.AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
+            return Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
+        else if (Constants.AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
+            return Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
         else
             return authTokenType + " (Label)";
     }
