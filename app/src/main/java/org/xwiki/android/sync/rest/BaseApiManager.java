@@ -98,7 +98,7 @@ public class BaseApiManager {
      * @param context Will be used to get info from shared preferences
      */
     public BaseApiManager(Context context) {
-        this(SharedPrefsUtils.getValue(context, Constants.SERVER_ADDRESS, null));
+        this(SharedPrefsUtils.Companion.getValue(context, Constants.Companion.getSERVER_ADDRESS(), null));
     }
 
     /**

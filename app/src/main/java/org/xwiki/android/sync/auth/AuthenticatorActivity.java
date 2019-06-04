@@ -175,7 +175,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         mViewFlipper = findViewById(R.id.view_flipper);
         Integer position;
         mAccountManager = AccountManager.get(getApplicationContext());
-        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.Companion.getACCOUNT_TYPE());
         position = 0;
         if (availableAccounts.length > 0) {
             Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show();
@@ -278,7 +278,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      * @param view View which trigger action
      */
     public void signUp(View view) {
-        String url = AppContext.currentBaseUrl();
+        String url = AppContext.Companion.currentBaseUrl();
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration";
         } else {
@@ -359,9 +359,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public void clearOldAccount(){
         //TODO: clear current user url
         //clear SharePreference
-        SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST);
-        SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS);
-        SharedPrefsUtils.removeKeyValue(this, Constants.SYNC_TYPE);
+        SharedPrefsUtils.Companion.removeKeyValue(this, Constants.Companion.getPACKAGE_LIST());
+        SharedPrefsUtils.Companion.removeKeyValue(this, Constants.Companion.getSELECTED_GROUPS());
+        SharedPrefsUtils.Companion.removeKeyValue(this, Constants.Companion.getSYNC_TYPE());
     }
 
     //TODO: Replace this logic to another place
@@ -389,7 +389,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
-        final Account account = new Account(accountName, Constants.ACCOUNT_TYPE);
+        final Account account = new Account(accountName, Constants.Companion.getACCOUNT_TYPE());
         mAccountManager.addAccountExplicitly(account, accountPassword, null);
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName);
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword);
@@ -401,7 +401,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         Log.d(TAG, packaName + ", " + getPackageName());
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
         if (packaName != null && !packaName.contains("android.uid.system")) {
-            AppContext.addAuthorizedApp(packaName);
+            AppContext.Companion.addAuthorizedApp(packaName);
             String authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             if (!TextUtils.isEmpty(authToken)) {
                 String authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE);
@@ -411,7 +411,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         //return value to AccountManager
         Intent intentReturn = new Intent();
-        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.Companion.getACCOUNT_TYPE());
         intentReturn.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
         setAccountAuthenticatorResult(intentReturn.getExtras());
         setResult(RESULT_OK, intentReturn);

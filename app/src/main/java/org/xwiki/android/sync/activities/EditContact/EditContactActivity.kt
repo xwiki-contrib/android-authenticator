@@ -184,7 +184,7 @@ class EditContactActivity : BaseActivity() {
             }
             disableContainer()
 
-            AppContext.getApiManager().xwikiServicesApi.updateUser(
+            AppContext.apiManager.xwikiServicesApi.updateUser(
                 it.wiki,
                 it.space,
                 it.pageName,
@@ -400,7 +400,7 @@ class EditContactActivity : BaseActivity() {
             ).show()
         }
         splittedUserId ?.let {
-            AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
+            AppContext.Companion.apiManager.xwikiServicesApi.getFullUserDetails(
                 it[0],
                 it[1],
                 it[2]

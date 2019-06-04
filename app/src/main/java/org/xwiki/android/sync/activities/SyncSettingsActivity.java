@@ -39,7 +39,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import static org.xwiki.android.sync.AppContext.getApiManager;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.clearOldAccountContacts;
 
 public class SyncSettingsActivity extends BaseActivity {
@@ -139,7 +138,7 @@ public class SyncSettingsActivity extends BaseActivity {
             }
         });
 
-        SYNC_TYPE = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+        SYNC_TYPE = SharedPrefsUtils.Companion.getValue(this, Constants.Companion.getSYNC_TYPE(), Constants.SYNC_TYPE_ALL_USERS);
         selectSyncSpinner.setSelection(SYNC_TYPE);
     }
 
@@ -202,7 +201,7 @@ public class SyncSettingsActivity extends BaseActivity {
     public void initData(View v) {
         if (groups.isEmpty()) {
             groupsAreLoading = true;
-            getApiManager().getXwikiServicesApi().availableGroups(
+            org.xwiki.android.sync.AppContext.Companion.getApiManager().getXwikiServicesApi().availableGroups(
                 Constants.LIMIT_MAX_SYNC_USERS
             )
                 .subscribeOn(Schedulers.newThread())
@@ -243,7 +242,7 @@ public class SyncSettingsActivity extends BaseActivity {
         }
         if (allUsers.isEmpty()) {
             allUsersAreLoading = true;
-            getApiManager().getXwikiServicesApi().getAllUsersPreview()
+            org.xwiki.android.sync.AppContext.Companion.getApiManager().getXwikiServicesApi().getAllUsersPreview()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -332,14 +331,14 @@ public class SyncSettingsActivity extends BaseActivity {
      */
     public void syncSettingComplete(View v) {
         //check changes. if no change, directly return
-        int oldSyncType = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, -1);
+        int oldSyncType = SharedPrefsUtils.Companion.getValue(this, Constants.Companion.getSYNC_TYPE(), -1);
         if(oldSyncType == SYNC_TYPE && !syncGroups()){
             return;
         }
 
         //TODO:: fix when will separate to different accounts
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
-        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.Companion.getACCOUNT_TYPE());
         Account account = availableAccounts[0];
 
         clearOldAccountContacts(
@@ -349,10 +348,10 @@ public class SyncSettingsActivity extends BaseActivity {
 
         //if has changes, set sync
         if(syncNothing()){
-            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC);
+            SharedPrefsUtils.Companion.putValue(getApplicationContext(), Constants.Companion.getSYNC_TYPE(), Constants.SYNC_TYPE_NO_NEED_SYNC);
             setSync(false);
         } else if (syncAllUsers()) {
-            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS);
+            SharedPrefsUtils.Companion.putValue(getApplicationContext(), Constants.Companion.getSYNC_TYPE(), Constants.SYNC_TYPE_ALL_USERS);
             setSync(true);
         } else if(syncGroups()){
             //compare to see if there are some changes.
@@ -362,7 +361,7 @@ public class SyncSettingsActivity extends BaseActivity {
 
             mGroupAdapter.saveSelectedGroups();
 
-            SharedPrefsUtils.putValue(getApplicationContext(), Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS);
+            SharedPrefsUtils.Companion.putValue(getApplicationContext(), Constants.Companion.getSYNC_TYPE(), Constants.SYNC_TYPE_SELECTED_GROUPS);
             setSync(true);
         }
     }
@@ -374,10 +373,10 @@ public class SyncSettingsActivity extends BaseActivity {
      */
     private void setSync(boolean syncEnabled) {
         AccountManager mAccountManager = AccountManager.get(getApplicationContext());
-        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE);
+        Account availableAccounts[] = mAccountManager.getAccountsByType(Constants.Companion.getACCOUNT_TYPE());
         Account account = availableAccounts[0];
         if (syncEnabled) {
-            mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null);
+            mAccountManager.setUserData(account, Constants.Companion.getSYNC_MARKER_KEY(), null);
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY);
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
@@ -400,7 +399,7 @@ public class SyncSettingsActivity extends BaseActivity {
         //new
         List<XWikiGroup> newList = mGroupAdapter.getSelectGroups();
         //old
-        List<String> oldList = SharedPrefsUtils.getArrayList(getApplicationContext(), Constants.SELECTED_GROUPS);
+        List<String> oldList = SharedPrefsUtils.Companion.getArrayList(getApplicationContext(), Constants.Companion.getSELECTED_GROUPS());
         if(newList == null && oldList == null){
             return true;
         }else if(newList != null && oldList != null){

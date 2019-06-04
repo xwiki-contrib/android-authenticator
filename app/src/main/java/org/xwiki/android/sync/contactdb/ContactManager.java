@@ -146,7 +146,7 @@ public class ContactManager {
         final long rawId,
         XWikiUserFull xwikiUser
     ) {
-        Observable<byte[]> gettingAvatarObservable = AppContext
+        Observable<byte[]> gettingAvatarObservable = AppContext.Companion
             .getApiManager()
             .getXWikiPhotosManager()
             .downloadAvatar(
@@ -334,7 +334,7 @@ public class ContactManager {
          */
         static final String SELECTION =
             RawContacts.ACCOUNT_TYPE + "='"
-            + Constants.ACCOUNT_TYPE + "' AND "
+            + Constants.Companion.getACCOUNT_TYPE() + "' AND "
             + RawContacts.SOURCE_ID + "=?";
     }
 
@@ -395,7 +395,7 @@ public class ContactManager {
          */
         static final String SELECTION =
             RawContacts.ACCOUNT_TYPE + "='"
-            + Constants.ACCOUNT_TYPE + "' AND "
+            + Constants.Companion.getACCOUNT_TYPE() + "' AND "
             + RawContacts.ACCOUNT_NAME + "=?";
     }
 }

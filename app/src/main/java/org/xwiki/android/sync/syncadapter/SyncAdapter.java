@@ -110,9 +110,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             false
         );
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtils.getValue(
+        int syncType = SharedPrefsUtils.Companion.getValue(
             mContext,
-            Constants.SYNC_TYPE,
+            Constants.Companion.getSYNC_TYPE(),
             Constants.SYNC_TYPE_NO_NEED_SYNC
         );
         Log.i(TAG, "syncType=" + syncType);
@@ -193,7 +193,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @return the change high-water-mark  Iso8601
      */
     private String getServerSyncMarker(Account account) {
-        String lastSyncIso = mAccountManager.getUserData(account, Constants.SYNC_MARKER_KEY);
+        String lastSyncIso = mAccountManager.getUserData(account, Constants.Companion.getSYNC_MARKER_KEY());
         //if empty, just return new Date(0) so that we can get all users from server.
         if (TextUtils.isEmpty(lastSyncIso)) {
             return StringUtils.dateToIso8601String(new Date(0));
@@ -208,7 +208,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @param lastSyncIso The high-water-mark we want to save.
      */
     private void setServerSyncMarker(Account account, String lastSyncIso) {
-        mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, lastSyncIso);
+        mAccountManager.setUserData(account, Constants.Companion.getSYNC_MARKER_KEY(), lastSyncIso);
     }
 }
 

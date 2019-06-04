@@ -90,9 +90,9 @@ public class XWikiInterceptor implements Interceptor {
      * @since 0.4
      */
     private String getCookie() {
-        return SharedPrefsUtils.getValue(
-            AppContext.getInstance().getApplicationContext(),
-            Constants.COOKIE,
+        return SharedPrefsUtils.Companion.getValue(
+            AppContext.Companion.getInstance().getApplicationContext(),
+            Constants.Companion.getCOOKIE(),
             ""
         );
     }

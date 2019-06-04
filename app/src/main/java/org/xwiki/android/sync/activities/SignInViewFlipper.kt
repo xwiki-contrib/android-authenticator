@@ -158,7 +158,7 @@ class SignInViewFlipper
             username: String,
             password: String
     ): Intent {
-        val userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null)
+        val userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, "")
 
         val accountType = mActivity.intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
 

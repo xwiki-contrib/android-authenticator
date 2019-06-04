@@ -24,7 +24,7 @@ public class SharedPrefsUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        mContext = AppContext.getInstance().getApplicationContext();
+        mContext = AppContext.Companion.getInstance().getApplicationContext();
     }
 
     @Test
@@ -33,8 +33,8 @@ public class SharedPrefsUtilsTest {
         for(int i=0; i<10; i++){
             mList.add("i="+i);
         }
-        SharedPrefsUtils.putArrayList(mContext, "mList", mList);
-        List<String> mList2 = SharedPrefsUtils.getArrayList(mContext, "mList");
+        SharedPrefsUtils.Companion.putArrayList(mContext, "mList", mList);
+        List<String> mList2 = SharedPrefsUtils.Companion.getArrayList(mContext, "mList");
         assertEquals(mList.size(), mList2.size());
         for(String item : mList) {
             assertTrue(mList2.contains(item));
