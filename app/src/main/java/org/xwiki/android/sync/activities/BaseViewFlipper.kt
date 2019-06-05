@@ -18,75 +18,66 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.android.sync.activities;
+package org.xwiki.android.sync.activities
 
-import android.content.Context;
-import android.view.View;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import org.xwiki.android.sync.auth.AuthenticatorActivity;
+import android.content.Context
+import android.view.View
+import org.xwiki.android.sync.auth.AuthenticatorActivity
 
 /**
  * Base class for any flipper which will be used in authenticator.
  *
- * @version $Id$
+ * @version $Id: f3c3c73d439018e529af43268d6d8c807d59f06e $
  */
-public abstract class BaseViewFlipper {
-
+abstract class BaseViewFlipper
+/**
+ * All childs of this class must use only this constructor!
+ *
+ * @param activity Current activity
+ * @param contentRootView Root view of current flipper
+ */
+    (
     /**
      * Activity for operations.
      */
-    protected AuthenticatorActivity mActivity;
-
-    /**
-     * Context of operations executing. In fact, represent {@link #mActivity}.
-     */
-    protected Context mContext;
-
+    protected var mActivity: AuthenticatorActivity,
     /**
      * Root view of flipper.
      */
-    protected View mContentRootView;
+    protected var mContentRootView: View
+) {
 
     /**
-     * All childs of this class must use only this constructor!
-     *
-     * @param activity Current activity
-     * @param contentRootView Root view of current flipper
+     * Context of operations executing. In fact, represent [.mActivity].
      */
-    public BaseViewFlipper(
-        @NonNull AuthenticatorActivity activity,
-        @NonNull View contentRootView
-    ) {
-        mActivity = activity;
-        mContext = mActivity;
-        mContentRootView = contentRootView;
+    protected var mContext: Context
+
+    /**
+     * @return Title of flipper or null if have no
+     */
+    val title: String?
+        get() = null
+
+    init {
+        mContext = mActivity
     }
 
     /**
      * @param id Resource identifier in view
      * @param <T> Result type
-     * @return Result of calling of {@link View#findViewById(int)} as for {@link #mContentRootView}
-     */
-    public <T extends View> T findViewById(int id) {
-        return mContentRootView.findViewById(id);
+     * @return Result of calling of [View.findViewById] as for [.mContentRootView]
+    </T> */
+    fun <T : View> findViewById(id: Int): T {
+        return mContentRootView.findViewById(id)
     }
 
     /**
      * Must be called when current flipper page must be slided to next.
      */
-    public abstract void doNext();
+    abstract fun doNext()
 
     /**
      * Must be called when current flipper page must be slided to previous.
      */
-    public abstract void doPrevious();
-
-    /**
-     * @return Title of flipper or null if have no
-     */
-    @Nullable
-    public String getTitle() {
-        return null;
-    }
+    abstract fun doPrevious()
 }

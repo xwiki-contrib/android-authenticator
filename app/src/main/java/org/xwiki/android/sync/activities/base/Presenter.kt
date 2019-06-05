@@ -17,29 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.activities.base;
+package org.xwiki.android.sync.activities.base
 
 /**
- * Implement this interface if your view must work in mvp pattern in authenticator bounds
+ * Presenter interface for use MVP pattern.
  *
- * @version $Id$
- */
-public interface MVPView {
+ * @param <V> Type of target Class for set exactly [MVPView] child.
+ *
+ * @version $Id: 57909d663b4d2794a9546d12ffba8653bdf5b59a $
+</V> */
+interface Presenter<V : MVPView> {
 
     /**
-     * Should be called when a time taking process starts and we want the user
-     * to wait for the process to finish. The UI should gracefully display some
-     * sort of progress bar or animation so that the user knows that the app is
-     * doing some work and has not stalled.
+     * Attach mvpView to to current presenter.
      *
-     * <p>For example: a network request to the API is made for authenticating
-     * the user.</p>
+     * @param mvpView [MVPView] which will be attached to presenter.
      */
-    void showProgress();
+    fun attachView(mvpView: V)
 
     /**
-     * Should be called when a time taking process ends and we have some result
-     * for the user.
+     * Detach [android.view.View] from presenter.
      */
-    void hideProgress();
+    fun detachView()
+
 }
