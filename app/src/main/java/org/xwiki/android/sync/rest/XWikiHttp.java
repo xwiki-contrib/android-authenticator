@@ -262,7 +262,7 @@ public class XWikiHttp {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
                         getDetailedInfo(
-                            summaries.objectSummaries,
+                            summaries.getObjectSummaries(),
                             subject,
                             account
                         );
@@ -391,7 +391,7 @@ public class XWikiHttp {
                 new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
-                        searchList.addAll(summaries.objectSummaries);
+                        searchList.addAll(summaries.getObjectSummaries());
                         semaphore.release();
                     }
                 },

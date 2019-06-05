@@ -17,27 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.exceptions;
+package org.xwiki.android.sync.bean.SerachResults
 
-/**
- * Exception which will be used when was problems with getting some data (such as
- * IMEI or device id) throw an exception or can't be performed
- *
- * @version $Id$
- */
-public class ReadPhoneStateException extends SecurityException {
-    public ReadPhoneStateException() {
-    }
-
-    public ReadPhoneStateException(String s) {
-        super(s);
-    }
-
-    public ReadPhoneStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ReadPhoneStateException(Throwable cause) {
-        super(cause);
-    }
+open class CustomObjectsSummariesContainer<T> {
+    var links: Array<String>? = null
+    var objectSummaries: List<T>? = null
 }

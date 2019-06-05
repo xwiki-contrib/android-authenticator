@@ -179,7 +179,7 @@ class SyncSettingsActivity : BaseActivity() {
                     Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
                         allUsersAreLoading = false
                         allUsers!!.clear()
-                        allUsers!!.addAll(summaries.objectSummaries)
+                        allUsers!!.addAll(summaries.objectSummaries!!)
                         updateListView()
                     },
                     Action1<Throwable> {
