@@ -106,7 +106,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.act_authenticator);
+        binding = DataBindingUtil.setContentView(this, R.layout.act_authenticator)
 
         val permissionsUtils = PermissionsUtils(this)
         if (!permissionsUtils.checkPermissions()) {

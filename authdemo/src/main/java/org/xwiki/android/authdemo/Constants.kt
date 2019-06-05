@@ -17,30 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.authdemo;
+package org.xwiki.android.authdemo
 
 /**
- * @version $Id$
+ * @version $Id: 75a8139c61762e9c24bca94897df7331856e374f $
  */
-public class Constants {
+object Constants {
     /**
      * Server
      */
-    public static final String SERVER_ADDRESS = "requestUrl";
+    val SERVER_ADDRESS = "requestUrl"
 
     /**
      * Account type id
      */
-    public static final String ACCOUNT_TYPE = "org.xwiki.android.sync";
+    val ACCOUNT_TYPE = "org.xwiki.android.sync"
 
     /**
      * Auth token types
      */
-    public static final String AUTHTOKEN_TYPE_READ_ONLY = "Read only";
-    public static final String AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account";
+    val AUTHTOKEN_TYPE_READ_ONLY = "Read only"
+    val AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account"
 
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account";
+    val AUTHTOKEN_TYPE_FULL_ACCESS = "Full access" + "org.xwiki.android.authdemo"
+    val AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account"
 
 
 }
