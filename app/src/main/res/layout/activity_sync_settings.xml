@@ -1,107 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout>
 
-    <include layout="@layout/toolbar_layout"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/defaultViewSmallPadding">
+        <include layout="@layout/toolbar_layout"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentTop="true"
-            android:layout_above="@+id/nextButton">
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:stretchColumns="1"
-                android:padding="@dimen/defaultViewMediumPadding">
-                <TableRow>
-                    <TextView
-                        android:id="@+id/version_label"
-                        android:text="@string/about_version"
-                        android:padding="@dimen/defaultViewSmallPadding"/>
-
-                    <Button
-                        android:id="@+id/version_check"
-                        android:text="@string/version"/>
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/sync_label"
-                        android:text="@string/synchronizationType"
-                        android:padding="@dimen/defaultViewSmallPadding"/>
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/select_spinner"
-                        android:entries="@array/select_groups_array"
-                        android:padding="@dimen/defaultViewSmallPadding"/>
-                </TableRow>
-            </TableLayout>
-
-
-
-            <RelativeLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="@dimen/defaultViewMediumPadding">
+                android:layout_margin="@dimen/defaultViewSmallPadding">
 
-                <ProgressBar
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/list_viewProgressBar"
-                    android:layout_centerInParent="true"
-                    android:visibility="gone"/>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/settingsSyncListViewContainer">
-                    <ListView
-                        android:id="@+id/list_view"
+                    android:orientation="vertical"
+                    android:layout_alignParentTop="true"
+                    android:layout_above="@+id/nextButton">
+                <TableLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:dividerHeight="1dp"/>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:id="@+id/syncTypeGetErrorContainer"
-                        android:visibility="gone">
+                        android:stretchColumns="1"
+                        android:padding="@dimen/defaultViewMediumPadding">
+                    <TableRow>
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="@dimen/syncTypeGetListErrorWidth"
-                            android:text="@string/syncTypeGetListErrorMessage"
-                            android:gravity="center"/>
+                                android:id="@+id/version_label"
+                                android:text="@string/about_version"
+                                android:padding="@dimen/defaultViewSmallPadding"/>
+
                         <Button
+                                android:id="@+id/version_check"
+                                android:text="@string/version"/>
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                                android:id="@+id/sync_label"
+                                android:text="@string/synchronizationType"
+                                android:padding="@dimen/defaultViewSmallPadding"/>
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/select_spinner"
+                                android:entries="@array/select_groups_array"
+                                android:padding="@dimen/defaultViewSmallPadding"/>
+                    </TableRow>
+                </TableLayout>
+
+
+
+                <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/defaultViewMediumPadding">
+
+                    <ProgressBar
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/tryAgain"
-                            android:onClick="initData"/>
-                    </LinearLayout>
-                </FrameLayout>
-            </RelativeLayout>
-        </LinearLayout>
+                            android:id="@+id/list_viewProgressBar"
+                            android:layout_centerInParent="true"
+                            android:visibility="gone"/>
+
+                    <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:id="@+id/settingsSyncListViewContainer">
+                        <ListView
+                                android:id="@+id/list_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:dividerHeight="1dp"/>
+                        <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:id="@+id/syncTypeGetErrorContainer"
+                                android:visibility="gone">
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxWidth="@dimen/syncTypeGetListErrorWidth"
+                                    android:text="@string/syncTypeGetListErrorMessage"
+                                    android:gravity="center"/>
+                            <Button
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/tryAgain"
+                                    android:onClick="initData"/>
+                        </LinearLayout>
+                    </FrameLayout>
+                </RelativeLayout>
+            </LinearLayout>
 
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="syncSettingComplete"
-            android:id="@+id/nextButton"
-            android:text="@string/save"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="syncSettingComplete"
+                    android:id="@+id/nextButton"
+                    android:text="@string/save"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"/>
 
-    </RelativeLayout>
-</LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+</layout>

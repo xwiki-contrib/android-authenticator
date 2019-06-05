@@ -14,6 +14,7 @@ import android.provider.ContactsContract
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
@@ -29,13 +30,14 @@ import rx.functions.Action1
 import rx.schedulers.Schedulers
 import java.util.ArrayList
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
+import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 
 class SyncSettingsActivity : BaseActivity() {
 
     /**
-     * [View] for presenting items.
+     * DataBinding for accessing layout variables.
      */
-    private var mListView: ListView? = null
+    var binding : ActivitySyncSettingsBinding? = null
 
     /**
      * Adapter for groups
@@ -75,30 +77,6 @@ class SyncSettingsActivity : BaseActivity() {
     private var allUsersAreLoading: Boolean? = false
 
     /**
-     * @return Spinner for sync type
-     *
-     * @since 0.4.2
-     */
-    private val selectSyncSpinner: AppCompatSpinner
-        get() = findViewById(R.id.select_spinner)
-
-    /**
-     * @return Progress bar view
-     *
-     * @since 0.4.2
-     */
-    private val progressBar: ProgressBar
-        get() = findViewById(R.id.list_viewProgressBar)
-
-    /**
-     * @return Container of [.mListView]
-     *
-     * @since 0.4.2
-     */
-    private val listViewContainer: View
-        get() = findViewById(R.id.settingsSyncListViewContainer)
-
-    /**
      * Init all views and other activity objects
      *
      * @param savedInstanceState
@@ -107,26 +85,23 @@ class SyncSettingsActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sync_settings)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings);
 
-        val versionCheckButton = findViewById<Button>(R.id.version_check)
-        versionCheckButton.text = String.format(
+        binding!!.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
             SystemTools.getAppVersionName(this)
         )
-        versionCheckButton.setOnClickListener { v -> openAppMarket(v.context) }
+        binding!!.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
-        mListView = findViewById(R.id.list_view)
-        mListView!!.emptyView = findViewById(R.id.syncTypeGetErrorContainer)
+        binding!!.listView.emptyView = binding!!.syncTypeGetErrorContainer
         groups = ArrayList()
         allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(this, groups)
         mUsersAdapter = UserListAdapter(this, allUsers!!)
         initData(null)
-        mListView!!.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        binding!!.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
-        val selectSyncSpinner = selectSyncSpinner
-        selectSyncSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding!!.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 SYNC_TYPE = position
                 updateListView()
@@ -138,7 +113,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
 
         SYNC_TYPE = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS)
-        selectSyncSpinner.setSelection(SYNC_TYPE)
+        binding!!.selectSpinner.setSelection(SYNC_TYPE)
     }
 
     /**
@@ -150,11 +125,11 @@ class SyncSettingsActivity : BaseActivity() {
         val progressBarVisible = syncGroups() && groupsAreLoading!! || syncAllUsers() && allUsersAreLoading!!
         runOnUiThread {
             if (progressBarVisible) {
-                progressBar.visibility = View.VISIBLE
-                listViewContainer.visibility = View.GONE
+                binding!!.listViewProgressBar.visibility = View.VISIBLE
+                binding!!.settingsSyncListViewContainer.visibility = View.GONE
             } else {
-                progressBar.visibility = View.GONE
-                listViewContainer.visibility = View.VISIBLE
+                binding!!.listViewProgressBar.visibility = View.GONE
+                binding!!.settingsSyncListViewContainer.visibility = View.VISIBLE
             }
         }
     }
@@ -251,10 +226,10 @@ class SyncSettingsActivity : BaseActivity() {
      */
     private fun updateListView() {
         if (syncNothing()) {
-            listViewContainer.visibility = View.GONE
-            progressBar.visibility = View.GONE
+            binding!!.settingsSyncListViewContainer.visibility = View.GONE
+            binding!!.listViewProgressBar.visibility = View.GONE
         } else {
-            listViewContainer.visibility = View.VISIBLE
+            binding!!.settingsSyncListViewContainer.visibility = View.VISIBLE
             val adapter: BaseAdapter?
             if (syncGroups()) {
                 adapter = mGroupAdapter
@@ -263,8 +238,8 @@ class SyncSettingsActivity : BaseActivity() {
                 adapter = mUsersAdapter
                 mUsersAdapter!!.refresh(allUsers!!)
             }
-            if (adapter !== mListView!!.adapter) {
-                mListView!!.adapter = adapter
+            if (adapter !== binding!!.listView.adapter) {
+                binding!!.listView.adapter = adapter
             }
             refreshProgressBar()
         }

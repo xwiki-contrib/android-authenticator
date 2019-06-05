@@ -38,6 +38,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import android.widget.ViewFlipper
 import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.AppContext.Companion.currentBaseUrl
 import org.xwiki.android.sync.Constants
@@ -46,6 +47,7 @@ import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
+import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.IntentUtils
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.SharedPrefsUtils
@@ -72,14 +74,14 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     private val flippers = ArrayList<BaseViewFlipper?>()
 
     /**
+     * DataBinding for accessing layout variables.
+     */
+    var binding : ActAuthenticatorBinding? = null
+
+    /**
      * Will be used for managing of user account.
      */
     private var mAccountManager: AccountManager? = null
-
-    /**
-     * Flippers root.
-     */
-    private var mViewFlipper: ViewFlipper? = null
 
     /**
      * Toolbar of current activity.
@@ -104,7 +106,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_authenticator)
+        binding = DataBindingUtil.setContentView(this, R.layout.act_authenticator);
 
         val permissionsUtils = PermissionsUtils(this)
         if (!permissionsUtils.checkPermissions()) {
@@ -127,7 +129,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             .setPositiveButton(
                 android.R.string.ok
             ) { dialog, which -> dialog.dismiss() }
-        mViewFlipper = findViewById(R.id.view_flipper)
         val position: Int?
         mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager!!.getAccountsByType(Constants.ACCOUNT_TYPE)
@@ -145,11 +146,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * not settings.
      */
     override fun onBackPressed() {
-        if (mViewFlipper!!.displayedChild == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java)) {
+        if (binding!!.viewFlipper.displayedChild == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java)) {
             super.onBackPressed()
         } else {
             doPrevious(
-                mViewFlipper!!.currentView
+                binding!!.viewFlipper.currentView
             )
         }
     }
@@ -161,7 +162,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View, which trigger action
      */
     fun doPrevious(view: View) {
-        val position = mViewFlipper!!.displayedChild
+        val position = binding!!.viewFlipper.displayedChild
         chooseAnimation(position == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java))
         flippers[position]!!.doPrevious()
         showViewFlipper(position - 1)
@@ -174,7 +175,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View, which trigger action
      */
     fun doNext(view: View) {
-        val position = mViewFlipper!!.displayedChild
+        val position = binding!!.viewFlipper.displayedChild
         chooseAnimation(true)
         flippers[position]!!.doNext()
         if (position + 1 >= orderOfFlippers.size) {
@@ -193,20 +194,20 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private fun chooseAnimation(toNext: Boolean) {
         if (toNext) {
-            mViewFlipper!!.inAnimation = AnimationUtils.loadAnimation(
+            binding!!.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_left_in
             )
-            mViewFlipper!!.outAnimation = AnimationUtils.loadAnimation(
+            binding!!.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_left_out
             )
         } else {
-            mViewFlipper!!.inAnimation = AnimationUtils.loadAnimation(
+            binding!!.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_right_in
             )
-            mViewFlipper!!.outAnimation = AnimationUtils.loadAnimation(
+            binding!!.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_right_out
             )
@@ -253,7 +254,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @since 0.4.2
      */
     fun showViewFlipper(position: Int) {
-        mViewFlipper!!.displayedChild = position
+        binding!!.viewFlipper.displayedChild = position
         while (flippers.size <= position) {
             flippers.add(null)
         }
@@ -265,7 +266,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                     View::class.java
                 ).newInstance(
                     this,
-                    mViewFlipper!!.getChildAt(position)
+                    binding!!.viewFlipper.getChildAt(position)
                 )
                 flippers[position] = flipper
             } catch (e: InstantiationException) {
