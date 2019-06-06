@@ -432,18 +432,18 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         /**
          * Tag which will be used for logging
          */
-        private val TAG = "AuthenticatorActivity"
+        private const val TAG = "AuthenticatorActivity"
 
-        val KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE"
-        val PARAM_USER_SERVER = "XWIKI_USER_SERVER"
-        val PARAM_USER_PASS = "XWIKI_USER_PASS"
-        val PARAM_APP_UID = "PARAM_APP_UID"
-        val PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME"
-        val IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE"
+        const val KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE"
+        const val PARAM_USER_SERVER = "XWIKI_USER_SERVER"
+        const val PARAM_USER_PASS = "XWIKI_USER_PASS"
+        const val PARAM_APP_UID = "PARAM_APP_UID"
+        const val PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME"
+        const val IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE"
 
         /**
          * Code which await to returns for requesting permissions
          */
-        private val REQUEST_PERMISSIONS_CODE = 1
+        private const val REQUEST_PERMISSIONS_CODE = 1
     }
 }

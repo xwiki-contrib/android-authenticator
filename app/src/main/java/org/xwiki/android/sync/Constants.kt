@@ -29,60 +29,55 @@ open class Constants {
         /**
          * Account type id
          */
-        val ACCOUNT_TYPE : String = "org.xwiki.android.sync"
+        const val ACCOUNT_TYPE = "org.xwiki.android.sync"
 
         /**
          * Account name
          */
-        val ACCOUNT_NAME : String = "XWiki"
-        val USERDATA_SERVER : String = "XWIKI_SERVER"
+        const val ACCOUNT_NAME = "XWiki"
+        const val USERDATA_SERVER = "XWIKI_SERVER"
 
         /**
          * Auth token types
          */
-        val AUTHTOKEN_TYPE_READ_ONLY : String = "Read only"
-        val AUTHTOKEN_TYPE_READ_ONLY_LABEL : String = "Read only access to an XWiki account"
-        val AUTHTOKEN_TYPE_FULL_ACCESS : String = "Full access"
-        val AUTHTOKEN_TYPE_FULL_ACCESS_LABEL : String = "Full access to an XWiki account"
+        const val AUTHTOKEN_TYPE_READ_ONLY = "Read only"
+        const val AUTHTOKEN_TYPE_READ_ONLY_LABEL = "Read only access to an XWiki account"
+        const val AUTHTOKEN_TYPE_FULL_ACCESS = "Full access"
+        const val AUTHTOKEN_TYPE_FULL_ACCESS_LABEL = "Full access to an XWiki account"
 
         /**
          * limit the number of users synchronizing from server.
          */
-        @JvmField
-        var LIMIT_MAX_SYNC_USERS: Int = 10000
+        const val LIMIT_MAX_SYNC_USERS = 10000
 
         /**
          * SyncType
          * 0: no sync, 1: all users, 2: sync groups
          */
 
-        @JvmField
-        var SYNC_TYPE_ALL_USERS: Int = 0
-        @JvmField
-        var SYNC_TYPE_SELECTED_GROUPS: Int = 1
-        @JvmField
-        var SYNC_TYPE_NO_NEED_SYNC: Int = 2
+        const val SYNC_TYPE_ALL_USERS = 0
+        const val SYNC_TYPE_SELECTED_GROUPS = 1
+        const val SYNC_TYPE_NO_NEED_SYNC = 2
 
         /**
          * sync maker
          */
-        var SYNC_MARKER_KEY: String = "org.xwiki.android.sync.marker"
+        const val SYNC_MARKER_KEY = "org.xwiki.android.sync.marker"
 
         /**
          * sharePreference
          */
-        var PACKAGE_LIST: String = "packageList"
-        var SERVER_ADDRESS: String = "requestUrl"
-        var SELECTED_GROUPS: String = "SelectGroups"
-        var SYNC_TYPE: String = "SyncType"
-        var COOKIE: String = "Cookie"
+        const val PACKAGE_LIST = "packageList"
+        const val SERVER_ADDRESS = "requestUrl"
+        const val SELECTED_GROUPS = "SelectGroups"
+        const val SYNC_TYPE = "SyncType"
+        const val COOKIE = "Cookie"
 
 
         /**
          * sync interval
          */
-        @JvmField
-        var SYNC_INTERVAL: Int = 60 * 60 //half an hour
+        const val SYNC_INTERVAL = 60 * 60 //half an hour
 
     }
 

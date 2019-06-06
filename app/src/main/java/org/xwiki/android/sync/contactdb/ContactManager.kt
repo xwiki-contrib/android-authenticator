@@ -138,7 +138,7 @@ object ContactManager {
         rawId: Long,
         xwikiUser: XWikiUserFull
     ) {
-        val gettingAvatarObservable = AppContext.apiManager.xWikiPhotosManager
+        val gettingAvatarObservable = AppContext.getApiManager().xWikiPhotosManager
             .downloadAvatar(
                 xwikiUser.pageName,
                 xwikiUser.avatar

@@ -88,13 +88,13 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         //just for passing some param
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        intent.putExtra(AuthenticatorActivity.Companion.getKEY_AUTH_TOKEN_TYPE(), authTokenType);
+        intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         //for granting permission
-        intent.putExtra(AuthenticatorActivity.Companion.getPARAM_APP_UID(), uid);
-        intent.putExtra(AuthenticatorActivity.Companion.getPARAM_APP_PACKAGENAME(), packageName);
+        intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
+        intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
         //true: if from XWiki Account Preference, false:if from adding account.
-        intent.putExtra(AuthenticatorActivity.Companion.getIS_SETTING_SYNC_TYPE(), false);
+        intent.putExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -125,7 +125,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
         String packageName = mContext.getPackageManager().getNameForUid(uid);
 
-        if (!authTokenType.equals(Constants.Companion.getAUTHTOKEN_TYPE_FULL_ACCESS() + packageName)) {
+        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
             return result;
@@ -137,7 +137,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             intent.putExtra("packageName", packageName);
             intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
             intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            intent.putExtra(AuthenticatorActivity.Companion.getKEY_AUTH_TOKEN_TYPE(), authTokenType);
+            intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 
             Bundle bundle = new Bundle();
@@ -202,7 +202,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(Constants.Companion.getSERVER_ADDRESS(), AppContext.Companion.currentBaseUrl());
+            result.putString(Constants.SERVER_ADDRESS, AppContext.Companion.currentBaseUrl());
             return result;
         }
     }
@@ -217,10 +217,10 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public String getAuthTokenLabel(String authTokenType) {
         Log.d(TAG, "getAuthTokenLabel," + authTokenType);
-        if (Constants.Companion.getAUTHTOKEN_TYPE_FULL_ACCESS().equals(authTokenType))
-            return Constants.Companion.getAUTHTOKEN_TYPE_FULL_ACCESS_LABEL();
-        else if (Constants.Companion.getAUTHTOKEN_TYPE_READ_ONLY().equals(authTokenType))
-            return Constants.Companion.getAUTHTOKEN_TYPE_READ_ONLY_LABEL();
+        if (Constants.AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
+            return Constants.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
+        else if (Constants.AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
+            return Constants.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
         else
             return authTokenType + " (Label)";
     }
@@ -286,11 +286,11 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     ) {
         List<String> packageList = SharedPrefsUtils.Companion.getArrayList(
             AppContext.Companion.getInstance().getApplicationContext(),
-            Constants.Companion.getPACKAGE_LIST()
+            Constants.PACKAGE_LIST
         );
         if (packageList == null || packageList.size() == 0) return;
         for (String item : packageList) {
-            String tokenType = Constants.Companion.getAUTHTOKEN_TYPE_FULL_ACCESS() + item;
+            String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
     }

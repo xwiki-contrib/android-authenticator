@@ -142,7 +142,7 @@ class SyncSettingsActivity : BaseActivity() {
     fun initData(v: View?) {
         if (groups!!.isEmpty()) {
             groupsAreLoading = true
-            AppContext.apiManager.xwikiServicesApi.availableGroups(
+            AppContext.getApiManager().xwikiServicesApi.availableGroups(
                 Constants.LIMIT_MAX_SYNC_USERS
             )
                 .subscribeOn(Schedulers.newThread())
@@ -172,7 +172,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
         if (allUsers!!.isEmpty()) {
             allUsersAreLoading = true
-            AppContext.apiManager.xwikiServicesApi.allUsersPreview
+            AppContext.getApiManager().xwikiServicesApi.allUsersPreview
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

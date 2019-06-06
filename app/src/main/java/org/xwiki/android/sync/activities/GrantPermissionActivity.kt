@@ -87,7 +87,7 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, Constants.ACCOUNT_TYPE)
         val authToken =
-            SharedPrefsUtils.getValue(AppContext.Companion.instance!!.getApplicationContext(), Constants.COOKIE, null)
+            SharedPrefsUtils.getValue(AppContext.getInstance()!!.applicationContext, Constants.COOKIE, null)
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)

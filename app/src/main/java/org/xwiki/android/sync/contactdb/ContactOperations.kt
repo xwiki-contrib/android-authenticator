@@ -248,7 +248,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             EDIT_CONTACT_MIME_TYPE,
             mapOf(
                 EDIT_CONTACT_USER_ID_FIELD to convertId(),
-                EDIT_CONTACT_TEXT_FIELD to AppContext.Companion.instance!!.getString(R.string.editXWikiContactInfo)
+                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance()!!.getString(R.string.editXWikiContactInfo)
             )
         )
     }

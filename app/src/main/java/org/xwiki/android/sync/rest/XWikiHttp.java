@@ -96,7 +96,7 @@ public class XWikiHttp {
                         String cookie = responseBodyResponse.headers().get("Set-Cookie");
                         SharedPrefsUtils.Companion.putValue(
                             AppContext.Companion.getInstance().getApplicationContext(),
-                            Constants.Companion.getCOOKIE(),
+                            Constants.COOKIE,
                             cookie
                         );
                         authTokenSubject.onNext(cookie);
@@ -201,7 +201,7 @@ public class XWikiHttp {
                                     accountName
                                 );
                             } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                List<String> groupIdList = SharedPrefsUtils.Companion.getArrayList(AppContext.Companion.getInstance().getApplicationContext(), Constants.Companion.getSELECTED_GROUPS());
+                                List<String> groupIdList = SharedPrefsUtils.Companion.getArrayList(AppContext.Companion.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
                                 getSyncGroups(
                                     groupIdList,
                                     subject,
@@ -482,7 +482,7 @@ public class XWikiHttp {
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
-            int syncType = SharedPrefsUtils.Companion.getValue(AppContext.Companion.getInstance().getApplicationContext(), Constants.Companion.getSYNC_TYPE(), -1);
+            int syncType = SharedPrefsUtils.Companion.getValue(AppContext.Companion.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
             if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);

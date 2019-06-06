@@ -48,7 +48,7 @@ class XWikiInterceptor : Interceptor {
      */
     private val cookie: String
         get() = SharedPrefsUtils.getValue(
-            AppContext.instance!!.getApplicationContext(),
+            AppContext.getInstance()!!.applicationContext,
             Constants.COOKIE,
             ""
         )

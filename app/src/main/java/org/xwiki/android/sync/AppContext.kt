@@ -32,14 +32,14 @@ import java.util.ArrayList
  *
  * @version $Id: c3a5996b1bce14d5c105a55f085115347c39c035 $
  */
-class AppContext : Application() {
+open class AppContext : Application() {
 
     /**
      * Set [.instance] to this object.
      */
     override fun onCreate() {
         super.onCreate()
-        instance = this
+        appContextInstance = this
         Log.d(TAG, "on create")
     }
 
@@ -58,17 +58,20 @@ class AppContext : Application() {
         /**
          * Instance of context to use it in static methods
          */
+        private lateinit var appContextInstance : AppContext
+
         /**
          * @return known AppContext instance
          */
-        var instance: AppContext? = null
-            private set
+        fun getInstance(): AppContext? {
+            return appContextInstance
+        }
 
         /**
          * @return actual base url
          */
         fun currentBaseUrl(): String {
-            return SharedPrefsUtils.getValue(instance!!, Constants.SERVER_ADDRESS, "")
+            return SharedPrefsUtils.getValue(appContextInstance, Constants.SERVER_ADDRESS, "")
         }
 
         /**
@@ -78,12 +81,12 @@ class AppContext : Application() {
          */
         fun addAuthorizedApp(packageName: String) {
             Log.d(TAG, "packageName=$packageName")
-            var packageList: MutableList<String>? = SharedPrefsUtils.getArrayList(instance!!.applicationContext, Constants.PACKAGE_LIST)
+            var packageList: MutableList<String>? = SharedPrefsUtils.getArrayList(appContextInstance.applicationContext, Constants.PACKAGE_LIST)
             if (packageList == null) {
                 packageList = ArrayList()
             }
             packageList.add(packageName)
-            SharedPrefsUtils.putArrayList(instance!!.applicationContext, Constants.PACKAGE_LIST, packageList)
+            SharedPrefsUtils.putArrayList(appContextInstance.applicationContext, Constants.PACKAGE_LIST, packageList)
         }
 
         /**
@@ -94,7 +97,7 @@ class AppContext : Application() {
          */
         fun isAuthorizedApp(packageName: String): Boolean {
             val packageList = SharedPrefsUtils.getArrayList(
-                instance!!.applicationContext,
+                appContextInstance.applicationContext,
                 Constants.PACKAGE_LIST
             )
             return packageList != null && packageList.contains(packageName)
@@ -105,8 +108,7 @@ class AppContext : Application() {
          *
          * @since 0.4
          */
-        val apiManager: BaseApiManager
-            get() {
+        fun getApiManager() : BaseApiManager {
                 val url = currentBaseUrl()
                 if (baseApiManager == null || baseApiManager!!.key != url) {
                     baseApiManager = AbstractMap.SimpleEntry(
@@ -115,6 +117,6 @@ class AppContext : Application() {
                     )
                 }
                 return baseApiManager!!.value
-            }
+        }
     }
 }
