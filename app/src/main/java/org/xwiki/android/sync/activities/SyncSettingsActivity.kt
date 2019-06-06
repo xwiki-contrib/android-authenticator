@@ -15,22 +15,60 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.databinding.DataBindingUtil
-import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.R
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.SystemTools
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 import java.util.ArrayList
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
+import org.xwiki.android.sync.utils.*
+
+
+/**
+ * Tag which will be used for logging.
+ */
+private val TAG = SyncSettingsActivity::class.java.simpleName
+
+/**
+ * Open market with application page.
+ *
+ * @param context Context to know where from to open market
+ */
+private fun openAppMarket(context: Context) {
+    val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.packageName))
+    var marketFound = false
+    // find all applications able to handle our rateIntent
+    val otherApps = context.packageManager.queryIntentActivities(rateIntent, 0)
+    for (otherApp in otherApps) {
+        // look for Google Play application
+        if (otherApp.activityInfo.applicationInfo.packageName == "com.android.vending") {
+            val otherAppActivity = otherApp.activityInfo
+            val componentName = ComponentName(
+                otherAppActivity.applicationInfo.packageName,
+                otherAppActivity.name
+            )
+            rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            rateIntent.component = componentName
+            context.startActivity(rateIntent)
+            marketFound = true
+            break
+        }
+    }
+    // if GooglePlay not present on device, open web browser
+    if (!marketFound) {
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
+        )
+        context.startActivity(webIntent)
+    }
+}
 
 class SyncSettingsActivity : BaseActivity() {
 
@@ -62,7 +100,7 @@ class SyncSettingsActivity : BaseActivity() {
     /**
      * Currently chosen sync type.
      */
-    private var SYNC_TYPE = Constants.SYNC_TYPE_NO_NEED_SYNC
+    private var chosenSyncType = SYNC_TYPE_NO_NEED_SYNC
 
     /**
      * Flag of currently loading groups.
@@ -89,7 +127,7 @@ class SyncSettingsActivity : BaseActivity() {
 
         binding!!.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
-            SystemTools.getAppVersionName(this)
+            getAppVersionName(this)
         )
         binding!!.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
@@ -103,7 +141,7 @@ class SyncSettingsActivity : BaseActivity() {
 
         binding!!.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                SYNC_TYPE = position
+                chosenSyncType = position
                 updateListView()
             }
 
@@ -112,8 +150,8 @@ class SyncSettingsActivity : BaseActivity() {
             }
         }
 
-        SYNC_TYPE = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS)
-        binding!!.selectSpinner.setSelection(SYNC_TYPE)
+        chosenSyncType = getValue(this, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
+        binding!!.selectSpinner.setSelection(chosenSyncType)
     }
 
     /**
@@ -142,8 +180,8 @@ class SyncSettingsActivity : BaseActivity() {
     fun initData(v: View?) {
         if (groups!!.isEmpty()) {
             groupsAreLoading = true
-            AppContext.getApiManager().xwikiServicesApi.availableGroups(
-                Constants.LIMIT_MAX_SYNC_USERS
+            getApiManager().xwikiServicesApi.availableGroups(
+                LIMIT_MAX_SYNC_USERS
             )
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -172,7 +210,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
         if (allUsers!!.isEmpty()) {
             allUsersAreLoading = true
-            AppContext.getApiManager().xwikiServicesApi.allUsersPreview
+            getApiManager().xwikiServicesApi.allUsersPreview
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -204,21 +242,21 @@ class SyncSettingsActivity : BaseActivity() {
      * @return true if currently selected to sync groups or false otherwise
      */
     private fun syncGroups(): Boolean {
-        return SYNC_TYPE == Constants.SYNC_TYPE_SELECTED_GROUPS
+        return chosenSyncType == SYNC_TYPE_SELECTED_GROUPS
     }
 
     /**
      * @return true if currently selected to sync all users or false otherwise
      */
     private fun syncAllUsers(): Boolean {
-        return SYNC_TYPE == Constants.SYNC_TYPE_ALL_USERS
+        return chosenSyncType == SYNC_TYPE_ALL_USERS
     }
 
     /**
      * @return true if currently selected to sync not or false otherwise
      */
     private fun syncNothing(): Boolean {
-        return SYNC_TYPE == Constants.SYNC_TYPE_NO_NEED_SYNC
+        return chosenSyncType == SYNC_TYPE_NO_NEED_SYNC
     }
 
     /**
@@ -250,14 +288,14 @@ class SyncSettingsActivity : BaseActivity() {
      */
     fun syncSettingComplete(v: View) {
         //check changes. if no change, directly return
-        val oldSyncType = SharedPrefsUtils.getValue(this, Constants.SYNC_TYPE, -1)
-        if (oldSyncType == SYNC_TYPE && !syncGroups()) {
+        val oldSyncType = getValue(this, SYNC_TYPE, -1)
+        if (oldSyncType == chosenSyncType && !syncGroups()) {
             return
         }
 
         //TODO:: fix when will separate to different accounts
         val mAccountManager = AccountManager.get(applicationContext)
-        val availableAccounts = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)
+        val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         val account = availableAccounts[0]
 
         clearOldAccountContacts(
@@ -267,21 +305,21 @@ class SyncSettingsActivity : BaseActivity() {
 
         //if has changes, set sync
         if (syncNothing()) {
-            SharedPrefsUtils.putValue(applicationContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_NO_NEED_SYNC)
+            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_NO_NEED_SYNC)
             setSync(false)
         } else if (syncAllUsers()) {
-            SharedPrefsUtils.putValue(applicationContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_ALL_USERS)
+            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
             setSync(true)
         } else if (syncGroups()) {
             //compare to see if there are some changes.
-            if (oldSyncType == SYNC_TYPE && compareSelectGroups()) {
+            if (oldSyncType == chosenSyncType && compareSelectGroups()) {
                 Toast.makeText(this, getString(R.string.unchangedSettings), Toast.LENGTH_LONG).show()
                 return
             }
 
             mGroupAdapter!!.saveSelectedGroups()
 
-            SharedPrefsUtils.putValue(applicationContext, Constants.SYNC_TYPE, Constants.SYNC_TYPE_SELECTED_GROUPS)
+            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_SELECTED_GROUPS)
             setSync(true)
             finish() // TODO:: FIX IT TO CORRECT HANDLE OF COMPLETING SETTINGS
         }
@@ -294,10 +332,10 @@ class SyncSettingsActivity : BaseActivity() {
      */
     private fun setSync(syncEnabled: Boolean) {
         val mAccountManager = AccountManager.get(applicationContext)
-        val availableAccounts = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)
+        val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         val account = availableAccounts[0]
         if (syncEnabled) {
-            mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, null)
+            mAccountManager.setUserData(account, SYNC_MARKER_KEY, null)
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY)
             ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1)
             ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true)
@@ -305,7 +343,7 @@ class SyncSettingsActivity : BaseActivity() {
                 account,
                 ContactsContract.AUTHORITY,
                 Bundle.EMPTY,
-                Constants.SYNC_INTERVAL.toLong()
+                SYNC_INTERVAL.toLong()
             )
             ContentResolver.requestSync(account, ContactsContract.AUTHORITY, Bundle.EMPTY)
         } else {
@@ -321,7 +359,7 @@ class SyncSettingsActivity : BaseActivity() {
         //new
         val newList = mGroupAdapter!!.selectGroups
         //old
-        val oldList = SharedPrefsUtils.getArrayList(applicationContext, Constants.SELECTED_GROUPS)
+        val oldList = getArrayList(applicationContext, SELECTED_GROUPS)
         if (newList == null && oldList == null) {
             return true
         } else if (newList != null && oldList != null) {
@@ -337,49 +375,6 @@ class SyncSettingsActivity : BaseActivity() {
             }
         } else {
             return false
-        }
-    }
-
-    companion object {
-
-        /**
-         * Tag which will be used for logging.
-         */
-        private val TAG = SyncSettingsActivity::class.java.simpleName
-
-        /**
-         * Open market with application page.
-         *
-         * @param context Context to know where from to open market
-         */
-        private fun openAppMarket(context: Context) {
-            val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.packageName))
-            var marketFound = false
-            // find all applications able to handle our rateIntent
-            val otherApps = context.packageManager.queryIntentActivities(rateIntent, 0)
-            for (otherApp in otherApps) {
-                // look for Google Play application
-                if (otherApp.activityInfo.applicationInfo.packageName == "com.android.vending") {
-                    val otherAppActivity = otherApp.activityInfo
-                    val componentName = ComponentName(
-                        otherAppActivity.applicationInfo.packageName,
-                        otherAppActivity.name
-                    )
-                    rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                    rateIntent.component = componentName
-                    context.startActivity(rateIntent)
-                    marketFound = true
-                    break
-                }
-            }
-            // if GooglePlay not present on device, open web browser
-            if (!marketFound) {
-                val webIntent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
-                )
-                context.startActivity(webIntent)
-            }
         }
     }
 }

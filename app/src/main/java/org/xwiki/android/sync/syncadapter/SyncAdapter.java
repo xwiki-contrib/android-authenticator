@@ -39,7 +39,9 @@ import rx.Observer;
 
 import java.util.Date;
 
+import static org.xwiki.android.sync.ConstantsKt.*;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getValue;
 
 /**
  * Adapter which will be used for synchronization.
@@ -108,13 +110,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             false
         );
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtils.Companion.getValue(
+        int syncType = getValue(
             mContext,
-            Constants.SYNC_TYPE,
-            Constants.SYNC_TYPE_NO_NEED_SYNC
+            SYNC_TYPE,
+            SYNC_TYPE_NO_NEED_SYNC
         );
         Log.i(TAG, "syncType=" + syncType);
-        if (syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
+        if (syncType == SYNC_TYPE_NO_NEED_SYNC) return;
         // get last sync date. return new Date(0) if first onPerformSync
         String lastSyncMarker = getServerSyncMarker(account);
         Log.d(TAG, lastSyncMarker);
@@ -191,7 +193,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @return the change high-water-mark  Iso8601
      */
     private String getServerSyncMarker(Account account) {
-        String lastSyncIso = mAccountManager.getUserData(account, Constants.SYNC_MARKER_KEY);
+        String lastSyncIso = mAccountManager.getUserData(account, SYNC_MARKER_KEY);
         //if empty, just return new Date(0) so that we can get all users from server.
         if (TextUtils.isEmpty(lastSyncIso)) {
             return StringUtils.dateToIso8601String(new Date(0));
@@ -206,7 +208,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @param lastSyncIso The high-water-mark we want to save.
      */
     private void setServerSyncMarker(Account account, String lastSyncIso) {
-        mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, lastSyncIso);
+        mAccountManager.setUserData(account, SYNC_MARKER_KEY, lastSyncIso);
     }
 }
 

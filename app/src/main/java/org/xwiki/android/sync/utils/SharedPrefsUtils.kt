@@ -26,149 +26,144 @@ import android.content.SharedPreferences.Editor
 import java.util.ArrayList
 import java.util.HashSet
 
+
+/**
+ * Settings shared preferences name.
+ */
+
+private val SETTING = "Setting"
+
+/**
+ * Put value into shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key to add
+ * @param value Value to add
+ */
+fun putValue(context: Context, key: String, value: Int) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
+    sp.putInt(key, value)
+    sp.apply()
+}
+
+/**
+ * Put value into shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key to add
+ * @param value Value to add
+ */
+fun putValue(context: Context, key: String, value: Boolean) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
+    sp.putBoolean(key, value)
+    sp.apply()
+}
+
+/**
+ * Put value into shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key to add
+ * @param value Value to add
+ */
+fun putValue(context: Context, key: String, value: String) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
+    sp.putString(key, value)
+    sp.apply()
+}
+
+/**
+ * Put value into shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key to add
+ * @param list Value to add
+ */
+fun putArrayList(context: Context, key: String, list: List<String>) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    val edit = sp.edit()
+    val set = HashSet(list)
+    edit.putStringSet(key, set)
+    edit.apply()
+}
+
+/**
+ * Get value from shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key for getting
+ * @return List value if exists or null
+ */
+fun getArrayList(context: Context, key: String): MutableList<String>? {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    val set = sp.getStringSet(key, null) ?: return null
+    return ArrayList(set)
+}
+
+/**
+ * Clear all data from shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ */
+fun clearAll(context: Context) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    sp.edit().clear().apply()
+}
+
+/**
+ * Get value from shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key for getting
+ * @param defValue Value which will be returned if value by key is absent
+ * @return int value if exists or defValue
+ */
+fun getValue(context: Context, key: String, defValue: Int): Int {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    return sp.getInt(key, defValue)
+}
+
+/**
+ * Get value from shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key for getting
+ * @param defValue Value which will be returned if value by key is absent
+ * @return boolean value if exists or defValue
+ */
+fun getValue(context: Context, key: String, defValue: Boolean): Boolean {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    return sp.getBoolean(key, defValue)
+}
+
+/**
+ * Get value from shared preferences.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key for getting
+ * @param defValue Value which will be returned if value by key is absent
+ * @return String value if exists or defValue
+ */
+fun getValue(context: Context, key: String, defValue: String?): String {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    return sp.getString(key, defValue)
+}
+
+/**
+ * Remove value from shared preferences by key.
+ *
+ * @param context Context for getting shared preferences
+ * @param key Key for removing
+ */
+fun removeKeyValue(context: Context, key: String) {
+    val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+    sp.edit().remove(key).apply()
+}
+
 /**
  * Utils for shared preferences
  *
  * @version $Id: f6a4505e6593fc031f5b944abcf6ab3632b3014b $
  */
-class SharedPrefsUtils {
-
-    companion object{
-
-        /**
-         * Settings shared preferences name.
-         */
-
-        private val SETTING = "Setting"
-
-        /**
-         * Put value into shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key to add
-         * @param value Value to add
-         */
-        fun putValue(context: Context, key: String, value: Int) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
-            sp.putInt(key, value)
-            sp.apply()
-        }
-
-        /**
-         * Put value into shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key to add
-         * @param value Value to add
-         */
-        fun putValue(context: Context, key: String, value: Boolean) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
-            sp.putBoolean(key, value)
-            sp.apply()
-        }
-
-        /**
-         * Put value into shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key to add
-         * @param value Value to add
-         */
-        fun putValue(context: Context, key: String, value: String) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
-            sp.putString(key, value)
-            sp.apply()
-        }
-
-        /**
-         * Put value into shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key to add
-         * @param list Value to add
-         */
-        fun putArrayList(context: Context, key: String, list: List<String>) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            val edit = sp.edit()
-            val set = HashSet(list)
-            edit.putStringSet(key, set)
-            edit.apply()
-        }
-
-        /**
-         * Get value from shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key for getting
-         * @return List value if exists or null
-         */
-        fun getArrayList(context: Context, key: String): MutableList<String>? {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            val set = sp.getStringSet(key, null) ?: return null
-            return ArrayList(set)
-        }
-
-        /**
-         * Clear all data from shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         */
-        fun clearAll(context: Context) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            sp.edit().clear().apply()
-        }
-
-        /**
-         * Get value from shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key for getting
-         * @param defValue Value which will be returned if value by key is absent
-         * @return int value if exists or defValue
-         */
-        fun getValue(context: Context, key: String, defValue: Int): Int {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            return sp.getInt(key, defValue)
-        }
-
-        /**
-         * Get value from shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key for getting
-         * @param defValue Value which will be returned if value by key is absent
-         * @return boolean value if exists or defValue
-         */
-        fun getValue(context: Context, key: String, defValue: Boolean): Boolean {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            return sp.getBoolean(key, defValue)
-        }
-
-        /**
-         * Get value from shared preferences.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key for getting
-         * @param defValue Value which will be returned if value by key is absent
-         * @return String value if exists or defValue
-         */
-        fun getValue(context: Context, key: String, defValue: String?): String {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            return sp.getString(key, defValue)
-        }
-
-        /**
-         * Remove value from shared preferences by key.
-         *
-         * @param context Context for getting shared preferences
-         * @param key Key for removing
-         */
-        fun removeKeyValue(context: Context, key: String) {
-            val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-            sp.edit().remove(key).apply()
-        }
-
-    }
-
-}
+class SharedPrefsUtils
 

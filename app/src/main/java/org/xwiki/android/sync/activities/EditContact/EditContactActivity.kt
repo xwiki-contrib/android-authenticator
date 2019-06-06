@@ -16,6 +16,7 @@ import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
+import org.xwiki.android.sync.getApiManager
 import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.StringUtils.isEmail
 import org.xwiki.android.sync.utils.StringUtils.isEmpty
@@ -194,7 +195,7 @@ class EditContactActivity : BaseActivity() {
             }
             disableContainer()
 
-            AppContext.getApiManager().xwikiServicesApi.updateUser(
+            getApiManager().xwikiServicesApi.updateUser(
                 it.wiki,
                 it.space,
                 it.pageName,
@@ -410,7 +411,7 @@ class EditContactActivity : BaseActivity() {
             ).show()
         }
         splittedUserId ?.let {
-            AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
+            getApiManager().xwikiServicesApi.getFullUserDetails(
                 it[0],
                 it[1],
                 it[2]

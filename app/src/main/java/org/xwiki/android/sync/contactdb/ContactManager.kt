@@ -31,9 +31,11 @@ import android.os.CancellationSignal
 import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
+import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.getApiManager
 import org.xwiki.android.sync.rest.XWikiHttp
 import retrofit2.HttpException
 import rx.Observable
@@ -138,7 +140,7 @@ object ContactManager {
         rawId: Long,
         xwikiUser: XWikiUserFull
     ) {
-        val gettingAvatarObservable = AppContext.getApiManager().xWikiPhotosManager
+        val gettingAvatarObservable = getApiManager().xWikiPhotosManager
             .downloadAvatar(
                 xwikiUser.pageName,
                 xwikiUser.avatar
@@ -302,7 +304,7 @@ object ContactManager {
          */
         internal val SELECTION = (
                 RawContacts.ACCOUNT_TYPE + "='"
-                        + Constants.ACCOUNT_TYPE + "' AND "
+                        + ACCOUNT_TYPE + "' AND "
                         + RawContacts.SOURCE_ID + "=?")
     }
     /**
@@ -357,7 +359,7 @@ object ContactManager {
          */
         internal val SELECTION = (
                 RawContacts.ACCOUNT_TYPE + "='"
-                        + Constants.ACCOUNT_TYPE + "' AND "
+                        + ACCOUNT_TYPE + "' AND "
                         + RawContacts.ACCOUNT_NAME + "=?")
     }
     /**

@@ -24,32 +24,28 @@ import android.net.Uri
 import android.text.TextUtils
 
 /**
+ * Check url (warning, url must start with "https://" or other protocol if you want not use
+ * http) and open browser or other application which can open that url.
+ *
+ * @param url Url to prepare
+ * @return NOT STARTED, but prepared intent
+ */
+fun openLink(url: String): Intent {
+    var url = url
+    // if protocol isn't defined use http by default
+    if (!TextUtils.isEmpty(url) && !url.contains("://")) {
+        url = "http://$url"
+    }
+
+    val intent = Intent()
+    intent.action = Intent.ACTION_VIEW
+    intent.data = Uri.parse(url)
+    return intent
+}
+
+/**
  * Utils for simple work with intents
  *
  * @version $Id: 922f8db5323030152468f37a681e4a3e612c4503 $
  */
-class IntentUtils {
-
-    companion object{
-        /**
-         * Check url (warning, url must start with "https://" or other protocol if you want not use
-         * http) and open browser or other application which can open that url.
-         *
-         * @param url Url to prepare
-         * @return NOT STARTED, but prepared intent
-         */
-        fun openLink(url: String): Intent {
-            var url = url
-            // if protocol isn't defined use http by default
-            if (!TextUtils.isEmpty(url) && !url.contains("://")) {
-                url = "http://$url"
-            }
-
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            intent.data = Uri.parse(url)
-            return intent
-        }
-    }
-
-}
+class IntentUtils

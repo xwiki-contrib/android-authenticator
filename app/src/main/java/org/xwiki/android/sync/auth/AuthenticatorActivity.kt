@@ -26,7 +26,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -36,24 +35,35 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import android.widget.ViewFlipper
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.AppContext.Companion.currentBaseUrl
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.R
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
-import org.xwiki.android.sync.utils.IntentUtils
-import org.xwiki.android.sync.utils.PermissionsUtils
-import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.*
 import rx.Subscription
 import java.lang.reflect.InvocationTargetException
 import java.util.ArrayList
+
+/**
+ * Tag which will be used for logging
+ */
+private const val TAG = "AuthenticatorActivity"
+
+const val KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE"
+const val PARAM_USER_SERVER = "XWIKI_USER_SERVER"
+const val PARAM_USER_PASS = "XWIKI_USER_PASS"
+const val PARAM_APP_UID = "PARAM_APP_UID"
+const val PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME"
+const val IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE"
+
+/**
+ * Code which await to returns for requesting permissions
+ */
+private const val REQUEST_PERMISSIONS_CODE = 1
 
 /**
  * Most important activity in authorisation process
@@ -93,6 +103,26 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
+
+    /**
+     * Contains order of flippers in authorisation progress.
+     *
+     *
+     *
+     * All flippers must support constructor
+     * [BaseViewFlipper.BaseViewFlipper], because
+     * all instances will be created automatically using reflection in
+     * [.showViewFlipper]
+     *
+     */
+    private val orderOfFlippers: MutableList<Class<out BaseViewFlipper>>
+
+    init {
+        orderOfFlippers = ArrayList()
+        orderOfFlippers.add(SettingServerIpViewFlipper::class.java)
+        orderOfFlippers.add(SignInViewFlipper::class.java)
+    }
+
     /**
      *
      *  1. Init view
@@ -131,7 +161,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             ) { dialog, which -> dialog.dismiss() }
         val position: Int?
         mAccountManager = AccountManager.get(applicationContext)
-        val availableAccounts = mAccountManager!!.getAccountsByType(Constants.ACCOUNT_TYPE)
+        val availableAccounts = mAccountManager!!.getAccountsByType(ACCOUNT_TYPE)
         position = 0
         if (availableAccounts.size > 0) {
             Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
@@ -227,7 +257,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         } else {
             url += "/bin/view/XWiki/Registration"
         }
-        val intent = IntentUtils.openLink(
+        val intent = openLink(
             url
         )
         startActivity(intent)
@@ -296,9 +326,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     fun clearOldAccount() {
         //TODO: clear current user url
         //clear SharePreference
-        SharedPrefsUtils.removeKeyValue(this, Constants.PACKAGE_LIST)
-        SharedPrefsUtils.removeKeyValue(this, Constants.SELECTED_GROUPS)
-        SharedPrefsUtils.removeKeyValue(this, Constants.SYNC_TYPE)
+        removeKeyValue(this, PACKAGE_LIST)
+        removeKeyValue(this, SELECTED_GROUPS)
+        removeKeyValue(this, SYNC_TYPE)
     }
 
     //TODO: Replace this logic to another place
@@ -326,11 +356,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE))
-        val account = Account(accountName, Constants.ACCOUNT_TYPE)
+        val account = Account(accountName, ACCOUNT_TYPE)
         mAccountManager!!.addAccountExplicitly(account, accountPassword, null)
         mAccountManager!!.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager!!.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
-        mAccountManager!!.setUserData(account, AuthenticatorActivity.PARAM_USER_SERVER, accountServer)
+        mAccountManager!!.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)
@@ -338,7 +368,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         Log.d(TAG, "$packaName, $packageName")
         //only if adding account from the third-party apps exclude android.uid.system, this will execute to grant permission and set token
         if (packaName != null && !packaName.contains("android.uid.system")) {
-            AppContext.addAuthorizedApp(packaName)
+            addAuthorizedApp(packaName)
             val authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
             if (!TextUtils.isEmpty(authToken)) {
                 val authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE)
@@ -348,7 +378,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
         //return value to AccountManager
         val intentReturn = Intent()
-        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE)
+        intentReturn.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
         intentReturn.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
         setAccountAuthenticatorResult(intentReturn.extras)
         setResult(Activity.RESULT_OK, intentReturn)
@@ -406,44 +436,5 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
-    }
-
-    companion object {
-
-        /**
-         * Contains order of flippers in authorisation progress.
-         *
-         *
-         *
-         * All flippers must support constructor
-         * [BaseViewFlipper.BaseViewFlipper], because
-         * all instances will be created automatically using reflection in
-         * [.showViewFlipper]
-         *
-         */
-        private val orderOfFlippers: MutableList<Class<out BaseViewFlipper>>
-
-        init {
-            orderOfFlippers = ArrayList()
-            orderOfFlippers.add(SettingServerIpViewFlipper::class.java)
-            orderOfFlippers.add(SignInViewFlipper::class.java)
-        }
-
-        /**
-         * Tag which will be used for logging
-         */
-        private const val TAG = "AuthenticatorActivity"
-
-        const val KEY_AUTH_TOKEN_TYPE = "KEY_AUTH_TOKEN_TYPE"
-        const val PARAM_USER_SERVER = "XWIKI_USER_SERVER"
-        const val PARAM_USER_PASS = "XWIKI_USER_PASS"
-        const val PARAM_APP_UID = "PARAM_APP_UID"
-        const val PARAM_APP_PACKAGENAME = "PARAM_APP_PACKAGENAME"
-        const val IS_SETTING_SYNC_TYPE = "IS_SETTING_SYNC_TYPE"
-
-        /**
-         * Code which await to returns for requesting permissions
-         */
-        private const val REQUEST_PERMISSIONS_CODE = 1
     }
 }

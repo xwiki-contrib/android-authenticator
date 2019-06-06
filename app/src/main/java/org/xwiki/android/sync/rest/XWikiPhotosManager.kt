@@ -24,6 +24,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import okhttp3.*
 import org.xwiki.android.sync.utils.ImageUtils
+import org.xwiki.android.sync.utils.compressByQuality
 import rx.Observable
 import rx.subjects.PublishSubject
 
@@ -185,7 +186,7 @@ class XWikiPhotosManager
         }
         avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
         //ensure < 1M.  avoid transactionException when storing in local database.
-        avatar = ImageUtils.compressByQuality(avatar, 960)
+        avatar = compressByQuality(avatar, 960)
         // Take the image we received from the server, whatever format it
         // happens to be in, and convert it to a JPEG image. Note: we're
         // not resizing the avatar - we assume that the image we get from

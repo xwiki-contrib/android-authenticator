@@ -12,6 +12,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.xwiki.android.sync.AppContextKt.getAppContextInstance;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.putArrayList;
 
 /**
  * SharedPrefsUtilsTest.
@@ -24,7 +27,7 @@ public class SharedPrefsUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        mContext = AppContext.Companion.getInstance().getApplicationContext();
+        mContext = getAppContextInstance().getApplicationContext();
     }
 
     @Test
@@ -33,8 +36,8 @@ public class SharedPrefsUtilsTest {
         for(int i=0; i<10; i++){
             mList.add("i="+i);
         }
-        SharedPrefsUtils.Companion.putArrayList(mContext, "mList", mList);
-        List<String> mList2 = SharedPrefsUtils.Companion.getArrayList(mContext, "mList");
+        putArrayList(mContext, "mList", mList);
+        List<String> mList2 = getArrayList(mContext, "mList");
         assertEquals(mList.size(), mList2.size());
         for(String item : mList) {
             assertTrue(mList2.contains(item));

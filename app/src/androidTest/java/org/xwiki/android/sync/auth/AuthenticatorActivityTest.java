@@ -29,8 +29,8 @@ public class AuthenticatorActivityTest extends ActivityInstrumentationTestCase2<
         AuthenticatorActivity authenticatorActivity;
         Bundle bundle = new Bundle();
         //AccountAuthenticatorResponse response = new AccountAuthenticatorResponse(null);
-        String authTokenType = Constants.Companion.getAUTHTOKEN_TYPE_FULL_ACCESS() + "android.uid.system";
-        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.Companion.getACCOUNT_TYPE());
+        String authTokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system";
+        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
         bundle.putString(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
         //bundle.putParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         bundle.putBoolean(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);

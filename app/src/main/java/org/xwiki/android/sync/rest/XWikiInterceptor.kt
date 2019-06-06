@@ -27,10 +27,20 @@ import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.Response
 import org.xwiki.android.sync.AppContext
+import org.xwiki.android.sync.COOKIE
 import org.xwiki.android.sync.Constants
+import org.xwiki.android.sync.getAppContextInstance
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.getValue
 
 import java.io.IOException
+
+private const val HEADER_CONTENT_TYPE = "Content-type"
+private const val HEADER_ACCEPT = "Accept"
+
+private const val HEADER_COOKIE = "Cookie"
+
+private const val CONTENT_TYPE = "application/json"
 
 /**
  * Must be used for each [okhttp3.OkHttpClient] which you will create in
@@ -47,9 +57,9 @@ class XWikiInterceptor : Interceptor {
      * @since 0.4
      */
     private val cookie: String
-        get() = SharedPrefsUtils.getValue(
-            AppContext.getInstance()!!.applicationContext,
-            Constants.COOKIE,
+        get() = getValue(
+            getAppContextInstance()!!.applicationContext,
+            COOKIE,
             ""
         )
 
@@ -87,13 +97,4 @@ class XWikiInterceptor : Interceptor {
         return chain.proceed(request)
     }
 
-    companion object {
-
-        private val HEADER_CONTENT_TYPE = "Content-type"
-        private val HEADER_ACCEPT = "Accept"
-
-        private val HEADER_COOKIE = "Cookie"
-
-        private val CONTENT_TYPE = "application/json"
-    }
 }

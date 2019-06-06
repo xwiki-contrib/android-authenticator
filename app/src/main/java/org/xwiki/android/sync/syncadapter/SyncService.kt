@@ -25,6 +25,15 @@ import android.os.IBinder
 
 
 /**
+ * Object which will be used for synchronized process
+ */
+private val sSyncAdapterLock = Any()
+
+/**
+ * Instance of sync adapter
+ */
+private var sSyncAdapter: SyncAdapter? = null
+/**
  * Service to handle Account sync. This is invoked with an intent with action
  * ACTION_AUTHENTICATOR_INTENT. It instantiates the syncadapter and returns its
  * IBinder.
@@ -51,16 +60,4 @@ class SyncService : Service() {
         return sSyncAdapter!!.syncAdapterBinder
     }
 
-    companion object {
-
-        /**
-         * Object which will be used for synchronized process
-         */
-        private val sSyncAdapterLock = Any()
-
-        /**
-         * Instance of sync adapter
-         */
-        private var sSyncAdapter: SyncAdapter? = null
-    }
 }

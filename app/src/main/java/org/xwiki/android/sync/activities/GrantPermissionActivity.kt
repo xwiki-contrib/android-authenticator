@@ -29,12 +29,11 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.AppContext.Companion.currentBaseUrl
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.R
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.AuthenticatorActivity
+import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.getValue
 
 /**
  * A grant permission activity.
@@ -65,7 +64,7 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         pkgName = intent.getStringExtra("packageName")
         accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         accountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-        authTokenType = intent.getStringExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE)
+        authTokenType = intent.getStringExtra(KEY_AUTH_TOKEN_TYPE)
         //check null, if null return.
         if (uid == 0 || accountName == null) {
             Toast.makeText(this, "null uid or accountName", Toast.LENGTH_SHORT).show()
@@ -83,17 +82,17 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
     }
 
     fun onHandleAuthorize(view: View) {
-        AppContext.addAuthorizedApp(packageName)
+        addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
-        val account = Account(accountName, Constants.ACCOUNT_TYPE)
+        val account = Account(accountName, ACCOUNT_TYPE)
         val authToken =
-            SharedPrefsUtils.getValue(AppContext.getInstance()!!.applicationContext, Constants.COOKIE, null)
+            getValue(getAppContextInstance()!!.applicationContext, COOKIE, null)
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType)
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
-        intent.putExtra(Constants.SERVER_ADDRESS, currentBaseUrl())
+        intent.putExtra(SERVER_ADDRESS, currentBaseUrl())
         setAccountAuthenticatorResult(intent.extras)
         setResult(Activity.RESULT_OK, intent)
         finish()

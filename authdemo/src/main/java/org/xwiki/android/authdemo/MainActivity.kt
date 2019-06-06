@@ -25,6 +25,44 @@ import org.xwiki.android.authdemo.databinding.ActivityMainBinding
 
 import java.io.IOException
 
+private val STATE_DIALOG = "state_dialog"
+private val STATE_INVALIDATE = "state_invalidate"
+
+/**
+ * Open market with application page.
+ *
+ * @param context Context to know where from to open market
+ */
+private fun openAppMarket(context: Context) {
+    val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "org.xwiki.android.sync"))
+    var marketFound = false
+    // find all applications able to handle our rateIntent
+    val otherApps = context.packageManager.queryIntentActivities(rateIntent, 0)
+    for (otherApp in otherApps) {
+        // look for Google Play application
+        if (otherApp.activityInfo.applicationInfo.packageName == "com.android.vending") {
+            val otherAppActivity = otherApp.activityInfo
+            val componentName = ComponentName(
+                otherAppActivity.applicationInfo.packageName,
+                otherAppActivity.name
+            )
+            rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            rateIntent.component = componentName
+            context.startActivity(rateIntent)
+            marketFound = true
+            break
+        }
+    }
+    // if GooglePlay not present on device, open web browser
+    if (!marketFound) {
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
+        )
+        context.startActivity(webIntent)
+    }
+}
+
 /**
  * MainActivity
  */
@@ -276,46 +314,5 @@ class MainActivity : AppCompatActivity() {
             return
 
         runOnUiThread { Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show() }
-    }
-
-    companion object {
-
-        private val STATE_DIALOG = "state_dialog"
-        private val STATE_INVALIDATE = "state_invalidate"
-
-        /**
-         * Open market with application page.
-         *
-         * @param context Context to know where from to open market
-         */
-        private fun openAppMarket(context: Context) {
-            val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "org.xwiki.android.sync"))
-            var marketFound = false
-            // find all applications able to handle our rateIntent
-            val otherApps = context.packageManager.queryIntentActivities(rateIntent, 0)
-            for (otherApp in otherApps) {
-                // look for Google Play application
-                if (otherApp.activityInfo.applicationInfo.packageName == "com.android.vending") {
-                    val otherAppActivity = otherApp.activityInfo
-                    val componentName = ComponentName(
-                        otherAppActivity.applicationInfo.packageName,
-                        otherAppActivity.name
-                    )
-                    rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                    rateIntent.component = componentName
-                    context.startActivity(rateIntent)
-                    marketFound = true
-                    break
-                }
-            }
-            // if GooglePlay not present on device, open web browser
-            if (!marketFound) {
-                val webIntent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
-                )
-                context.startActivity(webIntent)
-            }
-        }
     }
 }

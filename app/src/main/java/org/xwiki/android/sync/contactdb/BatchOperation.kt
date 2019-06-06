@@ -30,6 +30,12 @@ import android.util.Log
 
 import java.util.ArrayList
 
+
+/**
+ * Tag for logging.
+ */
+private val TAG = "BatchOperation"
+
 /**
  * This class handles execution of batch mOperations on Contacts provider.
  *
@@ -106,13 +112,5 @@ class BatchOperation
 
         mOperations.clear()
         return resultUris
-    }
-
-    companion object {
-
-        /**
-         * Tag for logging.
-         */
-        private val TAG = "BatchOperation"
     }
 }

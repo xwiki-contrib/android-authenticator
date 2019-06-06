@@ -8,9 +8,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.R
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.utils.extensions.getString
@@ -57,7 +55,7 @@ fun setAccountContactsVisibility(
 ) {
     val values = ContentValues()
     values.put(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
-    values.put(ContactsContract.RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE)
+    values.put(ContactsContract.RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE)
     values.put(ContactsContract.Settings.UNGROUPED_VISIBLE, if (visible) 1 else 0)
 
     resolver.insert(ContactsContract.Settings.CONTENT_URI, values)
@@ -102,7 +100,7 @@ fun XWikiUserFull.rowId(
     resolver.query(
         ContactsContract.RawContacts.CONTENT_URI,
         arrayOf(ContactsContract.Data._ID),
-        "${ContactsContract.RawContacts.ACCOUNT_TYPE}=\"${Constants.ACCOUNT_TYPE}\" AND " +
+        "${ContactsContract.RawContacts.ACCOUNT_TYPE}=\"${ACCOUNT_TYPE}\" AND " +
             "${ContactsContract.RawContacts.SOURCE_ID}=\"$id\"",
         null,
         null
@@ -115,7 +113,7 @@ fun XWikiUserFull.rowId(
             val rawContactUri = resolver.insert(
                 ContactsContract.RawContacts.CONTENT_URI,
                 ContentValues().apply {
-                    put(ContactsContract.RawContacts.ACCOUNT_TYPE, Constants.ACCOUNT_TYPE)
+                    put(ContactsContract.RawContacts.ACCOUNT_TYPE, ACCOUNT_TYPE)
                     put(ContactsContract.RawContacts.ACCOUNT_NAME, accountName)
                     put(ContactsContract.RawContacts.SOURCE_ID, id)
                 }
@@ -248,7 +246,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             EDIT_CONTACT_MIME_TYPE,
             mapOf(
                 EDIT_CONTACT_USER_ID_FIELD to convertId(),
-                EDIT_CONTACT_TEXT_FIELD to AppContext.getInstance()!!.getString(R.string.editXWikiContactInfo)
+                EDIT_CONTACT_TEXT_FIELD to getAppContextInstance()!!.getString(R.string.editXWikiContactInfo)
             )
         )
     }
@@ -341,7 +339,7 @@ fun getContactAccountName(
         "${ContactsContract.RawContacts._ID}=? AND ${ContactsContract.RawContacts.ACCOUNT_TYPE}=?",
         arrayOf(
             rowId.toString(),
-            Constants.ACCOUNT_TYPE
+            ACCOUNT_TYPE
         ),
         null
     ) ?.use {

@@ -28,8 +28,11 @@ import android.widget.CheckBox
 import android.widget.TextView
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.SELECTED_GROUPS
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.getArrayList
+import org.xwiki.android.sync.utils.putArrayList
 
 import java.util.ArrayList
 
@@ -140,7 +143,7 @@ class GroupListAdapter
      * Init groups which was selected in previous time.
      */
     private fun initSelectedGroup() {
-        val groupIds = SharedPrefsUtils.getArrayList(mContext, Constants.SELECTED_GROUPS)
+        val groupIds = getArrayList(mContext, SELECTED_GROUPS)
         if (groupIds == null || groupIds.size == 0) {
             return
         }
@@ -162,7 +165,7 @@ class GroupListAdapter
             selectedStrings.add(group.id!!)
         }
 
-        SharedPrefsUtils.putArrayList(mContext, Constants.SELECTED_GROUPS, selectedStrings)
+        putArrayList(mContext, SELECTED_GROUPS, selectedStrings)
     }
 
     /**

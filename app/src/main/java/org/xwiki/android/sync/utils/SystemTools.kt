@@ -23,32 +23,28 @@ import android.content.Context
 import android.content.pm.PackageManager.NameNotFoundException
 
 /**
+ * Get from package version name
+ *
+ * @param context Context to get version name
+ * @return version as how it was present in user settings
+ */
+fun getAppVersionName(context: Context): String {
+    try {
+        return context
+            .packageManager
+            .getPackageInfo(
+                context.packageName,
+                0
+            )
+            .versionName
+    } catch (e: NameNotFoundException) {
+        throw RuntimeException(SystemTools::class.java.name + "the application not found")
+    }
+}
+
+/**
  * System tools.
  *
  * @version $Id: eb9d8af9731a7f869eb33a9e6696dc354104c897 $
  */
-class SystemTools {
-
-   companion object {
-
-       /**
-        * Get from package version name
-        *
-        * @param context Context to get version name
-        * @return version as how it was present in user settings
-        */
-       fun getAppVersionName(context: Context): String {
-           try {
-               return context
-                       .packageManager
-                       .getPackageInfo(
-                               context.packageName,
-                               0
-                       )
-                       .versionName
-           } catch (e: NameNotFoundException) {
-               throw RuntimeException(SystemTools::class.java.name + "the application not found")
-           }
-       }
-   }
-}
+class SystemTools

@@ -25,8 +25,10 @@ import android.view.View
 import android.widget.EditText
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.putValue
 
 import java.net.MalformedURLException
 import java.net.URL
@@ -51,7 +53,7 @@ class SettingServerIpViewFlipper
     override fun doNext() {
         val serverAddress = checkInput()
         if (serverAddress != null) {
-            SharedPrefsUtils.putValue(mContext, Constants.SERVER_ADDRESS, serverAddress)
+            putValue(mContext, SERVER_ADDRESS, serverAddress)
         }
     }
 

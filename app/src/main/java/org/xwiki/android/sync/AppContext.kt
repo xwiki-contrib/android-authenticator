@@ -23,6 +23,9 @@ import android.app.Application
 import android.util.Log
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.getArrayList
+import org.xwiki.android.sync.utils.getValue
+import org.xwiki.android.sync.utils.putArrayList
 
 import java.util.AbstractMap
 import java.util.ArrayList
@@ -32,6 +35,83 @@ import java.util.ArrayList
  *
  * @version $Id: c3a5996b1bce14d5c105a55f085115347c39c035 $
  */
+
+
+/**
+ * Entry pair Server address - Base Api Manager
+ */
+private var baseApiManager: AbstractMap.SimpleEntry<String, BaseApiManager>? = null
+
+/**
+ * Logging tag
+ */
+private const val TAG = "AppContext"
+
+/**
+ * Instance of context to use it in static methods
+ */
+private lateinit var appContextInstance : AppContext
+
+
+/**
+ * @return known AppContext instance
+ */
+fun getAppContextInstance(): AppContext? {
+    return appContextInstance
+}
+
+/**
+ * @return actual base url
+ */
+fun currentBaseUrl(): String {
+    return getValue(appContextInstance, SERVER_ADDRESS, "")
+}
+
+/**
+ * Add app as authorized
+ *
+ * @param packageName Application package name to add as authorized
+ */
+fun addAuthorizedApp(packageName: String) {
+    Log.d(TAG, "packageName=$packageName")
+    var packageList: MutableList<String>? = getArrayList(appContextInstance.applicationContext, PACKAGE_LIST)
+    if (packageList == null) {
+        packageList = ArrayList()
+    }
+    packageList.add(packageName)
+    putArrayList(appContextInstance.applicationContext, PACKAGE_LIST, packageList)
+}
+
+/**
+ * Check that application with packageName is authorised.
+ *
+ * @param packageName Application package name
+ * @return true if application was authorized
+ */
+fun isAuthorizedApp(packageName: String): Boolean {
+    val packageList = getArrayList(
+        appContextInstance.applicationContext,
+        PACKAGE_LIST
+    )
+    return packageList != null && packageList.contains(packageName)
+}
+
+/**
+ * @return Current [.baseApiManager] value or create new and return
+ *
+ * @since 0.4
+ */
+fun getApiManager() : BaseApiManager {
+    val url = currentBaseUrl()
+    if (baseApiManager == null || baseApiManager!!.key != url) {
+        baseApiManager = AbstractMap.SimpleEntry(
+            url,
+            BaseApiManager(url)
+        )
+    }
+    return baseApiManager!!.value
+}
+
 open class AppContext : Application() {
 
     /**
@@ -41,82 +121,5 @@ open class AppContext : Application() {
         super.onCreate()
         appContextInstance = this
         Log.d(TAG, "on create")
-    }
-
-    companion object {
-
-        /**
-         * Entry pair Server address - Base Api Manager
-         */
-        private var baseApiManager: AbstractMap.SimpleEntry<String, BaseApiManager>? = null
-
-        /**
-         * Logging tag
-         */
-        private val TAG = "AppContext"
-
-        /**
-         * Instance of context to use it in static methods
-         */
-        private lateinit var appContextInstance : AppContext
-
-        /**
-         * @return known AppContext instance
-         */
-        fun getInstance(): AppContext? {
-            return appContextInstance
-        }
-
-        /**
-         * @return actual base url
-         */
-        fun currentBaseUrl(): String {
-            return SharedPrefsUtils.getValue(appContextInstance, Constants.SERVER_ADDRESS, "")
-        }
-
-        /**
-         * Add app as authorized
-         *
-         * @param packageName Application package name to add as authorized
-         */
-        fun addAuthorizedApp(packageName: String) {
-            Log.d(TAG, "packageName=$packageName")
-            var packageList: MutableList<String>? = SharedPrefsUtils.getArrayList(appContextInstance.applicationContext, Constants.PACKAGE_LIST)
-            if (packageList == null) {
-                packageList = ArrayList()
-            }
-            packageList.add(packageName)
-            SharedPrefsUtils.putArrayList(appContextInstance.applicationContext, Constants.PACKAGE_LIST, packageList)
-        }
-
-        /**
-         * Check that application with packageName is authorised.
-         *
-         * @param packageName Application package name
-         * @return true if application was authorized
-         */
-        fun isAuthorizedApp(packageName: String): Boolean {
-            val packageList = SharedPrefsUtils.getArrayList(
-                appContextInstance.applicationContext,
-                Constants.PACKAGE_LIST
-            )
-            return packageList != null && packageList.contains(packageName)
-        }
-
-        /**
-         * @return Current [.baseApiManager] value or create new and return
-         *
-         * @since 0.4
-         */
-        fun getApiManager() : BaseApiManager {
-                val url = currentBaseUrl()
-                if (baseApiManager == null || baseApiManager!!.key != url) {
-                    baseApiManager = AbstractMap.SimpleEntry(
-                        url,
-                        BaseApiManager(url)
-                    )
-                }
-                return baseApiManager!!.value
-        }
     }
 }

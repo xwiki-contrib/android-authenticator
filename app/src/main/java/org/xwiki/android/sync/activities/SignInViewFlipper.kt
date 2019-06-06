@@ -29,12 +29,21 @@ import android.widget.EditText
 import android.widget.TextView
 import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
+import org.xwiki.android.sync.auth.PARAM_USER_PASS
+import org.xwiki.android.sync.auth.PARAM_USER_SERVER
 import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.getValue
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
+
+/**
+ * Tag for logging.
+ */
+private val TAG = "SignInViewFlipper"
 
 /**
  * Main auth flipper.
@@ -156,7 +165,7 @@ class SignInViewFlipper
         username: String,
         password: String
     ): Intent {
-        val userServer = SharedPrefsUtils.getValue(mContext, Constants.SERVER_ADDRESS, null)
+        val userServer = getValue(mContext, SERVER_ADDRESS, null)
 
         val accountType = mActivity.intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
 
@@ -164,8 +173,8 @@ class SignInViewFlipper
         data.putString(AccountManager.KEY_ACCOUNT_NAME, username)
         data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType)
         data.putString(AccountManager.KEY_AUTHTOKEN, authtoken)
-        data.putString(AuthenticatorActivity.PARAM_USER_SERVER, userServer)
-        data.putString(AuthenticatorActivity.PARAM_USER_PASS, password)
+        data.putString(PARAM_USER_SERVER, userServer)
+        data.putString(PARAM_USER_PASS, password)
 
         val intent = Intent()
         intent.putExtras(data)
@@ -213,14 +222,6 @@ class SignInViewFlipper
             { errorTextView.visibility = View.GONE },
             2000
         )
-    }
-
-    companion object {
-
-        /**
-         * Tag for logging.
-         */
-        private val TAG = "SignInViewFlipper"
     }
 
 }
