@@ -54,7 +54,7 @@ constructor(
     /**
      * Array of permissions which this application required
      */
-    private var mRequiredPermissions: Array<String>? = null
+    private var mRequiredPermissions: Array<String>
 
     /**
      * Permissions which was not given
@@ -83,7 +83,7 @@ constructor(
      * @return true if all the required permissions are granted, otherwise false
      */
     fun checkPermissions(): Boolean {
-        for (permission in mRequiredPermissions!!) {
+        for (permission in mRequiredPermissions) {
             if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
                 mPermissionsToRequest.add(permission)
             }

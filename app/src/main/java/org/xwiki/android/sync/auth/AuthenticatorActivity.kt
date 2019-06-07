@@ -86,12 +86,12 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     /**
      * DataBinding for accessing layout variables.
      */
-    var binding : ActAuthenticatorBinding? = null
+    lateinit var binding : ActAuthenticatorBinding
 
     /**
      * Will be used for managing of user account.
      */
-    private var mAccountManager: AccountManager? = null
+    private lateinit var mAccountManager: AccountManager
 
     /**
      * Toolbar of current activity.
@@ -144,7 +144,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
 
         toolbar = findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.xwikiAccount)
+        toolbar?.setTitle(R.string.xwikiAccount)
 
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -161,7 +161,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             ) { dialog, which -> dialog.dismiss() }
         val position: Int?
         mAccountManager = AccountManager.get(applicationContext)
-        val availableAccounts = mAccountManager!!.getAccountsByType(ACCOUNT_TYPE)
+        val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         position = 0
         if (availableAccounts.size > 0) {
             Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
@@ -176,11 +176,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * not settings.
      */
     override fun onBackPressed() {
-        if (binding!!.viewFlipper.displayedChild == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java)) {
+        if (binding.viewFlipper.displayedChild == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java)) {
             super.onBackPressed()
         } else {
             doPrevious(
-                binding!!.viewFlipper.currentView
+                binding.viewFlipper.currentView
             )
         }
     }
@@ -192,9 +192,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View, which trigger action
      */
     fun doPrevious(view: View) {
-        val position = binding!!.viewFlipper.displayedChild
+        val position = binding.viewFlipper.displayedChild
         chooseAnimation(position == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java))
-        flippers[position]!!.doPrevious()
+        flippers[position]?.doPrevious()
         showViewFlipper(position - 1)
     }
 
@@ -205,9 +205,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View, which trigger action
      */
     fun doNext(view: View) {
-        val position = binding!!.viewFlipper.displayedChild
+        val position = binding.viewFlipper.displayedChild
         chooseAnimation(true)
-        flippers[position]!!.doNext()
+        flippers[position]?.doNext()
         if (position + 1 >= orderOfFlippers.size) {
             finish()
         }
@@ -224,20 +224,20 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private fun chooseAnimation(toNext: Boolean) {
         if (toNext) {
-            binding!!.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
+            binding.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_left_in
             )
-            binding!!.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
+            binding.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_left_out
             )
         } else {
-            binding!!.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
+            binding.viewFlipper.inAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_right_in
             )
-            binding!!.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
+            binding.viewFlipper.outAnimation = AnimationUtils.loadAnimation(
                 this,
                 R.anim.push_right_out
             )
@@ -284,7 +284,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @since 0.4.2
      */
     fun showViewFlipper(position: Int) {
-        binding!!.viewFlipper.displayedChild = position
+        binding.viewFlipper.displayedChild = position
         while (flippers.size <= position) {
             flippers.add(null)
         }
@@ -296,7 +296,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                     View::class.java
                 ).newInstance(
                     this,
-                    binding!!.viewFlipper.getChildAt(position)
+                    binding.viewFlipper.getChildAt(position)
                 )
                 flippers[position] = flipper
             } catch (e: InstantiationException) {
@@ -317,7 +317,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         if (title == null) {
             title = getString(R.string.app_name)
         }
-        toolbar!!.title = title
+        toolbar?.title = title
     }
 
     /**
@@ -357,10 +357,10 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE))
         val account = Account(accountName, ACCOUNT_TYPE)
-        mAccountManager!!.addAccountExplicitly(account, accountPassword, null)
-        mAccountManager!!.setUserData(account, AccountManager.KEY_USERDATA, accountName)
-        mAccountManager!!.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
-        mAccountManager!!.setUserData(account, PARAM_USER_SERVER, accountServer)
+        mAccountManager.addAccountExplicitly(account, accountPassword, null)
+        mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
+        mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
+        mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)
@@ -372,7 +372,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             val authToken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
             if (!TextUtils.isEmpty(authToken)) {
                 val authTokenType = getIntent().getStringExtra(KEY_AUTH_TOKEN_TYPE)
-                mAccountManager!!.setAuthToken(account, authTokenType, authToken)
+                mAccountManager.setAuthToken(account, authTokenType, authToken)
             }
         }
 
@@ -414,7 +414,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         // We save off the progress dialog in a field so that we can dismiss
         // it later.
         mProgressDialog = dialog
-        mProgressDialog!!.show()
+        mProgressDialog?.show()
     }
 
     /**
@@ -422,8 +422,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     fun hideProgress() {
         if (mProgressDialog != null) {
-            mProgressDialog!!.dismiss()
-            mProgressDialog = null
+            mProgressDialog?.dismiss()
         }
     }
 

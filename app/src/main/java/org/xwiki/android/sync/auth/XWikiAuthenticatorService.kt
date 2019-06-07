@@ -38,6 +38,6 @@ class XWikiAuthenticatorService : Service() {
         if (authenticator == null) {
             authenticator = XWikiAuthenticator(this)
         }
-        return authenticator!!.iBinder
+        return authenticator?.iBinder
     }
 }

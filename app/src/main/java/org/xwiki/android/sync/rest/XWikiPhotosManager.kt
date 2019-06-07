@@ -65,7 +65,7 @@ class XWikiPhotosManager
         name: String,
         avatarName: String
     ): Observable<ByteArray>? {
-        var request: Request? = null
+        var request: Request
         try {
             request = Request.Builder()
                 .url(
@@ -85,7 +85,7 @@ class XWikiPhotosManager
 
         val subject = PublishSubject.create<ByteArray>()
 
-        client.newCall(request!!).enqueue(object : Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(request: Call, e: IOException) {
                 println("request failed: " + e.message)
 
@@ -102,9 +102,11 @@ class XWikiPhotosManager
                     throw IOException("Response with error: $response")
                 }
 
-                val avatarBytes = prepareAvatar(
-                    response.body()!!.bytes()
-                )
+                val avatarBytes = response.body()?.bytes()?.let {
+                    prepareAvatar(
+                        it
+                    )
+                }
 
                 subject.onNext(avatarBytes)
             }
@@ -145,7 +147,7 @@ class XWikiPhotosManager
                     throw IOException("Response with error: $response")
                 }
 
-                subject.onNext(response.body()!!.bytes())
+                subject.onNext(response.body()?.bytes())
             }
         })
 

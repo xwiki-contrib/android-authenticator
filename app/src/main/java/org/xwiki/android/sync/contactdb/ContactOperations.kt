@@ -181,8 +181,8 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME to firstName!!,
-                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME to lastName!!
+                ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME to firstName,
+                ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME to lastName
             )
         )
     },
@@ -192,9 +192,9 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY to country!!,
-                ContactsContract.CommonDataKinds.StructuredPostal.CITY to city!!,
-                ContactsContract.CommonDataKinds.StructuredPostal.STREET to address!!
+                ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY to country,
+                ContactsContract.CommonDataKinds.StructuredPostal.CITY to city,
+                ContactsContract.CommonDataKinds.StructuredPostal.STREET to address
             )
         )
     },
@@ -204,7 +204,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.Phone.NUMBER to phone!!,
+                ContactsContract.CommonDataKinds.Phone.NUMBER to phone,
                 ContactsContract.CommonDataKinds.Phone.TYPE to ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE
             )
         )
@@ -215,7 +215,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.Organization.COMPANY to company!!
+                ContactsContract.CommonDataKinds.Organization.COMPANY to company
             )
         )
     },
@@ -225,7 +225,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.Email.ADDRESS to email!!
+                ContactsContract.CommonDataKinds.Email.ADDRESS to email
             )
         )
     },
@@ -235,7 +235,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             rowId,
             ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE,
             mapOf(
-                ContactsContract.CommonDataKinds.Note.NOTE to comment!!
+                ContactsContract.CommonDataKinds.Note.NOTE to comment
             )
         )
     },
@@ -246,7 +246,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             EDIT_CONTACT_MIME_TYPE,
             mapOf(
                 EDIT_CONTACT_USER_ID_FIELD to convertId(),
-                EDIT_CONTACT_TEXT_FIELD to getAppContextInstance()!!.getString(R.string.editXWikiContactInfo)
+                EDIT_CONTACT_TEXT_FIELD to getAppContextInstance().getString(R.string.editXWikiContactInfo)
             )
         )
     }

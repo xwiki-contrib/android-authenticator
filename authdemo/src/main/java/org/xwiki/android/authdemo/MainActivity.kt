@@ -66,13 +66,13 @@ private fun openAppMarket(context: Context) {
 /**
  * MainActivity
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity: AppCompatActivity() {
 
     private val TAG = this.javaClass.simpleName
-    private var mAccountManager: AccountManager? = null
+    private lateinit var mAccountManager: AccountManager
     private var mAlertDialog: AlertDialog? = null
     private var mInvalidate: Boolean = false
-    private var binding : ActivityMainBinding? = null
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,38 +81,38 @@ class MainActivity : AppCompatActivity() {
 
         mAccountManager = AccountManager.get(this)
 
-        binding!!.signatureTextview.text =
+        binding.signatureTextview.text =
             "Signature=" + SystemTools.getSign(this, packageName) + "\nPackageName=" + packageName
 
-        binding!!.btnAddAccount.setOnClickListener {
+        binding.btnAddAccount.setOnClickListener {
             addNewAccount(
                 Constants.ACCOUNT_TYPE,
                 Constants.AUTHTOKEN_TYPE_FULL_ACCESS
             )
         }
 
-        binding!!.btnGetAuthToken.setOnClickListener {
+        binding.btnGetAuthToken.setOnClickListener {
             showAccountPicker(
                 Constants.AUTHTOKEN_TYPE_FULL_ACCESS,
                 false
             )
         }
 
-        binding!!.btnGetAuthTokenConvenient.setOnClickListener {
+        binding.btnGetAuthTokenConvenient.setOnClickListener {
             getTokenForAccountCreateIfNeeded(
                 Constants.ACCOUNT_TYPE,
                 Constants.AUTHTOKEN_TYPE_FULL_ACCESS
             )
         }
 
-        binding!!.btnInvalidateAuthToken.setOnClickListener {
+        binding.btnInvalidateAuthToken.setOnClickListener {
             showAccountPicker(
                 Constants.AUTHTOKEN_TYPE_FULL_ACCESS,
                 true
             )
         }
 
-        binding!!.btnConfirmCredentials.setOnClickListener {
+        binding.btnConfirmCredentials.setOnClickListener {
             val account = Account("fitz", Constants.ACCOUNT_TYPE)
             confirmCredentials(account)
         }
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
      * @param authTokenType
      */
     private fun addNewAccount(accountType: String, authTokenType: String) {
-        val future = mAccountManager!!.addAccount(accountType, authTokenType, null, null, this, { future ->
+        val future = mAccountManager.addAccount(accountType, authTokenType, null, null, this, { future ->
             try {
                 val bnd = future.result
                 showMessage("Account was created")
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun showAccountPicker(authTokenType: String, invalidate: Boolean) {
         mInvalidate = invalidate
-        val availableAccounts = mAccountManager!!.getAccountsByType(Constants.ACCOUNT_TYPE)
+        val availableAccounts = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)
 
         if (availableAccounts.size == 0) {
             Toast.makeText(this, "No accounts", Toast.LENGTH_SHORT).show()
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun confirmCredentials(account: Account) {
-        val future = mAccountManager!!.confirmCredentials(account, null, this, { future ->
+        val future = mAccountManager.confirmCredentials(account, null, this, { future ->
             try {
                 val bnd = future.result
                 //showMessage((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL");
@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity() {
      * @param authTokenType
      */
     private fun getExistingAccountAuthToken(account: Account, authTokenType: String) {
-        val future = mAccountManager!!.getAuthToken(account, authTokenType, null, this, null, null)
+        val future = mAccountManager.getAuthToken(account, authTokenType, null, this, null, null)
 
         Thread(Runnable {
             try {
@@ -243,14 +243,14 @@ class MainActivity : AppCompatActivity() {
      * @param authTokenType
      */
     private fun invalidateAuthToken(account: Account, authTokenType: String) {
-        val future = mAccountManager!!.getAuthToken(account, authTokenType, null, this, null, null)
+        val future = mAccountManager.getAuthToken(account, authTokenType, null, this, null, null)
 
         Thread(Runnable {
             try {
                 val bnd = future.result
                 val authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN)
                 val server = bnd.getString(Constants.SERVER_ADDRESS)
-                mAccountManager!!.invalidateAuthToken(account.type, authToken)
+                mAccountManager.invalidateAuthToken(account.type, authToken)
                 showMessage(account.name + " invalidated")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -268,12 +268,12 @@ class MainActivity : AppCompatActivity() {
      * @param authTokenType
      */
     private fun getTokenForAccountCreateIfNeeded(accountType: String, authTokenType: String) {
-        val future = mAccountManager!!.getAuthTokenByFeatures(accountType, authTokenType, null, this, null, null,
+        val future = mAccountManager.getAuthTokenByFeatures(accountType, authTokenType, null, this, null, null,
             { future ->
                 var bnd: Bundle? = null
                 try {
                     bnd = future.result
-                    isValidToken(bnd!!)
+                    isValidToken(bnd)
                     Log.d(TAG, "GetTokenForAccount Bundle is $bnd")
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -292,7 +292,7 @@ class MainActivity : AppCompatActivity() {
             showMessage("FAIL! getAuthToken error message=" + errorMessage!!)
             return
         }
-        XWikiHttp.isValidToken(url, authToken, object : Callback {
+        XWikiHttp.isValidToken(url, authToken, object: Callback {
             override fun onFailure(call: Call, e: IOException) {
 
             }

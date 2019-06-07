@@ -57,7 +57,7 @@ class SyncService : Service() {
      * @return [SyncAdapter.getSyncAdapterBinder] of [.sSyncAdapter]
      */
     override fun onBind(intent: Intent): IBinder? {
-        return sSyncAdapter!!.syncAdapterBinder
+        return sSyncAdapter?.syncAdapterBinder
     }
 
 }

@@ -56,7 +56,7 @@ class GroupListAdapter
     /**
      * Current list of items.
      */
-    private var groupList: List<XWikiGroup>?
+    private var groupList: List<XWikiGroup>
 ) : BaseAdapter() {
 
     /**
@@ -74,7 +74,7 @@ class GroupListAdapter
      * @return Count of items
      */
     override fun getCount(): Int {
-        return groupList!!.size
+        return groupList.size
     }
 
     /**
@@ -82,7 +82,7 @@ class GroupListAdapter
      * @return Object ([XWikiGroup] if be exactly)
      */
     override fun getItem(position: Int): XWikiGroup {
-        return groupList!![position]
+        return groupList[position]
     }
 
     /**
@@ -115,7 +115,7 @@ class GroupListAdapter
 
         val group = getItem(position)
         viewHolder.groupNameTextView.text = group.pageName
-        viewHolder.lastModifiedTime.text = group.lastModifiedDate!!.substring(0, 10)
+        viewHolder.lastModifiedTime.text = group.lastModifiedDate.substring(0, 10)
         viewHolder.versionTextView.text = group.wiki
         viewHolder.checkBox.isChecked = selected.contains(group)
 
@@ -148,7 +148,7 @@ class GroupListAdapter
             return
         }
         selected.clear()
-        for (item in groupList!!) {
+        for (item in groupList) {
             if (groupIds.contains(item.id)) {
                 selected.add(item)
             }
@@ -162,7 +162,7 @@ class GroupListAdapter
         val selectedStrings = ArrayList<String>()
 
         for (group in selected) {
-            selectedStrings.add(group.id!!)
+            selectedStrings.add(group.id)
         }
 
         putArrayList(mContext, SELECTED_GROUPS, selectedStrings)

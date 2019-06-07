@@ -56,7 +56,7 @@ private lateinit var appContextInstance : AppContext
 /**
  * @return known AppContext instance
  */
-fun getAppContextInstance(): AppContext? {
+fun getAppContextInstance(): AppContext {
     return appContextInstance
 }
 
@@ -103,7 +103,7 @@ fun isAuthorizedApp(packageName: String): Boolean {
  */
 fun getApiManager() : BaseApiManager {
     val url = currentBaseUrl()
-    if (baseApiManager == null || baseApiManager!!.key != url) {
+    if (baseApiManager == null || baseApiManager?.key != url) {
         baseApiManager = AbstractMap.SimpleEntry(
             url,
             BaseApiManager(url)

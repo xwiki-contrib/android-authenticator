@@ -80,7 +80,7 @@ object ContactManager {
             object : Observer<XWikiUserFull> {
                 override fun onCompleted() {
                     for (id in localUserMaps.keys) {
-                        val rawId = localUserMaps[id]!!
+                        val rawId = localUserMaps[id]
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute()
                         }
@@ -146,7 +146,7 @@ object ContactManager {
                 xwikiUser.avatar
             )
         if (gettingAvatarObservable != null) {
-            gettingAvatarObservable!!.subscribe(
+            gettingAvatarObservable.subscribe(
                 Action1<ByteArray> { bytes ->
                     if (bytes != null) {
                         try {
@@ -198,10 +198,10 @@ object ContactManager {
             RawContacts.DisplayPhoto.CONTENT_DIRECTORY
         )
         val fd = contentResolver.openAssetFileDescriptor(rawContactPhotoUri, "rw")
-        val os = fd!!.createOutputStream()
-        os.write(photo)
-        os.close()
-        fd.close()
+        val os = fd?.createOutputStream()
+        os?.write(photo)
+        os?.close()
+        fd?.close()
     }
 
     /**
@@ -225,7 +225,7 @@ object ContactManager {
             arrayOf(accountName), null
         )
         try {
-            while (c!!.moveToNext()) {
+            while (c.moveToNext()) {
                 val serverId = c.getString(AllQuery.COLUMN_SERVER_ID)
 
                 val rawId = c.getLong(AllQuery.COLUMN_RAW_CONTACT_ID)

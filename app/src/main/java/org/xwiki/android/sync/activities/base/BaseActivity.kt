@@ -45,8 +45,7 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * @return [.progress]
      */
-    var progressDialog: ProgressDialog? = null
-        private set
+    lateinit var progressDialog: ProgressDialog
 
     /**
      * Work as [super.setContentView], but also prepare other components
@@ -66,8 +65,8 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     protected fun showBackButton() {
         if (supportActionBar != null) {
-            supportActionBar!!.setHomeButtonEnabled(true)
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeButtonEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
     }
 
@@ -95,19 +94,18 @@ abstract class BaseActivity : AppCompatActivity() {
     fun showProgressDialog(message: String = getString(R.string.pleaseWait)) {
         if (progressDialog == null) {
             progressDialog = ProgressDialog(this, ProgressDialog.STYLE_SPINNER)
-            progressDialog!!.setCancelable(true)
+            progressDialog.setCancelable(true)
         }
-        progressDialog!!.setMessage(message)
-        progressDialog!!.show()
+        progressDialog.setMessage(message)
+        progressDialog.show()
     }
 
     /**
      * Hide progress dialog if it currently visible.
      */
     fun hideProgressDialog() {
-        if (progressDialog != null && progressDialog!!.isShowing) {
-            progressDialog!!.dismiss()
-            progressDialog = null
+        if (progressDialog != null && progressDialog.isShowing) {
+            progressDialog.dismiss()
         }
     }
 

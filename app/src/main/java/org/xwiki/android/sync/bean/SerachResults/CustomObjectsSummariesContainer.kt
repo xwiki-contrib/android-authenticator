@@ -20,6 +20,6 @@
 package org.xwiki.android.sync.bean.SerachResults
 
 open class CustomObjectsSummariesContainer<T> {
-    var links: Array<String>? = null
-    var objectSummaries: List<T>? = null
+    lateinit var links: Array<String>
+    lateinit var objectSummaries: List<T>
 }

@@ -75,27 +75,27 @@ class SyncSettingsActivity : BaseActivity() {
     /**
      * DataBinding for accessing layout variables.
      */
-    var binding : ActivitySyncSettingsBinding? = null
+    lateinit var binding : ActivitySyncSettingsBinding
 
     /**
      * Adapter for groups
      */
-    private var mGroupAdapter: GroupListAdapter? = null
+    private lateinit var mGroupAdapter: GroupListAdapter
 
     /**
      * Adapter for users.
      */
-    private var mUsersAdapter: UserListAdapter? = null
+    private lateinit var mUsersAdapter: UserListAdapter
 
     /**
      * List of received groups.
      */
-    private var groups: MutableList<XWikiGroup>? = null
+    private lateinit var groups: MutableList<XWikiGroup>
 
     /**
      * List of received all users.
      */
-    private var allUsers: MutableList<ObjectSummary>? = null
+    private lateinit var allUsers: MutableList<ObjectSummary>
 
     /**
      * Currently chosen sync type.
@@ -106,13 +106,13 @@ class SyncSettingsActivity : BaseActivity() {
      * Flag of currently loading groups.
      */
     @Volatile
-    private var groupsAreLoading: Boolean? = false
+    private var groupsAreLoading: Boolean = false
 
     /**
      * Flag of currently loading all users.
      */
     @Volatile
-    private var allUsersAreLoading: Boolean? = false
+    private var allUsersAreLoading: Boolean = false
 
     /**
      * Init all views and other activity objects
@@ -125,21 +125,21 @@ class SyncSettingsActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings);
 
-        binding!!.versionCheck.text = String.format(
+        binding.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
             getAppVersionName(this)
         )
-        binding!!.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
+        binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
-        binding!!.listView.emptyView = binding!!.syncTypeGetErrorContainer
+        binding.listView.emptyView = binding.syncTypeGetErrorContainer
         groups = ArrayList()
         allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(this, groups)
-        mUsersAdapter = UserListAdapter(this, allUsers!!)
+        mUsersAdapter = UserListAdapter(this, allUsers)
         initData(null)
-        binding!!.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        binding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
-        binding!!.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 chosenSyncType = position
                 updateListView()
@@ -151,7 +151,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
 
         chosenSyncType = getValue(this, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
-        binding!!.selectSpinner.setSelection(chosenSyncType)
+        binding.selectSpinner.setSelection(chosenSyncType)
     }
 
     /**
@@ -160,14 +160,14 @@ class SyncSettingsActivity : BaseActivity() {
      * @since 0.4.2
      */
     private fun refreshProgressBar() {
-        val progressBarVisible = syncGroups() && groupsAreLoading!! || syncAllUsers() && allUsersAreLoading!!
+        val progressBarVisible = syncGroups() && groupsAreLoading || syncAllUsers() && allUsersAreLoading
         runOnUiThread {
             if (progressBarVisible) {
-                binding!!.listViewProgressBar.visibility = View.VISIBLE
-                binding!!.settingsSyncListViewContainer.visibility = View.GONE
+                binding.listViewProgressBar.visibility = View.VISIBLE
+                binding.settingsSyncListViewContainer.visibility = View.GONE
             } else {
-                binding!!.listViewProgressBar.visibility = View.GONE
-                binding!!.settingsSyncListViewContainer.visibility = View.VISIBLE
+                binding.listViewProgressBar.visibility = View.GONE
+                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
             }
         }
     }
@@ -178,7 +178,7 @@ class SyncSettingsActivity : BaseActivity() {
      * @since 0.4
      */
     fun initData(v: View?) {
-        if (groups!!.isEmpty()) {
+        if (groups.isEmpty()) {
             groupsAreLoading = true
             getApiManager().xwikiServicesApi.availableGroups(
                 LIMIT_MAX_SYNC_USERS
@@ -190,8 +190,8 @@ class SyncSettingsActivity : BaseActivity() {
                         groupsAreLoading = false
                         val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
                         if (searchResults != null) {
-                            groups!!.clear()
-                            groups!!.addAll(searchResults)
+                            groups.clear()
+                            groups.addAll(searchResults)
                             updateListView()
                         }
                     },
@@ -208,7 +208,7 @@ class SyncSettingsActivity : BaseActivity() {
                     }
                 )
         }
-        if (allUsers!!.isEmpty()) {
+        if (allUsers.isEmpty()) {
             allUsersAreLoading = true
             getApiManager().xwikiServicesApi.allUsersPreview
                 .subscribeOn(Schedulers.newThread())
@@ -216,8 +216,8 @@ class SyncSettingsActivity : BaseActivity() {
                 .subscribe(
                     Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
                         allUsersAreLoading = false
-                        allUsers!!.clear()
-                        allUsers!!.addAll(summaries.objectSummaries!!)
+                        allUsers.clear()
+                        allUsers.addAll(summaries.objectSummaries)
                         updateListView()
                     },
                     Action1<Throwable> {
@@ -233,7 +233,7 @@ class SyncSettingsActivity : BaseActivity() {
                     }
                 )
         }
-        if (allUsersAreLoading!! || groupsAreLoading!!) {
+        if (allUsersAreLoading || groupsAreLoading) {
             refreshProgressBar()
         }
     }
@@ -264,20 +264,20 @@ class SyncSettingsActivity : BaseActivity() {
      */
     private fun updateListView() {
         if (syncNothing()) {
-            binding!!.settingsSyncListViewContainer.visibility = View.GONE
-            binding!!.listViewProgressBar.visibility = View.GONE
+            binding.settingsSyncListViewContainer.visibility = View.GONE
+            binding.listViewProgressBar.visibility = View.GONE
         } else {
-            binding!!.settingsSyncListViewContainer.visibility = View.VISIBLE
+            binding.settingsSyncListViewContainer.visibility = View.VISIBLE
             val adapter: BaseAdapter?
             if (syncGroups()) {
                 adapter = mGroupAdapter
-                mGroupAdapter!!.refresh(groups!!)
+                mGroupAdapter.refresh(groups)
             } else {
                 adapter = mUsersAdapter
-                mUsersAdapter!!.refresh(allUsers!!)
+                mUsersAdapter.refresh(allUsers)
             }
-            if (adapter !== binding!!.listView.adapter) {
-                binding!!.listView.adapter = adapter
+            if (adapter !== binding.listView.adapter) {
+                binding.listView.adapter = adapter
             }
             refreshProgressBar()
         }
@@ -317,7 +317,7 @@ class SyncSettingsActivity : BaseActivity() {
                 return
             }
 
-            mGroupAdapter!!.saveSelectedGroups()
+            mGroupAdapter.saveSelectedGroups()
 
             putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_SELECTED_GROUPS)
             setSync(true)
@@ -357,7 +357,7 @@ class SyncSettingsActivity : BaseActivity() {
      */
     private fun compareSelectGroups(): Boolean {
         //new
-        val newList = mGroupAdapter!!.selectGroups
+        val newList = mGroupAdapter.selectGroups
         //old
         val oldList = getArrayList(applicationContext, SELECTED_GROUPS)
         if (newList == null && oldList == null) {

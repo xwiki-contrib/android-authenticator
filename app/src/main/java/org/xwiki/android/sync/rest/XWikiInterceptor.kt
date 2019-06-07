@@ -58,7 +58,7 @@ class XWikiInterceptor : Interceptor {
      */
     private val cookie: String
         get() = getValue(
-            getAppContextInstance()!!.applicationContext,
+            getAppContextInstance().applicationContext,
             COOKIE,
             ""
         )

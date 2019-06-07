@@ -28,16 +28,16 @@ class XWikiGroup {
     /**
      * curriki:XWiki.XWikiAdminGroup
      */
-    var id: String? = null
+    lateinit var id: String
 
-    var wiki: String? = null
+    lateinit var wiki: String
 
-    var space: String? = null
+    lateinit var space: String
 
-    var pageName: String? = null
+    lateinit var pageName: String
 
     @SerializedName("modified")
-    var lastModifiedDate: String? = null
+    lateinit var lastModifiedDate: String
 
     var version: String? = null
 

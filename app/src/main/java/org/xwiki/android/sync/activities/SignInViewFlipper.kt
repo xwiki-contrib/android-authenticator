@@ -65,12 +65,12 @@ class SignInViewFlipper
     /**
      * Typed username.
      */
-    private var accountName: String? = null
+    private lateinit var accountName: String
 
     /**
      * Typed password.
      */
-    private var accountPassword: String? = null
+    private lateinit var accountPassword: String
 
     init {
         findViewById<View>(R.id.signInButton).setOnClickListener {
@@ -108,7 +108,7 @@ class SignInViewFlipper
             nameEditText.requestFocus()
             nameEditText.error = mContext.getString(R.string.error_field_required)
             return false
-        } else if (TextUtils.isEmpty(accountPassword) || accountPassword!!.length < 5) {
+        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length < 5) {
             passwordEditText.requestFocus()
             passwordEditText.error = mContext.getString(R.string.error_invalid_password)
             return false
@@ -126,8 +126,8 @@ class SignInViewFlipper
         val userPass = accountPassword
 
         return XWikiHttp.login(
-            userName!!,
-            userPass!!
+            userName,
+            userPass
         )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

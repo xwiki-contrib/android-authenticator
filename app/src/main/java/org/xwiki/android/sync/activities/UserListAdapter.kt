@@ -50,14 +50,14 @@ class UserListAdapter
     /**
      * List which currently shows.
      */
-    private var searchResults: List<ObjectSummary>?
+    private var searchResults: List<ObjectSummary>
 ) : BaseAdapter() {
 
     /**
      * @return Size of [.searchResults]
      */
     override fun getCount(): Int {
-        return searchResults!!.size
+        return searchResults.size
     }
 
     /**
@@ -65,7 +65,7 @@ class UserListAdapter
      * @return Item fron [.searchResults] by position
      */
     override fun getItem(position: Int): ObjectSummary {
-        return searchResults!![position]
+        return searchResults[position]
     }
 
     /**
