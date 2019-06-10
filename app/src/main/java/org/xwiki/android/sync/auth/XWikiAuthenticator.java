@@ -289,7 +289,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         String authToken
     ) {
         List<String> packageList = getArrayList(
-                getAppContextInstance().getApplicationContext(),
+                getAppContext().getApplicationContext(),
             PACKAGE_LIST
         );
         if (packageList == null || packageList.size() == 0) return;

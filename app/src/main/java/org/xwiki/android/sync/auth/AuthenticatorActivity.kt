@@ -313,10 +313,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                 }
             }
         }
-        var title = flipper.title
-        if (title == null) {
-            title = getString(R.string.app_name)
-        }
+        val title = getString(R.string.app_name)
         toolbar?.title = title
     }
 

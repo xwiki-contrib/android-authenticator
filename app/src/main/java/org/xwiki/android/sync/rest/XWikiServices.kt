@@ -62,13 +62,13 @@ interface XWikiServices {
         @Path("wiki") wiki: String,
         @Path("space") space: String,
         @Path("pageName") pageName: String,
-        @Field("property#first_name") firstName: String,
-        @Field("property#last_name") lastName: String,
-        @Field("property#email") email: String,
-        @Field("property#phone") phone: String,
-        @Field("property#address") address: String,
-        @Field("property#company") company: String,
-        @Field("property#comment") comment: String
+        @Field("property#first_name") firstName: String?,
+        @Field("property#last_name") lastName: String?,
+        @Field("property#email") email: String?,
+        @Field("property#phone") phone: String?,
+        @Field("property#address") address: String?,
+        @Field("property#company") company: String?,
+        @Field("property#comment") comment: String?
     ): Observable<XWikiUserFull>
 
     /**

@@ -1,7 +1,7 @@
 package org.xwiki.android.sync.utils;
 
 import android.content.Context;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.xwiki.android.sync.AppContextKt.getAppContextInstance;
+import static org.xwiki.android.sync.AppContextKt.getAppContext;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.putArrayList;
 
@@ -27,7 +27,7 @@ public class SharedPrefsUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        mContext = getAppContextInstance().getApplicationContext();
+        mContext = getAppContext().getApplicationContext();
     }
 
     @Test

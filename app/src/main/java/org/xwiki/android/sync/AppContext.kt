@@ -20,6 +20,7 @@
 package org.xwiki.android.sync
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.SharedPrefsUtils
@@ -49,22 +50,17 @@ private const val TAG = "AppContext"
 
 /**
  * Instance of context to use it in static methods
- */
-private lateinit var appContextInstance : AppContext
-
-
-/**
  * @return known AppContext instance
  */
-fun getAppContextInstance(): AppContext {
-    return appContextInstance
-}
+
+lateinit var appContext: Context
+    private set
 
 /**
  * @return actual base url
  */
 fun currentBaseUrl(): String {
-    return getValue(appContextInstance, SERVER_ADDRESS, "")
+    return getValue(appContext, SERVER_ADDRESS, "")
 }
 
 /**
@@ -74,12 +70,12 @@ fun currentBaseUrl(): String {
  */
 fun addAuthorizedApp(packageName: String) {
     Log.d(TAG, "packageName=$packageName")
-    var packageList: MutableList<String>? = getArrayList(appContextInstance.applicationContext, PACKAGE_LIST)
+    var packageList: MutableList<String>? = getArrayList(appContext.applicationContext, PACKAGE_LIST)
     if (packageList == null) {
         packageList = ArrayList()
     }
     packageList.add(packageName)
-    putArrayList(appContextInstance.applicationContext, PACKAGE_LIST, packageList)
+    putArrayList(appContext.applicationContext, PACKAGE_LIST, packageList)
 }
 
 /**
@@ -90,7 +86,7 @@ fun addAuthorizedApp(packageName: String) {
  */
 fun isAuthorizedApp(packageName: String): Boolean {
     val packageList = getArrayList(
-        appContextInstance.applicationContext,
+        appContext.applicationContext,
         PACKAGE_LIST
     )
     return packageList != null && packageList.contains(packageName)
@@ -119,7 +115,7 @@ open class AppContext : Application() {
      */
     override fun onCreate() {
         super.onCreate()
-        appContextInstance = this
+        appContext = this
         Log.d(TAG, "on create")
     }
 }

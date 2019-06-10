@@ -52,12 +52,6 @@ abstract class BaseViewFlipper
      */
     protected var mContext: Context
 
-    /**
-     * @return Title of flipper or null if have no
-     */
-    val title: String?
-        get() = null
-
     init {
         mContext = mActivity
     }

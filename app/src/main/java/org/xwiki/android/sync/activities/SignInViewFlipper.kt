@@ -98,22 +98,37 @@ class SignInViewFlipper
      * [.accountPassword] was correctly set
      */
     private fun checkInput(): Boolean {
-        val nameEditText = findViewById<EditText>(R.id.accountName)
-        val passwordEditText = findViewById<EditText>(R.id.accountPassword)
-        nameEditText.error = null
-        passwordEditText.error = null
-        accountName = nameEditText.text.toString()
-        accountPassword = passwordEditText.text.toString()
-        if (TextUtils.isEmpty(accountName)) {
-            nameEditText.requestFocus()
-            nameEditText.error = mContext.getString(R.string.error_field_required)
-            return false
-        } else if (TextUtils.isEmpty(accountPassword) || accountPassword.length < 5) {
-            passwordEditText.requestFocus()
-            passwordEditText.error = mContext.getString(R.string.error_invalid_password)
-            return false
-        }
-        return true
+         return findViewById<EditText>(R.id.accountPassword).let { field ->
+             accountPassword = field.text.toString()
+            field.error = null
+            when {
+                TextUtils.isEmpty(field.text) || field.length() < 5 -> {
+                    field.requestFocus()
+                    field.error = mContext.getString(R.string.error_invalid_password)
+                    false
+                }
+                else -> {
+                    field.error = null
+                    true
+                }
+
+            }
+        } && findViewById<EditText>(R.id.accountName).let { field ->
+             field.error = null
+             accountName = field.text.toString()
+             when {
+                 TextUtils.isEmpty(field.text) -> {
+                     field.requestFocus()
+                     field.error = mContext.getString(R.string.error_field_required)
+                     false
+                 }
+                         else -> {
+                             field.error = null
+                             true
+                         }
+
+             }
+         }
     }
 
     /**

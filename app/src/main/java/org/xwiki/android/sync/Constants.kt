@@ -72,7 +72,7 @@ const val COOKIE = "Cookie"
 /**
  * sync interval
  */
-const val SYNC_INTERVAL = 60 * 60 //half an hour
+const val SYNC_INTERVAL = 1800 //half an hour
 /**
  * @version $Id: b5f3c64375bf824faab782e804c73de41ce33a4b $
  */

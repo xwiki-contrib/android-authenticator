@@ -49,8 +49,7 @@ import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
-import static org.xwiki.android.sync.AppContextKt.getApiManager;
-import static org.xwiki.android.sync.AppContextKt.getAppContextInstance;
+import static org.xwiki.android.sync.AppContextKt.*;
 import static org.xwiki.android.sync.ConstantsKt.*;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.*;
 
@@ -100,7 +99,7 @@ public class XWikiHttp {
                     if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
                         String cookie = responseBodyResponse.headers().get("Set-Cookie");
                         putValue(
-                                getAppContextInstance().getApplicationContext(),
+                                getAppContext().getApplicationContext(),
                             COOKIE,
                             cookie
                         );
@@ -206,7 +205,7 @@ public class XWikiHttp {
                                     accountName
                                 );
                             } else if (syncType == SYNC_TYPE_SELECTED_GROUPS) {
-                                List<String> groupIdList = getArrayList(getAppContextInstance().getApplicationContext(), SELECTED_GROUPS);
+                                List<String> groupIdList = getArrayList(getAppContext().getApplicationContext(), SELECTED_GROUPS);
                                 getSyncGroups(
                                     groupIdList,
                                     subject,
@@ -331,7 +330,7 @@ public class XWikiHttp {
                                 HttpException asHttpException = (HttpException) e;
                                 if (asHttpException.code() == 401) {//Unauthorized
                                     XWikiHttp.relogin(
-                                            getAppContextInstance(),
+                                            getAppContext(),
                                         account
                                     ).subscribe(
                                         new Observer<String>() {
@@ -445,7 +444,7 @@ public class XWikiHttp {
                             HttpException asHttpException = (HttpException) e;
                             if (asHttpException.code() == 401) {//Unauthorized
                                 XWikiHttp.relogin(
-                                        getAppContextInstance(),
+                                        getAppContext(),
                                     account
                                 ).subscribe(
                                     new Observer<String>() {
@@ -487,7 +486,7 @@ public class XWikiHttp {
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
-            int syncType = getValue(getAppContextInstance().getApplicationContext(), SYNC_TYPE, -1);
+            int syncType = getValue(getAppContext().getApplicationContext(), SYNC_TYPE, -1);
             if (syncType != SYNC_TYPE_ALL_USERS) {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);

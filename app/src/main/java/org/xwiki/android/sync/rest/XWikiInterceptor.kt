@@ -26,10 +26,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.Response
-import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.COOKIE
-import org.xwiki.android.sync.Constants
-import org.xwiki.android.sync.getAppContextInstance
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.getValue
 
@@ -58,7 +55,7 @@ class XWikiInterceptor : Interceptor {
      */
     private val cookie: String
         get() = getValue(
-            getAppContextInstance().applicationContext,
+            appContext.applicationContext,
             COOKIE,
             ""
         )

@@ -122,7 +122,7 @@ fun XWikiUserFull.rowId(
                 rawContactUri
             )
         }
-    } ?: throw IllegalStateException("Can't get or create row id for user")
+    } ?: throw IllegalStateException("Can't get or create row id for user") as Throwable
 }
 
 /**
@@ -246,7 +246,7 @@ private val propertiesToContentProvider = listOf<XWikiUserFull.(Long) -> Content
             EDIT_CONTACT_MIME_TYPE,
             mapOf(
                 EDIT_CONTACT_USER_ID_FIELD to convertId(),
-                EDIT_CONTACT_TEXT_FIELD to getAppContextInstance().getString(R.string.editXWikiContactInfo)
+                EDIT_CONTACT_TEXT_FIELD to appContext.getString(R.string.editXWikiContactInfo)
             )
         )
     }
