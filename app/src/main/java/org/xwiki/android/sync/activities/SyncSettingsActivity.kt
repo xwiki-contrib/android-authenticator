@@ -1,19 +1,15 @@
 package org.xwiki.android.sync.activities
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.View
 import android.widget.*
-import androidx.appcompat.widget.AppCompatSpinner
 import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -180,7 +176,7 @@ class SyncSettingsActivity : BaseActivity() {
     fun initData(v: View?) {
         if (groups.isEmpty()) {
             groupsAreLoading = true
-            getApiManager().xwikiServicesApi.availableGroups(
+            apiManager.xwikiServicesApi.availableGroups(
                 LIMIT_MAX_SYNC_USERS
             )
                 .subscribeOn(Schedulers.newThread())
@@ -210,7 +206,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
         if (allUsers.isEmpty()) {
             allUsersAreLoading = true
-            getApiManager().xwikiServicesApi.allUsersPreview
+            apiManager.xwikiServicesApi.allUsersPreview
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

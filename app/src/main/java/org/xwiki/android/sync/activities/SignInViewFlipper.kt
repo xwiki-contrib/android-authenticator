@@ -27,18 +27,15 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.auth.PARAM_USER_SERVER
 import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.getValue
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
 
 /**
  * Tag for logging.
@@ -57,10 +54,7 @@ class SignInViewFlipper
  * @param activity Current activity
  * @param contentRootView Root view of this flipper
  */
-    (
-    activity: AuthenticatorActivity,
-    contentRootView: View
-) : BaseViewFlipper(activity, contentRootView) {
+    (activity: AuthenticatorActivity, contentRootView: View) : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Typed username.
@@ -121,8 +115,7 @@ class SignInViewFlipper
                      field.requestFocus()
                      field.error = mContext.getString(R.string.error_field_required)
                      false
-                 }
-                         else -> {
+                 } else -> {
                              field.error = null
                              true
                          }

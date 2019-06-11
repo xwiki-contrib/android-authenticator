@@ -22,7 +22,6 @@ package org.xwiki.android.sync.rest
 import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.getValue

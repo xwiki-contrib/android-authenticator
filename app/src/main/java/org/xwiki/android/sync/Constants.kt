@@ -19,8 +19,6 @@
  */
 package org.xwiki.android.sync
 
-
-
 /**
  * Account type id
  */
@@ -76,4 +74,3 @@ const val SYNC_INTERVAL = 1800 //half an hour
 /**
  * @version $Id: b5f3c64375bf824faab782e804c73de41ce33a4b $
  */
-open class Constants
