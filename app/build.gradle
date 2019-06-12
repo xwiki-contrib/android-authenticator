@@ -11,7 +11,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 36
         versionName "0.5"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {

@@ -42,16 +42,7 @@ class UserListAdapter
  * @param context Initial context
  * @param searchResults Initial list
  */
-    (
-    /**
-     * Context which will be used for operations.
-     */
-    private val mContext: Context,
-    /**
-     * List which currently shows.
-     */
-    private var searchResults: List<ObjectSummary>
-) : BaseAdapter() {
+    (private val mContext: Context, private var searchResults: List<ObjectSummary>) : BaseAdapter() {
 
     /**
      * @return Size of [.searchResults]

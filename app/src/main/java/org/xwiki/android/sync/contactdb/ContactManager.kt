@@ -33,9 +33,8 @@ import android.provider.ContactsContract.RawContacts
 import android.util.Log
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AppContext
-import org.xwiki.android.sync.Constants
+import org.xwiki.android.sync.apiManager
 import org.xwiki.android.sync.bean.XWikiUserFull
-import org.xwiki.android.sync.getApiManager
 import org.xwiki.android.sync.rest.XWikiHttp
 import retrofit2.HttpException
 import rx.Observable
@@ -140,7 +139,7 @@ object ContactManager {
         rawId: Long,
         xwikiUser: XWikiUserFull
     ) {
-        val gettingAvatarObservable = getApiManager().xWikiPhotosManager
+        val gettingAvatarObservable = apiManager.xWikiPhotosManager
             .downloadAvatar(
                 xwikiUser.pageName,
                 xwikiUser.avatar

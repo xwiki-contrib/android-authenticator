@@ -163,10 +163,15 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         position = 0
-        if (availableAccounts.size > 0) {
-            Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
-            finish()
-            return
+
+        val isTestRunning : Boolean = intent.getBooleanExtra("Test", false)
+
+        if (!isTestRunning) {
+            if (availableAccounts.size > 0) {
+                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         }
         showViewFlipper(position)
     }

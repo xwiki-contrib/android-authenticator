@@ -97,16 +97,17 @@ fun isAuthorizedApp(packageName: String): Boolean {
  *
  * @since 0.4
  */
-fun getApiManager() : BaseApiManager {
-    val url = currentBaseUrl()
-    if (baseApiManager == null || baseApiManager?.key != url) {
-        baseApiManager = AbstractMap.SimpleEntry(
-            url,
-            BaseApiManager(url)
-        )
+val apiManager : BaseApiManager
+    get() {
+        val url = currentBaseUrl()
+        if (baseApiManager == null || baseApiManager?.key != url) {
+            baseApiManager = AbstractMap.SimpleEntry(
+                url,
+                BaseApiManager(url)
+            )
+        }
+        return baseApiManager!!.value
     }
-    return baseApiManager!!.value
-}
 
 open class AppContext : Application() {
 

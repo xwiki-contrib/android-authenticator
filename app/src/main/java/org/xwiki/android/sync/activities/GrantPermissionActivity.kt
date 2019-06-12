@@ -30,9 +30,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
-import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.getValue
 
 /**

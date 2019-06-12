@@ -20,9 +20,6 @@
 package org.xwiki.android.sync.utils
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
-
 import java.util.ArrayList
 import java.util.HashSet
 

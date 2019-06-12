@@ -1,19 +1,18 @@
 package org.xwiki.android.sync.auth
 
+import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Bundle
 import android.test.ActivityTestCase
+import android.util.Log
 import com.robotium.solo.Solo
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.xwiki.android.sync.Constants
-
-import androidx.test.InstrumentationRegistry.getInstrumentation
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AUTHTOKEN_TYPE_FULL_ACCESS
-import org.xwiki.android.sync.auth.IS_SETTING_SYNC_TYPE
-import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
+import org.xwiki.android.sync.R
+import org.xwiki.android.sync.appContext
 
 /**
  * AuthenticatorActivityTest
@@ -32,6 +31,7 @@ class AuthenticatorActivityTest : ActivityTestCase() {
         bundle.putString(KEY_AUTH_TOKEN_TYPE, authTokenType)
         //bundle.putParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         bundle.putBoolean(IS_SETTING_SYNC_TYPE, false)
+        bundle.putBoolean("Test", true)
         authenticatorActivity = launchActivity("org.xwiki.android.sync", AuthenticatorActivity::class.java, bundle)
         activity = authenticatorActivity
         return super.getActivity() as AuthenticatorActivity
@@ -55,23 +55,39 @@ class AuthenticatorActivityTest : ActivityTestCase() {
     }
 
     @Test
-    fun testVisibleUI() {
-        //Unlock the lock screen
-        //solo.unlockScreen();
-        //test view setting or sign
-        //View passwordEditText = solo.getView(R.id.accountPassword);
-        //assertTrue(passwordEditText.getVisibility() == View.VISIBLE);
-    }
-
-    @Test
-    fun testSignIn() {
+    fun testServerUrl () {
 
     }
 
     @Test
     fun testSignUp() {
-
+        solo!!.clickOnButton(0)
+        solo!!.clickOnView(solo!!.getView(R.id.tvSignUp))
     }
 
+    @Test
+    fun testSignIn() {
+        solo!!.clickOnButton(0)
+        solo!!.enterText(0, "TestUser")
+        solo!!.enterText(1, "test1234")
+        solo!!.clickOnButton(0)
+    }
 
+    @Test
+    fun testLoadingGroups() {
+        solo!!.clickOnButton(0)
+        solo!!.enterText(0, "TestUser")
+        solo!!.enterText(1, "test1234")
+        solo!!.clickOnButton(0)
+        var ac : AccountManager = AccountManager.get(activity)
+        var accounts : Array<Account> = ac.accounts
+        for (i in accounts.iterator()) {
+            when {
+                i.name.equals("TestUser") -> {
+                    ac.removeAccount(i, null, null)
+                    Log.d("UserRemoved", i.name)
+                }
+            }
+        }
+    }
 }

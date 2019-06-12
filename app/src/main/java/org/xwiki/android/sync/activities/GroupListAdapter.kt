@@ -26,11 +26,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.TextView
-import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.SELECTED_GROUPS
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.getArrayList
 import org.xwiki.android.sync.utils.putArrayList
 
@@ -48,16 +46,7 @@ class GroupListAdapter
  * @param context Context for all operations
  * @param groupList Initial group list
  */
-    (
-    /**
-     * Current context.
-     */
-    private val mContext: Context,
-    /**
-     * Current list of items.
-     */
-    private var groupList: List<XWikiGroup>
-) : BaseAdapter() {
+    (private val mContext: Context, private var groupList: List<XWikiGroup> ) : BaseAdapter() {
 
     /**
      * List of selected items.

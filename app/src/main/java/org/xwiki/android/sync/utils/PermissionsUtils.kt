@@ -20,7 +20,6 @@
 package org.xwiki.android.sync.utils
 
 import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.Log
@@ -44,12 +43,7 @@ class PermissionsUtils
  * @since 0.4
  */
 @Throws(IllegalArgumentException::class)
-constructor(
-    /**
-     * Context of permission operations
-     */
-    private val activity: Activity
-) {
+constructor (private val activity: Activity) {
 
     /**
      * Array of permissions which this application required

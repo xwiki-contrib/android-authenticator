@@ -23,11 +23,9 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import org.xwiki.android.sync.Constants
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
-import org.xwiki.android.sync.utils.SharedPrefsUtils
 import org.xwiki.android.sync.utils.putValue
 
 import java.net.MalformedURLException

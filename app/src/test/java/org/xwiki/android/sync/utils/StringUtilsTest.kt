@@ -36,7 +36,6 @@ class StringUtilsTest {
         assertFalse(StringUtils.isEmail("@outlook.com"))
         assertFalse(StringUtils.isEmail("fitz.lee@outlook:"))
         assertFalse(StringUtils.isEmail("fitz@@"))
-        assertFalse(StringUtils.isEmail(null!!))
         assertFalse(StringUtils.isEmail(""))
     }
 
@@ -50,7 +49,6 @@ class StringUtilsTest {
         assertNull(StringUtils.iso8601ToDate("2011-092419:45:31"))
         assertNull(StringUtils.iso8601ToDate("201"))
         assertNull(StringUtils.iso8601ToDate(""))
-        assertNull(StringUtils.iso8601ToDate(null!!))
     }
 
     @Test
@@ -58,7 +56,6 @@ class StringUtilsTest {
     fun dateToIso8601String() {
         assertNotNull(StringUtils.dateToIso8601String(Date()))
         //System.out.println(StringUtils.dateToIso8601String(new Date()));
-        assertNull(StringUtils.iso8601ToDate(null!!))
     }
 
 }

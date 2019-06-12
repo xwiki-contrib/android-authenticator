@@ -47,12 +47,7 @@ class BatchOperation
  *
  * @param resolver Will be set to [.mResolver]
  */
-    (
-    /**
-     * Variable for executing operations.
-     */
-    private val mResolver: ContentResolver
-) {
+    (private val mResolver: ContentResolver) {
 
     /**
      * Currently actual operations list.

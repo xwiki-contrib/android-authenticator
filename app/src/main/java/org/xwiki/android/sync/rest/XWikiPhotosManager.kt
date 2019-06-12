@@ -23,7 +23,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import okhttp3.*
-import org.xwiki.android.sync.utils.ImageUtils
 import org.xwiki.android.sync.utils.compressByQuality
 import rx.Observable
 import rx.subjects.PublishSubject
