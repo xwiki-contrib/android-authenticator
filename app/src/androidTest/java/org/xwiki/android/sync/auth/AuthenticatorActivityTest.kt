@@ -12,14 +12,13 @@ import org.junit.Test
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AUTHTOKEN_TYPE_FULL_ACCESS
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.appContext
 
 /**
  * AuthenticatorActivityTest
  */
 
 class AuthenticatorActivityTest : ActivityTestCase() {
-    private var solo: Solo? = null
+    private lateinit var solo: Solo
 
     public override fun getActivity(): AuthenticatorActivity {
         //pass data params.
@@ -51,7 +50,7 @@ class AuthenticatorActivityTest : ActivityTestCase() {
     public override fun tearDown() {
         //tearDown() is run after a test case has finished.
         //finishOpenedActivities() will finish all the activities th`at have been opened during the test execution.
-        solo!!.finishOpenedActivities()
+        solo.finishOpenedActivities()
     }
 
     @Test
@@ -61,33 +60,36 @@ class AuthenticatorActivityTest : ActivityTestCase() {
 
     @Test
     fun testSignUp() {
-        solo!!.clickOnButton(0)
-        solo!!.clickOnView(solo!!.getView(R.id.tvSignUp))
+        solo.clickOnButton(0)
+        solo.clickOnView(solo.getView(R.id.tvSignUp))
     }
 
     @Test
     fun testSignIn() {
-        solo!!.clickOnButton(0)
-        solo!!.enterText(0, "TestUser")
-        solo!!.enterText(1, "test1234")
-        solo!!.clickOnButton(0)
+        solo.clickOnButton(0)
+        solo.enterText(0, "TestUser")
+        solo.enterText(1, "test1234")
+        solo.clickOnButton(0)
     }
 
     @Test
     fun testLoadingGroups() {
-        solo!!.clickOnButton(0)
-        solo!!.enterText(0, "TestUser")
-        solo!!.enterText(1, "test1234")
-        solo!!.clickOnButton(0)
-        var ac : AccountManager = AccountManager.get(activity)
+        solo.clickOnButton(0)
+        solo.enterText(0, "TestUser")
+        solo.enterText(1, "test1234")
+        solo.clickOnButton(0)
+        solo.waitForEmptyActivityStack(8000)
+        var ac : AccountManager = AccountManager.get(solo.currentActivity)
         var accounts : Array<Account> = ac.accounts
         for (i in accounts.iterator()) {
             when {
                 i.name.equals("TestUser") -> {
                     ac.removeAccount(i, null, null)
                     Log.d("UserRemoved", i.name)
+                    return
                 }
             }
         }
+        solo.waitForEmptyActivityStack(1000)
     }
 }
