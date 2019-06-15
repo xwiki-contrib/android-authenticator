@@ -28,18 +28,15 @@ import android.content.Context
  *
  * @version $Id: 9bdc211c36cebc43d658be9dd02276308e8a5ac9 $
 </T> */
-abstract class BasePresenter<T : MVPView>
+
 /**
  * Base constructor to create base instance of presenter.
  *
- * @param context Context, can't be changed by default.
+ * @param context Context, can't be changed by default. To know where this presenter is work.
  */
-protected constructor(
-    /**
-     * Android [Context] to know where this presenter is work.
-     */
-    protected var context: Context
-) : Presenter<T> {
+
+abstract class BasePresenter<T : MVPView>(protected var context: Context)
+    : Presenter<T> {
     /**
      * Current target.
      */

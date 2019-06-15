@@ -36,14 +36,16 @@ import java.net.URL
  *
  * @version $Id: 1764429bc21ab6d1aaa331ae01d81ac5b9afd1f2 $
  */
-class SettingServerIpViewFlipper
+
 /**
  * Standard constructor.
  *
  * @param activity Actual [AuthenticatorActivity]
  * @param contentRootView Root [View] of that flipper (not activity)
  */
-    (activity: AuthenticatorActivity, contentRootView: View) : BaseViewFlipper(activity, contentRootView) {
+
+class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
+    : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Check typed server address and call sign in if all is ok.

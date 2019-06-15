@@ -29,23 +29,15 @@ import org.xwiki.android.sync.auth.AuthenticatorActivity
  *
  * @version $Id: f3c3c73d439018e529af43268d6d8c807d59f06e $
  */
-abstract class BaseViewFlipper
+
 /**
  * All childs of this class must use only this constructor!
  *
  * @param activity Current activity
  * @param contentRootView Root view of current flipper
  */
-    (
-    /**
-     * Activity for operations.
-     */
-    protected var mActivity: AuthenticatorActivity,
-    /**
-     * Root view of flipper.
-     */
-    protected var mContentRootView: View
-) {
+
+abstract class BaseViewFlipper(protected var mActivity: AuthenticatorActivity, protected var mContentRootView: View) {
 
     /**
      * Context of operations executing. In fact, represent [.mActivity].

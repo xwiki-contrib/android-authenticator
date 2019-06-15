@@ -39,14 +39,16 @@ import java.util.ArrayList
  *
  * @version $Id: 30d07c16a715a1a4929e18f6e5c1fdc7e357a9c5 $
  */
-class GroupListAdapter
+
 /**
  * Standard constructor which save context and groups.
  *
  * @param context Context for all operations
  * @param groupList Initial group list
  */
-    (private val mContext: Context, private var groupList: List<XWikiGroup> ) : BaseAdapter() {
+
+class GroupListAdapter(private val mContext: Context, private var groupList: List<XWikiGroup>)
+    : BaseAdapter() {
 
     /**
      * List of selected items.
