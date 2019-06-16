@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.getkeepsafe.dexcount'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -19,6 +22,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -26,4 +32,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation "com.squareup.okhttp3:okhttp:$rootProject.okHttp3Version"
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

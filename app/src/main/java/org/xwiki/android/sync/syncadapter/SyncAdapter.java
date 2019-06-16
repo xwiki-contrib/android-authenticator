@@ -28,18 +28,18 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.XWikiUserFull;
 import org.xwiki.android.sync.contactdb.ContactManager;
 import org.xwiki.android.sync.rest.XWikiHttp;
-import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import org.xwiki.android.sync.utils.StringUtils;
 import rx.Observable;
 import rx.Observer;
 
 import java.util.Date;
 
+import static org.xwiki.android.sync.ConstantsKt.*;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getValue;
 
 /**
  * Adapter which will be used for synchronization.
@@ -108,13 +108,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             false
         );
         Log.i(TAG, "onPerformSync start");
-        int syncType = SharedPrefsUtils.getValue(
+        int syncType = getValue(
             mContext,
-            Constants.SYNC_TYPE,
-            Constants.SYNC_TYPE_NO_NEED_SYNC
+            SYNC_TYPE,
+            SYNC_TYPE_NO_NEED_SYNC
         );
         Log.i(TAG, "syncType=" + syncType);
-        if (syncType == Constants.SYNC_TYPE_NO_NEED_SYNC) return;
+        if (syncType == SYNC_TYPE_NO_NEED_SYNC) return;
         // get last sync date. return new Date(0) if first onPerformSync
         String lastSyncMarker = getServerSyncMarker(account);
         Log.d(TAG, lastSyncMarker);
@@ -191,7 +191,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @return the change high-water-mark  Iso8601
      */
     private String getServerSyncMarker(Account account) {
-        String lastSyncIso = mAccountManager.getUserData(account, Constants.SYNC_MARKER_KEY);
+        String lastSyncIso = mAccountManager.getUserData(account, SYNC_MARKER_KEY);
         //if empty, just return new Date(0) so that we can get all users from server.
         if (TextUtils.isEmpty(lastSyncIso)) {
             return StringUtils.dateToIso8601String(new Date(0));
@@ -206,7 +206,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * @param lastSyncIso The high-water-mark we want to save.
      */
     private void setServerSyncMarker(Account account, String lastSyncIso) {
-        mAccountManager.setUserData(account, Constants.SYNC_MARKER_KEY, lastSyncIso);
+        mAccountManager.setUserData(account, SYNC_MARKER_KEY, lastSyncIso);
     }
 }
 

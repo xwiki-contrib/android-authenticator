@@ -7,7 +7,11 @@ import com.robotium.solo.Solo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.android.sync.Constants;
+
+import static org.xwiki.android.sync.ConstantsKt.ACCOUNT_TYPE;
+import static org.xwiki.android.sync.ConstantsKt.AUTHTOKEN_TYPE_FULL_ACCESS;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.IS_SETTING_SYNC_TYPE;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.KEY_AUTH_TOKEN_TYPE;
 
 /**
  * AuthenticatorActivityTest
@@ -29,11 +33,11 @@ public class AuthenticatorActivityTest extends ActivityInstrumentationTestCase2<
         AuthenticatorActivity authenticatorActivity;
         Bundle bundle = new Bundle();
         //AccountAuthenticatorResponse response = new AccountAuthenticatorResponse(null);
-        String authTokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system";
-        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-        bundle.putString(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
+        String authTokenType = AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system";
+        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE);
+        bundle.putString(KEY_AUTH_TOKEN_TYPE, authTokenType);
         //bundle.putParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        bundle.putBoolean(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
+        bundle.putBoolean(IS_SETTING_SYNC_TYPE, false);
         authenticatorActivity = launchActivity("org.xwiki.android.sync", AuthenticatorActivity.class, bundle);
         setActivity(authenticatorActivity);
         return super.getActivity();

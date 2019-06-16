@@ -10,14 +10,16 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
+import org.xwiki.android.sync.apiManager
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.utils.StringUtils.*
+import org.xwiki.android.sync.utils.StringUtils.isEmail
+import org.xwiki.android.sync.utils.StringUtils.isEmpty
+import org.xwiki.android.sync.utils.StringUtils.isPhone
 import org.xwiki.android.sync.utils.extensions.unauthorized
 import rx.Observer
 import rx.android.schedulers.AndroidSchedulers
@@ -192,7 +194,7 @@ class EditContactActivity : BaseActivity() {
             }
             disableContainer()
 
-            AppContext.getApiManager().xwikiServicesApi.updateUser(
+            apiManager.xwikiServicesApi.updateUser(
                 it.wiki,
                 it.space,
                 it.pageName,
@@ -408,7 +410,7 @@ class EditContactActivity : BaseActivity() {
             ).show()
         }
         splittedUserId ?.let {
-            AppContext.getApiManager().xwikiServicesApi.getFullUserDetails(
+            apiManager.xwikiServicesApi.getFullUserDetails(
                 it[0],
                 it[1],
                 it[2]

@@ -1,7 +1,7 @@
 package org.xwiki.android.sync.utils;
 
 import android.content.Context;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +12,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.xwiki.android.sync.AppContextKt.getAppContext;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.putArrayList;
 
 /**
  * SharedPrefsUtilsTest.
@@ -24,7 +27,7 @@ public class SharedPrefsUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        mContext = AppContext.getInstance().getApplicationContext();
+        mContext = getAppContext().getApplicationContext();
     }
 
     @Test
@@ -33,8 +36,8 @@ public class SharedPrefsUtilsTest {
         for(int i=0; i<10; i++){
             mList.add("i="+i);
         }
-        SharedPrefsUtils.putArrayList(mContext, "mList", mList);
-        List<String> mList2 = SharedPrefsUtils.getArrayList(mContext, "mList");
+        putArrayList(mContext, "mList", mList);
+        List<String> mList2 = getArrayList(mContext, "mList");
         assertEquals(mList.size(), mList2.size());
         for(String item : mList) {
             assertTrue(mList2.contains(item));

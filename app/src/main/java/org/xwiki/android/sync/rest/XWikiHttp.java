@@ -27,12 +27,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import okhttp3.Credentials;
 import okhttp3.ResponseBody;
-import org.xwiki.android.sync.AppContext;
-import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
@@ -40,7 +37,6 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -48,8 +44,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
-
-import static org.xwiki.android.sync.AppContext.getApiManager;
+import static org.xwiki.android.sync.AppContextKt.*;
+import static org.xwiki.android.sync.ConstantsKt.*;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.*;
 
 /**
  * Static class which can be used as wrapper for a few requests such as login and other. It
@@ -96,9 +93,9 @@ public class XWikiHttp {
                 public void call(Response<ResponseBody> responseBodyResponse) {
                     if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
                         String cookie = responseBodyResponse.headers().get("Set-Cookie");
-                        SharedPrefsUtils.putValue(
-                            AppContext.getInstance().getApplicationContext(),
-                            Constants.COOKIE,
+                        putValue(
+                                getAppContext().getApplicationContext(),
+                            COOKIE,
                             cookie
                         );
                         authTokenSubject.onNext(cookie);
@@ -172,8 +169,8 @@ public class XWikiHttp {
      * {@link Observer#onCompleted()} will be called when receiving of user was successfully
      * completed
      *
-     * @see Constants#SYNC_TYPE_ALL_USERS
-     * @see Constants#SYNC_TYPE_SELECTED_GROUPS
+     * @see SYNC_TYPE_ALL_USERS
+     * @see SYNC_TYPE_SELECTED_GROUPS
      */
     public static Observable<XWikiUserFull> getSyncData(
         final int syncType,
@@ -197,13 +194,13 @@ public class XWikiHttp {
                                     return;
                                 }
                             }
-                            if (syncType == Constants.SYNC_TYPE_ALL_USERS) {
+                            if (syncType == SYNC_TYPE_ALL_USERS) {
                                 getSyncAllUsers(
                                     subject,
                                     accountName
                                 );
-                            } else if (syncType == Constants.SYNC_TYPE_SELECTED_GROUPS) {
-                                List<String> groupIdList = SharedPrefsUtils.getArrayList(AppContext.getInstance().getApplicationContext(), Constants.SELECTED_GROUPS);
+                            } else if (syncType == SYNC_TYPE_SELECTED_GROUPS) {
+                                List<String> groupIdList = getArrayList(getAppContext().getApplicationContext(), SELECTED_GROUPS);
                                 getSyncGroups(
                                     groupIdList,
                                     subject,
@@ -264,7 +261,7 @@ public class XWikiHttp {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
                         getDetailedInfo(
-                            summaries.objectSummaries,
+                            summaries.getObjectSummaries(),
                             subject,
                             account
                         );
@@ -310,7 +307,7 @@ public class XWikiHttp {
             final ObjectSummary summary = queueOfSummaries.poll();
 
             try {
-                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.headline);
+                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.getHeadline());
                 if (spaceAndName == null) {
                     continue;
                 }
@@ -328,7 +325,7 @@ public class XWikiHttp {
                                 HttpException asHttpException = (HttpException) e;
                                 if (asHttpException.code() == 401) {//Unauthorized
                                     XWikiHttp.relogin(
-                                        AppContext.getInstance(),
+                                            getAppContext(),
                                         account
                                     ).subscribe(
                                         new Observer<String>() {
@@ -367,13 +364,13 @@ public class XWikiHttp {
                     }
                 );
             } catch (Exception e) {
-                Log.e(TAG, "Can't synchronize object with id: " + summary.headline, e);
+                Log.e(TAG, "Can't synchronize object with id: " + summary.getHeadline(), e);
             }
         }
     }
 
     /**
-     * Start to sync all users using {@link AppContext#getApiManager()}. In
+     * Start to sync all users using {@link getAppContextInstance()}. In
      * {@link Observer#onNext(Object)} you will receive each user which was correctly received.
      * {@link Observer#onError(Throwable)} will be called on first error of getting users and
      * receiving of users will be stopped. {@link Observer#onCompleted()} will be called when
@@ -393,7 +390,7 @@ public class XWikiHttp {
                 new Action1<CustomObjectsSummariesContainer<ObjectSummary>>() {
                     @Override
                     public void call(CustomObjectsSummariesContainer<ObjectSummary> summaries) {
-                        searchList.addAll(summaries.objectSummaries);
+                        searchList.addAll(summaries.getObjectSummaries());
                         semaphore.release();
                     }
                 },
@@ -427,9 +424,9 @@ public class XWikiHttp {
                 return;
             }
             getApiManager().getXwikiServicesApi().getFullUserDetails(
-                item.wiki,
-                item.space,
-                item.pageName
+                item.getWiki(),
+                item.getSpace(),
+                item.getPageName()
             ).subscribe(
                 new Observer<XWikiUserFull>() {
                     @Override
@@ -442,7 +439,7 @@ public class XWikiHttp {
                             HttpException asHttpException = (HttpException) e;
                             if (asHttpException.code() == 401) {//Unauthorized
                                 XWikiHttp.relogin(
-                                    AppContext.getInstance(),
+                                        getAppContext(),
                                     account
                                 ).subscribe(
                                     new Observer<String>() {
@@ -484,8 +481,8 @@ public class XWikiHttp {
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
-            int syncType = SharedPrefsUtils.getValue(AppContext.getInstance().getApplicationContext(), Constants.SYNC_TYPE, -1);
-            if (syncType != Constants.SYNC_TYPE_ALL_USERS) {
+            int syncType = getValue(getAppContext().getApplicationContext(), SYNC_TYPE, -1);
+            if (syncType != SYNC_TYPE_ALL_USERS) {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);
             }

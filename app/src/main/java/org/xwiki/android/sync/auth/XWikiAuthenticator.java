@@ -30,19 +30,15 @@ import android.text.TextUtils;
 import android.util.Log;
 import okhttp3.Credentials;
 import okhttp3.ResponseBody;
-import org.xwiki.android.sync.AppContext;
-import org.xwiki.android.sync.Constants;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
-import org.xwiki.android.sync.utils.SharedPrefsUtils;
 import retrofit2.Response;
 import rx.functions.Action1;
-
 import java.util.List;
-
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static org.xwiki.android.sync.AppContext.currentBaseUrl;
-import static org.xwiki.android.sync.AppContext.getApiManager;
-import static org.xwiki.android.sync.Constants.*;
+import static org.xwiki.android.sync.AppContextKt.*;
+import static org.xwiki.android.sync.ConstantsKt.*;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.*;
+import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
 
 /**
  * Realisation of authenticator for XWiki account. Full required management of XWiki account
@@ -93,13 +89,13 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         //just for passing some param
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
+        intent.putExtra(KEY_AUTH_TOKEN_TYPE, authTokenType);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         //for granting permission
-        intent.putExtra(AuthenticatorActivity.PARAM_APP_UID, uid);
-        intent.putExtra(AuthenticatorActivity.PARAM_APP_PACKAGENAME, packageName);
+        intent.putExtra(PARAM_APP_UID, uid);
+        intent.putExtra(PARAM_APP_PACKAGENAME, packageName);
         //true: if from XWiki Account Preference, false:if from adding account.
-        intent.putExtra(AuthenticatorActivity.IS_SETTING_SYNC_TYPE, false);
+        intent.putExtra(IS_SETTING_SYNC_TYPE, false);
 
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -130,19 +126,19 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
         int uid = options.getInt(AccountManager.KEY_CALLER_UID);
         String packageName = mContext.getPackageManager().getNameForUid(uid);
 
-        if (!authTokenType.equals(Constants.AUTHTOKEN_TYPE_FULL_ACCESS + packageName)) {
+        if (!authTokenType.equals(AUTHTOKEN_TYPE_FULL_ACCESS + packageName)) {
             final Bundle result = new Bundle();
             result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
             return result;
         }
 
-        if (!AppContext.isAuthorizedApp(packageName)) {
+        if (!isAuthorizedApp(packageName)) {
             final Intent intent = new Intent(mContext, GrantPermissionActivity.class);
             intent.putExtra("uid", uid);
             intent.putExtra("packageName", packageName);
             intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
             intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            intent.putExtra(AuthenticatorActivity.KEY_AUTH_TOKEN_TYPE, authTokenType);
+            intent.putExtra(KEY_AUTH_TOKEN_TYPE, authTokenType);
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 
             Bundle bundle = new Bundle();
@@ -207,17 +203,17 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(Constants.SERVER_ADDRESS, currentBaseUrl());
+            result.putString(SERVER_ADDRESS, currentBaseUrl());
             return result;
         }
     }
 
     /**
      * @param authTokenType Identifier for label
-     * @return {@link Constants#AUTHTOKEN_TYPE_FULL_ACCESS_LABEL} for
-     * {@link Constants#AUTHTOKEN_TYPE_FULL_ACCESS},
-     * {@link Constants#AUTHTOKEN_TYPE_READ_ONLY_LABEL} for
-     * {@link Constants#AUTHTOKEN_TYPE_READ_ONLY_LABEL} or "authTokenType + (Label)" otherwise
+     * @return {@link AUTHTOKEN_TYPE_FULL_ACCESS_LABEL} for
+     * {@link AUTHTOKEN_TYPE_FULL_ACCESS},
+     * {@link AUTHTOKEN_TYPE_READ_ONLY_LABEL} for
+     * {@link AUTHTOKEN_TYPE_READ_ONLY_LABEL} or "authTokenType + (Label)" otherwise
      */
     @Override
     public String getAuthTokenLabel(String authTokenType) {
@@ -282,20 +278,20 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
 
     /**
      * Refresh auth tokens for all packages which can be got by field
-     * {@link Constants#PACKAGE_LIST}.
+     * {@link PACKAGE_LIST}.
      */
     public static void refreshAllAuthTokenType(
         AccountManager am,
         Account account,
         String authToken
     ) {
-        List<String> packageList = SharedPrefsUtils.getArrayList(
-            AppContext.getInstance().getApplicationContext(),
-            Constants.PACKAGE_LIST
+        List<String> packageList = getArrayList(
+                getAppContext().getApplicationContext(),
+            PACKAGE_LIST
         );
         if (packageList == null || packageList.size() == 0) return;
         for (String item : packageList) {
-            String tokenType = Constants.AUTHTOKEN_TYPE_FULL_ACCESS + item;
+            String tokenType = AUTHTOKEN_TYPE_FULL_ACCESS + item;
             am.setAuthToken(account, tokenType, authToken);
         }
     }

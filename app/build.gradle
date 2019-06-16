@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.getkeepsafe.dexcount'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -20,6 +21,9 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+    dataBinding {
+        enabled = true
     }
 }
 
@@ -74,6 +78,9 @@ dependencies {
 
     // Optional -- UI testing with Espresso
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+
+    // For ViewModel lifecycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     // Optional -- UI testing with UI Automator
 
