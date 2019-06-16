@@ -43,7 +43,6 @@ import java.net.URL
  * @param activity Actual [AuthenticatorActivity]
  * @param contentRootView Root [View] of that flipper (not activity)
  */
-
 class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
     : BaseViewFlipper(activity, contentRootView) {
 
