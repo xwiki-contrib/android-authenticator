@@ -60,7 +60,7 @@ class BaseApiManager {
      * Base constructor which create [OkHttpClient] with [XWikiInterceptor] which will
      * be used in [Retrofit] for correct handling of requests.
      *
-     * @param baseUrl Url which will be used as base for all requests in this manager. Can be:
+     * @param baseURL Url which will be used as base for all requests in this manager. Can be:
      *
      *  * http://www.xwiki.org/xwiki/
      *  * http://some.site.url/xwiki/
@@ -69,8 +69,8 @@ class BaseApiManager {
      *
      * Strongly recommended to end url with **/
 
-    constructor(baseUrl: String) {
-        var baseUrl = baseUrl
+    constructor(baseURL: String) {
+        var baseUrl = baseURL
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY

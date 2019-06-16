@@ -48,14 +48,16 @@ private val TAG = "SignInViewFlipper"
  *
  * @version $Id: cc56e12004e2982133afa0c17258b164b8203a15 $
  */
-class SignInViewFlipper
+
 /**
  * Standard constructor
  *
  * @param activity Current activity
  * @param contentRootView Root view of this flipper
  */
-    (activity: AuthenticatorActivity, contentRootView: View) : BaseViewFlipper(activity, contentRootView) {
+
+class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
+    : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Typed username.

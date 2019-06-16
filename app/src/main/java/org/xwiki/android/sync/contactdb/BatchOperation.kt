@@ -41,13 +41,14 @@ private val TAG = "BatchOperation"
  *
  * @version $Id: ee2b72a85bf367d574d8910e4cc22db931c20841 $
  */
-class BatchOperation
+
 /**
  * Standard constructor.
  *
  * @param resolver Will be set to [.mResolver]
  */
-    (private val mResolver: ContentResolver) {
+
+class BatchOperation(private val mResolver: ContentResolver) {
 
     /**
      * Currently actual operations list.

@@ -35,14 +35,16 @@ import org.xwiki.android.sync.bean.SearchResult
  *
  * @version $Id: dcb077b86ade7b7121d3cb21886f740b09534fc5 $
  */
-class UserListAdapter
+
 /**
  * Standard constructor.
  *
  * @param context Initial context
  * @param searchResults Initial list
  */
-    (private val mContext: Context, private var searchResults: List<ObjectSummary>) : BaseAdapter() {
+
+class UserListAdapter(private val mContext: Context, private var searchResults: List<ObjectSummary>)
+    : BaseAdapter() {
 
     /**
      * @return Size of [.searchResults]
