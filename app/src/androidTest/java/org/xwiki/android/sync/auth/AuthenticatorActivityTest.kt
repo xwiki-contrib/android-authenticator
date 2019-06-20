@@ -36,7 +36,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Before
     fun setUp() {
-        IdlingRegistry.getInstance().register(idlingResource)
+        IdlingRegistry.getInstance().register(idlingResource)                       // Idling Resource, waits for the asynchronous call to end.
         val i = Intent(appContext, AuthenticatorActivity::class.java)
         val authTokenType = AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system"
         i.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
@@ -67,14 +67,16 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Test
     fun testSignIn() {
+//        onView(withId(R.id.accountServer)).perform(clearText())                       // for testing on local host uncomment these line
+//        onView(withId(R.id.accountServer)).perform(typeText("localhost:8080/xwiki"))
         onView(withId(R.id.accountServer)).perform(typeText(""))
         activityScenario.onActivity {
             it.showViewFlipper(1)
         }
         onView(withId(R.id.accountName))
-            .perform(typeText("jaindiv26"))
+            .perform(typeText("TestUser"))      // Test user, for log in
         onView(withId(R.id.accountPassword))
-            .perform(typeText("maps7890"))
+            .perform(typeText("qwerty"))
         onView(withId(R.id.signInButton)).perform(click())
     }
 
