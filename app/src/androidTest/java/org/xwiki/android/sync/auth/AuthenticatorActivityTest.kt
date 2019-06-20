@@ -2,94 +2,84 @@ package org.xwiki.android.sync.auth
 
 import android.accounts.Account
 import android.accounts.AccountManager
-import android.os.Bundle
-import android.test.ActivityTestCase
+import android.content.Intent
 import android.util.Log
-import com.robotium.solo.Solo
-import org.junit.After
-import org.junit.Before
+import androidx.core.view.get
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.test.core.app.ActivityScenario
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AUTHTOKEN_TYPE_FULL_ACCESS
+import org.xwiki.android.sync.appContext
+import org.junit.Before
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.filters.MediumTest
+import org.junit.After
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.activities.SyncSettingsActivityTest
+import org.xwiki.android.sync.utils.idlingResource
 
 /**
  * AuthenticatorActivityTest
  */
+@RunWith(AndroidJUnit4::class)
+@MediumTest
+class AuthenticatorActivityTest : LifecycleObserver {
 
-class AuthenticatorActivityTest : ActivityTestCase() {
-    private lateinit var solo: Solo
-
-    public override fun getActivity(): AuthenticatorActivity {
-        //pass data params.
-        val authenticatorActivity: AuthenticatorActivity
-        val bundle = Bundle()
-        //AccountAuthenticatorResponse response = new AccountAuthenticatorResponse(null);
-        val authTokenType = AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system"
-        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
-        bundle.putString(KEY_AUTH_TOKEN_TYPE, authTokenType)
-        //bundle.putParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        bundle.putBoolean(IS_SETTING_SYNC_TYPE, false)
-        bundle.putBoolean("Test", true)
-        authenticatorActivity = launchActivity("org.xwiki.android.sync", AuthenticatorActivity::class.java, bundle)
-        activity = authenticatorActivity
-        return super.getActivity() as AuthenticatorActivity
-    }
+    private lateinit var activityScenario: ActivityScenario<AuthenticatorActivity>
 
     @Before
-    @Throws(Exception::class)
-    public override fun setUp() {
-        //setUp() is run before a test case is started.
-        //This is where the solo object is created.
-        solo = Solo(instrumentation)
-        activity
-    }
-
-    @After
-    @Throws(Exception::class)
-    public override fun tearDown() {
-        //tearDown() is run after a test case has finished.
-        //finishOpenedActivities() will finish all the activities th`at have been opened during the test execution.
-        solo.finishOpenedActivities()
+    fun setUp() {
+        IdlingRegistry.getInstance().register(idlingResource)
+        val i = Intent(appContext, AuthenticatorActivity::class.java)
+        val authTokenType = AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system"
+        i.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
+        i.putExtra(KEY_AUTH_TOKEN_TYPE, authTokenType)
+        i.putExtra(IS_SETTING_SYNC_TYPE, false)
+        i.putExtra("Test", true)
+        activityScenario = ActivityScenario.launch(i)
     }
 
     @Test
     fun testServerUrl () {
-
+        activityScenario.onActivity {
+            it.showViewFlipper(0)
+        }
+        activityScenario.moveToState(Lifecycle.State.STARTED)
+        activityScenario.close()
     }
 
     @Test
     fun testSignUp() {
-        solo.clickOnButton(0)
-        solo.clickOnView(solo.getView(R.id.tvSignUp))
+        activityScenario.onActivity {
+            it.showViewFlipper(1)
+            it.signUp(it.binding.viewFlipper[1])
+        }
+        activityScenario.moveToState(Lifecycle.State.STARTED)
+        activityScenario.close()
     }
 
     @Test
     fun testSignIn() {
-        solo.clickOnButton(0)
-        solo.enterText(0, "TestUser")
-        solo.enterText(1, "test1234")
-        solo.clickOnButton(0)
+        onView(withId(R.id.accountServer)).perform(typeText(""))
+        activityScenario.onActivity {
+            it.showViewFlipper(1)
+        }
+        onView(withId(R.id.accountName))
+            .perform(typeText("jaindiv26"))
+        onView(withId(R.id.accountPassword))
+            .perform(typeText("maps7890"))
+        onView(withId(R.id.signInButton)).perform(click())
     }
 
-    @Test
-    fun testLoadingGroups() {
-        solo.clickOnButton(0)
-        solo.enterText(0, "TestUser")
-        solo.enterText(1, "test1234")
-        solo.clickOnButton(0)
-        solo.waitForEmptyActivityStack(8000)
-        var ac : AccountManager = AccountManager.get(solo.currentActivity)
-        var accounts : Array<Account> = ac.accounts
-        for (i in accounts.iterator()) {
-            when {
-                i.name.equals("TestUser") -> {
-                    ac.removeAccount(i, null, null)
-                    Log.d("UserRemoved", i.name)
-                    return
-                }
-            }
-        }
-        solo.waitForEmptyActivityStack(1000)
+    @After
+    fun unregisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(idlingResource)
     }
 }

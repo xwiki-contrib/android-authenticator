@@ -103,6 +103,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
+    var isTestRunning : Boolean = false
+
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -164,7 +166,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         position = 0
 
-        val isTestRunning : Boolean = intent.getBooleanExtra("Test", false)
+         isTestRunning = intent.getBooleanExtra("Test", false)
 
         if (!isTestRunning) {
             if (availableAccounts.size > 0) {
@@ -345,6 +347,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      *
      */
     fun finishLogin(intent: Intent) {
+        if (isTestRunning) {
+            decrement()
+            finish()
+            return
+        }
         Log.d(TAG, "> finishLogin")
 
         //before add new account, clear old account data.

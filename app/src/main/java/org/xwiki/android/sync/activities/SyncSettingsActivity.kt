@@ -174,6 +174,7 @@ class SyncSettingsActivity : BaseActivity() {
      * @since 0.4
      */
     fun initData(v: View?) {
+        increment()
         if (groups.isEmpty()) {
             groupsAreLoading = true
             apiManager.xwikiServicesApi.availableGroups(
@@ -201,6 +202,7 @@ class SyncSettingsActivity : BaseActivity() {
                             ).show()
                         }
                         refreshProgressBar()
+                        decrement()
                     }
                 )
         }
@@ -215,6 +217,7 @@ class SyncSettingsActivity : BaseActivity() {
                         allUsers.clear()
                         allUsers.addAll(summaries.objectSummaries)
                         updateListView()
+                        decrement()
                     },
                     Action1<Throwable> {
                         allUsersAreLoading = false
@@ -226,6 +229,7 @@ class SyncSettingsActivity : BaseActivity() {
                             ).show()
                         }
                         refreshProgressBar()
+                        decrement()
                     }
                 )
         }

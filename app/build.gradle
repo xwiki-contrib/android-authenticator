@@ -79,9 +79,13 @@ dependencies {
     // Optional -- Robotium library
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.5.4'
 
+    androidTestImplementation "androidx.test:core-ktx:1.2.0"
+    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.1"
+
     // Optional -- UI testing with Espresso
-//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+//    androidTestImplementation 'com.android.support.test.e.presso:espresso-core:3.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
 
     // For ViewModel lifecycle
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
