@@ -25,6 +25,9 @@ android {
     dataBinding {
         enabled = true
     }
+    configurations {
+        zipped
+    }
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     useLibrary 'android.test.mock'
@@ -50,6 +53,9 @@ dependencies {
     //rxjava Dependencies
     implementation 'io.reactivex:rxandroid:1.1.0'
     implementation 'io.reactivex:rxjava:1.3.0'
+
+    implementation files({ tasks.installDependencies.extractedJars })
+    zipped group: 'org.xwiki.platform', name: 'xwiki-platform-distribution-flavor-jetty-hsqldb', version: '10.11.8', ext: 'zip'
 
     // For Local Unit Tests
 
@@ -93,4 +99,18 @@ dependencies {
     // Optional -- UI testing with UI Automator
 
     //androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v23:2.1.1'
+}
+task installDependencies(type: Sync) {
+    def extractDir = "${buildDir}/xwikiLocalInstanceDependency"
+
+    ext.extractedJars = fileTree(extractDir) {
+        include "**/*.jar"
+        builtBy "installDependencies"
+    }
+
+    dependsOn configurations.zipped
+    from {
+        configurations.zipped.collect { zipTree(it) }
+    }
+    into extractDir
 }

@@ -35,6 +35,10 @@ allprojects {
             url "https://jitpack.io"
             name "Jitpack"
         }
+        maven {
+            url "https://maven.xwiki.org/releases/"
+            name "XWiki Releases"
+        }
         google()
     }
 }
