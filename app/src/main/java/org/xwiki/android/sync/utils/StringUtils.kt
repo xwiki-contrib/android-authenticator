@@ -19,6 +19,8 @@
  */
 package org.xwiki.android.sync.utils
 
+import android.text.TextUtils
+import org.xwiki.android.sync.currentBaseUrl
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -114,6 +116,27 @@ object StringUtils {
      */
     fun isPhone(input: CharSequence): Boolean {
         return !isEmpty(input) && phonePattern.matcher(input).matches()
+    }
+
+    fun validServerAddress(URL: String) : String {
+        var url = URL
+        if (url.startsWith("localhost")){
+            return "http://192.168.1.4:8080/xwiki"
+        }
+        if (url.startsWith("http://")) {
+            url = url.replace("http://", "")
+        }
+        (if (!url.startsWith("https://")) {
+            "https://${url}"
+        } else {
+            url
+        }).let {
+            return if (!it.endsWith("/")) {
+                "$it/"
+            } else {
+                it
+            }
+        }
     }
 
     /**

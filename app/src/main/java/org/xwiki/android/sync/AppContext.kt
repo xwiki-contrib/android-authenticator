@@ -24,6 +24,7 @@ import android.content.Context
 import android.util.Log
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.StringUtils.validServerAddress
 import org.xwiki.android.sync.utils.getArrayList
 import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.putArrayList
@@ -60,7 +61,7 @@ lateinit var appContext: Context
  * @return actual base url
  */
 fun currentBaseUrl(): String {
-    return getValue(appContext, SERVER_ADDRESS, "")
+   return validServerAddress(getValue(appContext, SERVER_ADDRESS, ""))
 }
 
 /**

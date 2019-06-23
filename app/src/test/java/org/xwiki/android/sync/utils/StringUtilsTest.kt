@@ -58,4 +58,14 @@ class StringUtilsTest {
         //System.out.println(StringUtils.dateToIso8601String(new Date()));
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun isValidServerAddress() {
+        assertNotNull(StringUtils.validServerAddress("localhost:8080/xwiki"))
+        assertNotNull(StringUtils.validServerAddress("https://www.xwiki.org/xwiki"))
+        assertNotNull(StringUtils.validServerAddress("http://www.xwiki.org/xwiki"))
+        assertNotNull(StringUtils.validServerAddress("www.xwiki.org/xwiki"))
+        assertNotNull(StringUtils.validServerAddress("http://www.xwiki.org/xwiki/"))
+    }
+
 }

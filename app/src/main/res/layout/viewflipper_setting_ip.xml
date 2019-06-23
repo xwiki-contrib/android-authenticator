@@ -52,6 +52,7 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
         <Button
+                android:id="@+id/btViewSignInFlipper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/defaultViewMediumPadding"
