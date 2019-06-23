@@ -132,7 +132,7 @@ class SyncSettingsActivity : BaseActivity() {
         allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(this, groups)
         mUsersAdapter = UserListAdapter(this, allUsers)
-        initData(null)
+        initData()
         binding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -173,7 +173,7 @@ class SyncSettingsActivity : BaseActivity() {
      *
      * @since 0.4
      */
-    fun initData(v: View?) {
+    fun initData() {
         increment()
         if (groups.isEmpty()) {
             groupsAreLoading = true

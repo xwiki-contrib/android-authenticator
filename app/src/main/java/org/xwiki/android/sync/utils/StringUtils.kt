@@ -118,25 +118,16 @@ object StringUtils {
         return !isEmpty(input) && phonePattern.matcher(input).matches()
     }
 
+    private val schemaUrlRegex = Regex("^https?://")
     fun validServerAddress(URL: String) : String {
         var url = URL
-        if (url.startsWith("localhost")){
-            return "http://192.168.1.4:8080/xwiki"
+        if (!schemaUrlRegex.containsMatchIn(url)) {
+            url = "http://$url"
         }
-        if (url.startsWith("http://")) {
-            url = url.replace("http://", "")
+        if (!url.endsWith("/")) {
+            url += "/"
         }
-        (if (!url.startsWith("https://")) {
-            "https://${url}"
-        } else {
-            url
-        }).let {
-            return if (!it.endsWith("/")) {
-                "$it/"
-            } else {
-                it
-            }
-        }
+        return url
     }
 
     /**

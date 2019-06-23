@@ -42,7 +42,7 @@ import java.util.ArrayList
 /**
  * Entry pair Server address - Base Api Manager
  */
-private var baseApiManager: AbstractMap.SimpleEntry<String, BaseApiManager>? = null
+private lateinit var baseApiManager: Pair<String, BaseApiManager>
 
 /**
  * Logging tag
@@ -61,7 +61,7 @@ lateinit var appContext: Context
  * @return actual base url
  */
 fun currentBaseUrl(): String {
-   return validServerAddress(getValue(appContext, SERVER_ADDRESS, ""))
+   return validServerAddress(getValue(appContext, SERVER_ADDRESS, "localhost:8080"))
 }
 
 /**
@@ -101,13 +101,13 @@ fun isAuthorizedApp(packageName: String): Boolean {
 val apiManager : BaseApiManager
     get() {
         val url = currentBaseUrl()
-        if (baseApiManager == null || baseApiManager?.key != url) {
-            baseApiManager = AbstractMap.SimpleEntry(
-                url,
-                BaseApiManager(url)
-            )
+        val manager = try {
+            baseApiManager
+        } catch (e: UninitializedPropertyAccessException) {
+            baseApiManager = url to BaseApiManager(url)
+            baseApiManager
         }
-        return baseApiManager!!.value
+        return manager.second
     }
 
 open class AppContext : Application() {
