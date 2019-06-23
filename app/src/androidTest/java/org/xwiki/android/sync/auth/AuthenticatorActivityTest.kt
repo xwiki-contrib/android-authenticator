@@ -77,6 +77,21 @@ class AuthenticatorActivityTest : LifecycleObserver {
         onView(withId(R.id.signInButton)).perform(click())
     }
 
+    @Test
+    fun testSignInOnLocalInstance() {
+        activityScenario.onActivity {
+            it.showViewFlipper(0)
+        }
+        onView(withId(R.id.accountServer)).perform(clearText())
+        onView(withId(R.id.accountServer)).perform(typeText("http://10.0.2.2:8080/xwiki"))
+        onView(withId(R.id.btViewSignInFlipper)).perform(click())
+        onView(withId(R.id.accountName))
+            .perform(typeText("TestUser"))      // Test user, for log in
+        onView(withId(R.id.accountPassword))
+            .perform(typeText("test1234"))
+        onView(withId(R.id.signInButton)).perform(click())
+    }
+
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(idlingResource)

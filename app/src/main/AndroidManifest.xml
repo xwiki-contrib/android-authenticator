@@ -31,6 +31,7 @@
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/BaseAppTheme"
         tools:replace="android:appComponentFactory"
+        android:usesCleartextTraffic="true"
         android:appComponentFactory="androidx">
 
         <activity android:name=".auth.AuthenticatorActivity"
