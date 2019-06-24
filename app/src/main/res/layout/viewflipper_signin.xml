@@ -1,85 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="@dimen/defaultViewMediumPadding">
+<layout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/defaultViewMediumPadding"
-        android:gravity="center">
-
-        <include layout="@layout/logo"/>
-
-        <View
-            android:id="@+id/message"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/defaultViewLargePadding"/>
-
-        <com.google.android.material.textfield.TextInputLayout
+    <ScrollView
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/defaultViewMediumPadding">
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/defaultViewMediumPadding">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/accountName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/login_activity_username_label"
-                android:inputType="textEmailAddress" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/defaultViewMediumPadding">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/accountPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/login_activity_password_label"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/error_msg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/defaultViewMediumPadding"
-            android:maxLines="2"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/error_color"
-            android:textStyle="normal"
-            android:visibility="gone" />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/log_in"
-            android:layout_margin="@dimen/defaultViewMediumPadding"
-            android:id="@+id/signInButton"/>
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/defaultViewMediumPadding"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/don_t_have_a_account"/>
-            <View
-                android:layout_width="@dimen/defaultViewSmallPadding"
-                android:layout_height="1dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/create_one"
-                android:onClick="signUp"
-                android:textColor="@color/primary_dark"/>
-        </LinearLayout>
-    </LinearLayout>
+                android:orientation="vertical"
+                android:padding="@dimen/defaultViewMediumPadding"
+                android:gravity="center">
 
-</ScrollView>
+            <include layout="@layout/logo"/>
+
+            <View
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/defaultViewLargePadding"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/defaultViewMediumPadding">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/accountName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/login_activity_username_label"
+                        android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/defaultViewMediumPadding">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/accountPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/login_activity_password_label"
+                        android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                    android:id="@+id/error_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/defaultViewMediumPadding"
+                    android:maxLines="2"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/error_color"
+                    android:textStyle="normal"
+                    android:visibility="gone" />
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/log_in"
+                    android:layout_margin="@dimen/defaultViewMediumPadding"
+                    android:id="@+id/signInButton"/>
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/defaultViewMediumPadding"
+                    android:orientation="horizontal">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/don_t_have_a_account"/>
+                <View
+                        android:layout_width="@dimen/defaultViewSmallPadding"
+                        android:layout_height="1dp"/>
+                <TextView
+                        android:id="@+id/tvSignUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_one"
+                        android:onClick="signUp"
+                        android:textColor="@color/primary_dark"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

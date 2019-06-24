@@ -19,11 +19,14 @@
  */
 package org.xwiki.android.sync.utils
 
+import android.text.TextUtils
+import org.xwiki.android.sync.currentBaseUrl
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher
 
 /**
  * String Utils
@@ -113,6 +116,18 @@ object StringUtils {
      */
     fun isPhone(input: CharSequence): Boolean {
         return !isEmpty(input) && phonePattern.matcher(input).matches()
+    }
+
+    private val schemaUrlRegex = Regex("^https?://")
+    fun validServerAddress(URL: String) : String {
+        var url = URL
+        if (!schemaUrlRegex.containsMatchIn(url)) {
+            url = "http://$url"
+        }
+        if (!url.endsWith("/")) {
+            url += "/"
+        }
+        return url
     }
 
     /**

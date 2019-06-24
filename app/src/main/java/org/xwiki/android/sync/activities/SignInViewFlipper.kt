@@ -25,15 +25,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.auth.PARAM_USER_SERVER
 import org.xwiki.android.sync.rest.XWikiHttp
+import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.getValue
+import org.xwiki.android.sync.utils.increment
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 
@@ -47,7 +48,6 @@ private val TAG = "SignInViewFlipper"
  *
  * @version $Id: cc56e12004e2982133afa0c17258b164b8203a15 $
  */
-
 /**
  * Standard constructor
  *
@@ -68,9 +68,17 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      */
     private lateinit var accountPassword: String
 
+    /**
+     * Databinding of this flipper
+     */
+
+    lateinit var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding
+
     init {
-        findViewById<View>(R.id.signInButton).setOnClickListener {
+        binding = DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
+        binding.signInButton.setOnClickListener {
             if (checkInput()) {
+                increment()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating),
                     submit()
@@ -94,7 +102,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      * [.accountPassword] was correctly set
      */
     private fun checkInput(): Boolean {
-         return findViewById<EditText>(R.id.accountPassword).let { field ->
+         return binding.accountPassword.let { field ->
              accountPassword = field.text.toString()
             field.error = null
             when {
@@ -109,7 +117,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                 }
 
             }
-        } && findViewById<EditText>(R.id.accountName).let { field ->
+        } && binding.accountName.let { field ->
              field.error = null
              accountName = field.text.toString()
              when {
@@ -225,11 +233,13 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      * @param error String which must be shown in error message
      */
     private fun showErrorMessage(error: String) {
-        val errorTextView = findViewById<TextView>(R.id.error_msg)
+        val errorTextView = binding.errorMsg
         errorTextView.visibility = View.VISIBLE
         errorTextView.text = error
-        Handler().postDelayed(
-            { errorTextView.visibility = View.GONE },
+        Handler().postDelayed({
+            errorTextView.visibility = View.GONE
+            decrement()
+        },
             2000
         )
     }

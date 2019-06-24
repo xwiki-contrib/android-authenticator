@@ -103,6 +103,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
+    var isTestRunning : Boolean = false
+
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -163,10 +165,15 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         position = 0
-        if (availableAccounts.size > 0) {
-            Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
-            finish()
-            return
+
+         isTestRunning = intent.getBooleanExtra("Test", false)
+
+        if (!isTestRunning) {
+            if (availableAccounts.size > 0) {
+                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         }
         showViewFlipper(position)
     }
@@ -340,6 +347,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      *
      */
     fun finishLogin(intent: Intent) {
+        if (isTestRunning) {
+            decrement()
+            finish()
+            return
+        }
         Log.d(TAG, "> finishLogin")
 
         //before add new account, clear old account data.

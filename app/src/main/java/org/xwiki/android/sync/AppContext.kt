@@ -24,6 +24,7 @@ import android.content.Context
 import android.util.Log
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.SharedPrefsUtils
+import org.xwiki.android.sync.utils.StringUtils.validServerAddress
 import org.xwiki.android.sync.utils.getArrayList
 import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.putArrayList
@@ -41,7 +42,7 @@ import java.util.ArrayList
 /**
  * Entry pair Server address - Base Api Manager
  */
-private var baseApiManager: AbstractMap.SimpleEntry<String, BaseApiManager>? = null
+private lateinit var baseApiManager: Pair<String, BaseApiManager>
 
 /**
  * Logging tag
@@ -60,7 +61,7 @@ lateinit var appContext: Context
  * @return actual base url
  */
 fun currentBaseUrl(): String {
-    return getValue(appContext, SERVER_ADDRESS, "")
+   return validServerAddress(getValue(appContext, SERVER_ADDRESS, "localhost:8080"))
 }
 
 /**
@@ -100,13 +101,13 @@ fun isAuthorizedApp(packageName: String): Boolean {
 val apiManager : BaseApiManager
     get() {
         val url = currentBaseUrl()
-        if (baseApiManager == null || baseApiManager?.key != url) {
-            baseApiManager = AbstractMap.SimpleEntry(
-                url,
-                BaseApiManager(url)
-            )
+        val manager = try {
+            baseApiManager
+        } catch (e: UninitializedPropertyAccessException) {
+            baseApiManager = url to BaseApiManager(url)
+            baseApiManager
         }
-        return baseApiManager!!.value
+        return manager.second
     }
 
 open class AppContext : Application() {
