@@ -67,8 +67,6 @@ class AuthenticatorActivityTest : LifecycleObserver {
         activityScenario.onActivity {
             it.showViewFlipper(0)
         }
-//        onView(withId(R.id.accountServer)).perform(clearText()) // for testing on local host uncomment these line
-//        onView(withId(R.id.accountServer)).perform(typeText("localhost:8080/xwiki"))
         onView(withId(R.id.btViewSignInFlipper)).perform(click())
         onView(withId(R.id.accountName))
             .perform(typeText("TestUser"))      // Test user, for log in

@@ -1,5 +1,6 @@
 package org.xwiki.android.sync.utils
 
+import android.webkit.URLUtil
 import org.junit.Before
 import org.junit.Test
 
@@ -56,16 +57,6 @@ class StringUtilsTest {
     fun dateToIso8601String() {
         assertNotNull(StringUtils.dateToIso8601String(Date()))
         //System.out.println(StringUtils.dateToIso8601String(new Date()));
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun isValidServerAddress() {
-        assertNotNull(StringUtils.validServerAddress("localhost:8080/xwiki"))
-        assertNotNull(StringUtils.validServerAddress("https://www.xwiki.org/xwiki"))
-        assertNotNull(StringUtils.validServerAddress("http://www.xwiki.org/xwiki"))
-        assertNotNull(StringUtils.validServerAddress("www.xwiki.org/xwiki"))
-        assertNotNull(StringUtils.validServerAddress("http://www.xwiki.org/xwiki/"))
     }
 
 }
