@@ -1,5 +1,6 @@
 package org.xwiki.android.sync.activities
 
+import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.ComponentName
 import android.content.ContentResolver
@@ -110,6 +111,8 @@ class SyncSettingsActivity : BaseActivity() {
     @Volatile
     private var allUsersAreLoading: Boolean = false
 
+    private lateinit var currentUserAccountName : String
+
     /**
      * Init all views and other activity objects
      *
@@ -119,8 +122,8 @@ class SyncSettingsActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings);
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings)
+        currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         binding.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
             getAppVersionName(this)
@@ -296,7 +299,13 @@ class SyncSettingsActivity : BaseActivity() {
         //TODO:: fix when will separate to different accounts
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-        val account = availableAccounts[0]
+//        var account : Account = availableAccounts[0]
+        var account : Account = availableAccounts[0]
+        for (acc in availableAccounts) {
+            if (acc.name.equals(currentUserAccountName)) {
+                account = acc
+            }
+        }
 
         clearOldAccountContacts(
             contentResolver,
@@ -333,7 +342,13 @@ class SyncSettingsActivity : BaseActivity() {
     private fun setSync(syncEnabled: Boolean) {
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-        val account = availableAccounts[0]
+//        var account : Account = availableAccounts[0]
+        var account : Account = availableAccounts[0]
+        for (acc in availableAccounts) {
+            if (acc.name.equals(currentUserAccountName)) {
+                account = acc
+            }
+        }
         if (syncEnabled) {
             mAccountManager.setUserData(account, SYNC_MARKER_KEY, null)
             ContentResolver.cancelSync(account, ContactsContract.AUTHORITY)

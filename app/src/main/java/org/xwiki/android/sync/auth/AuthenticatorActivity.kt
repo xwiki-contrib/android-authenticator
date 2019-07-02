@@ -168,13 +168,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
          isTestRunning = intent.getBooleanExtra("Test", false)
 
-        if (!isTestRunning) {
-            if (availableAccounts.size > 0) {
-                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
-                finish()
-                return
-            }
-        }
         showViewFlipper(position)
     }
 
@@ -355,7 +348,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         Log.d(TAG, "> finishLogin")
 
         //before add new account, clear old account data.
-        clearOldAccount()
+//        clearOldAccount()
 
         //get values
         val accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
@@ -392,10 +385,13 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         setAccountAuthenticatorResult(intentReturn.extras)
         setResult(Activity.RESULT_OK, intentReturn)
         Log.d(TAG, ">" + "finish return")
-        finish()
+        val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
+        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
         startActivity(
-            Intent(this, SyncSettingsActivity::class.java)
+            syncActivityIntent
         )
+        finish()
     }
 
     /**

@@ -64,6 +64,8 @@
 
         <activity android:name=".activities.SyncSettingsActivity"/>
 
+        <activity android:name=".activities.SelectAccountActivity"/>
+
         <provider
             android:name=".syncadapter.EmptyProvider"
             android:authorities="org.xwiki.android.sync"
