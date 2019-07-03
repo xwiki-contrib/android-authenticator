@@ -2,6 +2,7 @@ package org.xwiki.android.sync.activities
 
 import android.accounts.Account
 import android.accounts.AccountManager
+import android.app.Activity
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
@@ -113,6 +114,8 @@ class SyncSettingsActivity : BaseActivity() {
 
     private lateinit var currentUserAccountName : String
 
+    private lateinit var currentUserAccountType : String
+
     /**
      * Init all views and other activity objects
      *
@@ -123,7 +126,19 @@ class SyncSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings)
-        currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+
+        if (intent.extras.get("account") != null) {
+            val intentAccount : Account = intent.extras.get("account") as Account
+            currentUserAccountName = intentAccount.name
+            currentUserAccountType = intentAccount.type
+        } else {
+            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
+        }
+
+        binding.tvSelectedSyncAcc.text = currentUserAccountName
+        binding.tvSelectedSyncType.text = currentUserAccountType
+
         binding.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
             getAppVersionName(this)
@@ -149,8 +164,27 @@ class SyncSettingsActivity : BaseActivity() {
             }
         }
 
+        binding.rvChangeSelectedAccount.setOnClickListener {
+            val intent : Intent = Intent (this, SelectAccountActivity::class.java)
+            startActivityForResult(intent, 1000)
+        }
         chosenSyncType = getValue(this, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
         binding.selectSpinner.setSelection(chosenSyncType)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 1000) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null) {
+                    currentUserAccountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                    currentUserAccountType = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
+
+                    binding.tvSelectedSyncAcc.text = currentUserAccountName
+                    binding.tvSelectedSyncType.text = currentUserAccountType
+                }
+            }
+        }
+
     }
 
     /**

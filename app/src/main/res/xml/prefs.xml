@@ -28,6 +28,6 @@
         android:summary="Configure the synchronization of your account">
         <intent android:action="android.intent.action.VIEW"
             android:targetPackage="org.xwiki.android.sync"
-            android:targetClass="org.xwiki.android.sync.activities.SelectAccountActivity" />
+            android:targetClass="org.xwiki.android.sync.activities.SyncSettingsActivity" />
     </PreferenceScreen>
 </PreferenceScreen>
