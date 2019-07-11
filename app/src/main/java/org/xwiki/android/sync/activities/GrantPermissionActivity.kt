@@ -31,7 +31,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
-import org.xwiki.android.sync.utils.getValue
 
 /**
  * A grant permission activity.
@@ -83,11 +82,12 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, ACCOUNT_TYPE)
-        val authToken = getValue(
-            appContext
-                .applicationContext
-                , COOKIE,
-                null)
+//        val authToken = getValue(
+//            appContext
+//                .applicationContext
+//                , COOKIE,
+//                null)
+        val authToken = currentXWikiAccount?.cookie
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)

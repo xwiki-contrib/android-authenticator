@@ -29,17 +29,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.contactdb.ContactManager;
+import org.xwiki.android.sync.contactdb.*;
 import org.xwiki.android.sync.rest.XWikiHttp;
 import org.xwiki.android.sync.utils.StringUtils;
 import rx.Observable;
 import rx.Observer;
-
 import java.util.Date;
-
-import static org.xwiki.android.sync.ConstantsKt.*;
+import static org.xwiki.android.sync.AppContextKt.serverUrl;
+import static org.xwiki.android.sync.AppContextKt.setCurrentXWikiAccount;
+import static org.xwiki.android.sync.ConstantsKt.SYNC_MARKER_KEY;
+import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_NO_NEED_SYNC;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
-import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getValue;
 
 /**
  * Adapter which will be used for synchronization.
@@ -108,11 +108,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             false
         );
         Log.i(TAG, "onPerformSync start");
-        int syncType = getValue(
-            mContext,
-            SYNC_TYPE,
-            SYNC_TYPE_NO_NEED_SYNC
-        );
+        UserDao userDao = UserDatabase.Companion.getInstance(getContext()).userDao();
+        UserRepository userRepository = new UserRepository(userDao);
+        User user = userRepository.getAccountByName(account.name);
+        int syncType = user.getSyncType();
+        serverUrl = user.getServerAddress();
+        setCurrentXWikiAccount(user);
+
         Log.i(TAG, "syncType=" + syncType);
         if (syncType == SYNC_TYPE_NO_NEED_SYNC) return;
         // get last sync date. return new Date(0) if first onPerformSync
@@ -122,7 +124,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
         final Observable<XWikiUserFull> observable = XWikiHttp.getSyncData(
             syncType,
-            account.name
+            account.name,
+            user.getSelectedGroupsList()
         );
 
         // Update the local contacts database with the last modified changes. updateContact()

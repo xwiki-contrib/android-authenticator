@@ -37,6 +37,7 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -44,9 +45,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+
 import static org.xwiki.android.sync.AppContextKt.*;
-import static org.xwiki.android.sync.ConstantsKt.*;
-import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.*;
+import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_ALL_USERS;
+import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_SELECTED_GROUPS;
 
 /**
  * Static class which can be used as wrapper for a few requests such as login and other. It
@@ -93,11 +95,6 @@ public class XWikiHttp {
                 public void call(Response<ResponseBody> responseBodyResponse) {
                     if (responseBodyResponse.code() >= 200 && responseBodyResponse.code() <= 209) {
                         String cookie = responseBodyResponse.headers().get("Set-Cookie");
-                        putValue(
-                                getAppContext().getApplicationContext(),
-                            COOKIE,
-                            cookie
-                        );
                         authTokenSubject.onNext(cookie);
                     } else {
                         authTokenSubject.onNext(null);
@@ -174,7 +171,8 @@ public class XWikiHttp {
      */
     public static Observable<XWikiUserFull> getSyncData(
         final int syncType,
-        final String accountName
+        final String accountName,
+        final List<String> selectedGroups
     ) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
         final Semaphore semaphore = new Semaphore(1);
@@ -200,9 +198,8 @@ public class XWikiHttp {
                                     accountName
                                 );
                             } else if (syncType == SYNC_TYPE_SELECTED_GROUPS) {
-                                List<String> groupIdList = getArrayList(getAppContext().getApplicationContext(), SELECTED_GROUPS);
                                 getSyncGroups(
-                                    groupIdList,
+                                    selectedGroups,
                                     subject,
                                     accountName
                                 );
@@ -481,7 +478,7 @@ public class XWikiHttp {
             // if many users should be synchronized, the task will not be stop
             // even though you close the sync in settings or selecting the "don't sync" option.
             // we should stop the task by checking the sync type each time.
-            int syncType = getValue(getAppContext().getApplicationContext(), SYNC_TYPE, -1);
+            int syncType = getCurrentXWikiAccount().getSyncType();
             if (syncType != SYNC_TYPE_ALL_USERS) {
                 IOException exception = new IOException("the sync type has been changed");
                 subject.onError(exception);

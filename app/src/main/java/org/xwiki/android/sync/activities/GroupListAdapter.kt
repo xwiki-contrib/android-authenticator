@@ -27,12 +27,7 @@ import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.TextView
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.SELECTED_GROUPS
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.putArrayList
-
-import java.util.ArrayList
 
 /**
  * [android.widget.Adapter] which can be used to show groups.
@@ -47,7 +42,8 @@ import java.util.ArrayList
  * @param groupList Initial group list
  */
 
-class GroupListAdapter(private val mContext: Context, private var groupList: List<XWikiGroup>)
+class GroupListAdapter(private val mContext: Context,
+                       private var groupList: List<XWikiGroup>)
     : BaseAdapter() {
 
     /**
@@ -133,8 +129,8 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
     /**
      * Init groups which was selected in previous time.
      */
-    private fun initSelectedGroup() {
-        val groupIds = getArrayList(mContext, SELECTED_GROUPS)
+    private fun initSelectedGroup(selectedGroups: MutableList<String>?) {
+        val groupIds = selectedGroups
         if (groupIds == null || groupIds.size == 0) {
             return
         }
@@ -149,14 +145,14 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
     /**
      * Save current state of selected groups for future use
      */
-    fun saveSelectedGroups() {
+    fun saveSelectedGroups(): MutableList<String> {
         val selectedStrings = ArrayList<String>()
 
         for (group in selected) {
             selectedStrings.add(group.id)
         }
 
-        putArrayList(mContext, SELECTED_GROUPS, selectedStrings)
+        return selectedStrings
     }
 
     /**
@@ -164,11 +160,11 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
      *
      * @param groups new list
      */
-    fun refresh(groups: List<XWikiGroup>) {
+    fun refresh(groups: List<XWikiGroup>, selectedGroups: MutableList<String>?) {
         if (groupList != null && groupList != groups) {
             groupList = groups
         }
-        initSelectedGroup()
+        initSelectedGroup(selectedGroups)
         notifyDataSetChanged()
     }
 

@@ -22,15 +22,11 @@ package org.xwiki.android.sync
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import org.xwiki.android.sync.contactdb.User
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.StringUtils.validServerAddress
 import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.putArrayList
-
-import java.util.AbstractMap
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Application class for authenticator
@@ -43,6 +39,10 @@ import java.util.ArrayList
  * Entry pair Server address - Base Api Manager
  */
 private lateinit var baseApiManager: Pair<String, BaseApiManager>
+
+lateinit var serverUrl : String
+
+var currentXWikiAccount : User? = null
 
 /**
  * Logging tag
@@ -61,7 +61,7 @@ lateinit var appContext: Context
  * @return actual base url
  */
 fun currentBaseUrl(): String {
-   return validServerAddress(getValue(appContext, SERVER_ADDRESS, "localhost:8080"))
+    return serverUrl
 }
 
 /**

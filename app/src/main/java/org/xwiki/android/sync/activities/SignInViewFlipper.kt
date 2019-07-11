@@ -27,13 +27,12 @@ import android.text.TextUtils
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.auth.PARAM_USER_SERVER
 import org.xwiki.android.sync.rest.XWikiHttp
+import org.xwiki.android.sync.serverUrl
 import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.increment
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
@@ -183,7 +182,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         username: String,
         password: String
     ): Intent {
-        val userServer = getValue(mContext, SERVER_ADDRESS, null)
+        val userServer = serverUrl
 
         val accountType = mActivity.intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
 

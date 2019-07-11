@@ -27,6 +27,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -34,7 +35,6 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.*
@@ -42,11 +42,17 @@ import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
+import org.xwiki.android.sync.contactdb.User
+import org.xwiki.android.sync.contactdb.UserDatabase
+import org.xwiki.android.sync.contactdb.UserRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
-import org.xwiki.android.sync.utils.*
+import org.xwiki.android.sync.utils.PermissionsUtils
+import org.xwiki.android.sync.utils.decrement
+import org.xwiki.android.sync.utils.openLink
+import org.xwiki.android.sync.utils.removeKeyValue
 import rx.Subscription
 import java.lang.reflect.InvocationTargetException
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Tag which will be used for logging
@@ -354,6 +360,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
         val accountServer = intent.getStringExtra(PARAM_USER_SERVER)
+        val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
@@ -363,6 +370,14 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
+
+        AsyncTask.execute {
+            val user = User("$accountName@$accountServer", accountName, accountServer, -1, cookie, arrayListOf())
+            val userDao = UserDatabase.getInstance(application).userDao()
+            val userRepository = UserRepository(userDao)
+            userRepository.insert(user)
+            currentXWikiAccount = user
+        }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)

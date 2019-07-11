@@ -8,7 +8,9 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import org.xwiki.android.sync.*
+import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.R
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.utils.extensions.getString
@@ -98,9 +100,9 @@ fun XWikiUserFull.rowId(
     accountName: String
 ): Long {
     resolver.query(
-        ContactsContract.RawContacts.CONTENT_URI,
+        ContactsContract.Data.CONTENT_URI,
         arrayOf(ContactsContract.Data._ID),
-        "${ContactsContract.RawContacts.ACCOUNT_TYPE}=\"${ACCOUNT_TYPE}\" AND " +
+        "${ContactsContract.RawContacts.ACCOUNT_NAME}=\"${accountName}\" AND " +
             "${ContactsContract.RawContacts.SOURCE_ID}=\"$id\"",
         null,
         null

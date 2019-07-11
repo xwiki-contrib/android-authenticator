@@ -24,7 +24,6 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.getValue
 
 import java.io.IOException
 
@@ -50,11 +49,12 @@ class XWikiInterceptor : Interceptor {
      * @since 0.4
      */
     private val cookie: String
-        get() = getValue(
-            appContext.applicationContext,
-            COOKIE,
-            ""
-        )
+    get() = currentXWikiAccount?.cookie.toString()
+//        get() = getValue(
+//            appContext.applicationContext,
+//            COOKIE,
+//            ""
+//        )
 
     /**
      * Add query parameter **media=json**, headers [.HEADER_ACCEPT]=[.CONTENT_TYPE]

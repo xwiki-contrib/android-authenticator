@@ -11,21 +11,30 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.BaseAdapter
+import android.widget.ListView
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
+import org.xwiki.android.sync.contactdb.User
+import org.xwiki.android.sync.contactdb.clearOldAccountContacts
+import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
+import org.xwiki.android.sync.utils.decrement
+import org.xwiki.android.sync.utils.getAppVersionName
+import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
-import java.util.ArrayList
-import org.xwiki.android.sync.contactdb.clearOldAccountContacts
-import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
-import org.xwiki.android.sync.utils.*
+import java.util.*
 
 
 /**
@@ -98,7 +107,7 @@ class SyncSettingsActivity : BaseActivity() {
     /**
      * Currently chosen sync type.
      */
-    private var chosenSyncType = SYNC_TYPE_NO_NEED_SYNC
+    private var chosenSyncType: Int? = SYNC_TYPE_NO_NEED_SYNC
 
     /**
      * Flag of currently loading groups.
@@ -116,6 +125,12 @@ class SyncSettingsActivity : BaseActivity() {
 
     private lateinit var currentUserAccountType : String
 
+    private var user : User? = null
+
+    private lateinit var syncSettingsViewModel: SyncSettingsViewModel
+
+    private var selectedStrings = ArrayList<String>()
+
     /**
      * Init all views and other activity objects
      *
@@ -126,18 +141,6 @@ class SyncSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings)
-
-        if (intent.extras.get("account") != null) {
-            val intentAccount : Account = intent.extras.get("account") as Account
-            currentUserAccountName = intentAccount.name
-            currentUserAccountType = intentAccount.type
-        } else {
-            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-        }
-
-        binding.tvSelectedSyncAcc.text = currentUserAccountName
-        binding.tvSelectedSyncType.text = currentUserAccountType
 
         binding.versionCheck.text = String.format(
             getString(R.string.versionTemplate),
@@ -150,7 +153,6 @@ class SyncSettingsActivity : BaseActivity() {
         allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(this, groups)
         mUsersAdapter = UserListAdapter(this, allUsers)
-        initData()
         binding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -168,11 +170,14 @@ class SyncSettingsActivity : BaseActivity() {
             val intent : Intent = Intent (this, SelectAccountActivity::class.java)
             startActivityForResult(intent, 1000)
         }
-        chosenSyncType = getValue(this, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
-        binding.selectSpinner.setSelection(chosenSyncType)
+        chosenSyncType = user?.syncType
+        chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
+        syncSettingsViewModel = ViewModelProviders.of(this).get(SyncSettingsViewModel::class.java)
+        initData(null)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
         if (requestCode == 1000) {
             if (resultCode == Activity.RESULT_OK) {
                 if (data != null) {
@@ -210,69 +215,89 @@ class SyncSettingsActivity : BaseActivity() {
      *
      * @since 0.4
      */
-    fun initData() {
-        increment()
-        if (groups.isEmpty()) {
-            groupsAreLoading = true
-            apiManager.xwikiServicesApi.availableGroups(
-                LIMIT_MAX_SYNC_USERS
-            )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
-                        groupsAreLoading = false
-                        val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                        if (searchResults != null) {
-                            groups.clear()
-                            groups.addAll(searchResults)
-                            updateListView()
-                        }
-                    },
-                    Action1<Throwable> {
-                        groupsAreLoading = false
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SyncSettingsActivity,
-                                R.string.cantGetGroups,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        refreshProgressBar()
-                        decrement()
-                    }
-                )
+    fun initData(view: View?) {
+        if (intent.extras.get("account") != null) {
+            val intentAccount : Account = intent.extras.get("account") as Account
+            currentUserAccountName = intentAccount.name
+            currentUserAccountType = intentAccount.type
+        } else {
+            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
-        if (allUsers.isEmpty()) {
-            allUsersAreLoading = true
-            apiManager.xwikiServicesApi.allUsersPreview
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
-                        allUsersAreLoading = false
-                        allUsers.clear()
-                        allUsers.addAll(summaries.objectSummaries)
-                        updateListView()
-                        decrement()
-                    },
-                    Action1<Throwable> {
-                        allUsersAreLoading = false
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SyncSettingsActivity,
-                                R.string.cantGetAllUsers,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        refreshProgressBar()
-                        decrement()
-                    }
-                )
-        }
-        if (allUsersAreLoading || groupsAreLoading) {
-            refreshProgressBar()
-        }
+
+        binding.tvSelectedSyncAcc.text = currentUserAccountName
+        binding.tvSelectedSyncType.text = currentUserAccountType
+
+        syncSettingsViewModel.getUser(currentUserAccountName).observe( this, Observer {
+            if (it != null) {
+                currentXWikiAccount = it
+                user = it
+                selectedStrings = user?.selectedGroupsList as ArrayList<String>
+                serverUrl = it.serverAddress.toString()
+                increment()
+                if (groups.isEmpty()) {
+                    groupsAreLoading = true
+                    apiManager.xwikiServicesApi.availableGroups(
+                        LIMIT_MAX_SYNC_USERS
+                    )
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
+                                groupsAreLoading = false
+                                val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
+                                if (searchResults != null) {
+                                    groups.clear()
+                                    groups.addAll(searchResults)
+                                    updateListView()
+                                }
+                            },
+                            Action1<Throwable> {
+                                groupsAreLoading = false
+                                runOnUiThread {
+                                    Toast.makeText(
+                                        this@SyncSettingsActivity,
+                                        R.string.cantGetGroups,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                refreshProgressBar()
+                                decrement()
+                            }
+                        )
+                }
+                if (allUsers.isEmpty()) {
+                    allUsersAreLoading = true
+                    apiManager.xwikiServicesApi.allUsersPreview
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
+                                allUsersAreLoading = false
+                                allUsers.clear()
+                                allUsers.addAll(summaries.objectSummaries)
+                                updateListView()
+                                decrement()
+                            },
+                            Action1<Throwable> {
+                                allUsersAreLoading = false
+                                runOnUiThread {
+                                    Toast.makeText(
+                                        this@SyncSettingsActivity,
+                                        R.string.cantGetAllUsers,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                refreshProgressBar()
+                                decrement()
+                            }
+                        )
+                }
+                if (allUsersAreLoading || groupsAreLoading) {
+                    refreshProgressBar()
+                }
+            }
+        })
     }
 
     /**
@@ -308,7 +333,7 @@ class SyncSettingsActivity : BaseActivity() {
             val adapter: BaseAdapter?
             if (syncGroups()) {
                 adapter = mGroupAdapter
-                mGroupAdapter.refresh(groups)
+                mGroupAdapter.refresh(groups, user?.selectedGroupsList)
             } else {
                 adapter = mUsersAdapter
                 mUsersAdapter.refresh(allUsers)
@@ -324,8 +349,7 @@ class SyncSettingsActivity : BaseActivity() {
      * Save settings of synchronization.
      */
     fun syncSettingComplete(v: View) {
-        //check changes. if no change, directly return
-        val oldSyncType = getValue(this, SYNC_TYPE, -1)
+        val oldSyncType = user?.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
             return
         }
@@ -348,11 +372,15 @@ class SyncSettingsActivity : BaseActivity() {
 
         //if has changes, set sync
         if (syncNothing()) {
-            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_NO_NEED_SYNC)
+            user?.syncType = SYNC_TYPE_NO_NEED_SYNC
+            user?.let { syncSettingsViewModel.updateUser(it) }
             setSync(false)
+            finish()
         } else if (syncAllUsers()) {
-            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_ALL_USERS)
+            user?.syncType = SYNC_TYPE_ALL_USERS
+            user?.let { syncSettingsViewModel.updateUser(it) }
             setSync(true)
+            finish()
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
@@ -360,11 +388,12 @@ class SyncSettingsActivity : BaseActivity() {
                 return
             }
 
-            mGroupAdapter.saveSelectedGroups()
+            user?.selectedGroupsList?.addAll(mGroupAdapter.saveSelectedGroups())
 
-            putValue(applicationContext, SYNC_TYPE, SYNC_TYPE_SELECTED_GROUPS)
+            user?.syncType = SYNC_TYPE_SELECTED_GROUPS
+            user?.let { syncSettingsViewModel.updateUser(it) }
             setSync(true)
-            finish() // TODO:: FIX IT TO CORRECT HANDLE OF COMPLETING SETTINGS
+            finish()
         }
     }
 
@@ -408,7 +437,7 @@ class SyncSettingsActivity : BaseActivity() {
         //new
         val newList = mGroupAdapter.selectGroups
         //old
-        val oldList = getArrayList(applicationContext, SELECTED_GROUPS)
+        val oldList = user?.selectedGroupsList
         if (newList == null && oldList == null) {
             return true
         } else if (newList != null && oldList != null) {
