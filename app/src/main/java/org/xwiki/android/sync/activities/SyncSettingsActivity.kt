@@ -12,12 +12,11 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.View
 import android.widget.AdapterView
-import android.widget.BaseAdapter
-import android.widget.ListView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -146,34 +145,45 @@ class SyncSettingsActivity : BaseActivity() {
             getString(R.string.versionTemplate),
             getAppVersionName(this)
         )
-        binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
-        binding.listView.emptyView = binding.syncTypeGetErrorContainer
+        if (intent.extras.get("account") != null) {
+            val intentAccount : Account = intent.extras.get("account") as Account
+            currentUserAccountName = intentAccount.name
+            currentUserAccountType = intentAccount.type
+        } else {
+            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
+        }
+
         groups = ArrayList()
         allUsers = ArrayList()
-        mGroupAdapter = GroupListAdapter(this, groups)
-        mUsersAdapter = UserListAdapter(this, allUsers)
-        binding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        mGroupAdapter = GroupListAdapter(groups)
+        mUsersAdapter = UserListAdapter(allUsers)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = mUsersAdapter
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 chosenSyncType = position
-                updateListView()
+                updateListView(false)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
-            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-
         binding.rvChangeSelectedAccount.setOnClickListener {
             val intent : Intent = Intent (this, SelectAccountActivity::class.java)
             startActivityForResult(intent, 1000)
         }
+        binding.btTryAgain.setOnClickListener {
+            initData()
+        }
+        binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
+
         chosenSyncType = user?.syncType
         chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
         syncSettingsViewModel = ViewModelProviders.of(this).get(SyncSettingsViewModel::class.java)
-        initData(null)
+
+        initData()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -186,6 +196,7 @@ class SyncSettingsActivity : BaseActivity() {
 
                     binding.tvSelectedSyncAcc.text = currentUserAccountName
                     binding.tvSelectedSyncType.text = currentUserAccountType
+                    initData()
                 }
             }
         }
@@ -210,30 +221,46 @@ class SyncSettingsActivity : BaseActivity() {
         }
     }
 
+    private fun showProgressBar() {
+        runOnUiThread {
+            binding.listViewProgressBar.visibility = View.VISIBLE
+            binding.settingsSyncListViewContainer.visibility = View.GONE
+        }
+    }
+
+    private fun hideProgressBar() {
+        runOnUiThread {
+            binding.listViewProgressBar.visibility = View.GONE
+            binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+        }
+    }
+
     /**
      * Load data to groups and all users lists.
      *
      * @since 0.4
      */
-    fun initData(view: View?) {
-        if (intent.extras.get("account") != null) {
-            val intentAccount : Account = intent.extras.get("account") as Account
-            currentUserAccountName = intentAccount.name
-            currentUserAccountType = intentAccount.type
-        } else {
-            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-        }
-
+    private fun initData() {
         binding.tvSelectedSyncAcc.text = currentUserAccountName
         binding.tvSelectedSyncType.text = currentUserAccountType
+        showProgressBar()
 
         syncSettingsViewModel.getUser(currentUserAccountName).observe( this, Observer {
             if (it != null) {
                 currentXWikiAccount = it
                 user = it
+                selectedStrings.clear()
                 selectedStrings = user?.selectedGroupsList as ArrayList<String>
                 serverUrl = it.serverAddress.toString()
+                chosenSyncType = user?.syncType
+                groups.clear()
+                user?.groupsList?.let { it1 -> groups.addAll(it1) }
+                allUsers.clear()
+                user?.allUsersList?.let { it1 -> allUsers.addAll(it1) }
+                chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
+                if (user?.allUsersList?.size != 0 || user?.groupsList?.size != 0) {
+                    updateListView(true)
+                }
                 increment()
                 if (groups.isEmpty()) {
                     groupsAreLoading = true
@@ -245,11 +272,16 @@ class SyncSettingsActivity : BaseActivity() {
                         .subscribe(
                             Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
                                 groupsAreLoading = false
+                                runOnUiThread {
+                                    binding.syncTypeGetErrorContainer.visibility = View.GONE
+                                }
                                 val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
                                 if (searchResults != null) {
                                     groups.clear()
                                     groups.addAll(searchResults)
-                                    updateListView()
+                                    user?.groupsList?.clear()
+                                    user?.groupsList?.addAll(searchResults)
+                                    updateListView(false)
                                 }
                             },
                             Action1<Throwable> {
@@ -260,8 +292,9 @@ class SyncSettingsActivity : BaseActivity() {
                                         R.string.cantGetGroups,
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                                 }
-                                refreshProgressBar()
+                                hideProgressBar()
                                 decrement()
                             }
                         )
@@ -273,10 +306,15 @@ class SyncSettingsActivity : BaseActivity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
+                                runOnUiThread {
+                                    binding.syncTypeGetErrorContainer.visibility = View.GONE
+                                }
                                 allUsersAreLoading = false
                                 allUsers.clear()
                                 allUsers.addAll(summaries.objectSummaries)
-                                updateListView()
+                                user?.allUsersList?.clear()
+                                user?.allUsersList?.addAll(summaries.objectSummaries)
+                                updateListView(true)
                                 decrement()
                             },
                             Action1<Throwable> {
@@ -287,14 +325,12 @@ class SyncSettingsActivity : BaseActivity() {
                                         R.string.cantGetAllUsers,
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                                 }
-                                refreshProgressBar()
+                                hideProgressBar()
                                 decrement()
                             }
                         )
-                }
-                if (allUsersAreLoading || groupsAreLoading) {
-                    refreshProgressBar()
                 }
             }
         })
@@ -324,24 +360,23 @@ class SyncSettingsActivity : BaseActivity() {
     /**
      * Update list view and hide/show view from [.getListViewContainer]
      */
-    private fun updateListView() {
+    private fun updateListView(hideProgressBar: Boolean) {
         if (syncNothing()) {
             binding.settingsSyncListViewContainer.visibility = View.GONE
             binding.listViewProgressBar.visibility = View.GONE
         } else {
             binding.settingsSyncListViewContainer.visibility = View.VISIBLE
-            val adapter: BaseAdapter?
             if (syncGroups()) {
-                adapter = mGroupAdapter
+                binding.recyclerView.adapter = mGroupAdapter
                 mGroupAdapter.refresh(groups, user?.selectedGroupsList)
             } else {
-                adapter = mUsersAdapter
+                binding.recyclerView.adapter = mUsersAdapter
                 mUsersAdapter.refresh(allUsers)
             }
-            if (adapter !== binding.listView.adapter) {
-                binding.listView.adapter = adapter
+            mUsersAdapter.refresh(allUsers)
+            if (hideProgressBar) {
+                hideProgressBar()
             }
-            refreshProgressBar()
         }
     }
 
@@ -357,7 +392,6 @@ class SyncSettingsActivity : BaseActivity() {
         //TODO:: fix when will separate to different accounts
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-//        var account : Account = availableAccounts[0]
         var account : Account = availableAccounts[0]
         for (acc in availableAccounts) {
             if (acc.name.equals(currentUserAccountName)) {
@@ -388,6 +422,7 @@ class SyncSettingsActivity : BaseActivity() {
                 return
             }
 
+            user?.selectedGroupsList?.clear()
             user?.selectedGroupsList?.addAll(mGroupAdapter.saveSelectedGroups())
 
             user?.syncType = SYNC_TYPE_SELECTED_GROUPS
@@ -405,7 +440,6 @@ class SyncSettingsActivity : BaseActivity() {
     private fun setSync(syncEnabled: Boolean) {
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-//        var account : Account = availableAccounts[0]
         var account : Account = availableAccounts[0]
         for (acc in availableAccounts) {
             if (acc.name.equals(currentUserAccountName)) {

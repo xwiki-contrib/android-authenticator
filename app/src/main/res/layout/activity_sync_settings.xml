@@ -155,11 +155,13 @@
                             android:layout_centerInParent="true"
                             android:id="@+id/settingsSyncListViewContainer">
 
-                        <ListView
-                                android:id="@+id/list_view"
+                        <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recyclerView"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:dividerHeight="1dp"/>
+                                android:dividerHeight="1dp"
+                                android:scrollbars="vertical"
+                                android:layout_height="wrap_content"/>
+
                         <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -174,10 +176,10 @@
                                     android:text="@string/syncTypeGetListErrorMessage"
                                     android:gravity="center"/>
                             <Button
+                                    android:id="@+id/btTryAgain"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/tryAgain"
-                                    android:onClick="initData"/>
+                                    android:text="@string/tryAgain"/>
                         </LinearLayout>
 
                     </FrameLayout>

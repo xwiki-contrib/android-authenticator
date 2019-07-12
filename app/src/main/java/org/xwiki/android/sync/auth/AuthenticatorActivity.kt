@@ -372,7 +372,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         AsyncTask.execute {
-            val user = User("$accountName@$accountServer", accountName, accountServer, -1, cookie, arrayListOf())
+            val user = User("$accountName@$accountServer", accountName, accountServer, 0, cookie, arrayListOf(), arrayListOf(), arrayListOf())
             val userDao = UserDatabase.getInstance(application).userDao()
             val userRepository = UserRepository(userDao)
             userRepository.insert(user)
