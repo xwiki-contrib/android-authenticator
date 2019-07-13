@@ -26,7 +26,6 @@ import android.widget.EditText
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.serverUrl
-
 import java.net.MalformedURLException
 import java.net.URL
 

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.utils.AccountClickListener
 

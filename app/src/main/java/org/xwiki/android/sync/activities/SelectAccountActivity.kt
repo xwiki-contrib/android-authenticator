@@ -5,9 +5,7 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity

@@ -3,12 +3,11 @@ package org.xwiki.android.sync.contactdb
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
-
 @Dao
 interface UserDao {
 
     @Query ("SELECT * from user_table")
-    fun getAllAccount () : List<User>
+    fun getAllAccount () : LiveData<List<User>>
 
     @Query ("SELECT * FROM user_table WHERE account_name LIKE :name")
     fun findByAccountName(name: String): LiveData<User>
