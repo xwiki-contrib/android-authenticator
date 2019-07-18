@@ -27,7 +27,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -37,6 +36,9 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
@@ -371,7 +373,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
-        AsyncTask.execute {
+        CoroutineScope(Dispatchers.Default).launch {
             val user = User("$accountName@$accountServer",
                 accountName,
                 accountServer,
