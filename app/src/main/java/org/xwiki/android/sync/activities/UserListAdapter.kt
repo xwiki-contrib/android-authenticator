@@ -83,7 +83,7 @@ class UserListAdapter(private var searchResults: List<ObjectSummary>)
      * @param results New list
      */
     fun refresh(results: List<ObjectSummary>) {
-        val diffResult = DiffUtil.calculateDiff(MyDiffUtilCallBack(results, searchResults))
+        val diffResult = DiffUtil.calculateDiff(UserListDiffUtilCallBack(results, searchResults))
         diffResult.dispatchUpdatesTo(this)
         searchResults = listOf()
         this.searchResults = results
@@ -106,7 +106,7 @@ class UserListAdapter(private var searchResults: List<ObjectSummary>)
         }
     }
 
-    class MyDiffUtilCallBack(internal var newList: List<ObjectSummary>, internal var oldList: List<ObjectSummary>) :
+    class UserListDiffUtilCallBack(internal var newList: List<ObjectSummary>, internal var oldList: List<ObjectSummary>) :
         DiffUtil.Callback() {
 
         override fun getOldListSize() = oldList.size

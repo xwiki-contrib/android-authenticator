@@ -15,7 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.xwiki.android.sync.contactdb.User
 import org.xwiki.android.sync.contactdb.UserDao
-import org.xwiki.android.sync.contactdb.UserDatabase
+import org.xwiki.android.sync.contactdb.AppDatabase
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
@@ -25,14 +25,14 @@ class UserDaoTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var userDao: UserDao
-    private lateinit var db: UserDatabase
+    private lateinit var db: AppDatabase
 
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         // Using an in-memory database because the information stored here disappears when the
         // process is killed.
-        db = Room.inMemoryDatabaseBuilder(context, UserDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
                 // Allowing main thread queries, just for testing.
                 .allowMainThreadQueries()
                 .build()

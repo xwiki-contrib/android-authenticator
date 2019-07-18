@@ -14,43 +14,44 @@ import org.xwiki.android.sync.utils.AccountClickListener
 class AccountListAdapter (
     private val mContext: Context,
     private var availableAccounts : Array<Account>,
-    private val listener : AccountClickListener)
-    : BaseAdapter()  {
+    private val listener : AccountClickListener
+) : BaseAdapter()  {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var convertView = convertView
+        var view = convertView
         val viewHolder: AccountListViewHolder
 
-        if (convertView == null) {
-            val inflater = LayoutInflater.from(mContext)
-            convertView = inflater.inflate(R.layout.account_list_layout, null)
-            viewHolder = AccountListViewHolder(convertView!!)
-            convertView.tag = viewHolder
-        } else {
-            viewHolder = convertView.tag as AccountListViewHolder
+        view.let {
+            if (it == null) {
+                val inflater = LayoutInflater.from(mContext)
+                view = inflater.inflate(R.layout.account_list_layout, null)
+                viewHolder = AccountListViewHolder(view!!)
+                it?.tag = viewHolder
+            } else {
+                viewHolder = view?.tag as AccountListViewHolder
+            }
+            val account = getItem(position)
+            viewHolder.tvAccountName.text = account.name
+            viewHolder.tvAccountType.text = account.type
+
+            viewHolder.llAccountItem.setOnClickListener {
+                listener(account)
+            }
         }
 
-        val account = getItem(position)
-        viewHolder.tvAccountName.text = account.name
-        viewHolder.tvAccountType.text = account.type
-
-        viewHolder.llAccountItem.setOnClickListener {
-            listener.onItemClicked(account)
-        }
-
-        return convertView
+        return view!!
     }
 
     override fun getItem(position: Int): Account {
-       return availableAccounts[position]
+        return availableAccounts[position]
     }
 
     override fun getItemId(position: Int): Long {
-       return position.toLong()
+        return position.toLong()
     }
 
     override fun getCount(): Int {
-      return availableAccounts.size
+        return availableAccounts.size
     }
 
 }

@@ -27,7 +27,7 @@ class SelectAccountActivity : BaseActivity(), AccountClickListener {
         binding.lvAvailableAccounts.adapter = adapter
     }
 
-    override fun onItemClicked(selectedAccount: Account) {
+    override fun invoke(selectedAccount: Account) {
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, selectedAccount.name)
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, selectedAccount.type)

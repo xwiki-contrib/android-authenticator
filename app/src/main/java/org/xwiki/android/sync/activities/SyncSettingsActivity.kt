@@ -24,6 +24,8 @@ import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
+import org.xwiki.android.sync.contactdb.SyncTypeAllUsersList
+import org.xwiki.android.sync.contactdb.SyncTypeGroupsList
 import org.xwiki.android.sync.contactdb.User
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
@@ -253,86 +255,98 @@ class SyncSettingsActivity : BaseActivity() {
                 selectedStrings = user?.selectedGroupsList as ArrayList<String>
                 serverUrl = it.serverAddress.toString()
                 chosenSyncType = user?.syncType
-                groups.clear()
-                user?.groupsList?.let { it1 -> groups.addAll(it1) }
-                allUsers.clear()
-                user?.allUsersList?.let { it1 -> allUsers.addAll(it1) }
                 chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
-                if (user?.allUsersList?.size != 0 || user?.groupsList?.size != 0) {
-                    updateListView(true)
-                }
-                increment()
-                if (groups.isEmpty()) {
-                    groupsAreLoading = true
-                    apiManager.xwikiServicesApi.availableGroups(
-                        LIMIT_MAX_SYNC_USERS
-                    )
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
-                                groupsAreLoading = false
-                                runOnUiThread {
-                                    binding.syncTypeGetErrorContainer.visibility = View.GONE
-                                }
-                                val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                                if (searchResults != null) {
-                                    groups.clear()
-                                    groups.addAll(searchResults)
-                                    user?.groupsList?.clear()
-                                    user?.groupsList?.addAll(searchResults)
-                                    updateListView(false)
-                                }
-                            },
-                            Action1<Throwable> {
-                                groupsAreLoading = false
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        this@SyncSettingsActivity,
-                                        R.string.cantGetGroups,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                                }
-                                hideProgressBar()
-                                decrement()
-                            }
-                        )
-                }
-                if (allUsers.isEmpty()) {
-                    allUsersAreLoading = true
-                    apiManager.xwikiServicesApi.allUsersPreview
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
-                                runOnUiThread {
-                                    binding.syncTypeGetErrorContainer.visibility = View.GONE
-                                }
-                                allUsersAreLoading = false
-                                allUsers.clear()
-                                allUsers.addAll(summaries.objectSummaries)
-                                user?.allUsersList?.clear()
-                                user?.allUsersList?.addAll(summaries.objectSummaries)
-                                updateListView(true)
-                                decrement()
-                            },
-                            Action1<Throwable> {
-                                allUsersAreLoading = false
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        this@SyncSettingsActivity,
-                                        R.string.cantGetAllUsers,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                                }
-                                hideProgressBar()
-                                decrement()
-                            }
-                        )
-                }
+
+                getSyncList()
             }
+        })
+    }
+
+    private fun getSyncList () {
+
+        syncSettingsViewModel.getSyncTypeGroupsList()?.observe(this, Observer {
+            if (it.size == 0) {
+                increment()
+                groupsAreLoading = true
+                apiManager.xwikiServicesApi.availableGroups(
+                    LIMIT_MAX_SYNC_USERS
+                )
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
+                            groupsAreLoading = false
+                            runOnUiThread {
+                                binding.syncTypeGetErrorContainer.visibility = View.GONE
+                            }
+                            val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
+                            if (searchResults != null) {
+                                groups.clear()
+                                groups.addAll(searchResults)
+                                syncSettingsViewModel.insertSyncTypeGroupsList(SyncTypeGroupsList(0, searchResults))
+                                updateListView(false)
+                            }
+                        },
+                        Action1<Throwable> {
+                            groupsAreLoading = false
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@SyncSettingsActivity,
+                                    R.string.cantGetGroups,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            }
+                            hideProgressBar()
+                            decrement()
+                        }
+                    )
+            } else {
+                groups.clear()
+                groups.addAll(it[0].groupsList)
+                updateListView(false)
+            }
+        })
+
+        syncSettingsViewModel.getSyncTypeAllUsersList()?.observe(this, Observer {
+            if (it.size == 0) {
+                allUsersAreLoading = true
+                apiManager.xwikiServicesApi.allUsersPreview
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        Action1<CustomObjectsSummariesContainer<ObjectSummary>> { summaries ->
+                            runOnUiThread {
+                                binding.syncTypeGetErrorContainer.visibility = View.GONE
+                            }
+                            allUsersAreLoading = false
+                            allUsers.clear()
+                            allUsers.addAll(summaries.objectSummaries)
+
+                            syncSettingsViewModel.insertSyncTypeAllUsersList(SyncTypeAllUsersList(0, summaries.objectSummaries))
+                            updateListView(true)
+                            decrement()
+                        },
+                        Action1<Throwable> {
+                            allUsersAreLoading = false
+                            runOnUiThread {
+                                Toast.makeText(
+                                    this@SyncSettingsActivity,
+                                    R.string.cantGetAllUsers,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            }
+                            hideProgressBar()
+                            decrement()
+                        }
+                    )
+            } else {
+                allUsers.clear()
+                allUsers.addAll(it[0].allUsersList)
+                updateListView(false)
+            }
+
         })
     }
 

@@ -45,8 +45,9 @@ import org.xwiki.android.sync.bean.XWikiGroup
  * @param groupList Initial group list
  */
 
-class GroupListAdapter(private var groupList: List<XWikiGroup>)
-    : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
+class GroupListAdapter(
+    private var groupList: List<XWikiGroup>
+) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
 
     /**
      * List of selected items.
@@ -130,7 +131,7 @@ class GroupListAdapter(private var groupList: List<XWikiGroup>)
      * @param groups new list
      */
     fun refresh(groups: List<XWikiGroup>, selectedGroups: MutableList<String>?) {
-        val diffResult = DiffUtil.calculateDiff(MyDiffUtilCallBack(groups, groupList))
+        val diffResult = DiffUtil.calculateDiff(GroupListDiffUtilCallBack(groups, groupList))
         diffResult.dispatchUpdatesTo(this)
         groupList = listOf()
         this.groupList = groups
@@ -156,7 +157,7 @@ class GroupListAdapter(private var groupList: List<XWikiGroup>)
         }
     }
 
-    class MyDiffUtilCallBack(internal var newList: List<XWikiGroup>, internal var oldList: List<XWikiGroup>) :
+    class GroupListDiffUtilCallBack(internal var newList: List<XWikiGroup>, internal var oldList: List<XWikiGroup>) :
         DiffUtil.Callback() {
 
         override fun getOldListSize() = oldList.size

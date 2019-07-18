@@ -19,20 +19,14 @@
  */
 package org.xwiki.android.sync.contactdb
 
-import android.content.ContentProviderOperation
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
-import android.content.res.AssetFileDescriptor
-import android.database.Cursor
 import android.net.Uri
-import android.os.Bundle
-import android.os.CancellationSignal
 import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
 import org.xwiki.android.sync.ACCOUNT_TYPE
-import org.xwiki.android.sync.AppContext
 import org.xwiki.android.sync.apiManager
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.rest.XWikiHttp
@@ -41,10 +35,8 @@ import rx.Observable
 import rx.Observer
 import rx.functions.Action1
 import rx.schedulers.Schedulers
-
 import java.io.IOException
-import java.io.OutputStream
-import java.util.HashMap
+import java.util.*
 
 /**
  * Class for managing contacts sync related mOperations.

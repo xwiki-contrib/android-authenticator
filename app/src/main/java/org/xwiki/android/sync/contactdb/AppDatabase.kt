@@ -8,22 +8,24 @@ import androidx.room.TypeConverters
 import org.xwiki.android.sync.utils.SelectedGroupsListConverter
 
 
-@Database(entities = [User::class], version = 1, exportSchema = false)
+@Database(entities = [User::class, SyncTypeAllUsersList::class, SyncTypeGroupsList::class], version = 1, exportSchema = false)
 @TypeConverters(SelectedGroupsListConverter::class)
-abstract class UserDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun syncTypeAllUsersListDao(): SyncTypeAllUsersDao
+    abstract fun syncTypeGroupsListDao(): SyncTypeGroupsListDao
 
     companion object {
 
         @Volatile
-        private var INSTANCE: UserDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): UserDatabase {
+        fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    UserDatabase::class.java,
+                    AppDatabase::class.java,
                     "user.db"
                 )
                     .fallbackToDestructiveMigration()

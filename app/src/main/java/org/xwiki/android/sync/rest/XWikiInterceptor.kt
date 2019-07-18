@@ -22,9 +22,8 @@ package org.xwiki.android.sync.rest
 import android.text.TextUtils
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.xwiki.android.sync.*
+import org.xwiki.android.sync.currentXWikiAccount
 import org.xwiki.android.sync.utils.SharedPrefsUtils
-
 import java.io.IOException
 
 private const val HEADER_CONTENT_TYPE = "Content-type"
@@ -50,11 +49,6 @@ class XWikiInterceptor : Interceptor {
      */
     private val cookie: String
     get() = currentXWikiAccount?.cookie.toString()
-//        get() = getValue(
-//            appContext.applicationContext,
-//            COOKIE,
-//            ""
-//        )
 
     /**
      * Add query parameter **media=json**, headers [.HEADER_ACCEPT]=[.CONTENT_TYPE]

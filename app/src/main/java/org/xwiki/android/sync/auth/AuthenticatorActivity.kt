@@ -42,9 +42,9 @@ import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
+import org.xwiki.android.sync.contactdb.AppDatabase
+import org.xwiki.android.sync.contactdb.AppRepository
 import org.xwiki.android.sync.contactdb.User
-import org.xwiki.android.sync.contactdb.UserDatabase
-import org.xwiki.android.sync.contactdb.UserRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.decrement
@@ -372,10 +372,16 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         AsyncTask.execute {
-            val user = User("$accountName@$accountServer", accountName, accountServer, 0, cookie, arrayListOf(), arrayListOf(), arrayListOf())
-            val userDao = UserDatabase.getInstance(application).userDao()
-            val userRepository = UserRepository(userDao)
-            userRepository.insert(user)
+            val user = User("$accountName@$accountServer",
+                accountName,
+                accountServer,
+                0,
+                cookie,
+                arrayListOf()
+            )
+            val userDao = AppDatabase.getInstance(application).userDao()
+            val userRepository = AppRepository(userDao, null, null)
+            userRepository.insertUser(user)
             currentXWikiAccount = user
         }
 

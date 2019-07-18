@@ -5,24 +5,41 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.xwiki.android.sync.contactdb.User
-import org.xwiki.android.sync.contactdb.UserDatabase
-import org.xwiki.android.sync.contactdb.UserRepository
+import org.xwiki.android.sync.contactdb.*
 
 class SyncSettingsViewModel (application: Application) : AndroidViewModel(application) {
 
-    private val userRepository: UserRepository
+    private val appRepository: AppRepository
 
     init {
-        val userDao = UserDatabase.getInstance(application).userDao()
-        userRepository = UserRepository(userDao)
+        val appDatabase = AppDatabase.getInstance(application)
+        val userDao = appDatabase.userDao()
+        val syncTypeAllUsersDao = appDatabase.syncTypeAllUsersListDao()
+        val syncTypeGroupsListDao = appDatabase.syncTypeGroupsListDao()
+        appRepository = AppRepository(userDao, syncTypeAllUsersDao, syncTypeGroupsListDao)
     }
 
     fun getUser(accountName: String) : LiveData<User> {
-        return userRepository.findByAccountName(accountName)
+        return appRepository.findByAccountName(accountName)
     }
 
     fun updateUser (user: User) = viewModelScope.launch {
-        userRepository.updateUser(user)
+        appRepository.updateUser(user)
+    }
+
+    fun insertSyncTypeAllUsersList (list: SyncTypeAllUsersList) = viewModelScope.launch{
+        appRepository.insertSyncTypeAllUsersList(list)
+    }
+
+    fun getSyncTypeAllUsersList (): LiveData<List<SyncTypeAllUsersList>>? {
+        return appRepository.getSyncTypeAllUsersList()
+    }
+
+    fun insertSyncTypeGroupsList (list: SyncTypeGroupsList) = viewModelScope.launch{
+        appRepository.insertSyncTypeGroupsList(list)
+    }
+
+    fun getSyncTypeGroupsList (): LiveData<List<SyncTypeGroupsList>>? {
+        return appRepository.getSyncTypeGroupsList()
     }
 }

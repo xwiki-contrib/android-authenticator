@@ -82,11 +82,6 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, ACCOUNT_TYPE)
-//        val authToken = getValue(
-//            appContext
-//                .applicationContext
-//                , COOKIE,
-//                null)
         val authToken = currentXWikiAccount?.cookie
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()

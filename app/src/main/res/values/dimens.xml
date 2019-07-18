@@ -15,5 +15,16 @@
 
     <dimen name="logoPadding">@dimen/defaultViewMediumPadding</dimen>
     <dimen name="syncTypeGetListErrorWidth">180dp</dimen>
+
+    <dimen name="textDefaultExtraSmallSize">10sp</dimen>
+    <dimen name="textDefaultSmallSize">14sp</dimen>
+    <dimen name="textDefaultMediumSize">18sp</dimen>
     <dimen name="textDefaultLargeSize">22sp</dimen>
+    <dimen name="textDefaultExtraLargeSize">26sp</dimen>
+
+    <dimen name="viewDefaultExtraSmallSize">2dp</dimen>
+    <dimen name="viewDefaultSmallSize">4dp</dimen>
+    <dimen name="viewDefaultMediumSize">8dp</dimen>
+    <dimen name="viewDefaultLargeSize">16dp</dimen>
+    <dimen name="viewDefaultExtraLargeSize">32dp</dimen>
 </resources>

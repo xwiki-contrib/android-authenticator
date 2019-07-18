@@ -108,9 +108,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             false
         );
         Log.i(TAG, "onPerformSync start");
-        UserDao userDao = UserDatabase.Companion.getInstance(getContext()).userDao();
-        UserRepository userRepository = new UserRepository(userDao);
-        User user = userRepository.getAccountByName(account.name);
+        UserDao userDao = AppDatabase.Companion.getInstance(getContext()).userDao();
+        AppRepository appRepository = new AppRepository(userDao, null, null);
+        User user = appRepository.getAccountByName(account.name);
         int syncType = user.getSyncType();
         serverUrl = user.getServerAddress();
         setCurrentXWikiAccount(user);
