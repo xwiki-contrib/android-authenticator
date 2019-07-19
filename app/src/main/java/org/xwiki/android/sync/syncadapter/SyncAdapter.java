@@ -35,8 +35,7 @@ import org.xwiki.android.sync.utils.StringUtils;
 import rx.Observable;
 import rx.Observer;
 import java.util.Date;
-import static org.xwiki.android.sync.AppContextKt.serverUrl;
-import static org.xwiki.android.sync.AppContextKt.setCurrentXWikiAccount;
+import static org.xwiki.android.sync.AppContextKt.*;
 import static org.xwiki.android.sync.ConstantsKt.SYNC_MARKER_KEY;
 import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_NO_NEED_SYNC;
 import static org.xwiki.android.sync.contactdb.ContactOperationsKt.setAccountContactsVisibility;
@@ -112,8 +111,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         AppRepository appRepository = new AppRepository(userDao, null, null);
         User user = appRepository.getAccountByName(account.name);
         int syncType = user.getSyncType();
-        serverUrl = user.getServerAddress();
-        setCurrentXWikiAccount(user);
+        currentBaseUrl(user.getAccountName());
+        setUserCookie(user.getCookie());
+        setUserSyncType(user.getSyncType());
 
         Log.i(TAG, "syncType=" + syncType);
         if (syncType == SYNC_TYPE_NO_NEED_SYNC) return;

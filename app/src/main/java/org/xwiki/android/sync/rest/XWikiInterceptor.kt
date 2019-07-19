@@ -22,7 +22,7 @@ package org.xwiki.android.sync.rest
 import android.text.TextUtils
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.xwiki.android.sync.currentXWikiAccount
+import org.xwiki.android.sync.getUserCookie
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 import java.io.IOException
 
@@ -48,7 +48,7 @@ class XWikiInterceptor : Interceptor {
      * @since 0.4
      */
     private val cookie: String
-    get() = currentXWikiAccount?.cookie.toString()
+    get() = getUserCookie()
 
     /**
      * Add query parameter **media=json**, headers [.HEADER_ACCEPT]=[.CONTENT_TYPE]

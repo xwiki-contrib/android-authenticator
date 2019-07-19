@@ -25,7 +25,6 @@ import android.view.View
 import android.widget.EditText
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.auth.AuthenticatorActivity
-import org.xwiki.android.sync.serverUrl
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -50,7 +49,7 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
     override fun doNext() {
         checkInput().let {
             if (it != null) {
-                serverUrl = it
+                mActivity.serverUrl = it
             }
         }
     }

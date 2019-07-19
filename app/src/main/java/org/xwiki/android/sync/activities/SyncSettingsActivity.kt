@@ -17,6 +17,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -24,10 +27,7 @@ import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.contactdb.SyncTypeAllUsersList
-import org.xwiki.android.sync.contactdb.SyncTypeGroupsList
-import org.xwiki.android.sync.contactdb.User
-import org.xwiki.android.sync.contactdb.clearOldAccountContacts
+import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.getAppVersionName
@@ -249,13 +249,19 @@ class SyncSettingsActivity : BaseActivity() {
 
         syncSettingsViewModel.getUser(currentUserAccountName).observe( this, Observer {
             if (it != null) {
-                currentXWikiAccount = it
                 user = it
                 selectedStrings.clear()
                 selectedStrings = user?.selectedGroupsList as ArrayList<String>
-                serverUrl = it.serverAddress.toString()
-                chosenSyncType = user?.syncType
-                chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
+                user?.syncType?.let {
+                    if (it >= 0) {
+                        chosenSyncType = it
+                        binding.selectSpinner.setSelection(it)
+                    }
+                }
+
+                currentBaseUrl(it.accountName)
+                user?.syncType?.let { it1 -> setUserSyncType(it1) }
+                user?.cookie?.let { it1 -> setUserCookie(it1) }
 
                 getSyncList()
             }
@@ -440,7 +446,12 @@ class SyncSettingsActivity : BaseActivity() {
             user?.selectedGroupsList?.addAll(mGroupAdapter.saveSelectedGroups())
 
             user?.syncType = SYNC_TYPE_SELECTED_GROUPS
-            user?.let { syncSettingsViewModel.updateUser(it) }
+
+            CoroutineScope(Dispatchers.Default).launch {
+                val userDao = AppDatabase.getInstance(appContext).userDao()
+                val userRepository = AppRepository(userDao, null, null)
+                user?.let { userRepository.updateUser(it) }
+            }
             setSync(true)
             finish()
         }

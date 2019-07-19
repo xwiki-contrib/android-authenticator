@@ -22,7 +22,11 @@ package org.xwiki.android.sync
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import org.xwiki.android.sync.contactdb.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.xwiki.android.sync.contactdb.AppDatabase
+import org.xwiki.android.sync.contactdb.AppRepository
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.getArrayList
 import org.xwiki.android.sync.utils.putArrayList
@@ -40,10 +44,9 @@ import java.util.*
  */
 private lateinit var baseApiManager: Pair<String, BaseApiManager>
 
-lateinit var serverUrl : String
+private var userCookie: String? = null
 
-var currentXWikiAccount : User? = null
-
+private var userSyncType: Int = -1
 /**
  * Logging tag
  */
@@ -60,8 +63,37 @@ lateinit var appContext: Context
 /**
  * @return actual base url
  */
-fun currentBaseUrl(): String {
+fun currentBaseUrl(accountName: String?): String {
+    var serverUrl: String = ""
+    if (accountName == null) {
+        serverUrl = "https://www.xwiki.org/xwiki"
+    } else {
+        CoroutineScope(Dispatchers.Default).launch {
+            val userDao = AppDatabase.getInstance(appContext).userDao()
+            val userRepository = AppRepository(userDao, null, null)
+            val user = userRepository.findByAccountName(accountName)
+            serverUrl = user.value?.serverAddress.toString()
+            user.value?.syncType?.let { it1 -> setUserSyncType(it1) }
+            user.value?.cookie?.let { setUserCookie(it) }
+        }
+    }
     return serverUrl
+}
+
+fun setUserCookie(cookie: String) {
+    userCookie = cookie
+}
+
+fun setUserSyncType(syncType: Int) {
+    userSyncType = syncType
+}
+
+fun getUserCookie (): String {
+    return userCookie.toString()
+}
+
+fun getUserSyncType (): Int {
+    return userSyncType
 }
 
 /**
@@ -100,7 +132,7 @@ fun isAuthorizedApp(packageName: String): Boolean {
  */
 val apiManager : BaseApiManager
     get() {
-        val url = currentBaseUrl()
+        val url = currentBaseUrl(null)
         val manager = try {
             baseApiManager
         } catch (e: UninitializedPropertyAccessException) {

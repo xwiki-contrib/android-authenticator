@@ -111,7 +111,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
-    var isTestRunning : Boolean = false
+    var isTestRunning: Boolean = false
+
+    var serverUrl: String? = null
 
 
     /**
@@ -259,7 +261,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View which trigger action
      */
     fun signUp(view: View) {
-        var url = currentBaseUrl()
+        var url = currentBaseUrl(null)
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration"
         } else {
@@ -361,7 +363,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         //get values
         val accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
-        val accountServer = intent.getStringExtra(PARAM_USER_SERVER)
+        val accountServer = serverUrl
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
 
         // Creating the account on the device and setting the auth token we got
@@ -376,16 +378,17 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         CoroutineScope(Dispatchers.Default).launch {
             val user = User("$accountName@$accountServer",
                 accountName,
-                accountServer,
-                0,
+                accountServer.toString(),
+                -1,
                 cookie,
                 arrayListOf()
             )
             val userDao = AppDatabase.getInstance(application).userDao()
             val userRepository = AppRepository(userDao, null, null)
             userRepository.insertUser(user)
-            currentXWikiAccount = user
         }
+        setUserCookie(cookie)
+        setUserSyncType(-1)
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)
