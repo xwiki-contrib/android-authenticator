@@ -38,6 +38,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.BaseViewFlipper
@@ -115,6 +116,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     var serverUrl: String? = null
 
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -375,7 +377,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             val user = User("$accountName@$accountServer",
                 accountName,
                 accountServer.toString(),
@@ -418,6 +420,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             syncActivityIntent
         )
         finish()
+        scope.cancel()
     }
 
     /**

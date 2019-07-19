@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
@@ -131,6 +132,8 @@ class SyncSettingsActivity : BaseActivity() {
     private lateinit var syncSettingsViewModel: SyncSettingsViewModel
 
     private var selectedStrings = ArrayList<String>()
+
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Init all views and other activity objects
@@ -447,13 +450,14 @@ class SyncSettingsActivity : BaseActivity() {
 
             user?.syncType = SYNC_TYPE_SELECTED_GROUPS
 
-            CoroutineScope(Dispatchers.Default).launch {
+            scope.launch {
                 val userDao = AppDatabase.getInstance(appContext).userDao()
                 val userRepository = AppRepository(userDao, null, null)
                 user?.let { userRepository.updateUser(it) }
             }
             setSync(true)
             finish()
+            scope.cancel()
         }
     }
 
