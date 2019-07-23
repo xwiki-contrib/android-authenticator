@@ -22,7 +22,7 @@ package org.xwiki.android.sync.rest
 import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.xwiki.android.sync.currentBaseUrl
+import org.xwiki.android.sync.getAccountServerUrl
 import org.xwiki.android.sync.utils.SharedPrefsUtils
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -105,7 +105,7 @@ class BaseApiManager {
      *
      * @param context Will be used to get info from shared preferences
      */
-    constructor(context: Context) : this(currentBaseUrl(null))
+    constructor(context: Context) : this(getAccountServerUrl(null))
 
     /**
      * Create [XWikiServices] using given [Retrofit] instance

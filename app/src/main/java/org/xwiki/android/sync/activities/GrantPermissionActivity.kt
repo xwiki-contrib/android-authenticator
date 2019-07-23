@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
 
@@ -82,13 +83,16 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, ACCOUNT_TYPE)
-        val authToken = getUserCookie()
+        var authToken: String? = null
+        scope.launch {
+            authToken = getUserCookie(accountName.toString())
+        }
         mAccountManager.setAuthToken(account, authTokenType, authToken)
         val intent = Intent()
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType)
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
-        intent.putExtra(SERVER_ADDRESS, currentBaseUrl(accountName.toString()))
+        intent.putExtra(SERVER_ADDRESS, getAccountServerUrl(accountName.toString()))
         setAccountAuthenticatorResult(intent.extras)
         setResult(Activity.RESULT_OK, intent)
         finish()

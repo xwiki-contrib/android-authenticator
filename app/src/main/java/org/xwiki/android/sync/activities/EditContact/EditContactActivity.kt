@@ -7,7 +7,6 @@ import android.widget.EditText
 import androidx.core.view.get
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
@@ -17,6 +16,7 @@ import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.rest.XWikiHttp
+import org.xwiki.android.sync.scope
 import org.xwiki.android.sync.utils.StringUtils.isEmail
 import org.xwiki.android.sync.utils.StringUtils.isEmpty
 import org.xwiki.android.sync.utils.StringUtils.isPhone
@@ -35,13 +35,6 @@ private const val reloginTryes = 3
  * @since 0.5
  */
 class EditContactActivity : BaseActivity() {
-
-    /**
-     * The scope of edit contact activity
-     *
-     * @since 0.6
-     */
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Lazy initialized contact row id

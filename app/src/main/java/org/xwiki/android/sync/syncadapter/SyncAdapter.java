@@ -111,9 +111,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         AppRepository appRepository = new AppRepository(userDao, null, null);
         User user = appRepository.getAccountByName(account.name);
         int syncType = user.getSyncType();
-        currentBaseUrl(user.getAccountName());
-        setUserCookie(user.getCookie());
-        setUserSyncType(user.getSyncType());
+        getAccountServerUrl(user.getAccountName());
 
         Log.i(TAG, "syncType=" + syncType);
         if (syncType == SYNC_TYPE_NO_NEED_SYNC) return;

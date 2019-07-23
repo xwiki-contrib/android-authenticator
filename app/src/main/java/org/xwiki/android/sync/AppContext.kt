@@ -22,6 +22,7 @@ package org.xwiki.android.sync
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.facebook.stetho.Stetho
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +47,6 @@ private lateinit var baseApiManager: Pair<String, BaseApiManager>
 
 private var userCookie: String? = null
 
-private var userSyncType: Int = -1
 /**
  * Logging tag
  */
@@ -60,40 +60,46 @@ private const val TAG = "AppContext"
 lateinit var appContext: Context
     private set
 
+val scope = CoroutineScope(Dispatchers.Default)
+
 /**
  * @return actual base url
  */
-fun currentBaseUrl(accountName: String?): String {
+fun getAccountServerUrl(accountName: String?): String {
     var serverUrl: String = ""
     if (accountName == null) {
-        serverUrl = "https://www.xwiki.org/xwiki"
+        return XWIKI_DEFAULT_SERVER_ADDRESS
     } else {
-        CoroutineScope(Dispatchers.Default).launch {
+        scope.launch {
             val userDao = AppDatabase.getInstance(appContext).userDao()
             val userRepository = AppRepository(userDao, null, null)
             val user = userRepository.findByAccountName(accountName)
             serverUrl = user.value?.serverAddress.toString()
-            user.value?.syncType?.let { it1 -> setUserSyncType(it1) }
-            user.value?.cookie?.let { setUserCookie(it) }
+            userCookie = user.value?.cookie
         }
     }
     return serverUrl
 }
 
-fun setUserCookie(cookie: String) {
-    userCookie = cookie
-}
-
-fun setUserSyncType(syncType: Int) {
-    userSyncType = syncType
-}
-
-fun getUserCookie (): String {
+fun getUserCookie (accountName: String?): String {
+    if (userCookie.isNullOrBlank()) {
+        val userDao = AppDatabase.getInstance(appContext).userDao()
+        val userRepository = AppRepository(userDao, null, null)
+        val user = userRepository.findByAccountName(accountName.toString())
+        userCookie = user.value?.cookie.toString()
+    }
     return userCookie.toString()
 }
 
-fun getUserSyncType (): Int {
-    return userSyncType
+fun getUserSyncType (accountName: String): Int {
+    var syncType = 0
+    scope.launch {
+        val userDao = AppDatabase.getInstance(appContext).userDao()
+        val userRepository = AppRepository(userDao, null, null)
+        val user = userRepository.findByAccountName(accountName)
+        user.value?.syncType?.let { it1 -> syncType = it1 }
+    }
+    return syncType
 }
 
 /**
@@ -132,7 +138,7 @@ fun isAuthorizedApp(packageName: String): Boolean {
  */
 val apiManager : BaseApiManager
     get() {
-        val url = currentBaseUrl(null)
+        val url = getAccountServerUrl(null)
         val manager = try {
             baseApiManager
         } catch (e: UninitializedPropertyAccessException) {
@@ -151,5 +157,6 @@ open class AppContext : Application() {
         super.onCreate()
         appContext = this
         Log.d(TAG, "on create")
+        Stetho.initializeWithDefaults(this)
     }
 }

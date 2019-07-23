@@ -14,12 +14,10 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
@@ -133,7 +131,7 @@ class SyncSettingsActivity : BaseActivity() {
 
     private var selectedStrings = ArrayList<String>()
 
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private lateinit var context: LifecycleOwner
 
     /**
      * Init all views and other activity objects
@@ -144,6 +142,7 @@ class SyncSettingsActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        context = this
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings)
 
         binding.versionCheck.text = String.format(
@@ -151,7 +150,7 @@ class SyncSettingsActivity : BaseActivity() {
             getAppVersionName(this)
         )
 
-        if (intent.extras.get("account") != null) {
+        if (intent.extras != null && intent.extras.get("account") != null) {
             val intentAccount : Account = intent.extras.get("account") as Account
             currentUserAccountName = intentAccount.name
             currentUserAccountType = intentAccount.type
@@ -248,10 +247,14 @@ class SyncSettingsActivity : BaseActivity() {
     private fun initData() {
         binding.tvSelectedSyncAcc.text = currentUserAccountName
         binding.tvSelectedSyncType.text = currentUserAccountType
-        showProgressBar()
+
+        if (!intent.getBooleanExtra("Test", false)) {
+            showProgressBar()
+        }
 
         syncSettingsViewModel.getUser(currentUserAccountName).observe( this, Observer {
             if (it != null) {
+                syncSettingsViewModel.getUser(currentUserAccountName).removeObservers(context)
                 user = it
                 selectedStrings.clear()
                 selectedStrings = user?.selectedGroupsList as ArrayList<String>
@@ -262,9 +265,7 @@ class SyncSettingsActivity : BaseActivity() {
                     }
                 }
 
-                currentBaseUrl(it.accountName)
-                user?.syncType?.let { it1 -> setUserSyncType(it1) }
-                user?.cookie?.let { it1 -> setUserCookie(it1) }
+                getAccountServerUrl(it.accountName)
 
                 getSyncList()
             }
@@ -275,6 +276,7 @@ class SyncSettingsActivity : BaseActivity() {
 
         syncSettingsViewModel.getSyncTypeGroupsList()?.observe(this, Observer {
             if (it.size == 0) {
+                syncSettingsViewModel.getSyncTypeGroupsList()?.removeObservers(context)
                 increment()
                 groupsAreLoading = true
                 apiManager.xwikiServicesApi.availableGroups(
@@ -319,6 +321,7 @@ class SyncSettingsActivity : BaseActivity() {
 
         syncSettingsViewModel.getSyncTypeAllUsersList()?.observe(this, Observer {
             if (it.size == 0) {
+                syncSettingsViewModel.getSyncTypeAllUsersList()?.removeObservers(context)
                 allUsersAreLoading = true
                 apiManager.xwikiServicesApi.allUsersPreview
                     .subscribeOn(Schedulers.newThread())
@@ -412,7 +415,6 @@ class SyncSettingsActivity : BaseActivity() {
             return
         }
 
-        //TODO:: fix when will separate to different accounts
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         var account : Account = availableAccounts[0]
@@ -454,10 +456,9 @@ class SyncSettingsActivity : BaseActivity() {
                 val userDao = AppDatabase.getInstance(appContext).userDao()
                 val userRepository = AppRepository(userDao, null, null)
                 user?.let { userRepository.updateUser(it) }
+                setSync(true)
+                finish()
             }
-            setSync(true)
-            finish()
-            scope.cancel()
         }
     }
 

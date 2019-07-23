@@ -2,11 +2,9 @@ package org.xwiki.android.sync.contactdb
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity (tableName = "user_table")
-data class User (
-    @PrimaryKey var uid: String,
+@Entity (tableName = "user_table", primaryKeys = ["account_name", "server_address"])
+data class User(
     @ColumnInfo(name = "account_name") val accountName: String,
     @ColumnInfo(name = "server_address") val serverAddress: String,
     @ColumnInfo(name = "sync_type") var syncType: Int = -1,

@@ -36,8 +36,6 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
@@ -115,8 +113,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     var isTestRunning: Boolean = false
 
     var serverUrl: String? = null
-
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -263,7 +259,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View which trigger action
      */
     fun signUp(view: View) {
-        var url = currentBaseUrl(null)
+        var url = getAccountServerUrl(null)
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration"
         } else {
@@ -378,7 +374,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         scope.launch {
-            val user = User("$accountName@$accountServer",
+            val user = User(
                 accountName,
                 accountServer.toString(),
                 -1,
@@ -389,8 +385,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             val userRepository = AppRepository(userDao, null, null)
             userRepository.insertUser(user)
         }
-        setUserCookie(cookie)
-        setUserSyncType(-1)
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)

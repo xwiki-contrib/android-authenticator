@@ -30,6 +30,8 @@ const val ACCOUNT_TYPE = "org.xwiki.android.sync"
 const val ACCOUNT_NAME = "XWiki"
 const val USERDATA_SERVER = "XWIKI_SERVER"
 
+const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
+
 /**
  * Auth token types
  */

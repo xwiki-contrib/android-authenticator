@@ -203,7 +203,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(SERVER_ADDRESS, currentBaseUrl(account.name));
+            result.putString(SERVER_ADDRESS, getAccountServerUrl(account.name));
             return result;
         }
     }
