@@ -8,7 +8,7 @@ import androidx.room.Query
 
 @Dao
 interface SyncTypeAllUsersDao {
-    @Query("SELECT * from all_users_list")
+    @Query("SELECT * from ALL_USERS_LIST_TABLE")
     fun getList () : LiveData<List<SyncTypeAllUsersList>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

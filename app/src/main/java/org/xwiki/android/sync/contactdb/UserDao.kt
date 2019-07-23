@@ -6,13 +6,13 @@ import androidx.room.*
 @Dao
 interface UserDao {
 
-    @Query ("SELECT * from user_table")
+    @Query ("SELECT * from USER_TABLE")
     fun getAllAccount () : LiveData<List<User>>
 
-    @Query ("SELECT * FROM user_table WHERE account_name LIKE :name")
+    @Query ("SELECT * FROM USER_TABLE WHERE account_name LIKE :name")
     fun findByAccountName(name: String): LiveData<User>
 
-    @Query ("SELECT * FROM user_table WHERE account_name LIKE :name")
+    @Query ("SELECT * FROM USER_TABLE WHERE account_name LIKE :name")
     fun getAccountByName(name: String): User
 
     @Insert (onConflict = OnConflictStrategy.REPLACE)
