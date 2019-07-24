@@ -151,6 +151,12 @@ class SyncAdapter(
         }
     }
 
+    override fun onSyncCanceled() {
+        super.onSyncCanceled()
+
+
+    }
+
     /**
      * This helper function fetches the last known high-water-mark
      * we received from the server - or 0 if we've never synced.
