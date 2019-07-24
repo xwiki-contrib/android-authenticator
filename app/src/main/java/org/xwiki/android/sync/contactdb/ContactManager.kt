@@ -68,9 +68,8 @@ class ContactManager(
             observable: Observable<XWikiUserFull>
         ) {
             val apiManager = resolveApiManager(account)
-            val contactManager = ContactManager(
-                apiManager
-            )
+            val contactManager = ContactManager(apiManager)
+
             val resolver = context.contentResolver
             val batchOperation = BatchOperation(resolver)
             val localUserMaps = contactManager.getAllContactsIdMap(resolver, account.accountName)

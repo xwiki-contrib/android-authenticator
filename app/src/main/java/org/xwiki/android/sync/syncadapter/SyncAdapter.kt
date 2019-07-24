@@ -9,6 +9,7 @@ import android.content.SyncResult
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
@@ -18,6 +19,7 @@ import org.xwiki.android.sync.contactdb.setAccountContactsVisibility
 import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.ChannelJavaWaiter
 import org.xwiki.android.sync.utils.StringUtils
+import org.xwiki.android.sync.utils.awaitBlocking
 import rx.Observer
 import java.util.*
 
@@ -77,13 +79,13 @@ class SyncAdapter(
         val triggeringChannel = Channel<Boolean>(1)
         val channelJavaWaiter = ChannelJavaWaiter(appCoroutineScope, triggeringChannel)
 
-        appCoroutineScope.launch {
+        val updateJob = appCoroutineScope.async {
             Log.i(TAG, "onPerformSync start")
-            val userAccount = userAccountsRepo.findByAccountName(account.name) ?: return@launch
+            val userAccount = userAccountsRepo.findByAccountName(account.name) ?: return@async null
             val syncType = userAccount.syncType
 
             Log.i(TAG, "syncType=$syncType")
-            if (syncType == SYNC_TYPE_NO_NEED_SYNC) return@launch
+            if (syncType == SYNC_TYPE_NO_NEED_SYNC) return@async null
             // get last sync date. return new Date(0) if first onPerformSync
             val lastSyncMarker = getServerSyncMarker(account)
             Log.d(TAG, lastSyncMarker)
@@ -129,12 +131,24 @@ class SyncAdapter(
                         syncResult.stats.numEntries++
                     }
                 }
-            )
-        }.invokeOnCompletion {
-            triggeringChannel.offer(true)
+            ).also {
+                synchronized(observable) {
+                    (observable as Object).notifyAll()
+                }
+            }
         }
 
-        channelJavaWaiter.lock()
+        updateJob.invokeOnCompletion { error ->
+            if (error != null) {
+                triggeringChannel.offer(true)
+            }
+        }
+
+        try {
+            channelJavaWaiter.lock()
+        } catch (e: InterruptedException) {
+            updateJob.awaitBlocking(appCoroutineScope) ?.unsubscribe()
+        }
     }
 
     /**

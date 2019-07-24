@@ -192,7 +192,6 @@
             <androidx.appcompat.widget.AppCompatButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="syncSettingComplete"
                     android:id="@+id/nextButton"
                     android:text="@string/save"
                     android:layout_alignParentBottom="true"

@@ -50,6 +50,7 @@ class ChannelJavaWaiter(
         }
     }
 
+    @Throws(InterruptedException::class)
     fun lock() {
         synchronized(lockObject) {
             while (!lockChecker) {

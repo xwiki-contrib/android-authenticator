@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.allUsersCacheRepository
 import org.xwiki.android.sync.bean.ObjectSummary
@@ -35,7 +36,7 @@ class SyncSettingsViewModel(
     }
 
     fun updateUser(updatedUserAccount: UserAccount) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             if (updatedUserAccount.id == id) {
                 userAccountsRepo.updateAccount(updatedUserAccount)
             }
@@ -43,7 +44,7 @@ class SyncSettingsViewModel(
     }
 
     fun updateAllUsersCache(summaries: List<ObjectSummary>) {
-        viewModelScope.launch{
+        viewModelScope.launch(Dispatchers.Default) {
             allUsersCacheRepository[id] = summaries
         }
     }
@@ -53,7 +54,7 @@ class SyncSettingsViewModel(
     }
 
     fun updateGroupsCache(cache: List<XWikiGroup>) {
-        viewModelScope.launch{
+        viewModelScope.launch(Dispatchers.Default) {
             groupsCacheRepository[id] = cache
         }
     }

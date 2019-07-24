@@ -100,12 +100,12 @@ class SyncSettingsActivity : BaseActivity() {
     /**
      * List of received groups.
      */
-    private lateinit var groups: MutableList<XWikiGroup>
+    private val groups: MutableList<XWikiGroup> = mutableListOf()
 
     /**
      * List of received all users.
      */
-    private lateinit var allUsers: MutableList<ObjectSummary>
+    private val allUsers: MutableList<ObjectSummary> = mutableListOf()
 
     /**
      * Currently chosen sync type.
@@ -147,6 +147,7 @@ class SyncSettingsActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         context = this
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sync_settings)
 
@@ -164,8 +165,6 @@ class SyncSettingsActivity : BaseActivity() {
             currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
 
-        groups = ArrayList()
-        allUsers = ArrayList()
         mGroupAdapter = GroupListAdapter(groups)
         mUsersAdapter = UserListAdapter(allUsers)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -188,8 +187,7 @@ class SyncSettingsActivity : BaseActivity() {
         }
         binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
-        chosenSyncType = userAccount.syncType
-        chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
+        binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
     }
@@ -257,24 +255,27 @@ class SyncSettingsActivity : BaseActivity() {
         }
 
         appCoroutineScope.launch {
-            userAccount = syncSettingsViewModel.getUser() ?: return@launch
+            userAccount = userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
             chosenSyncType = userAccount.syncType
             apiManager = resolveApiManager(userAccount)
 
             selectedStrings.clear()
             selectedStrings = userAccount.selectedGroupsList as ArrayList<String>
-            userAccount.syncType.let {
-                if (it >= 0) {
-                    chosenSyncType = it
-                    binding.selectSpinner.setSelection(it)
-                }
-            }
 
             withContext(Dispatchers.Main) {
+                userAccount.syncType.let {
+                    if (it >= 0) {
+                        chosenSyncType = it
+                        binding.selectSpinner.setSelection(it)
+                    }
+                }
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
                     SyncSettingsViewModelFactory(application, userAccount.id)
                 ).get(SyncSettingsViewModel::class.java)
+
+                chosenSyncType = userAccount.syncType
+                chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
             }
 
             updateSyncList()
@@ -282,10 +283,8 @@ class SyncSettingsActivity : BaseActivity() {
     }
 
     private fun updateSyncList () {
-        when (chosenSyncType) {
-            SYNC_TYPE_SELECTED_GROUPS -> updateSyncGroups()
-            SYNC_TYPE_ALL_USERS -> updateSyncAllUsers()
-        }
+        updateSyncGroups()
+        updateSyncAllUsers()
     }
 
     private fun updateSyncGroups() {
@@ -402,21 +401,23 @@ class SyncSettingsActivity : BaseActivity() {
      * Update list view and hide/show view from [.getListViewContainer]
      */
     private fun updateListView(hideProgressBar: Boolean) {
-        if (syncNothing()) {
-            binding.settingsSyncListViewContainer.visibility = View.GONE
-            binding.listViewProgressBar.visibility = View.GONE
-        } else {
-            binding.settingsSyncListViewContainer.visibility = View.VISIBLE
-            if (syncGroups()) {
-                binding.recyclerView.adapter = mGroupAdapter
-                mGroupAdapter.refresh(groups, userAccount.selectedGroupsList)
+        appCoroutineScope.launch(Dispatchers.Main) {
+            if (syncNothing()) {
+                binding.settingsSyncListViewContainer.visibility = View.GONE
+                binding.listViewProgressBar.visibility = View.GONE
             } else {
-                binding.recyclerView.adapter = mUsersAdapter
+                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+                if (syncGroups()) {
+                    binding.recyclerView.adapter = mGroupAdapter
+                    mGroupAdapter.refresh(groups, userAccount.selectedGroupsList)
+                } else {
+                    binding.recyclerView.adapter = mUsersAdapter
+                    mUsersAdapter.refresh(allUsers)
+                }
                 mUsersAdapter.refresh(allUsers)
-            }
-            mUsersAdapter.refresh(allUsers)
-            if (hideProgressBar) {
-                hideProgressBar()
+                if (hideProgressBar) {
+                    hideProgressBar()
+                }
             }
         }
     }
@@ -425,7 +426,7 @@ class SyncSettingsActivity : BaseActivity() {
      * Save settings of synchronization.
      */
     fun syncSettingComplete(v: View) {
-        val oldSyncType = userAccount?.syncType
+        val oldSyncType = userAccount.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
             return
         }
