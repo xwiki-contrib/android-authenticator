@@ -22,7 +22,7 @@ import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.contactdb.AppDatabase
-import org.xwiki.android.sync.contactdb.User
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.utils.idlingResource
 
 
@@ -44,9 +44,9 @@ open class SyncSettingsActivityTest : LifecycleObserver {
             // Allowing main thread queries, just for testing.
             .allowMainThreadQueries()
             .build()
-        val userDao = db.userDao()
+        val userDao = db.usersDao()
 
-        val user = User(
+        val user = UserAccount(
             "testUser1",
             "https://www.xwiki.org/xwiki",
             -1,

@@ -23,8 +23,9 @@ import android.text.TextUtils
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.xwiki.android.sync.getUserCookie
-import org.xwiki.android.sync.scope
+import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.contactdb.UserAccountId
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import java.io.IOException
 
 private const val HEADER_CONTENT_TYPE = "Content-type"
@@ -40,7 +41,10 @@ private const val CONTENT_TYPE = "application/json"
  *
  * @version $Id: 374209a130ca477ae567048f6f4a129ace2ea0d1 $
  */
-class XWikiInterceptor : Interceptor {
+class XWikiInterceptor(
+    private val userAccountId: UserAccountId,
+    private val userAccountsCookiesRepository: UserAccountsCookiesRepository
+) : Interceptor {
 
     /**
      * Add query parameter **media=json**, headers [.HEADER_ACCEPT]=[.CONTENT_TYPE]
@@ -68,8 +72,8 @@ class XWikiInterceptor : Interceptor {
 
         var cookie: String? = null
 
-        scope.launch {
-            cookie = getUserCookie(null)
+        appCoroutineScope.launch {
+            cookie = userAccountsCookiesRepository[userAccountId]
         }
 
         if (!TextUtils.isEmpty(cookie)) {

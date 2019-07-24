@@ -44,8 +44,8 @@ import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.contactdb.AppDatabase
-import org.xwiki.android.sync.contactdb.AppRepository
-import org.xwiki.android.sync.contactdb.User
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.decrement
@@ -259,7 +259,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View which trigger action
      */
     fun signUp(view: View) {
-        var url = getAccountServerUrl(null)
+        var url = XWIKI_DEFAULT_SERVER_ADDRESS
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration"
         } else {
@@ -373,17 +373,14 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
-        scope.launch {
-            val user = User(
+        appCoroutineScope.launch {
+            val user = UserAccount(
                 accountName,
-                accountServer.toString(),
-                -1,
-                cookie,
-                arrayListOf()
+                accountServer.toString()
             )
-            val userDao = AppDatabase.getInstance(application).userDao()
-            val userRepository = AppRepository(userDao, null, null)
-            userRepository.insertUser(user)
+            val userDao = AppDatabase.getInstance(application).usersDao()
+            val userRepository = DAOUserAccountsRepository(userDao)
+            userRepository.createAccount(user)
         }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
@@ -414,7 +411,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             syncActivityIntent
         )
         finish()
-        scope.cancel()
+        appCoroutineScope.cancel()
     }
 
     /**

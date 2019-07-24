@@ -1,7 +1,7 @@
 package org.xwiki.android.sync.bean
 
 /**
- * User info for use in-app. This bean will not be used between server and client -
+ * UserAccount info for use in-app. This bean will not be used between server and client -
  * only for internal usage.
  *
  * @version $Id$

@@ -5,16 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import org.xwiki.android.sync.contactdb.dao.AccountsDao
+import org.xwiki.android.sync.contactdb.dao.AllUsersCacheDao
+import org.xwiki.android.sync.contactdb.dao.GroupsCacheDao
 import org.xwiki.android.sync.utils.SelectedGroupsListConverter
 
 
-@Database(entities = [User::class, SyncTypeAllUsersList::class, SyncTypeGroupsList::class], version = 1, exportSchema = false)
+@Database(entities = [UserAccount::class, AccountAllUsersEntity::class, GroupsCacheEntity::class], version = 1, exportSchema = false)
 @TypeConverters(SelectedGroupsListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
-
-    abstract fun userDao(): UserDao
-    abstract fun syncTypeAllUsersListDao(): SyncTypeAllUsersDao
-    abstract fun syncTypeGroupsListDao(): SyncTypeGroupsListDao
+    abstract fun usersDao(): AccountsDao
+    abstract fun allUsersCacheDao(): AllUsersCacheDao
+    abstract fun groupsCacheDao(): GroupsCacheDao
 
     companion object {
 

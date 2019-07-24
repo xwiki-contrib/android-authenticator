@@ -2,44 +2,63 @@ package org.xwiki.android.sync.ViewModel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.xwiki.android.sync.allUsersCacheRepository
+import org.xwiki.android.sync.bean.ObjectSummary
+import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.*
+import org.xwiki.android.sync.groupsCacheRepository
+import org.xwiki.android.sync.userAccountsRepo
 
-class SyncSettingsViewModel (application: Application) : AndroidViewModel(application) {
+class SyncSettingsViewModelFactory(
+    private val application: Application,
+    private val userAccountId: UserAccountId
+) : ViewModelProvider.AndroidViewModelFactory(application) {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return if (modelClass == SyncSettingsViewModel::class.java) {
+            SyncSettingsViewModel(application, userAccountId) as T
+        } else {
+            super.create(modelClass)
+        }
+    }
+}
 
-    private val appRepository: AppRepository
-
-    init {
-        val appDatabase = AppDatabase.getInstance(application)
-        val userDao = appDatabase.userDao()
-        val syncTypeAllUsersDao = appDatabase.syncTypeAllUsersListDao()
-        val syncTypeGroupsListDao = appDatabase.syncTypeGroupsListDao()
-        appRepository = AppRepository(userDao, syncTypeAllUsersDao, syncTypeGroupsListDao)
+class SyncSettingsViewModel(
+    application: Application,
+    private val id: UserAccountId
+) : AndroidViewModel(application) {
+    suspend fun getUser() : UserAccount? {
+        return userAccountsRepo.findByAccountId(id)
     }
 
-    fun getUser(accountName: String) : LiveData<User> {
-        return appRepository.findByAccountName(accountName)
+    fun updateUser(updatedUserAccount: UserAccount) {
+        viewModelScope.launch {
+            if (updatedUserAccount.id == id) {
+                userAccountsRepo.updateAccount(updatedUserAccount)
+            }
+        }
     }
 
-    fun updateUser (user: User) = viewModelScope.launch {
-        appRepository.updateUser(user)
+    fun updateAllUsersCache(summaries: List<ObjectSummary>) {
+        viewModelScope.launch{
+            allUsersCacheRepository[id] = summaries
+        }
     }
 
-    fun insertSyncTypeAllUsersList (list: SyncTypeAllUsersList) = viewModelScope.launch{
-        appRepository.insertSyncTypeAllUsersList(list)
+    fun getAllUsersCache(): List<ObjectSummary>? {
+        return allUsersCacheRepository[id]
     }
 
-    fun getSyncTypeAllUsersList (): LiveData<List<SyncTypeAllUsersList>>? {
-        return appRepository.getSyncTypeAllUsersList()
+    fun updateGroupsCache(cache: List<XWikiGroup>) {
+        viewModelScope.launch{
+            groupsCacheRepository[id] = cache
+        }
     }
 
-    fun insertSyncTypeGroupsList (list: SyncTypeGroupsList) = viewModelScope.launch{
-        appRepository.insertSyncTypeGroupsList(list)
-    }
-
-    fun getSyncTypeGroupsList (): LiveData<List<SyncTypeGroupsList>>? {
-        return appRepository.getSyncTypeGroupsList()
+    fun getGroupsCache(): List<XWikiGroup>? {
+        return groupsCacheRepository[id]
     }
 }

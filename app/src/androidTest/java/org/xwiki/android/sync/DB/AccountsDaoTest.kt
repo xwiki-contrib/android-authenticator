@@ -14,17 +14,17 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.xwiki.android.sync.contactdb.AppDatabase
-import org.xwiki.android.sync.contactdb.User
-import org.xwiki.android.sync.contactdb.UserDao
+import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.dao.AccountsDao
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class UserDaoTest {
+class AccountsDaoTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var userDao: UserDao
+    private lateinit var accountsDao: AccountsDao
     private lateinit var db: AppDatabase
 
     @Before
@@ -36,7 +36,7 @@ class UserDaoTest {
                 // Allowing main thread queries, just for testing.
                 .allowMainThreadQueries()
                 .build()
-        userDao = db.userDao()
+        accountsDao = db.usersDao()
     }
 
     @After
@@ -48,38 +48,38 @@ class UserDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertAndGetUser() = runBlocking {
-        val user = User(
+        val user = UserAccount(
             "testUser1",
             "https://www.xwiki.org/xwiki",
             -1,
             "",
             arrayListOf()
         )
-        userDao.insertAccount(user)
-        val allUsers = userDao.getAllAccount().waitForValue()
+        accountsDao.insertAccount(user)
+        val allUsers = accountsDao.getAllAccount().waitForValue()
         assertEquals(allUsers[0].accountName, user.accountName)
     }
 
     @Test
     @Throws(Exception::class)
     fun getAllUsers() = runBlocking {
-        val user1 = User(
+        val user1 = UserAccount(
             "testUser1",
             "https://www.xwiki.org/xwiki",
             -1,
             "",
             arrayListOf()
         )
-        userDao.insertAccount(user1)
-        val user2 = User(
+        accountsDao.insertAccount(user1)
+        val user2 = UserAccount(
             "testUser2",
             "https://www.xwiki.org/xwiki",
             -1,
             "",
             arrayListOf()
         )
-        userDao.insertAccount(user2)
-        val allUsers = userDao.getAllAccount().waitForValue()
+        accountsDao.insertAccount(user2)
+        val allUsers = accountsDao.getAllAccount().waitForValue()
         assertEquals(allUsers[0].accountName, user1.accountName)
         assertEquals(allUsers[1].accountName, user2.accountName)
     }
@@ -87,25 +87,25 @@ class UserDaoTest {
     @Test
     @Throws(Exception::class)
     fun deleteAllUsers() = runBlocking {
-        val user1 = User(
+        val user1 = UserAccount(
             "testUser2",
             "https://www.xwiki.org/xwiki",
             -1,
             "",
             arrayListOf()
         )
-        userDao.insertAccount(user1)
-        val user2 = User(
+        accountsDao.insertAccount(user1)
+        val user2 = UserAccount(
             "testUser2",
             "https://www.xwiki.org/xwiki",
             -1,
             "",
             arrayListOf()
         )
-        userDao.insertAccount(user1)
-        userDao.deleteAccount(user1)
-        userDao.deleteAccount(user2)
-        val allUsers = userDao.getAllAccount().waitForValue()
+        accountsDao.insertAccount(user1)
+        accountsDao.deleteUser(user1)
+        accountsDao.deleteUser(user2)
+        val allUsers = accountsDao.getAllAccount().waitForValue()
         assertTrue(allUsers.isEmpty())
     }
 }

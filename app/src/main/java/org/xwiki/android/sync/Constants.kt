@@ -32,12 +32,6 @@ const val USERDATA_SERVER = "XWIKI_SERVER"
 
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
-const val USER_TABLE = "user_table"
-
-const val ALL_USERS_LIST_TABLE = "all_users_list_table"
-
-const val GROUPS_LIST_TABLE = "groups_list_table"
-
 /**
  * Auth token types
  */

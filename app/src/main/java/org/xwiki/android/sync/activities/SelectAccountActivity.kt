@@ -23,7 +23,7 @@ class SelectAccountActivity : BaseActivity(), AccountClickListener {
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccountsList = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
 
-        val adapter: AccountListAdapter = AccountListAdapter(this, availableAccountsList, this)
+        val adapter = AccountListAdapter(this, availableAccountsList, this)
         binding.lvAvailableAccounts.adapter = adapter
     }
 
