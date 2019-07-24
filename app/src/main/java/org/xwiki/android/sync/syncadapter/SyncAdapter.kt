@@ -52,6 +52,18 @@ class SyncAdapter(
         false
     )
 
+    private var updateThread: Thread? = null
+        set(value) {
+            synchronized(this) {
+                field ?.also {
+                    if (it.isAlive == true) {
+                        it.interrupt()
+                    }
+                }
+                field = value
+            }
+        }
+
     /**
      * Perform all sync process.
      *
@@ -91,10 +103,15 @@ class SyncAdapter(
             Log.d(TAG, lastSyncMarker)
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-            val observable = resolveApiManager(userAccount).xWikiHttp.getSyncData(
+            val (observable, thread) = resolveApiManager(userAccount).xWikiHttp.getSyncData(
                 syncType,
                 userAccount.selectedGroupsList
             )
+
+            updateThread ?.also {
+                it.interrupt()
+            }
+            updateThread = thread
 
             // Update the local contacts database with the last modified changes. updateContact()
             ContactManager.updateContacts(context, userAccount, observable)
@@ -148,13 +165,14 @@ class SyncAdapter(
             channelJavaWaiter.lock()
         } catch (e: InterruptedException) {
             updateJob.awaitBlocking(appCoroutineScope) ?.unsubscribe()
+        } finally {
+            updateThread = null
         }
     }
 
     override fun onSyncCanceled() {
         super.onSyncCanceled()
-
-
+        updateThread = null
     }
 
     /**

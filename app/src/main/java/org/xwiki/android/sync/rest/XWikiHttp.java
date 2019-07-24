@@ -25,6 +25,7 @@ import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import kotlin.Pair;
 import okhttp3.Credentials;
 import okhttp3.ResponseBody;
 import org.xwiki.android.sync.bean.ObjectSummary;
@@ -39,11 +40,9 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -177,7 +176,7 @@ public class XWikiHttp {
      * {@link Observer#onCompleted()} will be called when receiving of user was successfully
      * completed
      */
-    public Observable<XWikiUserFull> getSyncData(
+    public Pair<Observable<XWikiUserFull>, Thread> getSyncData(
         final int syncType,
         final List<String> selectedGroups
     ) {
@@ -185,7 +184,7 @@ public class XWikiHttp {
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
-            new Thread(
+            final Thread newThread = new Thread(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -216,12 +215,13 @@ public class XWikiHttp {
                         }
                     }
                 }
-            ).start();
+            );
+            newThread.start();
             semaphore.acquire();
-        } catch (InterruptedException e) {
-            return subject;
+            return new Pair(subject, newThread);
+        } finally {
+            return new Pair(subject, null);
         }
-        return subject;
     }
 
     /**
