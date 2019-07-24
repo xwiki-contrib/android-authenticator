@@ -39,6 +39,7 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -176,15 +177,16 @@ public class XWikiHttp {
      * {@link Observer#onCompleted()} will be called when receiving of user was successfully
      * completed
      */
-    public Pair<Observable<XWikiUserFull>, Thread> getSyncData(
+    public Pair<Subject<XWikiUserFull, XWikiUserFull>, Thread> getSyncData(
         final int syncType,
         final List<String> selectedGroups
     ) {
         final PublishSubject<XWikiUserFull> subject = PublishSubject.create();
+        Thread newThread = null;
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
-            final Thread newThread = new Thread(
+            newThread = new Thread(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -218,9 +220,8 @@ public class XWikiHttp {
             );
             newThread.start();
             semaphore.acquire();
-            return new Pair(subject, newThread);
         } finally {
-            return new Pair(subject, null);
+            return new Pair(subject, newThread);
         }
     }
 
@@ -399,6 +400,7 @@ public class XWikiHttp {
             );
         } catch (InterruptedException e) {
             Log.e(TAG, "Can't await synchronize all users", e);
+            return;
         }
 
         try {
@@ -410,6 +412,7 @@ public class XWikiHttp {
         } catch (InterruptedException e) {
             e.printStackTrace();
             Log.e(TAG, "Can't await synchronize all users", e);
+            return;
         }
 
         while (subject.getThrowable() == null && !searchList.isEmpty()) {

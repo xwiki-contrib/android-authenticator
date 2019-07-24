@@ -74,9 +74,7 @@ class ContactManager(
             val batchOperation = BatchOperation(resolver)
             val localUserMaps = contactManager.getAllContactsIdMap(resolver, account.accountName)
 
-            observable.subscribeOn(
-                Schedulers.newThread()
-            ).subscribe(
+            observable.subscribe(
                 object : Observer<XWikiUserFull> {
                     override fun onCompleted() {
                         for (id in localUserMaps.keys) {

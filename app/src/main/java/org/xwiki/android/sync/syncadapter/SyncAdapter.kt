@@ -56,7 +56,7 @@ class SyncAdapter(
         set(value) {
             synchronized(this) {
                 field ?.also {
-                    if (it.isAlive == true) {
+                    if (it.isAlive) {
                         it.interrupt()
                     }
                 }
@@ -108,9 +108,10 @@ class SyncAdapter(
                 userAccount.selectedGroupsList
             )
 
-            updateThread ?.also {
-                it.interrupt()
+            thread.setUncaughtExceptionHandler { _, e ->
+                observable.onError(e)
             }
+
             updateThread = thread
 
             // Update the local contacts database with the last modified changes. updateContact()
@@ -119,9 +120,7 @@ class SyncAdapter(
             observable.subscribe(
                 object : Observer<XWikiUserFull> {
                     override fun onCompleted() {
-                        // Save off the new sync date. On our next sync, we only want to receive
-                        // contacts that have changed since this sync...
-                        setServerSyncMarker(account, StringUtils.dateToIso8601String(Date()))
+                        updateServerSyncMarker(account)
 
                         triggeringChannel.offer(true)
 
@@ -198,5 +197,11 @@ class SyncAdapter(
      */
     private fun setServerSyncMarker(account: Account, lastSyncIso: String) {
         mAccountManager.setUserData(account, SYNC_MARKER_KEY, lastSyncIso)
+    }
+
+    private fun updateServerSyncMarker(account: Account) {
+        // Save off the new sync date. On our next sync, we only want to receive
+        // contacts that have changed since this sync...
+        setServerSyncMarker(account, StringUtils.dateToIso8601String(Date()))
     }
 }
