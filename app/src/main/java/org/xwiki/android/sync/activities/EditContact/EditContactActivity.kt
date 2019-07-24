@@ -247,9 +247,8 @@ class EditContactActivity : BaseActivity() {
                 }
             ) {
                 if (it?.unauthorized == true) {
-                    XWikiHttp.relogin(
-                        this@EditContactActivity,
-                        accountName
+                    apiManager ?.xWikiHttp ?.relogin(
+                        this@EditContactActivity
                     )?.subscribe(
                         {
                             saveData(view, count + 1)

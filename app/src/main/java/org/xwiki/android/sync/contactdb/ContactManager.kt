@@ -67,8 +67,9 @@ class ContactManager(
             account: UserAccount,
             observable: Observable<XWikiUserFull>
         ) {
+            val apiManager = resolveApiManager(account)
             val contactManager = ContactManager(
-                resolveApiManager(account)
+                apiManager
             )
             val resolver = context.contentResolver
             val batchOperation = BatchOperation(resolver)
@@ -92,9 +93,8 @@ class ContactManager(
                         try {
                             val asHttpException = e as HttpException
                             if (asHttpException.code() == 401) {//Unauthorized
-                                XWikiHttp.relogin(
-                                    context,
-                                    account.accountName
+                                apiManager.xWikiHttp.relogin(
+                                    context
                                 )
                             }
                         } catch (e1: ClassCastException) {

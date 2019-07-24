@@ -62,14 +62,13 @@ class BaseApiManager(
     /**
      * Helper which work with downloading and managing of photos
      *
-     * @since 0.4
-     */
-    /**
      * @return [.xWikiPhotosManager]
      *
      * @since 0.4
      */
     val xWikiPhotosManager: XWikiPhotosManager
+
+    val xWikiHttp: XWikiHttp = XWikiHttp(this, userAccountId)
 
     init {
         var baseUrl = baseURL

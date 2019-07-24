@@ -4,6 +4,7 @@ import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.GroupsCacheRepository
 import org.xwiki.android.sync.contactdb.dao.GroupsCacheDao
+import org.xwiki.android.sync.contactdb.dao.set
 
 class DAOGroupsCacheRepository(
     private val groupsCacheDao: GroupsCacheDao

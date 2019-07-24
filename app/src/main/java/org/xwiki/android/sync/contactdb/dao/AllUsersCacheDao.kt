@@ -16,8 +16,8 @@ interface AllUsersCacheDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun set(syncTypeAccountAllUsersTable: AccountAllUsersEntity)
-
-    operator fun set(id: UserAccountId, objects: List<ObjectSummary>) = set(
-        AccountAllUsersEntity(id, objects)
-    )
 }
+
+operator fun AllUsersCacheDao.set(id: UserAccountId, objects: List<ObjectSummary>) = set(
+    AccountAllUsersEntity(id, objects)
+)

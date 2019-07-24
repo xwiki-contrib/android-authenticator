@@ -423,7 +423,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      *
      * @since 0.4.2
      */
-    fun showProgress(message: CharSequence, subscription: Subscription) {
+    fun showProgress(message: CharSequence, cancelCallback: () -> Unit) {
         // To avoid repeatedly create
         if (mProgressDialog != null && mProgressDialog!!.isShowing) {
             return
@@ -434,7 +434,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         dialog.setCancelable(true)
         dialog.setOnCancelListener {
             Log.i(TAG, "user cancelling authentication")
-            subscription.unsubscribe()
+            cancelCallback()
         }
         // We save off the progress dialog in a field so that we can dismiss
         // it later.

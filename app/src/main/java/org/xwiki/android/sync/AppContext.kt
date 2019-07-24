@@ -57,9 +57,9 @@ lateinit var groupsCacheRepository: GroupsCacheRepository
 lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
     private set
 
-private val apiManagers: MutableMap<String, BaseApiManager> = mutableMapOf()
+private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
 
-fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(serverAddress) {
+fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
     BaseApiManager(serverAddress, userAccountId, userAccountsCookiesRepo)
 }
 

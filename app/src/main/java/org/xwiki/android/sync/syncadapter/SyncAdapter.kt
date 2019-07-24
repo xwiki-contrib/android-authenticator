@@ -11,14 +11,11 @@ import android.text.TextUtils
 import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import org.xwiki.android.sync.SYNC_MARKER_KEY
-import org.xwiki.android.sync.SYNC_TYPE_NO_NEED_SYNC
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.ContactManager
 import org.xwiki.android.sync.contactdb.setAccountContactsVisibility
 import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.appCoroutineScope
-import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.ChannelJavaWaiter
 import org.xwiki.android.sync.utils.StringUtils
 import rx.Observer
@@ -92,9 +89,8 @@ class SyncAdapter(
             Log.d(TAG, lastSyncMarker)
 
             // Get XWiki SyncData from XWiki server , which should be added, updated or deleted after lastSyncMarker.
-            val observable = XWikiHttp.getSyncData(
+            val observable = resolveApiManager(userAccount).xWikiHttp.getSyncData(
                 syncType,
-                account.name,
                 userAccount.selectedGroupsList
             )
 

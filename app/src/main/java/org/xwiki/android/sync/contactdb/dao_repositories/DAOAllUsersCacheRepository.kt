@@ -4,6 +4,7 @@ import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.contactdb.dao.AllUsersCacheDao
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.AllUsersCacheRepository
+import org.xwiki.android.sync.contactdb.dao.set
 
 class DAOAllUsersCacheRepository(
     private val allUsersCacheDao: AllUsersCacheDao

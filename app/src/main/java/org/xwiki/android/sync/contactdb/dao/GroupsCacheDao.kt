@@ -16,8 +16,8 @@ interface GroupsCacheDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun set(groupsCacheEntity: GroupsCacheEntity)
-
-    operator fun set(id: UserAccountId, groups: List<XWikiGroup>) = set(
-        GroupsCacheEntity(id, groups)
-    )
 }
+
+operator fun GroupsCacheDao.set(id: UserAccountId, groups: List<XWikiGroup>) = set(
+    GroupsCacheEntity(id, groups)
+)
