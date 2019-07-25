@@ -23,4 +23,6 @@ class DAOUserAccountsRepository (
     override suspend fun deleteAccount(id: UserAccountId) {
         accountsDao.deleteUser(id)
     }
+
+    override suspend fun getAll(): List<UserAccount> = accountsDao.getAllAccount()
 }

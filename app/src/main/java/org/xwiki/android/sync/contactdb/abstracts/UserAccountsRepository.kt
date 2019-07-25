@@ -12,6 +12,8 @@ interface UserAccountsRepository {
     suspend fun updateAccount(userAccount: UserAccount)
 
     suspend fun deleteAccount(id: UserAccountId)
+
+    suspend fun getAll(): List<UserAccount>
 }
 
 suspend fun UserAccountsRepository.deleteAccount(userAccount: UserAccount) = deleteAccount(userAccount.id)

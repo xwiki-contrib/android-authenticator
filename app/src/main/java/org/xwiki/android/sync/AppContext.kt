@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.sync
 
+import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -37,6 +38,7 @@ import org.xwiki.android.sync.contactdb.dao_repositories.DAOAllUsersCacheReposit
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOGroupsCacheRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.rest.BaseApiManager
+import org.xwiki.android.sync.utils.enableDetectingOfAccountsRemoving
 import org.xwiki.android.sync.utils.getArrayList
 import org.xwiki.android.sync.utils.putArrayList
 import java.util.*
@@ -126,6 +128,7 @@ class AppContext : Application() {
         super.onCreate()
         appContext = this
         initRepos(this)
+        AccountManager.get(this).enableDetectingOfAccountsRemoving()
         Log.d(TAG, "on create")
         Stetho.initializeWithDefaults(this)
     }
