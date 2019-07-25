@@ -18,11 +18,11 @@ interface AccountsDao {
     fun findById(id: UserAccountId): UserAccount?
 
     @Insert (onConflict = OnConflictStrategy.REPLACE)
-    fun insertAccount(userAccount: UserAccount)
+    fun insertAccount(userAccount: UserAccount): UserAccountId
 
     @Update (onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateUser(userAccount: UserAccount): Int
 
-    @Query ("DELETE FROM $UserAccountIdColumn = :userAccountId")
+    @Query ("DELETE FROM USER_TABLE WHERE $UserAccountIdColumn = :userAccountId")
     fun deleteUser(userAccountId: UserAccountId)
 }

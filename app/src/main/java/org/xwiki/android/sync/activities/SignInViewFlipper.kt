@@ -149,13 +149,15 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         val userPass = accountPassword
 
         return appCoroutineScope.launch {
-            userAccountsRepo.createAccount(
+            val user = userAccountsRepo.createAccount(
                 UserAccount(
                     accountName,
                     mActivity.serverUrl ?: return@launch
                 )
-            )
-            val user = userAccountsRepo.findByAccountName(accountName) ?: return@launch
+            ) ?: let {
+                // Something went wrong, because we did not get user account
+                return@launch
+            }
 
             val apiManager = resolveApiManager(user)
             apiManager.xWikiHttp.login(

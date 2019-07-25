@@ -8,8 +8,9 @@ import org.xwiki.android.sync.contactdb.dao.AccountsDao
 class DAOUserAccountsRepository (
     private val accountsDao: AccountsDao
 ) : UserAccountsRepository {
-    override suspend fun createAccount(userAccount: UserAccount) {
-        accountsDao.insertAccount(userAccount)
+    override suspend fun createAccount(userAccount: UserAccount): UserAccount? {
+        val id = accountsDao.insertAccount(userAccount)
+        return accountsDao.findById(id)
     }
 
     override suspend fun findByAccountName(name: String): UserAccount? = accountsDao.findByAccountName(name)

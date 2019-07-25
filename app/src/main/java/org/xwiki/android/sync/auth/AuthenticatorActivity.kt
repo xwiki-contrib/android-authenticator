@@ -42,9 +42,7 @@ import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
-import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
-import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.decrement
@@ -373,13 +371,12 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
 
         appCoroutineScope.launch {
-            val user = UserAccount(
-                accountName,
-                accountServer.toString()
+            userAccountsRepo.createAccount(
+                UserAccount(
+                    accountName,
+                    accountServer.toString()
+                )
             )
-            val userDao = AppDatabase.getInstance(application).usersDao()
-            val userRepository = DAOUserAccountsRepository(userDao)
-            userRepository.createAccount(user)
         }
 
         //grant permission if adding user from the third-party app (UID,PackageName);

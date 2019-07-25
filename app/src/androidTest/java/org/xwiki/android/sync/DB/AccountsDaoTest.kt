@@ -79,18 +79,20 @@ class AccountsDaoTest {
     @Test
     @Throws(Exception::class)
     fun deleteAllUsers() = runBlocking {
-        val user1 = UserAccount(
-            "testUser1",
-            XWIKI_DEFAULT_SERVER_ADDRESS
+        val user1Id = accountsDao.insertAccount(
+            UserAccount(
+                "testUser1",
+                XWIKI_DEFAULT_SERVER_ADDRESS
+            )
         )
-        accountsDao.insertAccount(user1)
-        val user2 = UserAccount(
-            "testUser2",
-            XWIKI_DEFAULT_SERVER_ADDRESS
+        val user2Id = accountsDao.insertAccount(
+            UserAccount(
+                "testUser2",
+                XWIKI_DEFAULT_SERVER_ADDRESS
+            )
         )
-        accountsDao.insertAccount(user2)
-        accountsDao.deleteUser("testUser1")
-        accountsDao.deleteUser("testUser2")
+        accountsDao.deleteUser(user1Id)
+        accountsDao.deleteUser(user2Id)
         val allUsers = accountsDao.getAllAccount()
         assertTrue(allUsers.isEmpty())
     }
