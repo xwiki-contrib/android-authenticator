@@ -50,13 +50,10 @@ class AccountsDaoTest {
     fun insertAndGetUser() = runBlocking {
         val user = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "https://www.xwiki.org/xwiki"
         )
         accountsDao.insertAccount(user)
-        val allUsers = accountsDao.getAllAccount().waitForValue()
+        val allUsers = accountsDao.getAllAccount()
         assertEquals(allUsers[0].accountName, user.accountName)
     }
 
@@ -65,21 +62,15 @@ class AccountsDaoTest {
     fun getAllUsers() = runBlocking {
         val user1 = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "https://www.xwiki.org/xwiki"
         )
         accountsDao.insertAccount(user1)
         val user2 = UserAccount(
             "testUser2",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "https://www.xwiki.org/xwiki"
         )
         accountsDao.insertAccount(user2)
-        val allUsers = accountsDao.getAllAccount().waitForValue()
+        val allUsers = accountsDao.getAllAccount()
         assertEquals(allUsers[0].accountName, user1.accountName)
         assertEquals(allUsers[1].accountName, user2.accountName)
     }
@@ -88,24 +79,18 @@ class AccountsDaoTest {
     @Throws(Exception::class)
     fun deleteAllUsers() = runBlocking {
         val user1 = UserAccount(
-            "testUser2",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "testUser1",
+            "https://www.xwiki.org/xwiki"
         )
         accountsDao.insertAccount(user1)
         val user2 = UserAccount(
             "testUser2",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "https://www.xwiki.org/xwiki"
         )
-        accountsDao.insertAccount(user1)
-        accountsDao.deleteUser(user1)
-        accountsDao.deleteUser(user2)
-        val allUsers = accountsDao.getAllAccount().waitForValue()
+        accountsDao.insertAccount(user2)
+        accountsDao.deleteUser("testUser1")
+        accountsDao.deleteUser("testUser2")
+        val allUsers = accountsDao.getAllAccount()
         assertTrue(allUsers.isEmpty())
     }
 }

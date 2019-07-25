@@ -1,9 +1,9 @@
 package org.xwiki.android.sync.contactdb.dao_repositories
 
-import org.xwiki.android.sync.contactdb.dao.AccountsDao
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsRepository
+import org.xwiki.android.sync.contactdb.dao.AccountsDao
 
 class DAOUserAccountsRepository (
     private val accountsDao: AccountsDao
@@ -19,7 +19,7 @@ class DAOUserAccountsRepository (
         accountsDao.updateUser(userAccount)
     }
 
-    override suspend fun deleteAccount(userAccount: UserAccount) {
-        accountsDao.deleteUser(userAccount)
+    override suspend fun deleteAccount(userAccountName: String) {
+        accountsDao.deleteUser(userAccountName)
     }
 }

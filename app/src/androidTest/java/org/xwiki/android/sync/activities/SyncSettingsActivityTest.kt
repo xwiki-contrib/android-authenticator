@@ -48,10 +48,7 @@ open class SyncSettingsActivityTest : LifecycleObserver {
 
         val user = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki",
-            -1,
-            "",
-            arrayListOf()
+            "https://www.xwiki.org/xwiki"
         )
 
         userDao.insertAccount(user)

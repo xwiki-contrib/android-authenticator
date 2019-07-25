@@ -36,7 +36,6 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.BaseViewFlipper
@@ -44,8 +43,8 @@ import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.contactdb.AppDatabase
-import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.decrement
@@ -411,7 +410,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             syncActivityIntent
         )
         finish()
-        appCoroutineScope.cancel()
     }
 
     /**

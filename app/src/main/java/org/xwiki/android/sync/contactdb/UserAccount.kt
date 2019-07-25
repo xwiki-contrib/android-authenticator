@@ -3,7 +3,6 @@ package org.xwiki.android.sync.contactdb
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.xwiki.android.sync.SYNC_TYPE_NO_NEED_SYNC
 
 typealias UserAccountId = Long
 
@@ -20,7 +19,7 @@ data class UserAccount(
     @ColumnInfo(name = UserAccountAccountNameColumn) val accountName: String,
     @ColumnInfo(name = UserAccountServerAddressColumn) val serverAddress: String,
     @ColumnInfo(name = UserAccountSelectedGroupsColumn) var selectedGroupsList: MutableList<String> = mutableListOf(),
-    @ColumnInfo(name = UserAccountSyncTypeColumn) var syncType: Int = SYNC_TYPE_NO_NEED_SYNC,
+    @ColumnInfo(name = UserAccountSyncTypeColumn) var syncType: Int = -1,
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = UserAccountIdColumn)  val id: UserAccountId = 0
 )

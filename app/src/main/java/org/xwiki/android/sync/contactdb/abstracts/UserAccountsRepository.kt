@@ -11,5 +11,5 @@ interface UserAccountsRepository {
 
     suspend fun updateAccount(userAccount: UserAccount)
 
-    suspend fun deleteAccount(userAccount: UserAccount)
+    suspend fun deleteAccount(userAccountName: String)
 }

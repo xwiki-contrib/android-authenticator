@@ -23,6 +23,6 @@ interface AccountsDao {
     @Update (onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateUser(userAccount: UserAccount): Int
 
-    @Delete
-    fun deleteUser(userAccount: UserAccount): Int
+    @Query ("DELETE FROM USER_TABLE WHERE account_name = :userAccountName")
+    fun deleteUser(userAccountName: String)
 }
