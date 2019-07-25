@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <include layout="@layout/toolbar_layout"/>
 
@@ -19,35 +19,123 @@
                     android:orientation="vertical"
                     android:layout_alignParentTop="true"
                     android:layout_above="@+id/nextButton">
-                <TableLayout
+
+                <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:stretchColumns="1"
-                        android:padding="@dimen/defaultViewMediumPadding">
-                    <TableRow>
+                        android:orientation="vertical">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
                         <TextView
                                 android:id="@+id/version_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="@string/about_version"
-                                android:padding="@dimen/defaultViewSmallPadding"/>
+                                android:layout_marginStart="8dp"
+                                android:padding="@dimen/defaultViewSmallPadding"
+                                android:layout_marginLeft="8dp"/>
 
                         <Button
                                 android:id="@+id/version_check"
-                                android:text="@string/version"/>
-                    </TableRow>
-                    <TableRow>
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:text="@string/version"
+                                android:layout_marginRight="8dp"/>
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                            android:id="@+id/rvChangeSelectedAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
                         <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:id="@+id/syncAccount"
+                                android:text="Sync Account"
+                                android:padding="@dimen/defaultViewSmallPadding"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"/>
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/tvSelectedSyncAcc"
+                                android:textSize="18sp"
+                                android:textColor="#000000"
+                                android:layout_toEndOf="@id/syncAccount"
+                                android:layout_toStartOf="@id/ivEditSyncAcc"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_toRightOf="@id/syncAccount"
+                                android:layout_toLeftOf="@id/ivEditSyncAcc"/>
+
+                        <TextView
+                                android:id="@+id/tvSelectedSyncType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:layout_toEndOf="@id/syncAccount"
+                                android:layout_toStartOf="@id/ivEditSyncAcc"
+                                android:layout_below="@id/tvSelectedSyncAcc"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_toRightOf="@id/syncAccount"
+                                android:layout_toLeftOf="@id/ivEditSyncAcc"/>
+
+
+                        <ImageView
+                                android:layout_marginTop="8dp"
+                                android:id="@+id/ivEditSyncAcc"
+                                android:layout_height="20dp"
+                                android:layout_width="20dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_marginEnd="8dp"
+                                android:background="@drawable/ic_edit_black_24dp"
+                                android:layout_alignParentRight="true"
+                                android:padding="12dp"
+                                android:layout_marginRight="8dp"/>
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
                                 android:id="@+id/sync_label"
                                 android:text="@string/synchronizationType"
-                                android:padding="@dimen/defaultViewSmallPadding"/>
+                                android:padding="@dimen/defaultViewSmallPadding"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"/>
 
                         <androidx.appcompat.widget.AppCompatSpinner
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginStart="18dp"
+                                android:layout_marginLeft="18dp"
+                                android:layout_marginEnd="-4dp"
+                                android:layout_marginRight="-4dp"
                                 android:id="@+id/select_spinner"
                                 android:entries="@array/select_groups_array"
                                 android:padding="@dimen/defaultViewSmallPadding"/>
-                    </TableRow>
-                </TableLayout>
 
+                    </LinearLayout>
 
+                </LinearLayout>
 
                 <RelativeLayout
                         android:layout_width="match_parent"
@@ -66,11 +154,14 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:id="@+id/settingsSyncListViewContainer">
-                        <ListView
-                                android:id="@+id/list_view"
+
+                        <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/recyclerView"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:dividerHeight="1dp"/>
+                                android:dividerHeight="1dp"
+                                android:scrollbars="vertical"
+                                android:layout_height="wrap_content"/>
+
                         <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -85,20 +176,22 @@
                                     android:text="@string/syncTypeGetListErrorMessage"
                                     android:gravity="center"/>
                             <Button
+                                    android:id="@+id/btTryAgain"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/tryAgain"
-                                    android:onClick="initData"/>
+                                    android:text="@string/tryAgain"/>
                         </LinearLayout>
+
                     </FrameLayout>
+
                 </RelativeLayout>
+
             </LinearLayout>
 
 
             <androidx.appcompat.widget.AppCompatButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="syncSettingComplete"
                     android:id="@+id/nextButton"
                     android:text="@string/save"
                     android:layout_alignParentBottom="true"
@@ -106,6 +199,7 @@
                     android:layout_alignParentEnd="true"/>
 
         </RelativeLayout>
+
     </LinearLayout>
 
 </layout>

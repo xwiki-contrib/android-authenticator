@@ -7,16 +7,19 @@ import android.widget.EditText
 import androidx.core.view.get
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
-import org.xwiki.android.sync.apiManager
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
 import org.xwiki.android.sync.rest.XWikiHttp
+import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.resolveApiManager
+import org.xwiki.android.sync.rest.BaseApiManager
+import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.StringUtils.isEmail
 import org.xwiki.android.sync.utils.StringUtils.isEmpty
 import org.xwiki.android.sync.utils.StringUtils.isPhone
@@ -35,13 +38,6 @@ private const val reloginTryes = 3
  * @since 0.5
  */
 class EditContactActivity : BaseActivity() {
-
-    /**
-     * The scope of edit contact activity
-     *
-     * @since 0.6
-     */
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Lazy initialized contact row id
@@ -85,6 +81,8 @@ class EditContactActivity : BaseActivity() {
             )
         }
     }
+
+    private var apiManager: BaseApiManager? = null
 
     /**
      * Lazy initialized splitted {@link #userId}
@@ -159,12 +157,26 @@ class EditContactActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_contact)
 
+        accountName ?.let { accountName ->
+            appCoroutineScope.launch {
+                val account = userAccountsRepo.findByAccountName(accountName) ?:let {
+                    apiManager = null
+                    return@launch // TODO:: HERE MUST BE CORRECT CLOSING OF ACTIVITY
+                }
+                apiManager = resolveApiManager(
+                    account
+                )
+
+                withContext(Dispatchers.Main) {
+                    refillData()
+                }
+            }
+        }
+
         findViewById<FloatingActionButton>(R.id.editContactSaveButton).setOnClickListener {
             view ->
             saveData(view)
         }
-
-        refillData()
     }
 
     /**
@@ -194,7 +206,7 @@ class EditContactActivity : BaseActivity() {
             }
             disableContainer()
 
-            apiManager.xwikiServicesApi.updateUser(
+            apiManager ?.xwikiServicesApi ?.updateUser(
                 it.wiki,
                 it.space,
                 it.pageName,
@@ -205,11 +217,11 @@ class EditContactActivity : BaseActivity() {
                 it.address,
                 it.company,
                 it.comment
-            ).observeOn(
+            ) ?.observeOn(
                 AndroidSchedulers.mainThread()
-            ).subscribeOn(
+            ) ?.subscribeOn(
                 Schedulers.newThread()
-            ).subscribe(
+            ) ?.subscribe(
                 {
                     Snackbar.make(
                         view,
@@ -220,7 +232,7 @@ class EditContactActivity : BaseActivity() {
                         user ->
                         updateUserInDatabase(user)
 
-                        scope.launch (Dispatchers.Main) {
+                        appCoroutineScope.launch (Dispatchers.Main) {
                             Snackbar.make(
                                 view,
                                 getString(R.string.success),
@@ -235,9 +247,8 @@ class EditContactActivity : BaseActivity() {
                 }
             ) {
                 if (it?.unauthorized == true) {
-                    XWikiHttp.relogin(
-                        this@EditContactActivity,
-                        accountName
+                    apiManager ?.xWikiHttp ?.relogin(
+                        this@EditContactActivity
                     )?.subscribe(
                         {
                             saveData(view, count + 1)
@@ -319,7 +330,7 @@ class EditContactActivity : BaseActivity() {
             rowId ?: return,
             splittedUserId ?: return
         ).also {
-            scope.launch (Dispatchers.Main) {
+            appCoroutineScope.launch (Dispatchers.Main) {
                 firstNameEditText.text.apply {
                     clear()
                     insert(0, it.firstName ?: "")
@@ -357,7 +368,7 @@ class EditContactActivity : BaseActivity() {
      * Disable all possible to add data (prohibit input)
      */
     private fun disableContainer() {
-        scope.launch (Dispatchers.Main) {
+        appCoroutineScope.launch (Dispatchers.Main) {
             container.isEnabled = false
             (0 until container.childCount).forEach {
                 container[it].isEnabled = false
@@ -369,7 +380,7 @@ class EditContactActivity : BaseActivity() {
      * Enable all possible to add data (permit input)
      */
     private fun enableContainer() {
-        scope.launch (Dispatchers.Main) {
+        appCoroutineScope.launch (Dispatchers.Main) {
             container.isEnabled = true
             (0 until container.childCount).forEach {
                 container[it].isEnabled = true
@@ -402,7 +413,7 @@ class EditContactActivity : BaseActivity() {
      * @see updateUserInDatabase
      */
     private fun manuallyUpdateUserInfo(view: View) {
-        scope.launch (Dispatchers.Main) {
+        appCoroutineScope.launch (Dispatchers.Main) {
             Snackbar.make(
                 view,
                 getString(R.string.syncContactInfoWithServer),
@@ -410,16 +421,16 @@ class EditContactActivity : BaseActivity() {
             ).show()
         }
         splittedUserId ?.let {
-            apiManager.xwikiServicesApi.getFullUserDetails(
+            apiManager ?.xwikiServicesApi ?.getFullUserDetails(
                 it[0],
                 it[1],
                 it[2]
-            ).subscribeOn(
+            ) ?.subscribeOn(
                 Schedulers.newThread()
-            ).subscribe(
+            ) ?.subscribe(
                 object : Observer<XWikiUserFull> {
                     override fun onError(e: Throwable?) {
-                        scope.launch (Dispatchers.Main) {
+                        appCoroutineScope.launch (Dispatchers.Main) {
                             Snackbar.make(
                                 view,
                                 e ?. message ?: getString(R.string.cantSyncContact),
@@ -432,7 +443,7 @@ class EditContactActivity : BaseActivity() {
                         t ?.let {
                             updateUserInDatabase(it)
 
-                            scope.launch (Dispatchers.Main) {
+                            appCoroutineScope.launch (Dispatchers.Main) {
                                 Snackbar.make(
                                     view,
                                     getString(R.string.success),

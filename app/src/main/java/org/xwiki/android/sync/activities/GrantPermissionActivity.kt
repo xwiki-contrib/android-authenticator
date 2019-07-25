@@ -29,9 +29,11 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.KEY_AUTH_TOKEN_TYPE
-import org.xwiki.android.sync.utils.getValue
 
 /**
  * A grant permission activity.
@@ -83,20 +85,24 @@ class GrantPermissionActivity : AccountAuthenticatorActivity() {
         addAuthorizedApp(packageName)
         val mAccountManager = AccountManager.get(applicationContext)
         val account = Account(accountName, ACCOUNT_TYPE)
-        val authToken = getValue(
-            appContext
-                .applicationContext
-                , COOKIE,
-                null)
-        mAccountManager.setAuthToken(account, authTokenType, authToken)
-        val intent = Intent()
-        intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)
-        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType)
-        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
-        intent.putExtra(SERVER_ADDRESS, currentBaseUrl())
-        setAccountAuthenticatorResult(intent.extras)
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+        appCoroutineScope.launch {
+            val userAccount = userAccountsRepo.findByAccountName(accountName.toString()) ?: return@launch
+            val accountServerUrl = userAccount.serverAddress
+            val id = userAccount.id
+            val authToken = userAccountsCookiesRepo[id]
+
+            withContext(Dispatchers.Main) {
+                mAccountManager.setAuthToken(account, authTokenType, authToken)
+                val intent = Intent()
+                intent.putExtra(AccountManager.KEY_AUTHTOKEN, authToken)
+                intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType)
+                intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+                intent.putExtra(SERVER_ADDRESS, accountServerUrl)
+                setAccountAuthenticatorResult(intent.extras)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            }
+        }
     }
 }
 

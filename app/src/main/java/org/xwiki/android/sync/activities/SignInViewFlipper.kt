@@ -26,16 +26,19 @@ import android.os.Handler
 import android.text.TextUtils
 import android.view.View
 import androidx.databinding.DataBindingUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.SERVER_ADDRESS
+import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
-import org.xwiki.android.sync.auth.PARAM_USER_SERVER
-import org.xwiki.android.sync.rest.XWikiHttp
+import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
+import org.xwiki.android.sync.resolveApiManager
+import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.increment
-import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 
 /**
@@ -79,10 +82,12 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         binding.signInButton.setOnClickListener {
             if (checkInput()) {
                 increment()
+                val signInJob = submit()
                 mActivity.showProgress(
-                    mContext.getText(R.string.sign_in_authenticating),
-                    submit()
-                )
+                    mContext.getText(R.string.sign_in_authenticating)
+                ) {
+                    signInJob.cancel()
+                }
             }
         }
     }
@@ -139,33 +144,50 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      *
      * @return Subscription which can be unsubscribed for preventing log in if user cancel it
      */
-    private fun submit(): Subscription {
+    private fun submit(): Job {
         val userName = accountName
         val userPass = accountPassword
 
-        return XWikiHttp.login(
-            userName,
-            userPass
-        )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { authtoken ->
-                    mActivity.hideProgress()
-                    if (authtoken == null) {
-                        showErrorMessage(mContext.getString(R.string.loginError))
-                    } else {
-                        signedIn(
-                            authtoken,
-                            userName,
-                            userPass
-                        )
-                    }
-                },
-                {
-                    mActivity.hideProgress()
-                    showErrorMessage(mContext.getString(R.string.loginError))
-                }
+        return appCoroutineScope.launch {
+            val user = userAccountsRepo.createAccount(
+                UserAccount(
+                    accountName,
+                    mActivity.serverUrl ?: return@launch
+                )
+            ) ?: let {
+                // Something went wrong, because we did not get user account
+                return@launch
+            }
+
+            val apiManager = resolveApiManager(user)
+            apiManager.xWikiHttp.login(
+                userName,
+                userPass
             )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { authtoken ->
+                        mActivity.hideProgress()
+                        if (authtoken == null) {
+                            showErrorMessage(mContext.getString(R.string.loginError))
+                        } else {
+                            signedIn(
+                                authtoken,
+                                userName,
+                                userPass
+                            )
+                        }
+                    },
+                    {
+                        mActivity.hideProgress()
+                        showErrorMessage(mContext.getString(R.string.loginError))
+
+                        launch {
+                            userAccountsRepo.deleteAccount(user)
+                        }
+                    }
+                )
+        }
     }
 
     /**
@@ -183,15 +205,12 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         username: String,
         password: String
     ): Intent {
-        val userServer = getValue(mContext, SERVER_ADDRESS, null)
-
         val accountType = mActivity.intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
 
         val data = Bundle()
         data.putString(AccountManager.KEY_ACCOUNT_NAME, username)
         data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType)
         data.putString(AccountManager.KEY_AUTHTOKEN, authtoken)
-        data.putString(PARAM_USER_SERVER, userServer)
         data.putString(PARAM_USER_PASS, password)
 
         val intent = Intent()
@@ -219,7 +238,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
             password
         )
 
-        mActivity.runOnUiThread {
+        appCoroutineScope.launch(Dispatchers.Main) {
             mActivity.hideProgress()
             mActivity.finishLogin(signedIn)
             mActivity.hideInputMethod()

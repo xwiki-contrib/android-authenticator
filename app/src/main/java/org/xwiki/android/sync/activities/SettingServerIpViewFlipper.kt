@@ -24,10 +24,7 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.SERVER_ADDRESS
 import org.xwiki.android.sync.auth.AuthenticatorActivity
-import org.xwiki.android.sync.utils.putValue
-
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -50,9 +47,10 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
      * Check typed server address and call sign in if all is ok.
      */
     override fun doNext() {
-        val serverAddress = checkInput()
-        if (serverAddress != null) {
-            putValue(mContext, SERVER_ADDRESS, serverAddress)
+        checkInput().let {
+            if (it != null) {
+                mActivity.serverUrl = it
+            }
         }
     }
 

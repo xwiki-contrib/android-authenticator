@@ -19,22 +19,37 @@
  */
 package org.xwiki.android.sync.rest
 
-import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.xwiki.android.sync.SERVER_ADDRESS
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.getValue
+import org.xwiki.android.sync.contactdb.UserAccountId
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 /**
  * Will help to contain and separate functionality of working with API
  *
+ * Base constructor which create [OkHttpClient] with [XWikiInterceptor] which will
+ * be used in [Retrofit] for correct handling of requests.
+ *
+ * @param baseURL Url which will be used as base for all requests in this manager. Can be:
+ *
+ *  * http://www.xwiki.org/xwiki/
+ *  * http://some.site.url/xwiki/
+ *  * http://123.231.213.132/xwiki/
+ *  * http://123.231.213.132:123456/xwiki/
+ *
+ * Strongly recommended to end url with
+ *
  * @version $Id: 5f6167ab1821c765e6c4f42549b4447481e37cbc $
  */
-class BaseApiManager {
+class BaseApiManager(
+    baseURL: String,
+    userAccountId: UserAccountId,
+    userAccountsCookiesRepository: UserAccountsCookiesRepository
+) {
 
     /**
      * Main services which provide work with auth, getting groups/users and other
@@ -47,36 +62,25 @@ class BaseApiManager {
     /**
      * Helper which work with downloading and managing of photos
      *
-     * @since 0.4
-     */
-    /**
      * @return [.xWikiPhotosManager]
      *
      * @since 0.4
      */
     val xWikiPhotosManager: XWikiPhotosManager
 
-    /**
-     * Base constructor which create [OkHttpClient] with [XWikiInterceptor] which will
-     * be used in [Retrofit] for correct handling of requests.
-     *
-     * @param baseURL Url which will be used as base for all requests in this manager. Can be:
-     *
-     *  * http://www.xwiki.org/xwiki/
-     *  * http://some.site.url/xwiki/
-     *  * http://123.231.213.132/xwiki/
-     *  * http://123.231.213.132:123456/xwiki/
-     *
-     * Strongly recommended to end url with **/
+    val xWikiHttp: XWikiHttp = XWikiHttp(this, userAccountId)
 
-    constructor(baseURL: String) {
+    init {
         var baseUrl = baseURL
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(XWikiInterceptor())
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository))
             .addInterceptor(loggingInterceptor)
             .build()
 
@@ -95,14 +99,6 @@ class BaseApiManager {
         xwikiServicesApi = initXWikiServices(retrofit)
         xWikiPhotosManager = initXWikiPhotosManager(okHttpClient, baseUrl)
     }
-
-    /**
-     * Additional constructor which will try to get base url from [SharedPrefsUtils] using
-     * context and [Constants.SERVER_ADDRESS] preference name
-     *
-     * @param context Will be used to get info from shared preferences
-     */
-    constructor(context: Context) : this(getValue(context, SERVER_ADDRESS, null)) {}
 
     /**
      * Create [XWikiServices] using given [Retrofit] instance

@@ -20,12 +20,12 @@
 package org.xwiki.android.sync.rest
 
 import android.text.TextUtils
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.xwiki.android.sync.*
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.getValue
-
+import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.contactdb.UserAccountId
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import java.io.IOException
 
 private const val HEADER_CONTENT_TYPE = "Content-type"
@@ -41,20 +41,10 @@ private const val CONTENT_TYPE = "application/json"
  *
  * @version $Id: 374209a130ca477ae567048f6f4a129ace2ea0d1 $
  */
-class XWikiInterceptor : Interceptor {
-
-    /**
-     * @return [SharedPrefsUtils.getValue] with key
-     * [Constants.COOKIE] and def value **empty string**
-     *
-     * @since 0.4
-     */
-    private val cookie: String
-        get() = getValue(
-            appContext.applicationContext,
-            COOKIE,
-            ""
-        )
+class XWikiInterceptor(
+    private val userAccountId: UserAccountId,
+    private val userAccountsCookiesRepository: UserAccountsCookiesRepository
+) : Interceptor {
 
     /**
      * Add query parameter **media=json**, headers [.HEADER_ACCEPT]=[.CONTENT_TYPE]
@@ -80,10 +70,14 @@ class XWikiInterceptor : Interceptor {
             .header(HEADER_ACCEPT, CONTENT_TYPE)
             .url(url)
 
-        val cookie = cookie
+        var cookie: String? = null
+
+        appCoroutineScope.launch {
+            cookie = userAccountsCookiesRepository[userAccountId]
+        }
 
         if (!TextUtils.isEmpty(cookie)) {
-            builder.addHeader(HEADER_COOKIE, cookie)
+            builder.addHeader(HEADER_COOKIE, cookie.toString())
         }
 
         val request = builder.build()

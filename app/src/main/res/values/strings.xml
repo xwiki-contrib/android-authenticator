@@ -77,7 +77,7 @@
     <string name="userExists">User exists</string>
     <string name="serverAddress">Server address</string>
     <string name="synchronizationType">Sync type</string>
-    <string name="syncTypeGetListErrorMessage">Something went wrong when we try to get list for current sync type</string>
+    <string name="syncTypeGetListErrorMessage">Something went wrong when we try to get table for current sync type</string>
     <string name="tryAgain">Try again</string>
     <string name="versionTemplate" formatted="false">Version %s</string>
     <string name="updateSuccess">Update successfully</string>

@@ -19,20 +19,19 @@
  */
 package org.xwiki.android.sync.activities
 
-import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.CheckBox
+import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.Nullable
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.SELECTED_GROUPS
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.putArrayList
-
-import java.util.ArrayList
+import org.xwiki.android.sync.utils.GroupsListChangeListener
 
 /**
  * [android.widget.Adapter] which can be used to show groups.
@@ -47,8 +46,10 @@ import java.util.ArrayList
  * @param groupList Initial group list
  */
 
-class GroupListAdapter(private val mContext: Context, private var groupList: List<XWikiGroup>)
-    : BaseAdapter() {
+class GroupListAdapter(
+    private var groupList: List<XWikiGroup>,
+    private var groupsListChangeListener: GroupsListChangeListener
+) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
 
     /**
      * List of selected items.
@@ -61,80 +62,49 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
     val selectGroups: List<XWikiGroup>
         get() = selected
 
-    /**
-     * @return Count of items
-     */
-    override fun getCount(): Int {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_group, parent, false)
+        return ViewHolder(itemView)
+    }
+
+    override fun getItemCount(): Int {
         return groupList.size
     }
 
-    /**
-     * @param position Position of object (must be 0 <= position < [.getCount]
-     * @return Object ([XWikiGroup] if be exactly)
-     */
-    override fun getItem(position: Int): XWikiGroup {
-        return groupList[position]
-    }
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        viewHolder.groupNameTextView.text = groupList[position].pageName
+        viewHolder.lastModifiedTime.text = groupList[position].lastModifiedDate.substring(0, 10)
+        viewHolder.versionTextView.text = groupList[position].wiki
+        viewHolder.checkBox.isChecked = selected.contains(groupList[position])
 
-    /**
-     * @param position Position of object (must be 0 <= position < [.getCount]
-     * @return position
-     */
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    /**
-     * Create and set up view.
-     *
-     * @param position Position of object (must be 0 <= position < [.getCount]
-     * @param convertView Old [View]
-     * @param parent Parent view where result will be placed
-     * @return Result [View]
-     */
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var convertView = convertView
-        val viewHolder: ViewHolder
-        if (convertView == null) {
-            val inflater = LayoutInflater.from(mContext)
-            convertView = inflater.inflate(R.layout.list_item_group, null)
-            viewHolder = ViewHolder(convertView!!)
-            convertView.tag = viewHolder
-        } else {
-            viewHolder = convertView.tag as ViewHolder
-        }
-
-        val group = getItem(position)
-        viewHolder.groupNameTextView.text = group.pageName
-        viewHolder.lastModifiedTime.text = group.lastModifiedDate.substring(0, 10)
-        viewHolder.versionTextView.text = group.wiki
-        viewHolder.checkBox.isChecked = selected.contains(group)
-
-        convertView.setOnClickListener {
+        viewHolder.contactContent.setOnClickListener {
             if (viewHolder.checkBox.isChecked) {
                 viewHolder.checkBox.isChecked = false
-                selected.remove(group)
+                selected.remove(groupList[position])
             } else {
                 viewHolder.checkBox.isChecked = true
-                selected.add(group)
+                selected.add(groupList[position])
             }
+            groupsListChangeListener.onChangeListener()
         }
+
 
         viewHolder.checkBox.setOnClickListener {
             if (viewHolder.checkBox.isChecked) {
-                selected.add(group)
+                selected.add(groupList[position])
             } else {
-                selected.remove(group)
+                selected.remove(groupList[position])
             }
+            groupsListChangeListener.onChangeListener()
         }
-        return convertView
     }
 
     /**
      * Init groups which was selected in previous time.
      */
-    private fun initSelectedGroup() {
-        val groupIds = getArrayList(mContext, SELECTED_GROUPS)
+    private fun initSelectedGroup(selectedGroups: MutableList<String>?) {
+        val groupIds = selectedGroups
         if (groupIds == null || groupIds.size == 0) {
             return
         }
@@ -149,14 +119,14 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
     /**
      * Save current state of selected groups for future use
      */
-    fun saveSelectedGroups() {
+    fun saveSelectedGroups(): MutableList<String> {
         val selectedStrings = ArrayList<String>()
 
         for (group in selected) {
             selectedStrings.add(group.id)
         }
 
-        putArrayList(mContext, SELECTED_GROUPS, selectedStrings)
+        return selectedStrings
     }
 
     /**
@@ -164,29 +134,62 @@ class GroupListAdapter(private val mContext: Context, private var groupList: Lis
      *
      * @param groups new list
      */
-    fun refresh(groups: List<XWikiGroup>) {
-        if (groupList != null && groupList != groups) {
-            groupList = groups
-        }
-        initSelectedGroup()
-        notifyDataSetChanged()
+    fun refresh(groups: List<XWikiGroup>, selectedGroups: MutableList<String>?) {
+        val diffResult = DiffUtil.calculateDiff(GroupListDiffUtilCallBack(groups, groupList))
+        diffResult.dispatchUpdatesTo(this)
+        groupList = listOf()
+        this.groupList = groups
+        initSelectedGroup(selectedGroups)
+        groupsListChangeListener.onChangeListener()
     }
 
     /**
      * Help view holder class.
      */
-    private class ViewHolder(view: View) {
+     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val groupNameTextView: TextView
         val lastModifiedTime: TextView
         val versionTextView: TextView
         val checkBox: CheckBox
+        val contactContent : RelativeLayout
 
         init {
-            groupNameTextView = view.findViewById(R.id.groupName)
-            lastModifiedTime = view.findViewById(R.id.lastModifiedTime)
-            versionTextView = view.findViewById(R.id.version)
-            checkBox = view.findViewById(R.id.checkbox)
+            groupNameTextView = itemView.findViewById(R.id.groupName)
+            lastModifiedTime = itemView.findViewById(R.id.lastModifiedTime)
+            versionTextView = itemView.findViewById(R.id.version)
+            checkBox = itemView.findViewById(R.id.checkbox)
+            contactContent = itemView.findViewById(R.id.contact_content)
         }
     }
 
+    class GroupListDiffUtilCallBack(internal var newList: List<XWikiGroup>, internal var oldList: List<XWikiGroup>) :
+        DiffUtil.Callback() {
+
+        override fun getOldListSize() = oldList.size
+
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newList[newItemPosition].id.equals(oldList[oldItemPosition].id)
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newList[newItemPosition].id.equals(oldList[oldItemPosition].id)
+        }
+
+        @Nullable
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            val newModel = newList[newItemPosition]
+            val oldModel = oldList[oldItemPosition]
+
+            val diff = Bundle()
+
+            if (newModel.id !== oldModel.id) {
+                diff.putString("guid", newModel.id)
+            }
+            return if (diff.size() == 0) {
+                null
+            } else diff
+        }
+    }
 }

@@ -1,48 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/contact_content"
-    android:layout_width="fill_parent"
-    android:layout_height="60dip"
-    android:background="@drawable/list_item_selector"
-    android:descendantFocusability="blocksDescendants">
+                android:id="@+id/contact_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/list_item_selector"
+                android:descendantFocusability="blocksDescendants">
 
     <TextView
-        android:id="@+id/groupName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dip"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Admin"
-        android:textSize="20sp" />
+            android:id="@+id/groupName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="10dip"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="start"
+            android:text="Admin"
+            android:textSize="18sp"
+            android:layout_toStartOf="@id/checkbox"
+            android:layout_marginStart="6dp"
+            android:layout_toLeftOf="@id/checkbox"/>
 
     <TextView
-        android:id="@+id/version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/groupName"
-        android:layout_below="@id/groupName"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dip"
-        android:text="creator:xwiki" />
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/groupName"
+            android:layout_below="@id/groupName"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dip"
+            android:text="creator:xwiki"
+            android:layout_alignStart="@id/groupName"/>
 
     <TextView
-        android:id="@+id/lastModifiedTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/version"
-        android:layout_marginRight="60dp"
-        android:text="Last update:2015.06.03" />
+            android:id="@+id/lastModifiedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/checkbox"
+            android:layout_alignTop="@id/version"
+            android:text="Last update:2015.06.03"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/checkbox"
+            android:layout_marginEnd="8dp"/>
 
     <CheckBox
-        android:id="@+id/checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:focusable="false" />
+            android:id="@+id/checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:focusable="false"
+            android:layout_marginEnd="5dp"
+            android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

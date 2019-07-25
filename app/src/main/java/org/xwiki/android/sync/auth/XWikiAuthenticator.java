@@ -38,6 +38,8 @@ import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.sync.AppContextKt.*;
 import static org.xwiki.android.sync.ConstantsKt.*;
 import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.*;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserAccountByAccountName;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserServer;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
 
 /**
@@ -162,7 +164,9 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 authToken[0] = null;
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 final Object sync = new Object();
-                getApiManager().getXwikiServicesApi().login(
+                resolveApiManager(
+                        getUserAccountByAccountName(accountName)
+                ).getXwikiServicesApi().login(
                         Credentials.basic(accountName, accountPassword)
                 ).subscribe(
                         new Action1<Response<ResponseBody>>() {
@@ -203,7 +207,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
             result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
             result.putString(AccountManager.KEY_AUTHTOKEN, authToken[0]);
-            result.putString(SERVER_ADDRESS, currentBaseUrl());
+            result.putString(SERVER_ADDRESS, getUserServer(account.name));
             return result;
         }
     }
@@ -277,8 +281,7 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
     }
 
     /**
-     * Refresh auth tokens for all packages which can be got by field
-     * {@link PACKAGE_LIST}.
+     * Refresh auth tokens for all packages which can be got by field PACKAGE_LIST.
      */
     public static void refreshAllAuthTokenType(
         AccountManager am,

@@ -19,50 +19,79 @@
  */
 package org.xwiki.android.sync
 
+import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.facebook.stetho.Stetho
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import org.xwiki.android.sync.contactdb.AppDatabase
+import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.UserAccountId
+import org.xwiki.android.sync.contactdb.abstracts.AllUsersCacheRepository
+import org.xwiki.android.sync.contactdb.abstracts.GroupsCacheRepository
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsRepository
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOAllUsersCacheRepository
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOGroupsCacheRepository
+import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.SharedPrefsUtils
-import org.xwiki.android.sync.utils.StringUtils.validServerAddress
+import org.xwiki.android.sync.utils.enableDetectingOfAccountsRemoving
 import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.getValue
 import org.xwiki.android.sync.utils.putArrayList
-
-import java.util.AbstractMap
-import java.util.ArrayList
+import java.util.*
 
 /**
- * Application class for authenticator
- *
- * @version $Id: c3a5996b1bce14d5c105a55f085115347c39c035 $
+ * Instance of context to use it in static methods
+ * @return known AppContext instance
  */
+lateinit var appContext: Context
+    private set
 
+lateinit var userAccountsRepo: UserAccountsRepository
+    private set
+lateinit var allUsersCacheRepository: AllUsersCacheRepository
+    private set
+lateinit var groupsCacheRepository: GroupsCacheRepository
+    private set
+lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
+    private set
 
-/**
- * Entry pair Server address - Base Api Manager
- */
-private lateinit var baseApiManager: Pair<String, BaseApiManager>
+private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
+
+fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
+    BaseApiManager(serverAddress, userAccountId, userAccountsCookiesRepo)
+}
+
+fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
+    userAccount.serverAddress, userAccount.id
+)
+
+private fun initRepos(context: AppContext) {
+    val appDatabase = AppDatabase.getInstance(context)
+    userAccountsCookiesRepo = SharedPreferencesUserAccountsCookiesRepository(context)
+    allUsersCacheRepository = DAOAllUsersCacheRepository(
+        appDatabase.allUsersCacheDao()
+    )
+    groupsCacheRepository = DAOGroupsCacheRepository(
+        appDatabase.groupsCacheDao()
+    )
+    userAccountsRepo = DAOUserAccountsRepository(
+        appDatabase.usersDao(),
+        groupsCacheRepository,
+        allUsersCacheRepository,
+        userAccountsCookiesRepo
+    )
+}
 
 /**
  * Logging tag
  */
 private const val TAG = "AppContext"
 
-/**
- * Instance of context to use it in static methods
- * @return known AppContext instance
- */
-
-lateinit var appContext: Context
-    private set
-
-/**
- * @return actual base url
- */
-fun currentBaseUrl(): String {
-   return validServerAddress(getValue(appContext, SERVER_ADDRESS, "localhost:8080"))
-}
+val appCoroutineScope = CoroutineScope(Dispatchers.Default)
 
 /**
  * Add app as authorized
@@ -93,24 +122,7 @@ fun isAuthorizedApp(packageName: String): Boolean {
     return packageList != null && packageList.contains(packageName)
 }
 
-/**
- * @return Current [.baseApiManager] value or create new and return
- *
- * @since 0.4
- */
-val apiManager : BaseApiManager
-    get() {
-        val url = currentBaseUrl()
-        val manager = try {
-            baseApiManager
-        } catch (e: UninitializedPropertyAccessException) {
-            baseApiManager = url to BaseApiManager(url)
-            baseApiManager
-        }
-        return manager.second
-    }
-
-open class AppContext : Application() {
+class AppContext : Application() {
 
     /**
      * Set [.instance] to this object.
@@ -118,6 +130,9 @@ open class AppContext : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = this
+        initRepos(this)
+        AccountManager.get(this).enableDetectingOfAccountsRemoving()
         Log.d(TAG, "on create")
+        Stetho.initializeWithDefaults(this)
     }
 }

@@ -34,19 +34,23 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
-import org.xwiki.android.sync.utils.*
+import org.xwiki.android.sync.utils.PermissionsUtils
+import org.xwiki.android.sync.utils.decrement
+import org.xwiki.android.sync.utils.openLink
+import org.xwiki.android.sync.utils.removeKeyValue
 import rx.Subscription
 import java.lang.reflect.InvocationTargetException
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Tag which will be used for logging
@@ -103,8 +107,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
-    var isTestRunning : Boolean = false
+    var isTestRunning: Boolean = false
 
+    var serverUrl: String? = null
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -168,13 +173,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
          isTestRunning = intent.getBooleanExtra("Test", false)
 
-        if (!isTestRunning) {
-            if (availableAccounts.size > 0) {
-                Toast.makeText(this, "The user already exists!", Toast.LENGTH_SHORT).show()
-                finish()
-                return
-            }
-        }
         showViewFlipper(position)
     }
 
@@ -258,7 +256,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      * @param view View which trigger action
      */
     fun signUp(view: View) {
-        var url = currentBaseUrl()
+        var url = XWIKI_DEFAULT_SERVER_ADDRESS
         if (url.endsWith("/")) {
             url += "bin/view/XWiki/Registration"
         } else {
@@ -355,12 +353,13 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         Log.d(TAG, "> finishLogin")
 
         //before add new account, clear old account data.
-        clearOldAccount()
+//        clearOldAccount()
 
         //get values
         val accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
-        val accountServer = intent.getStringExtra(PARAM_USER_SERVER)
+        val accountServer = serverUrl
+        val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
@@ -370,6 +369,15 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
+
+        appCoroutineScope.launch {
+            userAccountsRepo.createAccount(
+                UserAccount(
+                    accountName,
+                    accountServer.toString()
+                )
+            )
+        }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
         val packaName = getIntent().getStringExtra(PARAM_APP_PACKAGENAME)
@@ -392,10 +400,13 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         setAccountAuthenticatorResult(intentReturn.extras)
         setResult(Activity.RESULT_OK, intentReturn)
         Log.d(TAG, ">" + "finish return")
-        finish()
+        val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
+        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
         startActivity(
-            Intent(this, SyncSettingsActivity::class.java)
+            syncActivityIntent
         )
+        finish()
     }
 
     /**
@@ -407,7 +418,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      *
      * @since 0.4.2
      */
-    fun showProgress(message: CharSequence, subscription: Subscription) {
+    fun showProgress(message: CharSequence, cancelCallback: () -> Unit) {
         // To avoid repeatedly create
         if (mProgressDialog != null && mProgressDialog!!.isShowing) {
             return
@@ -418,7 +429,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         dialog.setCancelable(true)
         dialog.setOnCancelListener {
             Log.i(TAG, "user cancelling authentication")
-            subscription.unsubscribe()
+            cancelCallback()
         }
         // We save off the progress dialog in a field so that we can dismiss
         // it later.

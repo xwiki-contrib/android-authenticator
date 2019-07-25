@@ -19,16 +19,17 @@
  */
 package org.xwiki.android.sync.activities
 
-import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.annotation.Nullable
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.ObjectSummary
-import org.xwiki.android.sync.bean.SearchResult
 
 /**
  * [android.widget.Adapter] which can be used to show [SearchResult] as users.
@@ -43,59 +44,37 @@ import org.xwiki.android.sync.bean.SearchResult
  * @param searchResults Initial list
  */
 
-class UserListAdapter(private val mContext: Context, private var searchResults: List<ObjectSummary>)
-    : BaseAdapter() {
+class UserListAdapter(private var searchResults: List<ObjectSummary>)
+    : RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
-    /**
-     * @return Size of [.searchResults]
-     */
-    override fun getCount(): Int {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_group, parent, false)
+        return ViewHolder(itemView)
+    }
+
+    override fun getItemCount(): Int {
         return searchResults.size
     }
 
-    /**
-     * @param position Position of item
-     * @return Item fron [.searchResults] by position
-     */
-    override fun getItem(position: Int): ObjectSummary {
-        return searchResults[position]
-    }
-
-    /**
-     * @param position Position of item
-     * @return position
-     */
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    /**
-     * Prepare and return view.
-     *
-     * @param position Position of item
-     * @param convertView Previous [View]
-     * @param parent Parent where view will be placed
-     * @return Result view
-     */
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var convertView = convertView
-        val viewHolder: ViewHolder
-        if (convertView == null) {
-            val inflater = LayoutInflater.from(mContext)
-            convertView = inflater.inflate(R.layout.list_item_group, null)
-            viewHolder = ViewHolder(convertView!!)
-            convertView.tag = viewHolder
-        } else {
-            viewHolder = convertView.tag as ViewHolder
-        }
-
-        val item = getItem(position)
-        viewHolder.groupNameTextView.text = item.pageName
-        viewHolder.versionTextView.text = item.wiki
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        viewHolder.groupNameTextView.text = searchResults.get(position).pageName
+        viewHolder.versionTextView.text = searchResults.get(position).wiki
         viewHolder.checkBox.visibility = View.INVISIBLE
-        convertView.setOnClickListener(null)
+    }
 
-        return convertView
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val o = payloads[0] as Bundle
+            for (key in o.keySet()) {
+                if (key == "guid") {
+                    holder.groupNameTextView.setText(searchResults.get(position).pageName)
+                    holder.versionTextView.setText(searchResults.get(position).wiki)
+                }
+            }
+        }
     }
 
     /**
@@ -104,27 +83,57 @@ class UserListAdapter(private val mContext: Context, private var searchResults: 
      * @param results New list
      */
     fun refresh(results: List<ObjectSummary>) {
-        if (searchResults != null && searchResults != results) {
-            searchResults = results
-        }
-        notifyDataSetChanged()
+        val diffResult = DiffUtil.calculateDiff(UserListDiffUtilCallBack(results, searchResults))
+        diffResult.dispatchUpdatesTo(this)
+        searchResults = listOf()
+        this.searchResults = results
     }
 
     /**
      * Help ViewHolder.
      */
-    private class ViewHolder(view: View) {
+    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val groupNameTextView: TextView
         val lastModifiedTime: TextView
         val versionTextView: TextView
         val checkBox: CheckBox
 
         init {
-            groupNameTextView = view.findViewById(R.id.groupName)
-            lastModifiedTime = view.findViewById(R.id.lastModifiedTime)
-            versionTextView = view.findViewById(R.id.version)
-            checkBox = view.findViewById(R.id.checkbox)
+            groupNameTextView = itemView.findViewById(R.id.groupName)
+            lastModifiedTime = itemView.findViewById(R.id.lastModifiedTime)
+            versionTextView = itemView.findViewById(R.id.version)
+            checkBox = itemView.findViewById(R.id.checkbox)
         }
     }
 
+    class UserListDiffUtilCallBack(internal var newList: List<ObjectSummary>, internal var oldList: List<ObjectSummary>) :
+        DiffUtil.Callback() {
+
+        override fun getOldListSize() = oldList.size
+
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newList[newItemPosition].id.equals(oldList[oldItemPosition].id)
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newList[newItemPosition].id.equals(oldList[oldItemPosition].id)
+        }
+
+        @Nullable
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            val newModel = newList[newItemPosition]
+            val oldModel = oldList[oldItemPosition]
+
+            val diff = Bundle()
+
+            if (newModel.guid !== oldModel.guid) {
+                diff.putString("guid", newModel.guid)
+            }
+            return if (diff.size() == 0) {
+                null
+            } else diff
+        }
+    }
 }

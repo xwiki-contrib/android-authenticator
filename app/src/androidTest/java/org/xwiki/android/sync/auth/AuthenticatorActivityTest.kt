@@ -7,19 +7,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.AUTHTOKEN_TYPE_FULL_ACCESS
-import org.xwiki.android.sync.appContext
-import org.junit.Before
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.filters.MediumTest
-import org.junit.After
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.utils.idlingResource
 
 /**
