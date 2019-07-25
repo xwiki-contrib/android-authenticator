@@ -461,7 +461,6 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
-                Toast.makeText(this, getString(R.string.unchangedSettings), Toast.LENGTH_LONG).show()
                 return
             }
 
