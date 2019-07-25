@@ -20,6 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.XWIKI_DEFAULT_SERVER_ADDRESS
 import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
@@ -48,7 +49,7 @@ open class SyncSettingsActivityTest : LifecycleObserver {
 
         val user = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
 
         userDao.insertAccount(user)

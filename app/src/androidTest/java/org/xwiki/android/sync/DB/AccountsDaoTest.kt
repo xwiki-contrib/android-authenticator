@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.xwiki.android.sync.XWIKI_DEFAULT_SERVER_ADDRESS
 import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.dao.AccountsDao
@@ -50,7 +51,7 @@ class AccountsDaoTest {
     fun insertAndGetUser() = runBlocking {
         val user = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
         accountsDao.insertAccount(user)
         val allUsers = accountsDao.getAllAccount()
@@ -62,12 +63,12 @@ class AccountsDaoTest {
     fun getAllUsers() = runBlocking {
         val user1 = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
         accountsDao.insertAccount(user1)
         val user2 = UserAccount(
             "testUser2",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
         accountsDao.insertAccount(user2)
         val allUsers = accountsDao.getAllAccount()
@@ -80,12 +81,12 @@ class AccountsDaoTest {
     fun deleteAllUsers() = runBlocking {
         val user1 = UserAccount(
             "testUser1",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
         accountsDao.insertAccount(user1)
         val user2 = UserAccount(
             "testUser2",
-            "https://www.xwiki.org/xwiki"
+            XWIKI_DEFAULT_SERVER_ADDRESS
         )
         accountsDao.insertAccount(user2)
         accountsDao.deleteUser("testUser1")
