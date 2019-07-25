@@ -17,8 +17,15 @@ class SharedPreferencesUserAccountsCookiesRepository(
         return sharedPreferences.getString(id.toString(), null)
     }
 
-    override fun set(id: UserAccountId, cookies: String) {
+    override fun set(id: UserAccountId, cookies: String?) {
         val sp = sharedPreferences
-        sp.edit().putString(id.toString(), cookies).apply()
+
+        val edit = sp.edit().apply {
+            cookies ?.let {
+                putString(id.toString(), it)
+            } ?: remove(id.toString())
+        }
+
+        edit.apply()
     }
 }

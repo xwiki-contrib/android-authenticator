@@ -10,7 +10,7 @@ class DAOGroupsCacheRepository(
     private val groupsCacheDao: GroupsCacheDao
 ) : GroupsCacheRepository {
     override fun get(id: UserAccountId): List<XWikiGroup>? = groupsCacheDao[id] ?.groupsList
-    override fun set(id: UserAccountId, groups: List<XWikiGroup>) {
+    override fun set(id: UserAccountId, groups: List<XWikiGroup>?) {
         groupsCacheDao[id] = groups
     }
 }

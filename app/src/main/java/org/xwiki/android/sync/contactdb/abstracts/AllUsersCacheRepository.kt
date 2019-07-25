@@ -5,5 +5,5 @@ import org.xwiki.android.sync.contactdb.UserAccountId
 
 interface AllUsersCacheRepository {
     operator fun get(id: UserAccountId): List<ObjectSummary>?
-    operator fun set(id: UserAccountId, objects: List<ObjectSummary>)
+    operator fun set(id: UserAccountId, objects: List<ObjectSummary>?)
 }

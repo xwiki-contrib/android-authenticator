@@ -10,7 +10,7 @@ class DAOAllUsersCacheRepository(
     private val allUsersCacheDao: AllUsersCacheDao
 ) : AllUsersCacheRepository {
     override fun get(id: UserAccountId): List<ObjectSummary>? = allUsersCacheDao[id] ?.allUsersList
-    override fun set(id: UserAccountId, objects: List<ObjectSummary>) {
+    override fun set(id: UserAccountId, objects: List<ObjectSummary>?) {
         allUsersCacheDao[id] = objects
     }
 }

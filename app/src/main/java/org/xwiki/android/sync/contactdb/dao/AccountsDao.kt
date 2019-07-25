@@ -1,10 +1,7 @@
 package org.xwiki.android.sync.contactdb.dao
 
 import androidx.room.*
-import org.xwiki.android.sync.contactdb.UserAccount
-import org.xwiki.android.sync.contactdb.UserAccountAccountNameColumn
-import org.xwiki.android.sync.contactdb.UserAccountId
-import org.xwiki.android.sync.contactdb.UserAccountIdColumn
+import org.xwiki.android.sync.contactdb.*
 
 @Dao
 interface AccountsDao {
@@ -25,4 +22,7 @@ interface AccountsDao {
 
     @Query ("DELETE FROM USER_TABLE WHERE $UserAccountIdColumn = :userAccountId")
     fun deleteUser(userAccountId: UserAccountId)
+
+    @Query ("SELECT $UserAccountIdColumn FROM USER_TABLE WHERE $UserAccountServerAddressColumn = :serverUrl")
+    fun oneServerAccounts(serverUrl: String): List<UserAccountId>
 }

@@ -72,14 +72,17 @@ fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiMana
 private fun initRepos(context: AppContext) {
     val appDatabase = AppDatabase.getInstance(context)
     userAccountsCookiesRepo = SharedPreferencesUserAccountsCookiesRepository(context)
-    userAccountsRepo = DAOUserAccountsRepository(
-        appDatabase.usersDao()
-    )
     allUsersCacheRepository = DAOAllUsersCacheRepository(
         appDatabase.allUsersCacheDao()
     )
     groupsCacheRepository = DAOGroupsCacheRepository(
         appDatabase.groupsCacheDao()
+    )
+    userAccountsRepo = DAOUserAccountsRepository(
+        appDatabase.usersDao(),
+        groupsCacheRepository,
+        allUsersCacheRepository,
+        userAccountsCookiesRepo
     )
 }
 
