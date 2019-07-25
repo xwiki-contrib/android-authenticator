@@ -517,6 +517,9 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         val newList = mGroupAdapter.selectGroups
         //old
         val oldList = userAccount.selectedGroupsList
+        if (newList.isEmpty() && oldList.isEmpty()) {
+            return false
+        }
         if (newList.size != oldList.size) {
             return false
         } else {
