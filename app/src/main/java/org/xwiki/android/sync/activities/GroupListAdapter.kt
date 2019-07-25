@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.bean.XWikiGroup
+import org.xwiki.android.sync.utils.GroupsListChangeListener
 
 /**
  * [android.widget.Adapter] which can be used to show groups.
@@ -46,7 +47,8 @@ import org.xwiki.android.sync.bean.XWikiGroup
  */
 
 class GroupListAdapter(
-    private var groupList: List<XWikiGroup>
+    private var groupList: List<XWikiGroup>,
+    private var groupsListChangeListener: GroupsListChangeListener
 ) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
 
     /**
@@ -84,6 +86,7 @@ class GroupListAdapter(
                 viewHolder.checkBox.isChecked = true
                 selected.add(groupList[position])
             }
+            groupsListChangeListener.onChangeListener()
         }
 
 
@@ -93,6 +96,7 @@ class GroupListAdapter(
             } else {
                 selected.remove(groupList[position])
             }
+            groupsListChangeListener.onChangeListener()
         }
     }
 
@@ -136,6 +140,7 @@ class GroupListAdapter(
         groupList = listOf()
         this.groupList = groups
         initSelectedGroup(selectedGroups)
+        groupsListChangeListener.onChangeListener()
     }
 
     /**

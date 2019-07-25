@@ -28,9 +28,11 @@ import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.contactdb.*
+import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
+import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.getAppVersionName
 import org.xwiki.android.sync.utils.increment
@@ -80,7 +82,7 @@ private fun openAppMarket(context: Context) {
     }
 }
 
-class SyncSettingsActivity : BaseActivity() {
+class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     /**
      * DataBinding for accessing layout variables.
@@ -165,7 +167,7 @@ class SyncSettingsActivity : BaseActivity() {
             currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
 
-        mGroupAdapter = GroupListAdapter(groups)
+        mGroupAdapter = GroupListAdapter(groups, this)
         mUsersAdapter = UserListAdapter(allUsers)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = mUsersAdapter
@@ -525,6 +527,16 @@ class SyncSettingsActivity : BaseActivity() {
                 }
             }
             return true
+        }
+    }
+
+    override fun onChangeListener() {
+        if (compareSelectGroups()) {
+            binding.nextButton.isClickable = false
+            binding.nextButton.alpha = 0.8F
+        } else {
+            binding.nextButton.isClickable = true
+            binding.nextButton.alpha = 1F
         }
     }
 }
