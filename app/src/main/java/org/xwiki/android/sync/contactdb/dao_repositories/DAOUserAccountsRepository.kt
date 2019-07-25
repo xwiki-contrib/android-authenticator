@@ -19,7 +19,7 @@ class DAOUserAccountsRepository (
         accountsDao.updateUser(userAccount)
     }
 
-    override suspend fun deleteAccount(userAccountName: String) {
-        accountsDao.deleteUser(userAccountName)
+    override suspend fun deleteAccount(id: UserAccountId) {
+        accountsDao.deleteUser(id)
     }
 }

@@ -34,6 +34,7 @@ import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.decrement
@@ -178,6 +179,10 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                     {
                         mActivity.hideProgress()
                         showErrorMessage(mContext.getString(R.string.loginError))
+
+                        launch {
+                            userAccountsRepo.deleteAccount(user)
+                        }
                     }
                 )
         }
