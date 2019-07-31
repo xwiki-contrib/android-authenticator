@@ -23,7 +23,6 @@ import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.facebook.stetho.Stetho
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.xwiki.android.sync.contactdb.AppDatabase
@@ -133,6 +132,5 @@ class AppContext : Application() {
         initRepos(this)
         AccountManager.get(this).enableDetectingOfAccountsRemoving()
         Log.d(TAG, "on create")
-        Stetho.initializeWithDefaults(this)
     }
 }

@@ -75,9 +75,4 @@ dependencies {
     // Optional -- UI testing with Espresso
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
-
-    // https://mvnrepository.com/artifact/org.xwiki.platform/xwiki-platform-distribution-flavor-data-hsqldb
-//    implementation "org.xwiki.platform:xwiki-platform-distribution-flavor-data-hsqldb:11.4"
-
-    implementation 'com.facebook.stetho:stetho:1.5.1'
 }
