@@ -75,4 +75,9 @@ dependencies {
     // Optional -- UI testing with Espresso
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+
+    implementation 'com.google.oauth-client:google-oauth-client:1.22.0'
+    implementation 'com.google.http-client:google-http-client-jackson2:1.22.0'
+
+    implementation 'com.facebook.stetho:stetho:1.5.1'
 }

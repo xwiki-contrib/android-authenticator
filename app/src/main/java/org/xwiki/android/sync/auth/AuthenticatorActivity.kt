@@ -43,6 +43,8 @@ import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
 import org.xwiki.android.sync.activities.SignInViewFlipper
 import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
+import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.decrement
@@ -107,9 +109,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     private var mProgressDialog: Dialog? = null
 
-    var isTestRunning: Boolean = false
+    var isTestRunning = false
 
     var serverUrl: String? = null
+
+    var addNewAccount = false
 
     /**
      * Contains order of flippers in authorisation progress.
@@ -171,7 +175,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
         position = 0
 
-         isTestRunning = intent.getBooleanExtra("Test", false)
+        isTestRunning = intent.getBooleanExtra("Test", false)
+        addNewAccount = intent.getBooleanExtra(ADD_NEW_ACCOUNT, false)
 
         showViewFlipper(position)
     }
@@ -361,6 +366,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val accountServer = serverUrl
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
 
+        val userAccountsCookiesRepo: UserAccountsCookiesRepository = SharedPreferencesUserAccountsCookiesRepository(appContext)
+
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
         Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE))
@@ -377,6 +384,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                     accountServer.toString()
                 )
             )
+            userAccountsCookiesRepo.set(userAccountsRepo.findByAccountName(accountName)!!.id, cookie)
         }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
@@ -400,13 +408,20 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         setAccountAuthenticatorResult(intentReturn.extras)
         setResult(Activity.RESULT_OK, intentReturn)
         Log.d(TAG, ">" + "finish return")
-        val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
-        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
-        syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
-        startActivity(
-            syncActivityIntent
-        )
-        finish()
+
+        if (addNewAccount) {
+            val i = Intent()
+            i.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+            setResult(REQUEST_NEW_ACCOUNT, i)
+        } else {
+            val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
+            syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+            syncActivityIntent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
+            startActivity(
+                syncActivityIntent
+            )
+            finish()
+        }
     }
 
     /**

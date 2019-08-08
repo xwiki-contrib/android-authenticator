@@ -66,6 +66,25 @@
 
         <activity android:name=".activities.SelectAccountActivity"/>
 
+        <activity android:name=".activities.OIDC.OIDCActivity"
+                  android:excludeFromRecents="true"
+                  android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.OIDC.OIDCAuthenticatorActivity"
+                  android:noHistory="true"
+                  android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="xwiki" android:host="oidc"/>
+            </intent-filter>
+        </activity>
+
         <provider
             android:name=".syncadapter.EmptyProvider"
             android:authorities="org.xwiki.android.sync"

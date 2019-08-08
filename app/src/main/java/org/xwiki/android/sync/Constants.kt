@@ -30,6 +30,14 @@ const val ACCOUNT_TYPE = "org.xwiki.android.sync"
 const val ACCOUNT_NAME = "XWiki"
 const val USERDATA_SERVER = "XWIKI_SERVER"
 
+const val ADD_NEW_ACCOUNT = "ADD_NEW_ACCOUNT"
+const val REQUEST_ACCESS_TOKEN = 1
+const val REQUEST_NEW_ACCOUNT = 2
+
+const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
+const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
+const val REDIRECT_URI = "xwiki://oidc"
+
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
 /**

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/llOIDCAccountItem"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:paddingTop="8dp"
+              android:paddingBottom="8dp"
+              android:layout_height="48dp">
+
+    <ImageView
+            android:layout_width="@dimen/viewDefaultExtraLargeSize"
+            android:layout_height="@dimen/viewDefaultExtraLargeSize"
+            android:layout_gravity="center"
+            android:background="@mipmap/ic_launcher"/>
+
+    <TextView
+            android:id="@+id/tvOIDCAccountName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/textDefaultSmallSize"
+            android:layout_marginStart="@dimen/viewDefaultLargeSize"
+            android:layout_marginLeft="@dimen/viewDefaultLargeSize"/>
+
+</LinearLayout>
