@@ -10,9 +10,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
@@ -24,7 +27,6 @@ import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
-import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
@@ -33,10 +35,7 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.GroupsListChangeListener
-import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.getAppVersionName
-import org.xwiki.android.sync.utils.increment
+import org.xwiki.android.sync.utils.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -83,7 +82,7 @@ private fun openAppMarket(context: Context) {
     }
 }
 
-class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
+class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     /**
      * DataBinding for accessing layout variables.
@@ -147,9 +146,13 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     private var initialUsersListLoading = true
 
-    var currentPage = 0
+    private var currentPage = 0
 
-    var lastVisiblePosition = 0
+    private var lastVisiblePosition = 0
+
+    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
+
+    private lateinit var dataSavingCheckbox: MenuItem
 
     /**
      * Init all views and other activity objects
@@ -177,6 +180,9 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
             currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
             currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
+
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         mGroupAdapter = GroupListAdapter(groups, this)
         mUsersAdapter = UserListAdapter(allUsers, this)
@@ -206,6 +212,37 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.sync_setting_view_menu, menu)
+        dataSavingCheckbox = menu!!.findItem(R.id.action_data_saving)
+
+        val dataSaving = getValue(this, "data_saving", false)
+
+        if (dataSaving) {
+            dataSavingCheckbox.setChecked(true)
+        } else {
+            dataSavingCheckbox.setChecked(false)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_data_saving -> {
+                if (item.isChecked) {
+                    item.setChecked(false)
+                    putValue(this, "data_saving", false)
+                } else {
+                    item.setChecked(true)
+                    putValue(this, "data_saving", true)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
