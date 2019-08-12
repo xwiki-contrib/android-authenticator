@@ -149,6 +149,8 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     var currentPage = 0
 
+    var lastVisiblePosition = 0
+
     /**
      * Init all views and other activity objects
      *
@@ -186,6 +188,7 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 chosenSyncType = position
+                initialUsersListLoading = true
                 updateListView(false)
             }
 
@@ -207,18 +210,13 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     private val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
 
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                val totalItemCount = layoutManager.itemCount
 
-            val visibleItemCount = layoutManager.childCount
-            val totalItemCount = layoutManager.itemCount
-            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-
-            if (!isLoading) {
-
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                    && firstVisibleItemPosition >= 0
-                    && totalItemCount >= PAGE_SIZE) {
+                if (!isLoading && layoutManager.findLastCompletelyVisibleItemPosition() >= totalItemCount/2) {
+                    lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
                     loadMoreUsers()
                 }
             }
@@ -252,7 +250,7 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     fun scrollToCurrentPosition() {
         if (!initialUsersListLoading) {
-            binding.recyclerView.scrollToPosition(mUsersAdapter.itemCount - PAGE_SIZE - 3)
+            binding.recyclerView.scrollToPosition(lastVisiblePosition - 3)
         }
     }
 
