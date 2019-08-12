@@ -53,7 +53,7 @@ class UserPayload : Parcelable {
         dest.writeString(this.phone)
     }
 
-    constructor() {}
+    constructor()
 
     protected constructor(`in`: Parcel) {
         this.className = `in`.readString()

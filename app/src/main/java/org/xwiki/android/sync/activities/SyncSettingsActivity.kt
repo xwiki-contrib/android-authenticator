@@ -17,6 +17,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,6 +141,14 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     private lateinit var context: LifecycleOwner
 
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private var isLoading = false
+
+    private var initialUsersListLoading = true
+
+    var currentPage = 0
+
     /**
      * Init all views and other activity objects
      *
@@ -168,9 +177,11 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         }
 
         mGroupAdapter = GroupListAdapter(groups, this)
-        mUsersAdapter = UserListAdapter(allUsers)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        mUsersAdapter = UserListAdapter(allUsers, this)
+        layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = mUsersAdapter
+        binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -192,6 +203,57 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
+    }
+
+    private val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val visibleItemCount = layoutManager.childCount
+            val totalItemCount = layoutManager.itemCount
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+            if (!isLoading) {
+
+                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                    && firstVisibleItemPosition >= 0
+                    && totalItemCount >= PAGE_SIZE) {
+                    loadMoreUsers()
+                }
+            }
+        }
+    }
+
+    private fun loadMoreUsers () {
+        isLoading = true
+        apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                Action1 {
+                    initialUsersListLoading = false
+                    currentPage += PAGE_SIZE
+                    allUsersAreLoading = false
+                    allUsers.addAll(it.objectSummaries)
+                    updateListView(true)
+                    isLoading = false
+
+                    syncSettingsViewModel.updateAllUsersCache(
+                        allUsers
+                    )
+                },
+                Action1 {
+                    allUsersAreLoading = false
+                    hideProgressBar()
+                }
+            )
+    }
+
+    fun scrollToCurrentPosition() {
+        if (!initialUsersListLoading) {
+            binding.recyclerView.scrollToPosition(mUsersAdapter.itemCount - PAGE_SIZE - 3)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -279,17 +341,61 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
                 chosenSyncType = userAccount.syncType
                 chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
             }
-
-            updateSyncList()
+            initSyncList()
         }
     }
 
-    private fun updateSyncList () {
-        updateSyncGroups()
-        updateSyncAllUsers()
+    private fun initSyncList () {
+        loadSyncGroups()
+        loadAllUsers()
     }
 
-    private fun updateSyncGroups() {
+    // Initial loading of all users.
+    private fun loadAllUsers() {
+        val users = syncSettingsViewModel.getAllUsersCache() ?: emptyList()
+        if (users.isEmpty()) {
+            apiManager.xwikiServicesApi.getAllUsersListByOffset( currentPage, PAGE_SIZE)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    Action1 { summaries ->
+                        currentPage = PAGE_SIZE
+                        runOnUiThread {
+                            binding.syncTypeGetErrorContainer.visibility = View.GONE
+                        }
+                        allUsersAreLoading = false
+                        allUsers.clear()
+                        allUsers.addAll(summaries.objectSummaries)
+
+                        syncSettingsViewModel.updateAllUsersCache(
+                            summaries.objectSummaries
+                        )
+                        updateListView(true)
+                        decrement()
+                    },
+                    Action1 {
+                        allUsersAreLoading = false
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@SyncSettingsActivity,
+                                R.string.cantGetAllUsers,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                        hideProgressBar()
+                        decrement()
+                    }
+                )
+        }  else {
+            allUsers.clear()
+            allUsers.addAll(users)
+            updateListView(false)
+            currentPage = PAGE_SIZE
+        }
+    }
+
+    private fun loadSyncGroups() {
         val groupsCache = syncSettingsViewModel.getGroupsCache() ?: emptyList()
 
         if (groupsCache.isEmpty()) {
@@ -335,6 +441,7 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         }
     }
 
+    // Load all users at once, does not support pagination.
     private fun updateSyncAllUsers() {
         val users = syncSettingsViewModel.getAllUsersCache() ?: emptyList()
         if (users.isEmpty()) {

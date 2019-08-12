@@ -26,11 +26,11 @@ package org.xwiki.android.sync.exceptions
  * @version $Id: 0d1fdae9631c52a72618cd9c1e8899184fbe811b $
  */
 class ReadPhoneStateException : SecurityException {
-    constructor() {}
+    constructor()
 
-    constructor(s: String) : super(s) {}
+    constructor(s: String) : super(s)
 
-    constructor(message: String, cause: Throwable) : super(message, cause) {}
+    constructor(message: String, cause: Throwable) : super(message, cause)
 
-    constructor(cause: Throwable) : super(cause) {}
+    constructor(cause: Throwable) : super(cause)
 }

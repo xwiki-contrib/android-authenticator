@@ -81,7 +81,7 @@ object SystemTools {
         val cm = context
             .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val info = cm.activeNetworkInfo
-        return if (info != null && info.isAvailable) true else false
+        return info != null && info.isAvailable
     }
 
     fun checkWifi(context: Context): Boolean {
@@ -89,11 +89,7 @@ object SystemTools {
             .getSystemService(Context.WIFI_SERVICE) as WifiManager
         val wifiInfo = mWifiManager.connectionInfo
         val ipAddress = wifiInfo?.ipAddress ?: 0
-        return if (mWifiManager.isWifiEnabled && ipAddress != 0) {
-            true
-        } else {
-            false
-        }
+        return mWifiManager.isWifiEnabled && ipAddress != 0
     }
 
 
@@ -107,13 +103,7 @@ object SystemTools {
             .runningAppProcesses
         for (appProcess in appProcesses) {
             if (appProcess.processName == context.packageName) {
-                return if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-                    // background
-                    true
-                } else {
-                    // foreground
-                    false
-                }
+                return appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND
             }
         }
         return false

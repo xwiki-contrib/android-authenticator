@@ -38,6 +38,8 @@ const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
 const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
 const val REDIRECT_URI = "xwiki://oidc"
 
+const val PAGE_SIZE = 30
+
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
 /**
