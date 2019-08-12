@@ -156,12 +156,18 @@ public class XWikiHttp {
                 accountManager.getPassword(account)
             );
             loginObservable.subscribe(
-                new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        Log.d("XWikiHttp", "Relogged in");
+                    new Action1<String>() {
+                        @Override
+                        public void call(String s) {
+                            Log.d("XWikiHttp", "Relogged in");
+                        }
+                    },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Log.e(TAG, "Failed to relogin", throwable);
+                        }
                     }
-                }
             );
             return loginObservable;
         }
