@@ -15,10 +15,34 @@ import com.google.api.client.auth.openidconnect.IdTokenResponse
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.OIDC.OIDCActivity.OIDCActivity.selectedAc
 import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
+
+private fun createAuthorizationCodeFlow(): AuthorizationCodeFlow {
+    return AuthorizationCodeFlow.Builder(
+        BearerToken.authorizationHeaderAccessMethod(),
+        NetHttpTransport(),
+        JacksonFactory(),
+        GenericUrl(TOKEN_SERVER_URL),
+        ClientParametersAuthentication(
+            selectedAc,
+            ""
+        ),
+        selectedAc,
+        AUTHORIZATION_SERVER_URL
+    ).apply {
+        scopes = mutableListOf(
+            "openid",
+            "offline_access",
+            "profile"
+        )
+    }.build()
+}
 
 class OIDCAuthenticatorActivity: AppCompatActivity() {
 
@@ -26,27 +50,7 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         try {
-            val flow= AuthorizationCodeFlow.Builder(
-                BearerToken.authorizationHeaderAccessMethod(),
-                NetHttpTransport(),
-                JacksonFactory(),
-                GenericUrl(TOKEN_SERVER_URL),
-                ClientParametersAuthentication(
-                    selectedAc,
-                    ""
-                ),
-                selectedAc,
-                AUTHORIZATION_SERVER_URL
-            ).run {
-                setScopes(
-                    mutableListOf(
-                        "openid",
-                        "offline_access",
-                        "profile"
-                    )
-                )
-                build()
-            }
+            val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow()
 
             if (!isRedirect(intent)) {
                 flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
@@ -66,32 +70,15 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        try {
-            val flow= AuthorizationCodeFlow.Builder(
-                BearerToken.authorizationHeaderAccessMethod(),
-                NetHttpTransport(),
-                JacksonFactory(),
-                GenericUrl(TOKEN_SERVER_URL),
-                ClientParametersAuthentication(
-                    selectedAc,
-                    ""
-                ),
-                selectedAc,
-                AUTHORIZATION_SERVER_URL
-            ).run {
-                setScopes(
-                    mutableListOf(
-                        "openid",
-                        "offline_access",
-                        "profile"
-                    )
-                )
-                build()
-            }
+        intent ?: return // check for null
 
-            if (isRedirect(intent!!)) {
+        try {
+            val flow = createAuthorizationCodeFlow()
+
+            if (isRedirect(intent)) {
                 val authorizationCode = extractAuthorizationCode(intent)
-                flow.let { GetTokens(it).execute(authorizationCode) }
+
+                requestAccessToken(flow, authorizationCode)
             }
         } catch (ex: Exception) {
             Log.e(TAG, "Failed")
@@ -110,33 +97,38 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
         return uri.getQueryParameter("code")
     }
 
-    private inner class GetTokens(private val flow: AuthorizationCodeFlow) : AsyncTask<String, String, String>() {
+    private fun requestAccessToken(flow: AuthorizationCodeFlow, authorizationCode: String?) {
+        appCoroutineScope.launch {
+            try {
+                val idTokenResponse = IdTokenResponse.execute(
+                    flow.newTokenRequest(
+                        authorizationCode
+                    ).setRedirectUri(
+                        REDIRECT_URI
+                    )
+                )
+                Log.d(TAG, idTokenResponse.parseIdToken().payload["sub"].toString())
+                val accessToken = idTokenResponse.accessToken
 
-        override fun doInBackground(vararg params: String): String? {
-            return try {
-                val idTokenResponse = IdTokenResponse.execute(flow.newTokenRequest(params[0]).setRedirectUri(REDIRECT_URI))
-                Log.d(TAG, idTokenResponse.parseIdToken().payload.get("sub").toString())
-                idTokenResponse.accessToken
-            } catch (ex: IOException) {
-                Log.e(TAG, ex.message)
-                ""
+                withContext(Dispatchers.Main) { // launch on UI thread. TODO:: Check necessarily of UI scope
+                    sendResult(accessToken)
+                }
             } catch (ex: Exception) {
                 Log.e(TAG, ex.message)
-                ""
             }
         }
+    }
 
-        override fun onPostExecute(token: String?) {
-            if (token.isNullOrEmpty()) {
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            } else {
-                // Here I'm sending the access token but the the activity is not receiving.
-                //That's why I wish to call public method of OIDCActivity to send the token.
-                intent.putExtra(AccountManager.KEY_AUTHTOKEN, token)
-                setResult(Activity.RESULT_OK, intent)
-                finish()
-            }
+    private fun sendResult(accessToken: String?) {
+        if (accessToken.isNullOrEmpty()) {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        } else {
+            // Here I'm sending the access token but the the activity is not receiving.
+            //That's why I wish to call public method of OIDCActivity to send the token.
+            intent.putExtra(AccountManager.KEY_AUTHTOKEN, accessToken)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
     }
 }
