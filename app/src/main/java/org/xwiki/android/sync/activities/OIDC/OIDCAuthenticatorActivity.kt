@@ -1,10 +1,8 @@
 package org.xwiki.android.sync.activities.OIDC
 
-import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +19,7 @@ import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.activities.OIDC.OIDCActivity.OIDCActivity.selectedAc
 import org.xwiki.android.sync.utils.extensions.TAG
-import java.io.IOException
+import org.xwiki.android.sync.utils.putValue
 
 private fun createAuthorizationCodeFlow(): AuthorizationCodeFlow {
     return AuthorizationCodeFlow.Builder(
@@ -58,26 +56,9 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
                     startActivity(browserIntent)
                 }
             }
-//            else {
-//                val authorizationCode = extractAuthorizationCode(intent)
-//                flow.let { GetTokens(it).execute(authorizationCode) }
-//            }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Failed")
-        }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        intent ?: return // check for null
-
-        try {
-            val flow = createAuthorizationCodeFlow()
-
-            if (isRedirect(intent)) {
+            else {
+                intent ?: return
                 val authorizationCode = extractAuthorizationCode(intent)
-
                 requestAccessToken(flow, authorizationCode)
             }
         } catch (ex: Exception) {
@@ -124,9 +105,7 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
             setResult(Activity.RESULT_CANCELED)
             finish()
         } else {
-            // Here I'm sending the access token but the the activity is not receiving.
-            //That's why I wish to call public method of OIDCActivity to send the token.
-            intent.putExtra(AccountManager.KEY_AUTHTOKEN, accessToken)
+            putValue(this, "ACCESS_TOKEN", accessToken)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
