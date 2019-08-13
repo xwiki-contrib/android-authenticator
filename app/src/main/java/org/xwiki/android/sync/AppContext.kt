@@ -60,10 +60,6 @@ lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
 
 private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
 
-var selectedAccount = ""
-
-var access_token = ""
-
 fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
     BaseApiManager(serverAddress, userAccountId, userAccountsCookiesRepo)
 }

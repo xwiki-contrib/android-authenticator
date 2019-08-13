@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.activities.OIDC.OIDCActivity.OIDCActivity.selectedAc
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
@@ -16,6 +17,10 @@ import org.xwiki.android.sync.utils.AccountClickListener
 class OIDCActivity: AccountAuthenticatorActivity(), AccountClickListener {
 
     private lateinit var binding: ActOidcChooseAccountBinding
+
+    object OIDCActivity{
+        var selectedAc = ""
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,37 +42,45 @@ class OIDCActivity: AccountAuthenticatorActivity(), AccountClickListener {
             addNewAccount()
         }
 
-
         val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
         binding.lvSelectAccount.adapter = adapter
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ACCESS_TOKEN) {
-            if (access_token.isNullOrEmpty()) {
-                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
-            } else {
-                val i = Intent()
-                i.putExtra(AccountManager.KEY_AUTHTOKEN, access_token)
-                setResult(Activity.RESULT_OK, i)
-                finish()
-            }
+        if (resultCode != Activity.RESULT_OK) {
+            // something went wrong
+            return
         }
-        if (requestCode == REQUEST_NEW_ACCOUNT) {
-            val mAccountManager = AccountManager.get(applicationContext)
-            val availableAccountsList = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
+        when (requestCode) {
+            REQUEST_ACCESS_TOKEN -> {
+                if (data != null) {
+                    println(data)
+//                if (accessToken.isNullOrEmpty()) {
+//                    Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    val i = Intent()
+//                    i.putExtra(AccountManager.KEY_AUTHTOKEN, accessToken)
+//                    setResult(Activity.RESULT_OK, i)
+//                    finish()
+//                }
+                }
+            }
+            REQUEST_NEW_ACCOUNT -> {
+                val mAccountManager = AccountManager.get(applicationContext)
+                val availableAccountsList = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
 
-            val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
-            binding.lvSelectAccount.adapter = adapter
+                val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
+                binding.lvSelectAccount.adapter = adapter
 
-            selectedAccount = data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME).toString()
-            startActivityForResult(Intent (this, OIDCAuthenticatorActivity::class.java), REQUEST_ACCESS_TOKEN)
+                selectedAc = data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME).toString()
+                startActivityForResult(Intent (this, OIDCAuthenticatorActivity::class.java), REQUEST_ACCESS_TOKEN)
+            }
         }
     }
 
     override fun invoke(selectedAcc: Account) {
-        selectedAccount = selectedAcc.name
+        selectedAc = selectedAcc.name
         startActivityForResult(Intent (this, OIDCAuthenticatorActivity::class.java), REQUEST_ACCESS_TOKEN)
     }
 
