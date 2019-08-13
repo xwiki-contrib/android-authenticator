@@ -14,31 +14,39 @@ import com.google.api.client.auth.oauth2.ClientParametersAuthentication
 import com.google.api.client.auth.openidconnect.IdTokenResponse
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.jackson2.JacksonFactory
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.activities.OIDC.OIDCActivity.OIDCActivity.selectedAc
 import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
 
 class OIDCAuthenticatorActivity: AppCompatActivity() {
 
-    private lateinit var flow: AuthorizationCodeFlow
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         try {
-            flow = AuthorizationCodeFlow.Builder(
+            val flow= AuthorizationCodeFlow.Builder(
                 BearerToken.authorizationHeaderAccessMethod(),
                 NetHttpTransport(),
                 JacksonFactory(),
                 GenericUrl(TOKEN_SERVER_URL),
-                ClientParametersAuthentication(selectedAccount, ""),
-                selectedAccount,
-                AUTHORIZATION_SERVER_URL)
-                .setScopes(mutableListOf("openid", "offline_access", "profile"))
-                .build()
+                ClientParametersAuthentication(
+                    selectedAc,
+                    ""
+                ),
+                selectedAc,
+                AUTHORIZATION_SERVER_URL
+            ).run {
+                setScopes(
+                    mutableListOf(
+                        "openid",
+                        "offline_access",
+                        "profile"
+                    )
+                )
+                build()
+            }
 
             if (!isRedirect(intent)) {
                 flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
@@ -88,7 +96,8 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             } else {
-                access_token = token
+                // Here I'm sending the access token but the the activity is not receiving.
+                //That's why I wish to call public method of OIDCActivity to send the token.
                 val i = Intent()
                 i.putExtra(AccountManager.KEY_AUTHTOKEN, token)
                 setResult(Activity.RESULT_OK, i)
