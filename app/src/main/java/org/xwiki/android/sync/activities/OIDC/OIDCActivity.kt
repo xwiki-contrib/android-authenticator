@@ -48,10 +48,15 @@ class OIDCActivity: AccountAuthenticatorActivity(), AccountClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode) {
+        if (resultCode != Activity.RESULT_OK) {
+            // something went wrong
+            return
+        }
+        when (requestCode) {
             REQUEST_ACCESS_TOKEN -> {
                 if (data != null) {
-//                    if (accessToken.isNullOrEmpty()) {
+                    println(data)
+//                if (accessToken.isNullOrEmpty()) {
 //                    Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
 //                } else {
 //                    val i = Intent()
@@ -83,18 +88,5 @@ class OIDCActivity: AccountAuthenticatorActivity(), AccountClickListener {
         val i = Intent(this, AuthenticatorActivity::class.java)
         i.putExtra(ADD_NEW_ACCOUNT, true)
         startActivityForResult(i, REQUEST_NEW_ACCOUNT)
-    }
-
-    public fun postOIDCAuth (token: String) {
-        if (token.isNullOrEmpty()) {
-            Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
-        } else {
-            val i = Intent()
-            i.putExtra(AccountManager.KEY_AUTHTOKEN,
-                token
-            )
-            setResult(Activity.RESULT_OK, i)
-            finish()
-        }
     }
 }

@@ -78,29 +78,29 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
     private inner class GetTokens(private val flow: AuthorizationCodeFlow) : AsyncTask<String, String, String>() {
 
         override fun doInBackground(vararg params: String): String? {
-            try {
+            return try {
                 val idTokenResponse = IdTokenResponse.execute(flow.newTokenRequest(params[0]).setRedirectUri(REDIRECT_URI))
                 Log.d(TAG, idTokenResponse.parseIdToken().payload.get("sub").toString())
-                return idTokenResponse.accessToken
+                idTokenResponse.accessToken
             } catch (ex: IOException) {
                 Log.e(TAG, ex.message)
-                return ""
+                ""
             } catch (ex: Exception) {
                 Log.e(TAG, ex.message)
-                return ""
+                ""
             }
         }
 
-        override fun onPostExecute(token: String) {
+        override fun onPostExecute(token: String?) {
             if (token.isNullOrEmpty()) {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             } else {
                 // Here I'm sending the access token but the the activity is not receiving.
                 //That's why I wish to call public method of OIDCActivity to send the token.
-                val i = Intent()
-                i.putExtra(AccountManager.KEY_AUTHTOKEN, token)
-                setResult(Activity.RESULT_OK, i)
+                val intent = Intent(this@OIDCAuthenticatorActivity, OIDCActivity::class.java)
+                intent.putExtra(AccountManager.KEY_AUTHTOKEN, token)
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }
