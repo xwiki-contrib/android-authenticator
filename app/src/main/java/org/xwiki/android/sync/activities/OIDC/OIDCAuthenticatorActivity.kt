@@ -52,9 +52,44 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
                 flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
                     startActivity(browserIntent)
-                    finish()
                 }
-            } else {
+            }
+//            else {
+//                val authorizationCode = extractAuthorizationCode(intent)
+//                flow.let { GetTokens(it).execute(authorizationCode) }
+//            }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Failed")
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        try {
+            val flow= AuthorizationCodeFlow.Builder(
+                BearerToken.authorizationHeaderAccessMethod(),
+                NetHttpTransport(),
+                JacksonFactory(),
+                GenericUrl(TOKEN_SERVER_URL),
+                ClientParametersAuthentication(
+                    selectedAc,
+                    ""
+                ),
+                selectedAc,
+                AUTHORIZATION_SERVER_URL
+            ).run {
+                setScopes(
+                    mutableListOf(
+                        "openid",
+                        "offline_access",
+                        "profile"
+                    )
+                )
+                build()
+            }
+
+            if (isRedirect(intent!!)) {
                 val authorizationCode = extractAuthorizationCode(intent)
                 flow.let { GetTokens(it).execute(authorizationCode) }
             }
