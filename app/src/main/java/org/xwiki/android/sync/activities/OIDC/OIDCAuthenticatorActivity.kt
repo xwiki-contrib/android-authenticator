@@ -98,7 +98,6 @@ class OIDCAuthenticatorActivity: AppCompatActivity() {
             } else {
                 // Here I'm sending the access token but the the activity is not receiving.
                 //That's why I wish to call public method of OIDCActivity to send the token.
-                val intent = Intent(this@OIDCAuthenticatorActivity, OIDCActivity::class.java)
                 intent.putExtra(AccountManager.KEY_AUTHTOKEN, token)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
