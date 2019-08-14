@@ -67,16 +67,7 @@
         <activity android:name=".activities.SelectAccountActivity"/>
 
         <activity android:name=".activities.OIDC.OIDCActivity"
-                  android:excludeFromRecents="true"
-                  android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".activities.OIDC.OIDCAuthenticatorActivity"
-                  android:noHistory="true"
-                  android:excludeFromRecents="true">
+                  android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
