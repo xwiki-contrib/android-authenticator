@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.activities.OIDC.OIDCActivity.OIDCActivity.selectedAc
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
@@ -34,10 +33,10 @@ private fun createAuthorizationCodeFlow(): AuthorizationCodeFlow {
         JacksonFactory(),
         GenericUrl(TOKEN_SERVER_URL),
         ClientParametersAuthentication(
-            selectedAc,
+            selectedAccountName,
             ""
         ),
-        selectedAc,
+        selectedAccountName,
         AUTHORIZATION_SERVER_URL
     ).apply {
         scopes = mutableListOf(
@@ -48,13 +47,11 @@ private fun createAuthorizationCodeFlow(): AuthorizationCodeFlow {
     }.build()
 }
 
+private var selectedAccountName = ""
+
 class OIDCActivity: AppCompatActivity(), AccountClickListener {
 
     private lateinit var binding: ActOidcChooseAccountBinding
-
-    object OIDCActivity{
-        var selectedAc = ""
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +117,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
                 val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
                 binding.lvSelectAccount.adapter = adapter
 
-                selectedAc = data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME).toString()
+                selectedAccountName = data ?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) .toString()
                 startAuthorization()
             }
         }
@@ -144,8 +141,8 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         requestAccessToken(createAuthorizationCodeFlow(), authorizationCode)
     }
 
-    override fun invoke(selectedAcc: Account) {
-        selectedAc = selectedAcc.name
+    override fun invoke(selectedAccount: Account) {
+        selectedAccountName = selectedAccount.name
         startAuthorization()
     }
 
