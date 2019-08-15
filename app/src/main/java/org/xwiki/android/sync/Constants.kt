@@ -34,8 +34,12 @@ const val ADD_NEW_ACCOUNT = "ADD_NEW_ACCOUNT"
 const val REQUEST_ACCESS_TOKEN = 1
 const val REQUEST_NEW_ACCOUNT = 2
 
-const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
-const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
+private const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
+private const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
+
+fun buildOIDCTokenServerUrl(baseServerUrl: String): String = "$baseServerUrl/oidc/token"
+fun buildOIDCAuthorizationServerUrl(baseServerUrl: String): String = "$baseServerUrl/oidc/authorization"
+
 const val REDIRECT_URI = "xwiki://oidc"
 
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
