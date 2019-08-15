@@ -20,8 +20,7 @@ class OIDCAccountAdapter (
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = convertView ?:let {
             val inflater = LayoutInflater.from(mContext)
-            val nnView = inflater.inflate(R.layout.oidc_account_list_layout, null)
-            nnView
+            inflater.inflate(R.layout.oidc_account_list_layout, null)
         }
 
         val viewHolder = AccountListViewHolder(view)
