@@ -34,11 +34,13 @@ const val ADD_NEW_ACCOUNT = "ADD_NEW_ACCOUNT"
 const val REQUEST_ACCESS_TOKEN = 1
 const val REQUEST_NEW_ACCOUNT = 2
 
-private const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
-private const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
-
-fun buildOIDCTokenServerUrl(baseServerUrl: String): String = "$baseServerUrl/oidc/token"
-fun buildOIDCAuthorizationServerUrl(baseServerUrl: String): String = "$baseServerUrl/oidc/authorization"
+private fun prepareBaseUrlForOIDCUrlCreating(baseServerUrl: String): String = if (baseServerUrl.endsWith("/")) {
+    baseServerUrl.substring(0, baseServerUrl.length - 1)
+} else {
+    baseServerUrl
+}
+fun buildOIDCTokenServerUrl(baseServerUrl: String): String = "${prepareBaseUrlForOIDCUrlCreating(baseServerUrl)}/oidc/token"
+fun buildOIDCAuthorizationServerUrl(baseServerUrl: String): String = "${prepareBaseUrlForOIDCUrlCreating(baseServerUrl)}/oidc/authorization"
 
 const val REDIRECT_URI = "xwiki://oidc"
 
