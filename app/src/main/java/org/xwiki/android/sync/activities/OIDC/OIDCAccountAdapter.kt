@@ -18,29 +18,23 @@ class OIDCAccountAdapter (
 ) : BaseAdapter()  {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var view = convertView
-        var viewHolder: AccountListViewHolder
-
-        view.let {
-            if (it == null) {
-                val inflater = LayoutInflater.from(mContext)
-                view = inflater.inflate(R.layout.oidc_account_list_layout, null)
-                viewHolder = AccountListViewHolder(view!!)
-                it?.tag = viewHolder
-            } else {
-                viewHolder = AccountListViewHolder(view!!)
-                it.tag = viewHolder
-                viewHolder = view?.tag as AccountListViewHolder
-            }
-            val account = getItem(position)
-            viewHolder.tvOIDCAccountName.text = account.name
-
-            viewHolder.llOIDCAccountItem.setOnClickListener {
-                listener(account)
-            }
+        val view = convertView ?:let {
+            val inflater = LayoutInflater.from(mContext)
+            val nnView = inflater.inflate(R.layout.oidc_account_list_layout, null)
+            nnView
         }
 
-        return view!!
+        val viewHolder = AccountListViewHolder(view)
+        view.tag = viewHolder
+
+        val account = getItem(position)
+        viewHolder.tvOIDCAccountName.text = account.name
+
+        viewHolder.llOIDCAccountItem.setOnClickListener {
+            listener(account)
+        }
+
+        return view
     }
 
     override fun getItem(position: Int): Account {
@@ -58,11 +52,6 @@ class OIDCAccountAdapter (
 }
 
 private class AccountListViewHolder (view: View) {
-    val tvOIDCAccountName : TextView
-    val llOIDCAccountItem : LinearLayout
-
-    init {
-        tvOIDCAccountName = view.findViewById(R.id.tvOIDCAccountName)
-        llOIDCAccountItem = view.findViewById(R.id.llOIDCAccountItem)
-    }
+    val tvOIDCAccountName : TextView = view.findViewById(R.id.tvOIDCAccountName)
+    val llOIDCAccountItem : LinearLayout = view.findViewById(R.id.llOIDCAccountItem)
 }
