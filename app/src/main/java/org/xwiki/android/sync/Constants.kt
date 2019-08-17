@@ -24,6 +24,8 @@ package org.xwiki.android.sync
  */
 const val ACCOUNT_TYPE = "org.xwiki.android.sync"
 
+const val defaultLearnMoreLink = "https://xwiki.org"
+
 /**
  * Account name
  */
@@ -34,8 +36,14 @@ const val ADD_NEW_ACCOUNT = "ADD_NEW_ACCOUNT"
 const val REQUEST_ACCESS_TOKEN = 1
 const val REQUEST_NEW_ACCOUNT = 2
 
-const val TOKEN_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/token"
-const val AUTHORIZATION_SERVER_URL = "https://www.xwiki.org/xwiki/oidc/authorization"
+private fun prepareBaseUrlForOIDCUrlCreating(baseServerUrl: String): String = if (baseServerUrl.endsWith("/")) {
+    baseServerUrl.substring(0, baseServerUrl.length - 1)
+} else {
+    baseServerUrl
+}
+fun buildOIDCTokenServerUrl(baseServerUrl: String): String = "${prepareBaseUrlForOIDCUrlCreating(baseServerUrl)}/oidc/token"
+fun buildOIDCAuthorizationServerUrl(baseServerUrl: String): String = "${prepareBaseUrlForOIDCUrlCreating(baseServerUrl)}/oidc/authorization"
+
 const val REDIRECT_URI = "xwiki://oidc"
 
 const val PAGE_SIZE = 30

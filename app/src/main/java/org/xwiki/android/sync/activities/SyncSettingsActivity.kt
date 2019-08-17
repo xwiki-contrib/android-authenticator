@@ -175,10 +175,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         if (intent.extras != null && intent.extras.get("account") != null) {
             val intentAccount : Account = intent.extras.get("account") as Account
             currentUserAccountName = intentAccount.name
-            currentUserAccountType = intentAccount.type
         } else {
             currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
 
         toolbar = findViewById(R.id.toolbar)
@@ -346,15 +344,14 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
      * @since 0.4
      */
     private fun initData() {
-        binding.tvSelectedSyncAcc.text = currentUserAccountName
-        binding.tvSelectedSyncType.text = currentUserAccountType
-
         if (!intent.getBooleanExtra("Test", false)) {
             showProgressBar()
         }
 
         appCoroutineScope.launch {
             userAccount = userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
+            binding.tvSelectedSyncAcc.text = userAccount.accountName
+            binding.tvSelectedSyncType.text = userAccount.serverAddress
             chosenSyncType = userAccount.syncType
             apiManager = resolveApiManager(userAccount)
 

@@ -35,7 +35,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/learn_more_dialog"
-                    android:onClick="doNext"
+                    android:onClick="learnMore"
                     android:id="@+id/learn_more"
                     android:textColor="@color/primary_dark"/>
 

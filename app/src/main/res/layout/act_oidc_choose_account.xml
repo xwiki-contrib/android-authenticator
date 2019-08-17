@@ -8,6 +8,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <androidx.cardview.widget.CardView
+                android:id="@+id/cvOIDCAccountList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -33,13 +34,17 @@
                         android:text="Choose an account"
                         android:layout_centerHorizontal="true"
                         android:layout_gravity="center"
-                        android:textSize="@dimen/textDefaultMediumSize"/>
+                        android:textStyle="bold"/>
 
                 <ListView
                         android:id="@+id/lvSelectAccount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/viewDefaultLargeSize"/>
+                        android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                        android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginEnd="@dimen/viewDefaultLargeSize"
+                        android:layout_marginRight="@dimen/viewDefaultLargeSize"
+                        android:layout_marginTop="@dimen/viewDefaultLargeSize"/>
 
                 <LinearLayout
                         android:id="@+id/lvAddAnotherAccount"
@@ -50,6 +55,8 @@
                         android:textSize="@dimen/textDefaultMediumSize"
                         android:layout_marginStart="@dimen/viewDefaultLargeSize"
                         android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginTop="@dimen/viewDefaultSmallSize"
+                        android:layout_marginBottom="@dimen/viewDefaultSmallSize"
                         android:orientation="horizontal">
 
                     <ImageView
@@ -70,7 +77,11 @@
                 <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/viewDefaultLargeSize"
+                        android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                        android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginEnd="@dimen/viewDefaultLargeSize"
+                        android:layout_marginRight="@dimen/viewDefaultLargeSize"
+                        android:layout_marginBottom="@dimen/viewDefaultLargeSize"
                         android:textSize="@dimen/textDefaultSmallSize"
                         android:text="To continue, XWiki will share your name, email address and profile picture with the requesting app"
                 />
@@ -78,6 +89,16 @@
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <TextView
+                android:id="@+id/tvPleaseWait"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please wait"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:visibility="gone"/>
 
     </RelativeLayout>
 
