@@ -82,10 +82,13 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
 
         binding = DataBindingUtil.setContentView(this, R.layout.act_oidc_choose_account)
 
-        clientID = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+        if (!intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME).isNullOrEmpty()) {
+            clientID = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+        }
 
-        serverUrl = intent.getStringExtra("serverUrl")
-
+        if (!intent.getStringExtra("serverUrl").isNullOrEmpty()) {
+            serverUrl = intent.getStringExtra("serverUrl")
+        }
         if (!clientID.isEmpty()) {
             binding.cvOIDCAccountList.visibility = View.GONE
             binding.tvPleaseWait.visibility = View.VISIBLE
