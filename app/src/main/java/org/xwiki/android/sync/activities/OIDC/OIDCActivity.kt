@@ -1,12 +1,12 @@
 package org.xwiki.android.sync.activities.OIDC
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -22,16 +22,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.AuthenticatorActivity
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
 import org.xwiki.android.sync.utils.extensions.TAG
+import java.io.IOException
 
-private suspend fun createAuthorizationCodeFlow(selectedAccountName: String): AuthorizationCodeFlow {
-    val userServerBaseUrl = userAccountsRepo.findByAccountName(
-        selectedAccountName
-    ) ?.serverAddress ?: throw IllegalArgumentException(
-        "Selected account name is absent in databse"
-    )
+private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, serverUrl: String): AuthorizationCodeFlow {
+    val userServerBaseUrl: String = if (serverUrl.isNullOrEmpty()) {
+        userAccountsRepo.findByAccountName(
+            selectedAccountName
+        ) ?.serverAddress ?: throw IllegalArgumentException(
+            "Selected account name is absent in databse"
+        )
+    } else {
+        serverUrl
+    }
 
     return AuthorizationCodeFlow.Builder(
         BearerToken.authorizationHeaderAccessMethod(),
@@ -65,29 +71,52 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
 
     private lateinit var binding: ActOidcChooseAccountBinding
 
+    private var allUsersList: List<UserAccount> = listOf()
+
+    private var clientID = ""
+
+    private var serverUrl = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.act_oidc_choose_account)
 
+        clientID = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+
+        serverUrl = intent.getStringExtra("serverUrl")
+
+        if (!clientID.isEmpty()) {
+            binding.cvOIDCAccountList.visibility = View.GONE
+            binding.tvPleaseWait.visibility = View.VISIBLE
+        }
+
         init()
     }
 
     private fun init() {
-        val mAccountManager = AccountManager.get(applicationContext)
-        val availableAccountsList = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
+        appCoroutineScope.launch {
+            allUsersList = userAccountsRepo.getAll()
 
-        if (availableAccountsList.isEmpty()) {
-            addNewAccount()
+            if (!clientID.isEmpty()) {
+                startAuthorization(clientID)
+            } else {
+                if (allUsersList.isEmpty()) {
+                    addNewAccount()
+                }
+                val adapter = OIDCAccountAdapter(
+                    this@OIDCActivity,
+                    allUsersList,
+                    this@OIDCActivity
+                )
+
+                binding.lvAddAnotherAccount.setOnClickListener {
+                    addNewAccount()
+                }
+
+                binding.lvSelectAccount.adapter = adapter
+            }
         }
-
-        val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
-
-        binding.lvAddAnotherAccount.setOnClickListener {
-            addNewAccount()
-        }
-
-        binding.lvSelectAccount.adapter = adapter
     }
 
     private fun extractAuthorizationCode(intent: Intent): String? {
@@ -113,8 +142,19 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
                 withContext(Dispatchers.Main) { // launch on UI thread. TODO:: Check necessarily of UI scope
                     sendResult(accessToken)
                 }
-            } catch (ex: Exception) {
+            }  catch(ex: IOException) {
                 Log.e(TAG, ex.message)
+                withContext(Dispatchers.Main) {
+                    sendResult("")
+                    finish()
+                }
+            }
+            catch (ex: Exception) {
+                Log.e(TAG, ex.message)
+                withContext(Dispatchers.Main) {
+                    sendResult("")
+                    finish()
+                }
             }
         }
     }
@@ -123,10 +163,11 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_NEW_ACCOUNT -> {
-                val mAccountManager = AccountManager.get(applicationContext)
-                val availableAccountsList = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
+                appCoroutineScope.launch {
+                    allUsersList = userAccountsRepo.getAll()
+                }
 
-                val adapter = OIDCAccountAdapter(this, availableAccountsList, this)
+                val adapter = OIDCAccountAdapter(this, allUsersList, this)
                 binding.lvSelectAccount.adapter = adapter
 
                 val accountName = data ?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?.toString() ?: return
@@ -142,6 +183,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
             Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
         } else {
             val i = Intent()
+            i.putExtra(AccountManager.KEY_ACCOUNT_NAME, clientID)
             i.putExtra(AccountManager.KEY_AUTHTOKEN, accessToken)
             setResult(Activity.RESULT_OK, i)
             finish()
@@ -154,26 +196,26 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         val accountName = selectedAccountName ?: return
         val authorizationCode = extractAuthorizationCode(intent)
         appCoroutineScope.launch {
-            requestAccessToken(createAuthorizationCodeFlow(accountName), authorizationCode)
+            requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
         }
     }
 
-    override fun invoke(selectedAccount: Account) {
+    override fun invoke(selectedAccount: UserAccount) {
         appCoroutineScope.launch {
-            startAuthorization(selectedAccount.name)
+            startAuthorization(selectedAccount.accountName)
         }
     }
 
     private suspend fun startAuthorization(accountName: String) {
         try {
             selectedAccountName = accountName
-            val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName)
+            val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName, serverUrl)
             flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
                 startActivity(browserIntent)
             }
         } catch (ex: Exception) {
-            Log.e(TAG, "Failed")
+            Log.e(TAG, ex.message)
         }
     }
 

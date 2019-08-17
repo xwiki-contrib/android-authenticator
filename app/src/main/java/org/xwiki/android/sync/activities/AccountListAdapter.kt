@@ -1,6 +1,5 @@
 package org.xwiki.android.sync.activities
 
-import android.accounts.Account
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,12 @@ import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.utils.AccountClickListener
 
 class AccountListAdapter (
     private val mContext: Context,
-    private var availableAccounts : Array<Account>,
+    private var availableAccounts : List<UserAccount>,
     private val listener : AccountClickListener
 ) : BaseAdapter()  {
 
@@ -31,8 +31,8 @@ class AccountListAdapter (
                 viewHolder = view?.tag as AccountListViewHolder
             }
             val account = getItem(position)
-            viewHolder.tvAccountName.text = account.name
-            viewHolder.tvAccountType.text = account.type
+            viewHolder.tvAccountName.text = account.accountName
+            viewHolder.tvAccountServerAddress.text = account.serverAddress
 
             viewHolder.llAccountItem.setOnClickListener {
                 listener(account)
@@ -42,7 +42,7 @@ class AccountListAdapter (
         return view!!
     }
 
-    override fun getItem(position: Int): Account {
+    override fun getItem(position: Int): UserAccount {
         return availableAccounts[position]
     }
 
@@ -58,12 +58,12 @@ class AccountListAdapter (
 
 private class AccountListViewHolder (view: View) {
     val tvAccountName : TextView
-    val tvAccountType : TextView
+    val tvAccountServerAddress : TextView
     val llAccountItem : LinearLayout
 
     init {
         tvAccountName = view.findViewById(R.id.tvAccountName)
-        tvAccountType = view.findViewById(R.id.tvAccountType)
+        tvAccountServerAddress = view.findViewById(R.id.tvAccountServerAddress)
         llAccountItem = view.findViewById(R.id.llAccountItem)
     }
 }

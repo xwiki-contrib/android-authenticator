@@ -38,10 +38,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.activities.BaseViewFlipper
-import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
-import org.xwiki.android.sync.activities.SignInViewFlipper
-import org.xwiki.android.sync.activities.SyncSettingsActivity
+import org.xwiki.android.sync.activities.*
+import org.xwiki.android.sync.activities.OIDC.OIDCActivity
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
@@ -203,7 +201,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     fun doPrevious(view: View) {
         val position = binding.viewFlipper.displayedChild
-        chooseAnimation(position == orderOfFlippers.indexOf(SettingServerIpViewFlipper::class.java))
+        chooseAnimation(false)
         flippers[position]?.doPrevious()
         showViewFlipper(position - 1)
     }
@@ -269,6 +267,13 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
         val intent = openLink(
             url
+        )
+        startActivity(intent)
+    }
+
+    fun learnMore(view: View) {
+        val intent = openLink(
+            "https://xwiki.org"
         )
         startActivity(intent)
     }
@@ -356,9 +361,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             return
         }
         Log.d(TAG, "> finishLogin")
-
-        //before add new account, clear old account data.
-//        clearOldAccount()
 
         //get values
         val accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
@@ -469,6 +471,22 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         if (view != null) {
             val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    fun startOIDCAuth(cliendID: String) {
+        val oidcIntent = Intent(this, OIDCActivity::class.java)
+        oidcIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, cliendID)
+        oidcIntent.putExtra("serverUrl", serverUrl)
+        startActivityForResult(oidcIntent, REQUEST_NEW_ACCOUNT)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_NEW_ACCOUNT) {
+            if (!data?.getExtras()?.get(AccountManager.KEY_AUTHTOKEN).toString().isNullOrEmpty()) {
+                data?.let { finishLogin(it) }
+            }
         }
     }
 }

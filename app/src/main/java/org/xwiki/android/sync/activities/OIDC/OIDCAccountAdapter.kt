@@ -1,6 +1,5 @@
 package org.xwiki.android.sync.activities.OIDC
 
-import android.accounts.Account
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,12 @@ import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.utils.AccountClickListener
 
 class OIDCAccountAdapter (
     private val mContext: Context,
-    private var availableAccounts : Array<Account>,
+    private var availableAccounts : List<UserAccount>,
     private val listener : AccountClickListener
 ) : BaseAdapter()  {
 
@@ -27,7 +27,8 @@ class OIDCAccountAdapter (
         view.tag = viewHolder
 
         val account = getItem(position)
-        viewHolder.tvOIDCAccountName.text = account.name
+        viewHolder.tvOIDCAccountName.text = account.accountName
+        viewHolder.tvOIDCAccountServerAddress.text = account.serverAddress
 
         viewHolder.llOIDCAccountItem.setOnClickListener {
             listener(account)
@@ -36,7 +37,7 @@ class OIDCAccountAdapter (
         return view
     }
 
-    override fun getItem(position: Int): Account {
+    override fun getItem(position: Int): UserAccount {
         return availableAccounts[position]
     }
 
@@ -53,4 +54,5 @@ class OIDCAccountAdapter (
 private class AccountListViewHolder (view: View) {
     val tvOIDCAccountName : TextView = view.findViewById(R.id.tvOIDCAccountName)
     val llOIDCAccountItem : LinearLayout = view.findViewById(R.id.llOIDCAccountItem)
+    val tvOIDCAccountServerAddress: TextView = view.findViewById(R.id.tvOIDCAccountServerAddress)
 }

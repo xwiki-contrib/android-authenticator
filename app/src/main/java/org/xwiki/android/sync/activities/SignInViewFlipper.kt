@@ -24,11 +24,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import okhttp3.*
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
@@ -40,6 +43,8 @@ import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
+import java.io.IOException
+import java.net.URL
 
 /**
  * Tag for logging.
@@ -90,6 +95,33 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                 }
             }
         }
+        binding.llXWikiOIDCButton.setOnClickListener {
+            binding.loading.visibility = View.VISIBLE
+            binding.llXWikiOIDCButton.visibility = View.INVISIBLE
+            checkOIDCSupport()
+        }
+
+        binding.llXWikiLoginButton.setOnClickListener {
+            binding.accountName.error = null
+            binding.accountPassword.error = null
+            binding.clientID.error = null
+            binding.accountName.clearFocus()
+            binding.accountPassword.clearFocus()
+            binding.clientID.clearFocus()
+            binding.llLoginFields.visibility = View.VISIBLE
+            binding.llXWikiOIDCButton.visibility = View.VISIBLE
+            binding.llOIDCFields.visibility = View.GONE
+            binding.llXWikiLoginButton.visibility = View.GONE
+        }
+
+        binding.btOIDC.setOnClickListener {
+            if (binding.clientID.text.isNullOrEmpty()) {
+                binding.clientID.requestFocus()
+                binding.clientID.error = mContext.getString(R.string.error_field_required)
+            } else {
+                mActivity.startOIDCAuth(binding.clientID.text.toString())
+            }
+        }
     }
 
     /**
@@ -107,8 +139,21 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      * [.accountPassword] was correctly set
      */
     private fun checkInput(): Boolean {
-         return binding.accountPassword.let { field ->
-             accountPassword = field.text.toString()
+        return binding.accountName.let { field ->
+            field.error = null
+            accountName = field.text.toString()
+            when {
+                TextUtils.isEmpty(field.text) -> {
+                    field.requestFocus()
+                    field.error = mContext.getString(R.string.error_field_required)
+                    false
+                } else -> {
+                field.error = null
+                true
+            }
+            }
+        } && binding.accountPassword.let { field ->
+            accountPassword = field.text.toString()
             field.error = null
             when {
                 TextUtils.isEmpty(field.text) || field.length() < 5 -> {
@@ -120,23 +165,8 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                     field.error = null
                     true
                 }
-
             }
-        } && binding.accountName.let { field ->
-             field.error = null
-             accountName = field.text.toString()
-             when {
-                 TextUtils.isEmpty(field.text) -> {
-                     field.requestFocus()
-                     field.error = mContext.getString(R.string.error_field_required)
-                     false
-                 } else -> {
-                             field.error = null
-                             true
-                         }
-
-             }
-         }
+        }
     }
 
     /**
@@ -263,4 +293,33 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         )
     }
 
+    fun checkOIDCSupport() {
+        val url = URL ("${mActivity.serverUrl}/oidc/userinfo")
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                mActivity.runOnUiThread {
+                    binding.loading.visibility = View.GONE
+                    if (response.code() == 500) {
+                        binding.llLoginFields.visibility = View.GONE
+                        binding.llXWikiOIDCButton.visibility = View.INVISIBLE
+                        binding.llOIDCFields.visibility = View.VISIBLE
+                        binding.llXWikiLoginButton.visibility = View.VISIBLE
+                    }
+                    if (response.code() == 404 || response.code() == 401) {
+                        Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, e.message)
+                Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
 }
