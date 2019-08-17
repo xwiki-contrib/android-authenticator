@@ -38,8 +38,11 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.activities.*
+import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.OIDC.OIDCActivity
+import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
+import org.xwiki.android.sync.activities.SignInViewFlipper
+import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
@@ -273,7 +276,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     fun learnMore(view: View) {
         val intent = openLink(
-            "https://xwiki.org"
+            defaultLearnMoreLink
         )
         startActivity(intent)
     }

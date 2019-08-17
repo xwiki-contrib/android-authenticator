@@ -22,7 +22,6 @@ package org.xwiki.android.sync.auth;
 import android.accounts.*;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,7 +31,9 @@ import org.xwiki.android.sync.activities.GrantPermissionActivity;
 import org.xwiki.android.sync.contactdb.UserAccount;
 import retrofit2.Response;
 import rx.functions.Action1;
+
 import java.util.List;
+
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.sync.AppContextKt.*;
 import static org.xwiki.android.sync.ConstantsKt.*;

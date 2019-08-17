@@ -63,8 +63,10 @@ private val TAG = "SignInViewFlipper"
  * @param contentRootView Root view of this flipper
  */
 
-class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
-    : BaseViewFlipper(activity, contentRootView) {
+class SignInViewFlipper(
+    activity: AuthenticatorActivity,
+    contentRootView: View
+) : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Typed username.
@@ -148,9 +150,9 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                     field.error = mContext.getString(R.string.error_field_required)
                     false
                 } else -> {
-                field.error = null
-                true
-            }
+                    field.error = null
+                    true
+                }
             }
         } && binding.accountPassword.let { field ->
             accountPassword = field.text.toString()

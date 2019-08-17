@@ -31,10 +31,10 @@ import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.AllUsersCacheRepository
 import org.xwiki.android.sync.contactdb.abstracts.GroupsCacheRepository
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
-import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsRepository
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOAllUsersCacheRepository
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOGroupsCacheRepository
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.enableDetectingOfAccountsRemoving

@@ -24,6 +24,8 @@ package org.xwiki.android.sync
  */
 const val ACCOUNT_TYPE = "org.xwiki.android.sync"
 
+const val defaultLearnMoreLink = "https://xwiki.org"
+
 /**
  * Account name
  */

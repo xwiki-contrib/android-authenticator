@@ -31,7 +31,6 @@ import okhttp3.ResponseBody;
 import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import org.xwiki.android.sync.contactdb.UserAccount;
 import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
@@ -41,13 +40,15 @@ import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
-import static org.xwiki.android.sync.AppContextKt.*;
+import static org.xwiki.android.sync.AppContextKt.getAppContext;
 import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_ALL_USERS;
 import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_SELECTED_GROUPS;
 import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserAccountName;
