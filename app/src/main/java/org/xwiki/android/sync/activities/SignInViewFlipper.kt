@@ -311,6 +311,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                         binding.llXWikiLoginButton.visibility = View.VISIBLE
                     }
                     if (response.code() == 404 || response.code() == 401) {
+                        binding.llXWikiOIDCButton.visibility = View.VISIBLE
                         Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
                     }
                 }
