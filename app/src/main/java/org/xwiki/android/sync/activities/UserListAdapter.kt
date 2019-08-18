@@ -52,7 +52,7 @@ class UserListAdapter(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(org.xwiki.android.sync.R.layout.list_item_group, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item_group, parent, false)
         return ViewHolder(itemView)
     }
 
@@ -90,7 +90,7 @@ class UserListAdapter(
         diffResult.dispatchUpdatesTo(this)
         searchResults = listOf()
         this.searchResults = results
-        (context as SyncSettingsActivity).scrollToCurrentPosition()
+        (context as SyncSettingsActivity)?.scrollToCurrentPosition()
     }
 
     /**
