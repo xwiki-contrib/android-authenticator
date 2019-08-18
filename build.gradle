@@ -36,7 +36,6 @@ allprojects {
 
 ext {
     // Sdk and tools
-
     minSdkVersion = rootProject.minSdkVersion.toInteger()
     targetSdkVersion = rootProject.targetSdkVersion.toInteger()
     compileSdkVersion = rootProject.compileSdkVersion.toInteger()
