@@ -4,9 +4,11 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -27,6 +29,9 @@ import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
 import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
+import android.webkit.CookieSyncManager
+import org.xwiki.android.sync.utils.OIDCWebViewClient
+import org.xwiki.android.sync.utils.WebViewPageLoadedListener
 
 private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, serverUrl: String): AuthorizationCodeFlow {
     val userServerBaseUrl: String = if (serverUrl.isNullOrEmpty()) {
@@ -65,7 +70,7 @@ private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, ser
     }.build()
 }
 
-class OIDCActivity: AppCompatActivity(), AccountClickListener {
+class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoadedListener {
 
     private var selectedAccountName: String? = null
 
@@ -92,12 +97,26 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         if (!clientID.isEmpty()) {
             binding.cvOIDCAccountList.visibility = View.GONE
             binding.tvPleaseWait.visibility = View.VISIBLE
+            binding.webview.visibility  = View.VISIBLE
         }
 
         init()
     }
 
     private fun init() {
+        val cookieManager = CookieManager.getInstance()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.flush()
+            cookieManager.removeAllCookies(null)
+            cookieManager.removeSessionCookies(null)
+        } else {
+            val cookieSyncManager = CookieSyncManager.createInstance(this)
+            cookieSyncManager.startSync()
+            cookieManager.removeAllCookie()
+            cookieManager.removeSessionCookie()
+            cookieSyncManager.stopSync()
+        }
+
         appCoroutineScope.launch {
             allUsersList = userAccountsRepo.getAll()
 
@@ -204,6 +223,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
     }
 
     override fun invoke(selectedAccount: UserAccount) {
+        binding.webview.visibility  = View.VISIBLE
         appCoroutineScope.launch {
             startAuthorization(selectedAccount.accountName)
         }
@@ -214,8 +234,10 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
             selectedAccountName = accountName
             val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName, serverUrl)
             flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                startActivity(browserIntent)
+                appCoroutineScope.launch (Dispatchers.Main) {
+                    binding.webview.webViewClient = OIDCWebViewClient(this@OIDCActivity, accountName)
+                    binding.webview.loadUrl(it)
+                }
             }
         } catch (ex: Exception) {
             Log.e(TAG, ex.message)
@@ -226,5 +248,11 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         val i = Intent(this, AuthenticatorActivity::class.java)
         i.putExtra(ADD_NEW_ACCOUNT, true)
         startActivityForResult(i, REQUEST_NEW_ACCOUNT)
+    }
+
+    override fun onPageLoaded(authorizationCode: String?, accountName: String) {
+        appCoroutineScope.launch {
+            requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
+        }
     }
 }
