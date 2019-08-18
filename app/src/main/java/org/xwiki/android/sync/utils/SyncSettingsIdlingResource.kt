@@ -1,7 +1,7 @@
 package org.xwiki.android.sync.utils
 
-import androidx.test.espresso.IdlingResource.ResourceCallback
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource.ResourceCallback
 import java.util.concurrent.atomic.AtomicInteger
 
 

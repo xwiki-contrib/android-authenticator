@@ -1,5 +1,5 @@
 package org.xwiki.android.sync.utils
 
-import android.accounts.Account
+import org.xwiki.android.sync.contactdb.UserAccount
 
-interface AccountClickListener : (Account) -> Unit
+interface AccountClickListener : (UserAccount) -> Unit

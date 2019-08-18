@@ -66,6 +66,16 @@
 
         <activity android:name=".activities.SelectAccountActivity"/>
 
+        <activity android:name=".activities.OIDC.OIDCActivity"
+                  android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="xwiki" android:host="oidc"/>
+            </intent-filter>
+        </activity>
+
         <provider
             android:name=".syncadapter.EmptyProvider"
             android:authorities="org.xwiki.android.sync"

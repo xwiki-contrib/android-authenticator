@@ -10,7 +10,8 @@ import kotlinx.coroutines.launch
 import org.xwiki.android.sync.allUsersCacheRepository
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.contactdb.*
+import org.xwiki.android.sync.contactdb.UserAccount
+import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.groupsCacheRepository
 import org.xwiki.android.sync.userAccountsRepo
 

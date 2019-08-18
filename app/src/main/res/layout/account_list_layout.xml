@@ -16,9 +16,10 @@
             android:layout_marginTop="@dimen/viewDefaultMediumSize"/>
 
     <TextView
-            android:id="@+id/tvAccountType"
+            android:id="@+id/tvAccountServerAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:singleLine="true"
             android:textSize="@dimen/viewDefaultLargeSize"
             android:layout_marginRight="@dimen/viewDefaultLargeSize"
             android:layout_marginEnd="@dimen/viewDefaultLargeSize"

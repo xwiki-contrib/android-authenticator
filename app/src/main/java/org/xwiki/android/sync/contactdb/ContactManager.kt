@@ -30,13 +30,10 @@ import org.xwiki.android.sync.ACCOUNT_TYPE
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.userAccountsRepo
 import retrofit2.HttpException
 import rx.Observable
 import rx.Observer
 import rx.functions.Action1
-import rx.schedulers.Schedulers
 import java.io.IOException
 import java.util.*
 
