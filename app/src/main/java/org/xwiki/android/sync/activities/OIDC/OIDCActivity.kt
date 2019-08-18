@@ -4,9 +4,11 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -92,12 +94,18 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         if (!clientID.isEmpty()) {
             binding.cvOIDCAccountList.visibility = View.GONE
             binding.tvPleaseWait.visibility = View.VISIBLE
+            binding.webview.visibility  = View.VISIBLE
         }
 
         init()
     }
 
     private fun init() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().removeAllCookies(null)
+            CookieManager.getInstance().flush()
+        }
+
         appCoroutineScope.launch {
             allUsersList = userAccountsRepo.getAll()
 
@@ -204,6 +212,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
     }
 
     override fun invoke(selectedAccount: UserAccount) {
+        binding.webview.visibility  = View.VISIBLE
         appCoroutineScope.launch {
             startAuthorization(selectedAccount.accountName)
         }
@@ -214,8 +223,21 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
             selectedAccountName = accountName
             val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName, serverUrl)
             flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                startActivity(browserIntent)
+                runOnUiThread {
+                    binding.webview.webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            if (!Uri.parse(url).getQueryParameter("code").isNullOrEmpty()) {
+                                val authorizationCode = Uri.parse(url).getQueryParameter("code")
+                                binding.webview.destroy()
+                                binding.webview.visibility  = View.GONE
+                                appCoroutineScope.launch {
+                                    requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
+                                }
+                            }
+                        }
+                    }
+                    binding.webview.loadUrl(it)
+                }
             }
         } catch (ex: Exception) {
             Log.e(TAG, ex.message)
