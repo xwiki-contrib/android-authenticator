@@ -183,7 +183,7 @@ class SignInViewFlipper(
         return appCoroutineScope.launch {
             val user = userAccountsRepo.createAccount(
                 UserAccount(
-                    accountName,
+                    "$accountName@temp",
                     mActivity.serverUrl ?: return@launch
                 )
             ) ?: let {
