@@ -304,7 +304,7 @@ class SignInViewFlipper(
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                mActivity.runOnUiThread {
+                appCoroutineScope.launch (Dispatchers.Main) {
                     binding.loading.visibility = View.GONE
                     if (response.code() == 500) {
                         binding.llLoginFields.visibility = View.GONE
@@ -321,7 +321,11 @@ class SignInViewFlipper(
 
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(TAG, e.message)
-                Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                appCoroutineScope.launch (Dispatchers.Main) {
+                    binding.loading.visibility = View.GONE
+                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
+                    Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

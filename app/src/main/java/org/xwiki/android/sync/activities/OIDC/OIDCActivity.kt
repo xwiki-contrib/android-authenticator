@@ -29,6 +29,7 @@ import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
 import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
+import android.webkit.CookieSyncManager
 
 private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, serverUrl: String): AuthorizationCodeFlow {
     val userServerBaseUrl: String = if (serverUrl.isNullOrEmpty()) {
@@ -67,7 +68,7 @@ private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, ser
     }.build()
 }
 
-class OIDCActivity: AppCompatActivity(), AccountClickListener {
+class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoadedListener {
 
     private var selectedAccountName: String? = null
 
@@ -101,16 +102,24 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
     }
 
     private fun init() {
+        val cookieManager = CookieManager.getInstance()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().removeAllCookies(null)
-            CookieManager.getInstance().flush()
+            cookieManager.flush()
+            cookieManager.removeAllCookies(null)
+            cookieManager.removeSessionCookies(null)
+        } else {
+            val cookieSyncManager = CookieSyncManager.createInstance(this)
+            cookieSyncManager.startSync()
+            cookieManager.removeAllCookie()
+            cookieManager.removeSessionCookie()
+            cookieSyncManager.stopSync()
         }
 
         appCoroutineScope.launch {
             allUsersList = userAccountsRepo.getAll()
 
             if (!clientID.isEmpty()) {
-                startAuthorization(clientID)
+                startAuthorization(clientID, this@OIDCActivity)
             } else {
                 if (allUsersList.isEmpty()) {
                     addNewAccount()
@@ -183,7 +192,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
 
                 val accountName = data ?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?.toString() ?: return
                 appCoroutineScope.launch {
-                    startAuthorization(accountName)
+                    startAuthorization(accountName, this@OIDCActivity)
                 }
             }
         }
@@ -214,26 +223,30 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
     override fun invoke(selectedAccount: UserAccount) {
         binding.webview.visibility  = View.VISIBLE
         appCoroutineScope.launch {
-            startAuthorization(selectedAccount.accountName)
+            startAuthorization(selectedAccount.accountName, this@OIDCActivity)
         }
     }
 
-    private suspend fun startAuthorization(accountName: String) {
+    override fun onPageLoaded(url: String?) {
+        if (!Uri.parse(url).getQueryParameter("code").isNullOrEmpty()) {
+            val authorizationCode = Uri.parse(url).getQueryParameter("code")
+            binding.webview.destroy()
+            binding.webview.visibility  = View.GONE
+            appCoroutineScope.launch {
+                requestAccessToken(createAuthorizationCodeFlow(selectedAccountName.toString(), serverUrl), authorizationCode)
+            }
+        }
+    }
+
+    private suspend fun startAuthorization(accountName: String, listener : WebViewPageLoadedListener) {
         try {
             selectedAccountName = accountName
             val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName, serverUrl)
             flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
-                runOnUiThread {
+                appCoroutineScope.launch (Dispatchers.Main) {
                     binding.webview.webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
-                            if (!Uri.parse(url).getQueryParameter("code").isNullOrEmpty()) {
-                                val authorizationCode = Uri.parse(url).getQueryParameter("code")
-                                binding.webview.destroy()
-                                binding.webview.visibility  = View.GONE
-                                appCoroutineScope.launch {
-                                    requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
-                                }
-                            }
+                            listener.onPageLoaded(url)
                         }
                     }
                     binding.webview.loadUrl(it)
@@ -249,4 +262,8 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener {
         i.putExtra(ADD_NEW_ACCOUNT, true)
         startActivityForResult(i, REQUEST_NEW_ACCOUNT)
     }
+}
+
+interface WebViewPageLoadedListener {
+    fun onPageLoaded(url : String?)
 }
