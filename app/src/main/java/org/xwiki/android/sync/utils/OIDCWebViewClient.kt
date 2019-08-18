@@ -4,7 +4,6 @@ import android.net.Uri
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import org.xwiki.android.sync.activities.OIDC.WebViewPageLoadedListener
 
 internal class OIDCWebViewClient(private val webViewPageLoadedListener: WebViewPageLoadedListener, private val accountName: String) : WebViewClient() {
 
@@ -16,4 +15,8 @@ internal class OIDCWebViewClient(private val webViewPageLoadedListener: WebViewP
             webViewPageLoadedListener.onPageLoaded(authorizationCode, accountName)
         }
     }
+}
+
+interface WebViewPageLoadedListener {
+    fun onPageLoaded(authorizationCode: String?, accountName: String)
 }

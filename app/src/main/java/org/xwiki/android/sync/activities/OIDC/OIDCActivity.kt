@@ -31,6 +31,7 @@ import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
 import android.webkit.CookieSyncManager
 import org.xwiki.android.sync.utils.OIDCWebViewClient
+import org.xwiki.android.sync.utils.WebViewPageLoadedListener
 
 private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, serverUrl: String): AuthorizationCodeFlow {
     val userServerBaseUrl: String = if (serverUrl.isNullOrEmpty()) {
@@ -254,8 +255,4 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
             requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
         }
     }
-}
-
-interface WebViewPageLoadedListener {
-    fun onPageLoaded(authorizationCode: String?, accountName: String)
 }
