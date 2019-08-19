@@ -25,8 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.ViewModel.BaseViewModelFactory
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
-import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
@@ -371,7 +371,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 }
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
-                    SyncSettingsViewModelFactory(application, userAccount.id)
+                    BaseViewModelFactory {SyncSettingsViewModel (application, userAccount.id)}
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType

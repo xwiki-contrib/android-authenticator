@@ -15,19 +15,6 @@ import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.groupsCacheRepository
 import org.xwiki.android.sync.userAccountsRepo
 
-class SyncSettingsViewModelFactory(
-    private val application: Application,
-    private val userAccountId: UserAccountId
-) : ViewModelProvider.AndroidViewModelFactory(application) {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return if (modelClass == SyncSettingsViewModel::class.java) {
-            SyncSettingsViewModel(application, userAccountId) as T
-        } else {
-            super.create(modelClass)
-        }
-    }
-}
-
 class SyncSettingsViewModel(
     application: Application,
     private var id: UserAccountId
