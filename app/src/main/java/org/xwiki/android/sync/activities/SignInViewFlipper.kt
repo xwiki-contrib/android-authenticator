@@ -40,8 +40,6 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
-import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
@@ -88,7 +86,6 @@ class SignInViewFlipper(
         binding = DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
         binding.signInButton.setOnClickListener {
             if (checkInput()) {
-                increment()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -289,7 +286,6 @@ class SignInViewFlipper(
         errorTextView.text = error
         Handler().postDelayed({
             errorTextView.visibility = View.GONE
-            decrement()
         },
             2000
         )

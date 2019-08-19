@@ -48,7 +48,6 @@ import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
 import org.xwiki.android.sync.utils.PermissionsUtils
-import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.openLink
 import org.xwiki.android.sync.utils.removeKeyValue
 import rx.Subscription
@@ -359,7 +358,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
      */
     fun finishLogin(intent: Intent) {
         if (isTestRunning) {
-            decrement()
             finish()
             return
         }
