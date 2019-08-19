@@ -30,7 +30,7 @@ class SyncSettingsViewModelFactory(
 
 class SyncSettingsViewModel(
     application: Application,
-    private val id: UserAccountId
+    private var id: UserAccountId
 ) : AndroidViewModel(application) {
     suspend fun getUser() : UserAccount? {
         return userAccountsRepo.findByAccountId(id)
@@ -38,29 +38,27 @@ class SyncSettingsViewModel(
 
     fun updateUser(updatedUserAccount: UserAccount) {
         viewModelScope.launch(Dispatchers.Default) {
-            if (updatedUserAccount.id == id) {
-                userAccountsRepo.updateAccount(updatedUserAccount)
-            }
+            userAccountsRepo.updateAccount(updatedUserAccount)
         }
     }
 
-    fun updateAllUsersCache(summaries: List<ObjectSummary>) {
+    fun updateAllUsersCache(summaries: List<ObjectSummary>, userID: UserAccountId) {
         viewModelScope.launch(Dispatchers.Default) {
-            allUsersCacheRepository[id] = summaries
+            allUsersCacheRepository[userID] = summaries
         }
     }
 
-    fun getAllUsersCache(): List<ObjectSummary>? {
-        return allUsersCacheRepository[id]
+    fun getAllUsersCache(userID: UserAccountId): List<ObjectSummary>? {
+        return allUsersCacheRepository[userID]
     }
 
-    fun updateGroupsCache(cache: List<XWikiGroup>) {
+    fun updateGroupsCache(cache: List<XWikiGroup>, userID: UserAccountId) {
         viewModelScope.launch(Dispatchers.Default) {
-            groupsCacheRepository[id] = cache
+            groupsCacheRepository[userID] = cache
         }
     }
 
-    fun getGroupsCache(): List<XWikiGroup>? {
-        return groupsCacheRepository[id]
+    fun getGroupsCache(userID: UserAccountId): List<XWikiGroup>? {
+        return groupsCacheRepository[userID]
     }
 }
