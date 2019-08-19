@@ -69,7 +69,7 @@ dependencies {
 
     //For androidx test support
     androidTestImplementation "androidx.test:core-ktx:$androidXTestCoreKTXVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKTXKotlinRunnerVersion"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKTXKotlinVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$androidXArchCoreTestingKotlinVersion"
 
     // Optional -- UI testing with Espresso
