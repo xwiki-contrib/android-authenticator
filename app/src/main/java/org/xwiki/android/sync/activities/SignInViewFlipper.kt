@@ -316,7 +316,11 @@ class SignInViewFlipper(
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "No response from the server.")
+                if (e.message.isNullOrEmpty()) {
+                    Log.e(TAG, "No response from the server.")
+                } else {
+                    Log.e(TAG, e.message)
+                }
                 appCoroutineScope.launch (Dispatchers.Main) {
                     binding.loading.visibility = View.GONE
                     binding.llXWikiOIDCButton.visibility = View.VISIBLE

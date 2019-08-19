@@ -27,7 +27,9 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
 import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.dataSaverModeEnabled
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.getValue
@@ -110,7 +112,7 @@ class ContactManager(
                             batchOperation.execute()
                         }
 
-                        if (!getValue(context, "data_saving", false)) {
+                        if (!appContext.dataSaverModeEnabled) {
                             contactManager.updateAvatar(
                                 resolver,
                                 contactManager.lookupRawContact(resolver, xWikiUserFull.id),

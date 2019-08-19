@@ -219,9 +219,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         menuInflater.inflate(R.menu.sync_setting_view_menu, menu)
         dataSavingCheckbox = menu!!.findItem(R.id.action_data_saving)
 
-        val dataSaving = getValue(this, "data_saving", false)
-
-        if (dataSaving) {
+        if (appContext.dataSaverModeEnabled) {
             dataSavingCheckbox.setChecked(true)
         } else {
             dataSavingCheckbox.setChecked(false)
@@ -235,10 +233,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             R.id.action_data_saving -> {
                 if (item.isChecked) {
                     item.setChecked(false)
-                    putValue(this, "data_saving", false)
+                    appContext.dataSaverModeEnabled = false
                 } else {
                     item.setChecked(true)
-                    putValue(this, "data_saving", true)
+                    appContext.dataSaverModeEnabled = true
                 }
                 true
             }
