@@ -1,8 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    // Sdk and tools
+    ext.minSdkVersion = rootProject.minSdkVersion.toInteger()
+    ext.targetSdkVersion = rootProject.targetSdkVersion.toInteger()
+    ext.compileSdkVersion = rootProject.compileSdkVersion.toInteger()
+
     repositories {
-        google()
         mavenLocal()
         mavenCentral()
         jcenter()
@@ -10,9 +14,10 @@ buildscript {
             url "https://jitpack.io"
             name "Jitpack"
         }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
 
@@ -23,21 +28,13 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         jcenter()
         maven {
             url "https://jitpack.io"
             name "Jitpack"
         }
+        google()
     }
-}
-
-ext {
-    // Sdk and tools
-
-    minSdkVersion = rootProject.minSdkVersion.toInteger()
-    targetSdkVersion = rootProject.targetSdkVersion.toInteger()
-    compileSdkVersion = rootProject.compileSdkVersion.toInteger()
 }
