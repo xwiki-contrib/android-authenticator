@@ -40,8 +40,6 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
-import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
@@ -88,7 +86,6 @@ class SignInViewFlipper(
         binding = DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
         binding.signInButton.setOnClickListener {
             if (checkInput()) {
-                increment()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -183,7 +180,7 @@ class SignInViewFlipper(
         return appCoroutineScope.launch {
             val user = userAccountsRepo.createAccount(
                 UserAccount(
-                    accountName,
+                    "$accountName@temp",
                     mActivity.serverUrl ?: return@launch
                 )
             ) ?: let {
@@ -289,7 +286,6 @@ class SignInViewFlipper(
         errorTextView.text = error
         Handler().postDelayed({
             errorTextView.visibility = View.GONE
-            decrement()
         },
             2000
         )
@@ -304,7 +300,7 @@ class SignInViewFlipper(
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                mActivity.runOnUiThread {
+                appCoroutineScope.launch (Dispatchers.Main) {
                     binding.loading.visibility = View.GONE
                     if (response.code() == 500) {
                         binding.llLoginFields.visibility = View.GONE
@@ -321,7 +317,11 @@ class SignInViewFlipper(
 
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(TAG, e.message)
-                Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                appCoroutineScope.launch (Dispatchers.Main) {
+                    binding.loading.visibility = View.GONE
+                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
+                    Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

@@ -35,7 +35,8 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.*
+import org.xwiki.android.sync.utils.GroupsListChangeListener
+import org.xwiki.android.sync.utils.getAppVersionName
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -431,7 +432,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         val groupsCache = syncSettingsViewModel.getGroupsCache() ?: emptyList()
 
         if (groupsCache.isEmpty()) {
-            increment()
             groupsAreLoading = true
             apiManager.xwikiServicesApi.availableGroups(
                 LIMIT_MAX_SYNC_USERS
@@ -463,7 +463,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                         hideProgressBar()
-                        decrement()
                     }
                 )
         } else {
@@ -494,7 +493,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             summaries.objectSummaries
                         )
                         updateListView(true)
-                        decrement()
                     },
                     Action1<Throwable> {
                         allUsersAreLoading = false
@@ -507,7 +505,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                         hideProgressBar()
-                        decrement()
                     }
                 )
         } else {
