@@ -68,10 +68,10 @@ fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiMana
 
 var Context.dataSaverModeEnabled: Boolean
     set(value) {
-        putValue(appContext, "data_saving", value)
+        putValue(this, "data_saving", value)
     }
     get() {
-        return getValue(appContext, "data_saving", false)
+        return getValue(this, "data_saving", false)
     }
 
 private fun initRepos(context: AppContext) {
