@@ -90,7 +90,7 @@ class UserListAdapter(
         diffResult.dispatchUpdatesTo(this)
         searchResults = listOf()
         this.searchResults = results
-        (context as SyncSettingsActivity)?.scrollToCurrentPosition()
+        (context as? SyncSettingsActivity) ?.scrollToCurrentPosition()
     }
 
     /**
