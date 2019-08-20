@@ -25,8 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.ViewModel.BaseViewModelFactory
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
+import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
@@ -37,8 +37,6 @@ import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.getAppVersionName
-import org.xwiki.android.sync.utils.getValue
-import org.xwiki.android.sync.utils.putValue
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -369,7 +367,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 }
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
-                    BaseViewModelFactory {SyncSettingsViewModel (application, userAccount.id)}
+                    SyncSettingsViewModelFactory (application, userAccount.id)
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType
