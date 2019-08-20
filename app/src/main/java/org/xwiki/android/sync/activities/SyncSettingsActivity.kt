@@ -367,7 +367,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 }
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
-                    SyncSettingsViewModelFactory (application, userAccount.id)
+                    SyncSettingsViewModelFactory (application)
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType
