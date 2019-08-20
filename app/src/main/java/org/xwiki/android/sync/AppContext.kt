@@ -67,12 +67,8 @@ fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiMana
 )
 
 var Context.dataSaverModeEnabled: Boolean
-    set(value) {
-        putValue(this, "data_saving", value)
-    }
-    get() {
-        return getValue(this, "data_saving", false)
-    }
+    set(value) = putValue(this, "data_saving", value)
+    get() = getValue(this, "data_saving", false)
 
 private fun initRepos(context: AppContext) {
     val appDatabase = AppDatabase.getInstance(context)
