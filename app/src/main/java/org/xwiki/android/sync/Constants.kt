@@ -46,6 +46,8 @@ fun buildOIDCAuthorizationServerUrl(baseServerUrl: String): String = "${prepareB
 
 const val REDIRECT_URI = "xwiki://oidc"
 
+const val PAGE_SIZE = 30
+
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
 /**

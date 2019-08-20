@@ -37,9 +37,7 @@ import org.xwiki.android.sync.contactdb.dao_repositories.DAOGroupsCacheRepositor
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.enableDetectingOfAccountsRemoving
-import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.putArrayList
+import org.xwiki.android.sync.utils.*
 import java.util.*
 
 /**
@@ -67,6 +65,10 @@ fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): Base
 fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
     userAccount.serverAddress, userAccount.id
 )
+
+var Context.dataSaverModeEnabled: Boolean
+    set(value) = putValue(this, "data_saving", value)
+    get() = getValue(this, "data_saving", false)
 
 private fun initRepos(context: AppContext) {
     val appDatabase = AppDatabase.getInstance(context)

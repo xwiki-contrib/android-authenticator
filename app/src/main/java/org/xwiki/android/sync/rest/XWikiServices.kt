@@ -78,6 +78,16 @@ interface XWikiServices {
         @Query("number") number: Int?
     ): Observable<CustomSearchResultContainer<XWikiGroup>>
 
+    @GET(
+        ApiEndPoints.REST +
+                ApiEndPoints.WIKIS +
+                "/xwiki/classes/XWiki.XWikiUsers/objects"
+    )
+    fun getAllUsersListByOffset (
+        @Query("start") offset: Int?,
+        @Query("number") limit: Int?
+    ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
+
     /**
      * @since 0.4
      */

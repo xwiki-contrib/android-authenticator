@@ -27,9 +27,12 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
 import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.dataSaverModeEnabled
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
+import org.xwiki.android.sync.utils.getValue
 import retrofit2.HttpException
 import rx.Observable
 import rx.Observer
@@ -108,11 +111,14 @@ class ContactManager(
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute()
                         }
-                        contactManager.updateAvatar(
-                            resolver,
-                            contactManager.lookupRawContact(resolver, xWikiUserFull.id),
-                            xWikiUserFull
-                        )
+
+                        if (!appContext.dataSaverModeEnabled) {
+                            contactManager.updateAvatar(
+                                resolver,
+                                contactManager.lookupRawContact(resolver, xWikiUserFull.id),
+                                xWikiUserFull
+                            )
+                        }
                     }
                 }
             )

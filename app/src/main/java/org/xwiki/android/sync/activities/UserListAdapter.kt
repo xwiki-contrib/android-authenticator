@@ -19,6 +19,7 @@
  */
 package org.xwiki.android.sync.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,8 +45,10 @@ import org.xwiki.android.sync.bean.ObjectSummary
  * @param searchResults Initial list
  */
 
-class UserListAdapter(private var searchResults: List<ObjectSummary>)
-    : RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
+class UserListAdapter(
+    private var searchResults: List<ObjectSummary>,
+    private val context: Context
+) : RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -70,8 +73,8 @@ class UserListAdapter(private var searchResults: List<ObjectSummary>)
             val o = payloads[0] as Bundle
             for (key in o.keySet()) {
                 if (key == "guid") {
-                    holder.groupNameTextView.setText(searchResults.get(position).pageName)
-                    holder.versionTextView.setText(searchResults.get(position).wiki)
+                    holder.groupNameTextView.text = searchResults.get(position).pageName
+                    holder.versionTextView.text = searchResults.get(position).wiki
                 }
             }
         }
@@ -87,6 +90,7 @@ class UserListAdapter(private var searchResults: List<ObjectSummary>)
         diffResult.dispatchUpdatesTo(this)
         searchResults = listOf()
         this.searchResults = results
+        (context as? SyncSettingsActivity) ?.scrollToCurrentPosition()
     }
 
     /**
