@@ -17,7 +17,7 @@ import org.xwiki.android.sync.userAccountsRepo
 
 class SyncSettingsViewModel(
     application: Application,
-    private var id: UserAccountId
+    private val id: UserAccountId
 ) : AndroidViewModel(application) {
     suspend fun getUser() : UserAccount? {
         return userAccountsRepo.findByAccountId(id)
