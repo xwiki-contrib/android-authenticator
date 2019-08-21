@@ -253,9 +253,10 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
             override fun onResponse(call: Call, response: Response) {
                 if (response.code() == 200) {
                     val userInfo = JSONObject(response.body()?.string())
+                    val sub = userInfo.getString("sub").split(".")
                     val i = Intent()
                     i.putExtra(AccountManager.KEY_AUTHTOKEN, token)
-                    i.putExtra(AccountManager.KEY_ACCOUNT_NAME, userInfo.getString("preferred_username"))
+                    i.putExtra(AccountManager.KEY_ACCOUNT_NAME, sub[sub.size-1])
                     setResult(Activity.RESULT_OK, i)
                     finish()
                 } else {
