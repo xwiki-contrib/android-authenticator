@@ -414,7 +414,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
         if (addNewAccount) {
             val i = Intent()
-            i.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+            i.putExtra("serverUrl", serverUrl)
             setResult(REQUEST_NEW_ACCOUNT, i)
         } else {
             val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
@@ -475,10 +475,10 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
     }
 
-    fun startOIDCAuth(cliendID: String) {
+    fun startOIDCAuth() {
         val oidcIntent = Intent(this, OIDCActivity::class.java)
-        oidcIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, cliendID)
         oidcIntent.putExtra("serverUrl", serverUrl)
+        oidcIntent.putExtra("requestNewLogin", true)
         startActivityForResult(oidcIntent, REQUEST_NEW_ACCOUNT)
     }
 
@@ -490,4 +490,5 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             }
         }
     }
+
 }

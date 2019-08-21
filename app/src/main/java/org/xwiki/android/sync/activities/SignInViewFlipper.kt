@@ -80,10 +80,10 @@ class SignInViewFlipper(
      * Databinding of this flipper
      */
 
-    lateinit var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding
+    var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding =
+        DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
 
     init {
-        binding = DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
         binding.signInButton.setOnClickListener {
             if (checkInput()) {
                 val signInJob = submit()
@@ -94,32 +94,11 @@ class SignInViewFlipper(
                 }
             }
         }
+
         binding.llXWikiOIDCButton.setOnClickListener {
             binding.loading.visibility = View.VISIBLE
             binding.llXWikiOIDCButton.visibility = View.INVISIBLE
             checkOIDCSupport()
-        }
-
-        binding.llXWikiLoginButton.setOnClickListener {
-            binding.accountName.error = null
-            binding.accountPassword.error = null
-            binding.clientID.error = null
-            binding.accountName.clearFocus()
-            binding.accountPassword.clearFocus()
-            binding.clientID.clearFocus()
-            binding.llLoginFields.visibility = View.VISIBLE
-            binding.llXWikiOIDCButton.visibility = View.VISIBLE
-            binding.llOIDCFields.visibility = View.GONE
-            binding.llXWikiLoginButton.visibility = View.GONE
-        }
-
-        binding.btOIDC.setOnClickListener {
-            if (binding.clientID.text.isNullOrEmpty()) {
-                binding.clientID.requestFocus()
-                binding.clientID.error = mContext.getString(R.string.error_field_required)
-            } else {
-                mActivity.startOIDCAuth(binding.clientID.text.toString())
-            }
         }
     }
 
@@ -302,14 +281,12 @@ class SignInViewFlipper(
             override fun onResponse(call: Call, response: Response) {
                 appCoroutineScope.launch (Dispatchers.Main) {
                     binding.loading.visibility = View.GONE
+                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
+
                     if (response.code() == 500) {
-                        binding.llLoginFields.visibility = View.GONE
-                        binding.llXWikiOIDCButton.visibility = View.INVISIBLE
-                        binding.llOIDCFields.visibility = View.VISIBLE
-                        binding.llXWikiLoginButton.visibility = View.VISIBLE
+                        mActivity.startOIDCAuth()
                     }
                     if (response.code() == 404 || response.code() == 401) {
-                        binding.llXWikiOIDCButton.visibility = View.VISIBLE
                         Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
                     }
                 }

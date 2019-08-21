@@ -100,38 +100,6 @@
             </LinearLayout>
 
             <LinearLayout
-                    android:id="@+id/llOIDCFields"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center_horizontal"
-                    android:visibility="gone"
-                    android:orientation="vertical">
-
-                <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/defaultViewMediumPadding">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/clientID"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/login_activity_username_label"
-                            android:inputType="textEmailAddress" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <Button
-                        android:id="@+id/btOIDC"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Continue"
-                        android:textAllCaps="false"
-                        android:layout_margin="@dimen/defaultViewMediumPadding"/>
-
-            </LinearLayout>
-
-            <LinearLayout
                     android:id="@+id/llContinueWith"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,30 +153,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="OpenID Connect"
-                        android:layout_gravity="center"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                    android:id="@+id/llXWikiLoginButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true">
-
-                <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_email_black_24dp"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Login"
                         android:layout_gravity="center"/>
 
             </LinearLayout>

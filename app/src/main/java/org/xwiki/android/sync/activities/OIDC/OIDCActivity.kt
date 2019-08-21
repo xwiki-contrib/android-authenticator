@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.webkit.*
@@ -30,36 +31,29 @@ import org.xwiki.android.sync.utils.AccountClickListener
 import org.xwiki.android.sync.utils.extensions.TAG
 import java.io.IOException
 import android.webkit.CookieSyncManager
+import okhttp3.*
+import org.json.JSONObject
 import org.xwiki.android.sync.utils.OIDCWebViewClient
 import org.xwiki.android.sync.utils.WebViewPageLoadedListener
+import java.net.URL
 
-private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, serverUrl: String): AuthorizationCodeFlow {
-    val userServerBaseUrl: String = if (serverUrl.isNullOrEmpty()) {
-        userAccountsRepo.findByAccountName(
-            selectedAccountName
-        ) ?.serverAddress ?: throw IllegalArgumentException(
-            "Selected account name is absent in databse"
-        )
-    } else {
-        serverUrl
-    }
-
+private suspend fun createAuthorizationCodeFlow(serverUrl: String): AuthorizationCodeFlow {
     return AuthorizationCodeFlow.Builder(
         BearerToken.authorizationHeaderAccessMethod(),
         NetHttpTransport(),
         JacksonFactory(),
         GenericUrl(
             buildOIDCTokenServerUrl(
-                userServerBaseUrl
+                serverUrl
             )
         ),
         ClientParametersAuthentication(
-            selectedAccountName,
+            Settings.Secure.ANDROID_ID,
             ""
         ),
-        selectedAccountName,
+        Settings.Secure.ANDROID_ID,
         buildOIDCAuthorizationServerUrl(
-            userServerBaseUrl
+            serverUrl
         )
     ).apply {
         scopes = mutableListOf(
@@ -72,13 +66,11 @@ private suspend fun createAuthorizationCodeFlow(selectedAccountName: String, ser
 
 class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoadedListener {
 
-    private var selectedAccountName: String? = null
-
     private lateinit var binding: ActOidcChooseAccountBinding
 
     private var allUsersList: List<UserAccount> = listOf()
 
-    private var clientID = ""
+    private var requestNewLogin = false
 
     private var serverUrl = ""
 
@@ -87,17 +79,12 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
 
         binding = DataBindingUtil.setContentView(this, R.layout.act_oidc_choose_account)
 
-        if (!intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME).isNullOrEmpty()) {
-            clientID = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-        }
-
         if (!intent.getStringExtra("serverUrl").isNullOrEmpty()) {
             serverUrl = intent.getStringExtra("serverUrl")
-        }
-        if (!clientID.isEmpty()) {
             binding.cvOIDCAccountList.visibility = View.GONE
             binding.tvPleaseWait.visibility = View.VISIBLE
             binding.webview.visibility  = View.VISIBLE
+            requestNewLogin = intent.getBooleanExtra("requestNewLogin",false)
         }
 
         init()
@@ -120,8 +107,8 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
         appCoroutineScope.launch {
             allUsersList = userAccountsRepo.getAll()
 
-            if (!clientID.isEmpty()) {
-                startAuthorization(clientID)
+            if (requestNewLogin) {
+                startAuthorization()
             } else {
                 if (allUsersList.isEmpty()) {
                     addNewAccount()
@@ -192,50 +179,46 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
                 val adapter = OIDCAccountAdapter(this, allUsersList, this)
                 binding.lvSelectAccount.adapter = adapter
 
-                val accountName = data ?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?.toString() ?: return
+                serverUrl = data?.getStringExtra("serverUrl").toString()
+
                 appCoroutineScope.launch {
-                    startAuthorization(accountName)
+                    startAuthorization()
                 }
             }
         }
     }
 
-    private fun sendResult(accessToken: String?) {
+    private fun sendResult(accessToken: String) {
         if (accessToken.isNullOrEmpty()) {
             Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
         } else {
-            val i = Intent()
-            i.putExtra(AccountManager.KEY_ACCOUNT_NAME, clientID)
-            i.putExtra(AccountManager.KEY_AUTHTOKEN, accessToken)
-            setResult(Activity.RESULT_OK, i)
-            finish()
+            getUserInfo(accessToken)
         }
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent ?: return
-        val accountName = selectedAccountName ?: return
         val authorizationCode = extractAuthorizationCode(intent)
         appCoroutineScope.launch {
-            requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
+            requestAccessToken(createAuthorizationCodeFlow(serverUrl), authorizationCode)
         }
     }
 
     override fun invoke(selectedAccount: UserAccount) {
         binding.webview.visibility  = View.VISIBLE
+        serverUrl = selectedAccount.serverAddress
         appCoroutineScope.launch {
-            startAuthorization(selectedAccount.accountName)
+            startAuthorization()
         }
     }
 
-    private suspend fun startAuthorization(accountName: String) {
+    private suspend fun startAuthorization() {
         try {
-            selectedAccountName = accountName
-            val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(accountName, serverUrl)
+            val flow: AuthorizationCodeFlow = createAuthorizationCodeFlow(serverUrl)
             flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build().let {
                 appCoroutineScope.launch (Dispatchers.Main) {
-                    binding.webview.webViewClient = OIDCWebViewClient(this@OIDCActivity, accountName)
+                    binding.webview.webViewClient = OIDCWebViewClient(this@OIDCActivity)
                     binding.webview.loadUrl(it)
                 }
             }
@@ -250,9 +233,39 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
         startActivityForResult(i, REQUEST_NEW_ACCOUNT)
     }
 
-    override fun onPageLoaded(authorizationCode: String?, accountName: String) {
+    override fun onPageLoaded(authorizationCode: String?) {
         appCoroutineScope.launch {
-            requestAccessToken(createAuthorizationCodeFlow(accountName, serverUrl), authorizationCode)
+            requestAccessToken(createAuthorizationCodeFlow(serverUrl), authorizationCode)
         }
+    }
+
+    private fun getUserInfo(token: String) {
+        val url = URL ("$serverUrl/oidc/userinfo")
+
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(object :Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.code() == 200) {
+                    val userInfo = JSONObject(response.body()?.string())
+                    val i = Intent()
+                    i.putExtra(AccountManager.KEY_AUTHTOKEN, token)
+                    i.putExtra(AccountManager.KEY_ACCOUNT_NAME, userInfo.getString("preferred_username"))
+                    setResult(Activity.RESULT_OK, i)
+                    finish()
+                } else {
+                    Toast.makeText(this@OIDCActivity, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Toast.makeText(this@OIDCActivity, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }
