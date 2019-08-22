@@ -192,6 +192,11 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                if (userAccount.syncType == position) {
+                    binding.nextButton.alpha = 0.8F
+                } else {
+                    binding.nextButton.alpha = 1F
+                }
                 chosenSyncType = position
                 initialUsersListLoading = true
                 currentPage = 0
@@ -567,6 +572,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     fun syncSettingComplete(v: View) {
         val oldSyncType = userAccount.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
+            binding.nextButton.alpha = 0.8F
+            Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -587,17 +594,20 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         //if has changes, set sync
         if (syncNothing()) {
             userAccount.syncType = SYNC_TYPE_NO_NEED_SYNC
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(false)
             finish()
         } else if (syncAllUsers()) {
             userAccount.syncType = SYNC_TYPE_ALL_USERS
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(true)
             finish()
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
+                Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -671,10 +681,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     override fun onChangeListener() {
         if (compareSelectGroups()) {
-            binding.nextButton.isClickable = false
             binding.nextButton.alpha = 0.8F
         } else {
-            binding.nextButton.isClickable = true
             binding.nextButton.alpha = 1F
         }
     }
