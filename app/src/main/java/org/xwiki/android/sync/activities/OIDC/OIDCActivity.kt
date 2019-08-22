@@ -249,7 +249,9 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
 
         val client = OkHttpClient()
 
-        client.newCall(request).enqueue(object :Callback {
+        client
+            .newCall(request)
+            .enqueue(object :Callback {
             override fun onResponse(call: Call, response: Response) {
                 if (response.code() == 200) {
                     val userInfo = JSONObject(response.body()?.string())

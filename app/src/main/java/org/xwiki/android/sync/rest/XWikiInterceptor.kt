@@ -19,7 +19,6 @@
  */
 package org.xwiki.android.sync.rest
 
-import android.text.TextUtils
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -43,7 +42,8 @@ private const val CONTENT_TYPE = "application/json"
  */
 class XWikiInterceptor(
     private val userAccountId: UserAccountId,
-    private val userAccountsCookiesRepository: UserAccountsCookiesRepository
+    private val userAccountsCookiesRepository: UserAccountsCookiesRepository,
+    private val authToken: String?
 ) : Interceptor {
 
     /**
@@ -60,28 +60,32 @@ class XWikiInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val chainRequest = chain.request()
 
-        val originalHttpUrl = chainRequest.url()
-        val url = originalHttpUrl.newBuilder()
-            .addQueryParameter("media", "json")
-            .build()
-
-        val builder = chainRequest.newBuilder()
-            .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
-            .header(HEADER_ACCEPT, CONTENT_TYPE)
-            .url(url)
-
         var cookie: String? = null
 
         appCoroutineScope.launch {
             cookie = userAccountsCookiesRepository[userAccountId]
         }
 
-        if (!TextUtils.isEmpty(cookie)) {
-            builder.addHeader(HEADER_COOKIE, cookie.toString())
+        val originalHttpUrl = chainRequest.url()
+        val url = originalHttpUrl.newBuilder()
+            .addQueryParameter("media", "json")
+            .build()
+
+        val builder = if(authToken.isNullOrEmpty()) {
+            chainRequest
+                .newBuilder()
+                .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
+                .header(HEADER_ACCEPT, CONTENT_TYPE)
+                .header(HEADER_COOKIE, cookie.toString())
+                .url(url)
+        } else {
+            chainRequest
+                .newBuilder()
+                .addHeader("Authorization", "Bearer $authToken")
+                .url(url)
         }
 
         val request = builder.build()
         return chain.proceed(request)
     }
-
 }

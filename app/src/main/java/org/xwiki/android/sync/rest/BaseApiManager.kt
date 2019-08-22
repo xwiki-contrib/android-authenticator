@@ -19,10 +19,17 @@
  */
 package org.xwiki.android.sync.rest
 
-import okhttp3.OkHttpClient
+import android.accounts.Account
+import android.accounts.AccountManager
+import kotlinx.coroutines.launch
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.appContext
+import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
+import org.xwiki.android.sync.userAccountsRepo
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -72,17 +79,45 @@ class BaseApiManager(
 
     init {
         var baseUrl = baseURL
+        var accountName = ""
+        var accountPassword: String? = ""
+        var authToken: String? = ""
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository))
-            .addInterceptor(loggingInterceptor)
-            .build()
+        appCoroutineScope.launch {
+            accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
+            val account = Account(accountName, ACCOUNT_TYPE)
+            val am = AccountManager.get(appContext)
+            accountPassword = am.getUserData(account,AccountManager.KEY_PASSWORD)
+            authToken = userAccountsCookiesRepository[userAccountId]
+        }
+
+        val okHttpClient = if (accountPassword.isNullOrEmpty()) {
+            OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken))
+                .addInterceptor(loggingInterceptor)
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .authenticator { route, response ->
+                    if (response.request().header("Authorization") != null) {
+                        return@authenticator null
+                    }
+                    val credential = Credentials.basic(accountName, accountPassword)
+                    return@authenticator response.request().newBuilder().header("Authorization", credential).build()
+                }
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken))
+                .addInterceptor(loggingInterceptor)
+                .build()
+        }
 
         // Check that url ends with `/` and put it if not
         if (!baseUrl.endsWith("/")) {
