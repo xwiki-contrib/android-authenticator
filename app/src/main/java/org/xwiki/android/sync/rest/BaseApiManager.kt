@@ -52,7 +52,8 @@ import java.util.concurrent.TimeUnit
 class BaseApiManager(
     baseURL: String,
     userAccountId: UserAccountId,
-    userAccountsCookiesRepository: UserAccountsCookiesRepository
+    userAccountsCookiesRepository: UserAccountsCookiesRepository,
+    accountName: String
 ) {
 
     /**
@@ -76,29 +77,22 @@ class BaseApiManager(
 
     init {
         var baseUrl = baseURL
-        var accountName = ""
-        var accountPassword: String? = ""
-        var cookie: String? = ""
-        var authToken: String? = ""
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        appCoroutineScope.launch {
-            accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
-            cookie = userAccountsCookiesRepo[userAccountId]
-            val account = Account(accountName, ACCOUNT_TYPE)
-            val am = AccountManager.get(appContext)
-            accountPassword = am.getUserData(account,AccountManager.KEY_PASSWORD)
-            authToken = am.getUserData(account, "access_token")
-        }
+        val account = Account(accountName, ACCOUNT_TYPE)
+        val am = AccountManager.get(appContext)
+        val accountPassword = am.getUserData(account,AccountManager.KEY_PASSWORD)
+        val authToken = am.getUserData(account, "access_token")
+        val cookie = userAccountsCookiesRepo[userAccountId]
 
         val okHttpClient = if (cookie.isNullOrEmpty()) {
             OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken.toString()))
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken))
                 .addInterceptor(loggingInterceptor)
                 .build()
         } else {
@@ -113,7 +107,7 @@ class BaseApiManager(
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, cookie.toString()))
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, cookie))
                 .addInterceptor(loggingInterceptor)
                 .build()
         }

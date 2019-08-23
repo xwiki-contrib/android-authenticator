@@ -19,12 +19,15 @@
  */
 package org.xwiki.android.sync
 
+import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.UserAccountId
@@ -59,7 +62,15 @@ lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
 private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
 
 fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
-    BaseApiManager(serverAddress, userAccountId, userAccountsCookiesRepo)
+    runBlocking {
+        val accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
+        BaseApiManager(
+            serverAddress,
+            userAccountId,
+            userAccountsCookiesRepo,
+            accountName
+        )
+    }
 }
 
 fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(

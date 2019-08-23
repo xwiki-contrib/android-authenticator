@@ -44,7 +44,7 @@ private const val CONTENT_TYPE = "application/json"
 class XWikiInterceptor(
     private val userAccountId: UserAccountId,
     private val userAccountsCookiesRepository: UserAccountsCookiesRepository,
-    private val token: String
+    private val token: String?
 ) : Interceptor {
 
     /**
@@ -74,7 +74,7 @@ class XWikiInterceptor(
 
         var builder = Request.Builder()
 
-        if(token.contains("JSESSIONID") || token.isEmpty()) {
+        if(token.isNullOrEmpty() || token.contains("JSESSIONID")) {
             builder = chainRequest
                 .newBuilder()
                 .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
