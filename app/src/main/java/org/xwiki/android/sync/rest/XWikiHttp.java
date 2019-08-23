@@ -312,61 +312,63 @@ public class XWikiHttp {
             final ObjectSummary summary = queueOfSummaries.poll();
 
             try {
-                Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.getHeadline());
-                if (spaceAndName == null) {
-                    continue;
-                }
-                apiManager.getXwikiServicesApi().getFullUserDetails(
-                    spaceAndName.getKey(),
-                    spaceAndName.getValue()
-                ).subscribe(
-                    new Observer<XWikiUserFull>() {
-                        @Override
-                        public void onCompleted() { }
+                if (summary.getHeadline() != null && !summary.getHeadline().isEmpty()) {
+                    Map.Entry<String, String> spaceAndName = XWikiUserFull.spaceAndPage(summary.getHeadline());
+                    if (spaceAndName == null) {
+                        continue;
+                    }
+                    apiManager.getXwikiServicesApi().getFullUserDetails(
+                            spaceAndName.getKey(),
+                            spaceAndName.getValue()
+                    ).subscribe(
+                            new Observer<XWikiUserFull>() {
+                                @Override
+                                public void onCompleted() { }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            try {
-                                HttpException asHttpException = (HttpException) e;
-                                if (asHttpException.code() == 401) {//Unauthorized
-                                    relogin(
-                                            getAppContext()
-                                    ).subscribe(
-                                        new Observer<String>() {
-                                            @Override
-                                            public void onCompleted() {
-                                                queueOfSummaries.offer(summary);
-                                            }
+                                @Override
+                                public void onError(Throwable e) {
+                                    try {
+                                        HttpException asHttpException = (HttpException) e;
+                                        if (asHttpException.code() == 401) {//Unauthorized
+                                            relogin(
+                                                    getAppContext()
+                                            ).subscribe(
+                                                    new Observer<String>() {
+                                                        @Override
+                                                        public void onCompleted() {
+                                                            queueOfSummaries.offer(summary);
+                                                        }
 
-                                            @Override
-                                            public void onError(Throwable e) {
-                                                subject.onError(e);
-                                            }
+                                                        @Override
+                                                        public void onError(Throwable e) {
+                                                            subject.onError(e);
+                                                        }
 
-                                            @Override
-                                            public void onNext(String s) {
-                                                Log.d(TAG, "Relogged in");
+                                                        @Override
+                                                        public void onNext(String s) {
+                                                            Log.d(TAG, "Relogged in");
+                                                        }
+                                                    }
+                                            );
+                                            return;
+                                        } else {
+                                            if (asHttpException.code() == 404) {
+                                                return;
                                             }
                                         }
-                                    );
-                                    return;
-                                } else {
-                                    if (asHttpException.code() == 404) {
-                                        return;
+                                    } catch (ClassCastException e1) {
+                                        Log.e(TAG, "Can't cast exception to HttpException", e1);
                                     }
+                                    subject.onError(e);
                                 }
-                            } catch (ClassCastException e1) {
-                                Log.e(TAG, "Can't cast exception to HttpException", e1);
-                            }
-                            subject.onError(e);
-                        }
 
-                        @Override
-                        public void onNext(XWikiUserFull userFull) {
-                            subject.onNext(userFull);
-                        }
-                    }
-                );
+                                @Override
+                                public void onNext(XWikiUserFull userFull) {
+                                    subject.onNext(userFull);
+                                }
+                            }
+                    );
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Can't synchronize object with id: " + summary.getHeadline(), e);
             }

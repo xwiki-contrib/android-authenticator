@@ -34,6 +34,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.launch
@@ -489,7 +490,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_NEW_ACCOUNT) {
-            if (!data?.getExtras()?.get("access_token").toString().isNullOrEmpty()) {
+            if (data?.extras?.get("access_token").toString().isNullOrEmpty()) {
+                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
+            } else {
                 data?.let { finishLogin(it) }
             }
         }
