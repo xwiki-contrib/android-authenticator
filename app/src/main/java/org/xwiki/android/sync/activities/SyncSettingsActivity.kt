@@ -425,7 +425,9 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             R.string.cantGetAllUsers,
                             Toast.LENGTH_SHORT
                         ).show()
-                        binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        if (allUsers.size <= 0) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
                     }
                     hideProgressBar()
                 }
@@ -469,7 +471,9 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             R.string.cantGetGroups,
                             Toast.LENGTH_SHORT
                         ).show()
-                        binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        if (groups.size <= 0) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
                     }
                     hideProgressBar()
                 }

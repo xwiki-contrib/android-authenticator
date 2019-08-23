@@ -24,12 +24,9 @@ import android.accounts.AccountManager
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
-import org.xwiki.android.sync.ACCOUNT_TYPE
-import org.xwiki.android.sync.appContext
-import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
-import org.xwiki.android.sync.userAccountsRepo
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -64,7 +61,7 @@ class BaseApiManager(
     /**
      * @return [.xWikiServices]
      */
-    val xwikiServicesApi: XWikiServices
+    var xwikiServicesApi: XWikiServices
 
     /**
      * Helper which work with downloading and managing of photos
@@ -73,7 +70,7 @@ class BaseApiManager(
      *
      * @since 0.4
      */
-    val xWikiPhotosManager: XWikiPhotosManager
+    var xWikiPhotosManager: XWikiPhotosManager
 
     val xWikiHttp: XWikiHttp = XWikiHttp(this, userAccountId)
 
@@ -81,6 +78,7 @@ class BaseApiManager(
         var baseUrl = baseURL
         var accountName = ""
         var accountPassword: String? = ""
+        var cookie: String? = ""
         var authToken: String? = ""
 
         val loggingInterceptor = HttpLoggingInterceptor()
@@ -88,18 +86,19 @@ class BaseApiManager(
 
         appCoroutineScope.launch {
             accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
+            cookie = userAccountsCookiesRepo[userAccountId]
             val account = Account(accountName, ACCOUNT_TYPE)
             val am = AccountManager.get(appContext)
             accountPassword = am.getUserData(account,AccountManager.KEY_PASSWORD)
-            authToken = userAccountsCookiesRepository[userAccountId]
+            authToken = am.getUserData(account, "access_token")
         }
 
-        val okHttpClient = if (accountPassword.isNullOrEmpty()) {
+        val okHttpClient = if (cookie.isNullOrEmpty()) {
             OkHttpClient.Builder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken))
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken.toString()))
                 .addInterceptor(loggingInterceptor)
                 .build()
         } else {
@@ -114,7 +113,7 @@ class BaseApiManager(
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, authToken))
+                .addInterceptor(XWikiInterceptor(userAccountId, userAccountsCookiesRepository, cookie.toString()))
                 .addInterceptor(loggingInterceptor)
                 .build()
         }

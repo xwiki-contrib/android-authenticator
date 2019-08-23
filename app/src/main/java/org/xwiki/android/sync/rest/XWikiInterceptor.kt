@@ -21,6 +21,7 @@ package org.xwiki.android.sync.rest
 
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.contactdb.UserAccountId
@@ -43,7 +44,7 @@ private const val CONTENT_TYPE = "application/json"
 class XWikiInterceptor(
     private val userAccountId: UserAccountId,
     private val userAccountsCookiesRepository: UserAccountsCookiesRepository,
-    private val authToken: String?
+    private val token: String
 ) : Interceptor {
 
     /**
@@ -71,17 +72,21 @@ class XWikiInterceptor(
             .addQueryParameter("media", "json")
             .build()
 
-        val builder = if(authToken.isNullOrEmpty()) {
-            chainRequest
+        var builder = Request.Builder()
+
+        if(token.contains("JSESSIONID") || token.isEmpty()) {
+            builder = chainRequest
                 .newBuilder()
                 .header(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                 .header(HEADER_ACCEPT, CONTENT_TYPE)
-                .header(HEADER_COOKIE, cookie.toString())
                 .url(url)
+            if (!cookie.isNullOrEmpty()) {
+                builder.header(HEADER_COOKIE, cookie.toString())
+            }
         } else {
-            chainRequest
+            builder = chainRequest
                 .newBuilder()
-                .addHeader("Authorization", "Bearer $authToken")
+                .addHeader("Authorization", "Bearer $token")
                 .url(url)
         }
 

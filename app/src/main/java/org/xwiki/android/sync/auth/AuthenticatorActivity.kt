@@ -368,6 +368,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
         val accountServer = serverUrl
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
+        val accessToken = intent.getStringExtra("access_token")
 
         val userAccountsCookiesRepo: UserAccountsCookiesRepository = SharedPreferencesUserAccountsCookiesRepository(appContext)
 
@@ -379,6 +380,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
+        mAccountManager.setUserData(account, "access_token", accessToken)
 
         appCoroutineScope.launch {
             userAccountsRepo.createAccount(
@@ -387,7 +389,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                     accountServer.toString()
                 )
             )
-            userAccountsCookiesRepo.set(userAccountsRepo.findByAccountName(accountName)!!.id, cookie)
+            val userAccount = userAccountsRepo.findByAccountName(accountName)
+            userAccount?.let { resolveApiManager(it) }
+            userAccountsCookiesRepo[userAccount!!.id] = cookie
         }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
@@ -485,10 +489,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_NEW_ACCOUNT) {
-            if (!data?.getExtras()?.get(AccountManager.KEY_AUTHTOKEN).toString().isNullOrEmpty()) {
+            if (!data?.getExtras()?.get("access_token").toString().isNullOrEmpty()) {
                 data?.let { finishLogin(it) }
             }
         }
     }
-
 }

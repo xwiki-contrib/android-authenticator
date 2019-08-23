@@ -257,7 +257,7 @@ class OIDCActivity: AppCompatActivity(), AccountClickListener, WebViewPageLoaded
                     val userInfo = JSONObject(response.body()?.string())
                     val sub = userInfo.getString("sub").split(".")
                     val i = Intent()
-                    i.putExtra(AccountManager.KEY_AUTHTOKEN, token)
+                    i.putExtra("access_token", token)
                     i.putExtra(AccountManager.KEY_ACCOUNT_NAME, sub[sub.size-1])
                     setResult(Activity.RESULT_OK, i)
                     finish()
