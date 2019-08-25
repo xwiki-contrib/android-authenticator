@@ -50,6 +50,8 @@ const val PAGE_SIZE = 30
 
 const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
+const val ACCESS_TOKEN = "access_token"
+
 /**
  * Auth token types
  */

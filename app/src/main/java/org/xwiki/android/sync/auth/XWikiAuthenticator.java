@@ -163,8 +163,14 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 authToken[0] = null;
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 final Object sync = new Object();
-                resolveApiManager(
-                        getUserAccountByAccountName(accountName)
+                UserAccount userAccount = getUserAccountByAccountName(accountName);
+
+                if (userAccount == null) {
+                    throw new IllegalStateException("User Account for $accountName must not be null in repo");
+                }
+
+                resolveApiManagerSynchronized(
+                        userAccount
                 ).getXwikiServicesApi().login(
                         Credentials.basic(accountName, accountPassword)
                 ).subscribe(

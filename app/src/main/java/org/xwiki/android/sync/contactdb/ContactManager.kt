@@ -62,7 +62,7 @@ class ContactManager(
          *
          * @since 0.4
          */
-        fun updateContacts(
+        suspend fun updateContacts(
             context: Context,
             account: UserAccount,
             observable: Observable<XWikiUserFull>
@@ -140,6 +140,10 @@ class ContactManager(
         rawId: Long,
         xwikiUser: XWikiUserFull
     ) {
+        if (xwikiUser.avatar.isNullOrEmpty()) {
+            Log.e(TAG, "Avatar url is null or empty")
+            return
+        }
         val gettingAvatarObservable = apiManager.xWikiPhotosManager
             .downloadAvatar(
                 xwikiUser.pageName,

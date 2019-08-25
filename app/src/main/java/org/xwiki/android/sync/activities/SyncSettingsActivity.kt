@@ -192,8 +192,32 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                binding.syncTypeGetErrorContainer.visibility = View.GONE
+
+                when(position) {
+                    0 -> {
+                        if (allUsers.isEmpty() && allUsersAreLoading) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    1 -> {
+                        if (groups.isEmpty()) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    2 -> {
+                        binding.syncTypeGetErrorContainer.visibility = View.GONE
+                    }
+                }
+
+                if (userAccount.syncType == position) {
+                    binding.nextButton.alpha = 0.8F
+                } else {
+                    binding.nextButton.alpha = 1F
+                }
                 chosenSyncType = position
                 initialUsersListLoading = true
+                currentPage = 0
                 updateListView(false)
             }
 
@@ -204,7 +228,12 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             startActivityForResult(intent, 1000)
         }
         binding.btTryAgain.setOnClickListener {
-            initData()
+            appCoroutineScope.launch {
+                when(chosenSyncType) {
+                    SYNC_TYPE_ALL_USERS -> {loadAllUsers()}
+                    SYNC_TYPE_SELECTED_GROUPS -> {loadSyncGroups()}
+                }
+            }
         }
         binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
@@ -257,6 +286,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
+    // TODO:: Test case for pagination of loading MoreUsers
     private fun loadMoreUsers () {
         isLoading = true
         apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
@@ -264,20 +294,23 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 Action1 {
-                    initialUsersListLoading = false
-                    currentPage += PAGE_SIZE
-                    allUsersAreLoading = false
-                    allUsers.addAll(it.objectSummaries)
-                    updateListView(true)
-                    isLoading = false
+                    if (it.objectSummaries.isNotEmpty()) {
+                        currentPage += PAGE_SIZE
+                        allUsers.addAll(it.objectSummaries)
+                        updateListView(true)
 
-                    syncSettingsViewModel.updateAllUsersCache(
-                        allUsers,
-                        userAccount.id
-                    )
+                        syncSettingsViewModel.updateAllUsersCache(
+                            allUsers,
+                            userAccount.id
+                        )
+                    }
+                    initialUsersListLoading = false
+                    allUsersAreLoading = false
+                    isLoading = false
                 },
                 Action1 {
                     allUsersAreLoading = false
+                    isLoading = false
                     hideProgressBar()
                 }
             )
@@ -299,6 +332,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
                     binding.tvSelectedSyncAcc.text = currentUserAccountName
                     binding.tvSelectedSyncType.text = currentUserAccountType
+                    currentPage = 0
                     initData()
                 }
             }
@@ -316,10 +350,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         runOnUiThread {
             if (progressBarVisible) {
                 binding.listViewProgressBar.visibility = View.VISIBLE
-                binding.settingsSyncListViewContainer.visibility = View.GONE
+                binding.recyclerView.visibility = View.GONE
             } else {
                 binding.listViewProgressBar.visibility = View.GONE
-                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.VISIBLE
             }
         }
     }
@@ -327,14 +361,15 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     private fun showProgressBar() {
         runOnUiThread {
             binding.listViewProgressBar.visibility = View.VISIBLE
-            binding.settingsSyncListViewContainer.visibility = View.GONE
+            binding.syncTypeGetErrorContainer.visibility = View.GONE
+            binding.recyclerView.visibility = View.GONE
         }
     }
 
     private fun hideProgressBar() {
         runOnUiThread {
             binding.listViewProgressBar.visibility = View.GONE
-            binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.VISIBLE
         }
     }
 
@@ -359,24 +394,18 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             withContext(Dispatchers.Main) {
                 binding.tvSelectedSyncAcc.text = userAccount.accountName
                 binding.tvSelectedSyncType.text = userAccount.serverAddress
-                userAccount.syncType.let {
-                    if (it >= 0) {
-                        chosenSyncType = it
-                        binding.selectSpinner.setSelection(it)
-                    }
-                }
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
                     SyncSettingsViewModelFactory (application)
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType
-                chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
             }
             initSyncList()
         }
     }
 
+    // TODO:: Test case for both allUsers and SyncGroups
     private fun initSyncList () {
         loadSyncGroups()
         loadAllUsers()
@@ -384,13 +413,27 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     // Initial loading of all users.
     private fun loadAllUsers() {
+        allUsersAreLoading = true
         val users = syncSettingsViewModel.getAllUsersCache(userAccount.id) ?: emptyList()
         if (users.isEmpty()) {
-            apiManager.xwikiServicesApi.getAllUsersListByOffset( currentPage, PAGE_SIZE)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Action1 { summaries ->
+            showProgressBar()
+        } else {
+            allUsers.clear()
+            allUsers.addAll(users)
+            updateListView(false)
+        }
+        apiManager.xwikiServicesApi.getAllUsersListByOffset( currentPage, PAGE_SIZE)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { summaries ->
+                    val objectSummary = summaries.objectSummaries
+                    if (objectSummary.isNullOrEmpty()) {
+                        runOnUiThread {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            hideProgressBar()
+                        }
+                    } else {
                         currentPage = PAGE_SIZE
                         runOnUiThread {
                             binding.syncTypeGetErrorContainer.visibility = View.GONE
@@ -404,73 +447,80 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             userAccount.id
                         )
                         updateListView(true)
-                    },
-                    Action1 {
-                        allUsersAreLoading = false
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SyncSettingsActivity,
-                                R.string.cantGetAllUsers,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    }
+                },
+                {
+                    allUsersAreLoading = false
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@SyncSettingsActivity,
+                            R.string.cantGetAllUsers,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (allUsers.size <= 0) {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
-                        hideProgressBar()
                     }
-                )
-        }  else {
-            allUsers.clear()
-            allUsers.addAll(users)
-            updateListView(false)
-            currentPage = PAGE_SIZE
-        }
+                    hideProgressBar()
+                }
+            )
     }
 
     private fun loadSyncGroups() {
         val groupsCache = syncSettingsViewModel.getGroupsCache(userAccount.id) ?: emptyList()
-
         if (groupsCache.isEmpty()) {
-            groupsAreLoading = true
-            apiManager.xwikiServicesApi.availableGroups(
-                LIMIT_MAX_SYNC_USERS
-            )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
-                        groupsAreLoading = false
-                        runOnUiThread {
-                            binding.syncTypeGetErrorContainer.visibility = View.GONE
-                        }
-                        val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                        if (searchResults != null) {
-                            groups.clear()
-                            groups.addAll(searchResults)
-                            syncSettingsViewModel.updateGroupsCache(
-                                searchResults,
-                                userAccount.id
-                            )
-                            updateListView(false)
-                        }
-                    },
-                    Action1<Throwable> {
-                        groupsAreLoading = false
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SyncSettingsActivity,
-                                R.string.cantGetGroups,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                        }
-                        hideProgressBar()
-                    }
-                )
+            showProgressBar()
         } else {
             groups.clear()
             groups.addAll(groupsCache)
             updateListView(false)
         }
+        groupsAreLoading = true
+        apiManager.xwikiServicesApi.availableGroups(
+            LIMIT_MAX_SYNC_USERS
+        )
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { xWikiGroupCustomSearchResultContainer ->
+                    groupsAreLoading = false
+                    val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
+                    hideProgressBar()
+
+                    if (searchResults.isNullOrEmpty()) {
+                        runOnUiThread {
+                            if (chosenSyncType == SYNC_TYPE_SELECTED_GROUPS) {
+                                binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            }
+                        }
+                    } else {
+                        runOnUiThread {
+                            binding.syncTypeGetErrorContainer.visibility = View.GONE
+                        }
+                        groups.clear()
+                        groups.addAll(searchResults)
+                        syncSettingsViewModel.updateGroupsCache(
+                            searchResults,
+                            userAccount.id
+                        )
+                        updateListView(false)
+                    }
+                },
+                {
+                    groupsAreLoading = false
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@SyncSettingsActivity,
+                            R.string.cantGetGroups,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (groups.size <= 0) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    hideProgressBar()
+                }
+            )
     }
 
     // Load all users at once, does not support pagination.
@@ -543,10 +593,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     private fun updateListView(hideProgressBar: Boolean) {
         appCoroutineScope.launch(Dispatchers.Main) {
             if (syncNothing()) {
-                binding.settingsSyncListViewContainer.visibility = View.GONE
+                binding.recyclerView.visibility = View.GONE
                 binding.listViewProgressBar.visibility = View.GONE
             } else {
-                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.VISIBLE
                 if (syncGroups()) {
                     binding.recyclerView.adapter = mGroupAdapter
                     mGroupAdapter.refresh(groups, userAccount.selectedGroupsList)
@@ -554,6 +604,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     binding.recyclerView.adapter = mUsersAdapter
                     mUsersAdapter.refresh(allUsers)
                 }
+                binding.recyclerView.layoutManager?.scrollToPosition(0)
                 mUsersAdapter.refresh(allUsers)
                 if (hideProgressBar) {
                     hideProgressBar()
@@ -568,6 +619,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     fun syncSettingComplete(v: View) {
         val oldSyncType = userAccount.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
+            binding.nextButton.alpha = 0.8F
+            Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -588,17 +641,20 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         //if has changes, set sync
         if (syncNothing()) {
             userAccount.syncType = SYNC_TYPE_NO_NEED_SYNC
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(false)
             finish()
         } else if (syncAllUsers()) {
             userAccount.syncType = SYNC_TYPE_ALL_USERS
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(true)
             finish()
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
+                Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -672,10 +728,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     override fun onChangeListener() {
         if (compareSelectGroups()) {
-            binding.nextButton.isClickable = false
             binding.nextButton.alpha = 0.8F
         } else {
-            binding.nextButton.isClickable = true
             binding.nextButton.alpha = 1F
         }
     }

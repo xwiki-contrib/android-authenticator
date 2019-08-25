@@ -1,7 +1,6 @@
 package org.xwiki.android.sync.DB
 
 import android.content.Context
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,7 +9,6 @@ import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.xwiki.android.sync.XWIKI_DEFAULT_SERVER_ADDRESS
@@ -21,9 +19,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class AccountsDaoTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var accountsDao: AccountsDao
     private lateinit var db: AppDatabase

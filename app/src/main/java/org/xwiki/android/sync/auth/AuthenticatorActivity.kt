@@ -34,6 +34,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.launch
@@ -368,6 +369,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
         val accountServer = serverUrl
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
+        val accessToken = intent.getStringExtra(ACCESS_TOKEN)
 
         val userAccountsCookiesRepo: UserAccountsCookiesRepository = SharedPreferencesUserAccountsCookiesRepository(appContext)
 
@@ -379,6 +381,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
+        mAccountManager.setUserData(account, ACCESS_TOKEN, accessToken)
 
         appCoroutineScope.launch {
             userAccountsRepo.createAccount(
@@ -387,7 +390,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
                     accountServer.toString()
                 )
             )
-            userAccountsCookiesRepo.set(userAccountsRepo.findByAccountName(accountName)!!.id, cookie)
+            val userAccount = userAccountsRepo.findByAccountName(accountName)
+            userAccount?.let { resolveApiManager(it) }
+            userAccountsCookiesRepo[userAccount!!.id] = cookie
         }
 
         //grant permission if adding user from the third-party app (UID,PackageName);
@@ -414,7 +419,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
         if (addNewAccount) {
             val i = Intent()
-            i.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName)
+            i.putExtra("serverUrl", serverUrl)
             setResult(REQUEST_NEW_ACCOUNT, i)
         } else {
             val syncActivityIntent = Intent(this, SyncSettingsActivity::class.java)
@@ -475,18 +480,21 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
     }
 
-    fun startOIDCAuth(cliendID: String) {
+    fun startOIDCAuth() {
         val oidcIntent = Intent(this, OIDCActivity::class.java)
-        oidcIntent.putExtra(AccountManager.KEY_ACCOUNT_NAME, cliendID)
         oidcIntent.putExtra("serverUrl", serverUrl)
+        oidcIntent.putExtra("requestNewLogin", true)
         startActivityForResult(oidcIntent, REQUEST_NEW_ACCOUNT)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_NEW_ACCOUNT) {
-            if (!data?.getExtras()?.get(AccountManager.KEY_AUTHTOKEN).toString().isNullOrEmpty()) {
-                data?.let { finishLogin(it) }
+            val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
+            if (accessToken.isNullOrEmpty()) {
+                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
+            } else {
+                finishLogin(data)
             }
         }
     }
