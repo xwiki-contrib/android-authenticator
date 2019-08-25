@@ -26,9 +26,9 @@ import java.net.URL
  * AuthenticatorActivityTest
  */
 
-const val TEST_USERNAME = "aa700"
+private const val TEST_USERNAME = "aa700"
 
-const val TEST_PASSWORD = "a7890"
+private const val TEST_PASSWORD = "a7890"
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
