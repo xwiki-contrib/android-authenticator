@@ -196,12 +196,12 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
                 when(position) {
                     0 -> {
-                        if (allUsers.size == 0 && allUsersAreLoading) {
+                        if (allUsers.isEmpty() && allUsersAreLoading) {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                     }
                     1 -> {
-                        if (groups.size == 0) {
+                        if (groups.isEmpty()) {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                     }
