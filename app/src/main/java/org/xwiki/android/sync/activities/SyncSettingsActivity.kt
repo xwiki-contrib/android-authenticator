@@ -286,6 +286,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
+    // TODO:: Test case for pagination of loading MoreUsers
     private fun loadMoreUsers () {
         isLoading = true
         apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
@@ -404,6 +405,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
+    // TODO:: Test case for both allUsers and SyncGroups
     private fun initSyncList () {
         loadSyncGroups()
         loadAllUsers()
