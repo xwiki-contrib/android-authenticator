@@ -62,7 +62,7 @@ class ContactManager(
          *
          * @since 0.4
          */
-        fun updateContacts(
+        suspend fun updateContacts(
             context: Context,
             account: UserAccount,
             observable: Observable<XWikiUserFull>

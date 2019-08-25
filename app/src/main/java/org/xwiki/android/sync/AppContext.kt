@@ -61,21 +61,36 @@ lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
 
 private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
 
-fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
-    runBlocking {
-        val accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
-        BaseApiManager(
-            serverAddress,
-            userAccountId,
-            userAccountsCookiesRepo,
-            accountName
-        )
-    }
+suspend fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
+    val accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
+    BaseApiManager(
+        serverAddress,
+        userAccountId,
+        userAccountsCookiesRepo,
+        accountName
+    )
 }
 
-fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
+suspend fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
     userAccount.serverAddress, userAccount.id
 )
+
+fun resolveApiManagerSynchronized(userAccount: UserAccount): BaseApiManager {
+    var answer: BaseApiManager? = null
+    val blockObject = Object()
+    appCoroutineScope.launch {
+        answer = resolveApiManager(userAccount)
+        synchronized(blockObject) {
+            blockObject.notifyAll()
+        }
+    }
+    synchronized(blockObject) {
+        while (true) {
+            answer ?.let { return it }
+            blockObject.wait()
+        }
+    }
+}
 
 var Context.dataSaverModeEnabled: Boolean
     set(value) = putValue(this, "data_saving", value)
