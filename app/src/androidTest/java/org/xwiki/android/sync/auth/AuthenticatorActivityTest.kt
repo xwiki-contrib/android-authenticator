@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import okhttp3.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -74,6 +75,8 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Test
     fun checkOIDCSupport() {
+        activityScenario.moveToState(Lifecycle.State.STARTED)
+
         val url = URL ("$XWIKI_DEFAULT_SERVER_ADDRESS/oidc/userinfo")
 
         val request = Request.Builder().url(url).build()
@@ -89,5 +92,10 @@ class AuthenticatorActivityTest : LifecycleObserver {
                 Log.e("Test", e.localizedMessage)
             }
         })
+    }
+
+    @After
+    fun closeActivity() {
+        activityScenario.close()
     }
 }
