@@ -62,7 +62,7 @@ class BaseApiManager(
     /**
      * @return [.xWikiServices]
      */
-    var xwikiServicesApi: XWikiServices
+    val xwikiServicesApi: XWikiServices
 
     /**
      * Helper which work with downloading and managing of photos
@@ -71,7 +71,7 @@ class BaseApiManager(
      *
      * @since 0.4
      */
-    var xWikiPhotosManager: XWikiPhotosManager
+    val xWikiPhotosManager: XWikiPhotosManager
 
     val xWikiHttp: XWikiHttp = XWikiHttp(this, userAccountId)
 
@@ -84,7 +84,7 @@ class BaseApiManager(
         val account = Account(accountName, ACCOUNT_TYPE)
         val am = AccountManager.get(appContext)
         val accountPassword = am.getUserData(account,AccountManager.KEY_PASSWORD)
-        val authToken = am.getUserData(account, "access_token")
+        val authToken = am.getUserData(account, ACCESS_TOKEN)
         val cookie = userAccountsCookiesRepo[userAccountId]
 
         val okHttpClient = if (cookie.isNullOrEmpty()) {

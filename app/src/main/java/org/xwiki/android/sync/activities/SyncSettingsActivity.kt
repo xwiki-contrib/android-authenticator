@@ -193,14 +193,21 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 binding.syncTypeGetErrorContainer.visibility = View.GONE
-                if (position == 0 && allUsers.size == 0 && allUsersAreLoading) {
-                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                }
-                if (position == 1 && groups.size == 0) {
-                    binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                }
-                if (position == 2) {
-                    binding.syncTypeGetErrorContainer.visibility = View.GONE
+
+                when(position) {
+                    0 -> {
+                        if (allUsers.size == 0 && allUsersAreLoading) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    1 -> {
+                        if (groups.size == 0) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    2 -> {
+                        binding.syncTypeGetErrorContainer.visibility = View.GONE
+                    }
                 }
 
                 if (userAccount.syncType == position) {

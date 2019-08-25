@@ -369,7 +369,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val accountPassword = intent.getStringExtra(PARAM_USER_PASS)
         val accountServer = serverUrl
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
-        val accessToken = intent.getStringExtra("access_token")
+        val accessToken = intent.getStringExtra(ACCESS_TOKEN)
 
         val userAccountsCookiesRepo: UserAccountsCookiesRepository = SharedPreferencesUserAccountsCookiesRepository(appContext)
 
@@ -381,7 +381,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
         mAccountManager.setUserData(account, AccountManager.KEY_PASSWORD, accountPassword)
         mAccountManager.setUserData(account, PARAM_USER_SERVER, accountServer)
-        mAccountManager.setUserData(account, "access_token", accessToken)
+        mAccountManager.setUserData(account, ACCESS_TOKEN, accessToken)
 
         appCoroutineScope.launch {
             userAccountsRepo.createAccount(
@@ -490,7 +490,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_NEW_ACCOUNT) {
-            if (data?.extras?.get("access_token").toString().isNullOrEmpty()) {
+            if (data?.extras?.get(ACCESS_TOKEN)?.toString().isNullOrEmpty()) {
                 Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
             } else {
                 data?.let { finishLogin(it) }

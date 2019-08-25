@@ -54,8 +54,6 @@ open class SyncSettingsActivityTest : LifecycleObserver {
         i.putExtra(AccountManager.KEY_ACCOUNT_NAME, user.accountName)
         i.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
         i.putExtra("Test", true)
-
-//        activityScenario = ActivityScenario.launch(i)
     }
 
     @Test
