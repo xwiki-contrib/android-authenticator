@@ -1,90 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ScrollView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="@dimen/defaultViewMediumPadding">
-
-        <LinearLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="@dimen/defaultViewMediumPadding"
-                android:gravity="center">
+                android:animateLayoutChanges="true"
+                android:gravity="center_horizontal">
 
-            <include layout="@layout/logo"/>
-
-            <View
-                    android:id="@+id/message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/defaultViewLargePadding"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding">
-
-                <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/accountName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/login_activity_username_label"
-                        android:inputType="textEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding">
-
-                <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/accountPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/login_activity_password_label"
-                        android:inputType="textPassword" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <include layout="@layout/logo" />
 
             <TextView
-                    android:id="@+id/error_msg"
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/xwikiLogo"
+                    android:text="Choose the login method"
+                    android:textStyle="bold"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <LinearLayout
+                    android:id="@+id/llLoginFields"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding"
-                    android:maxLines="2"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/error_color"
-                    android:textStyle="normal"
-                    android:visibility="gone" />
-            <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/log_in"
-                    android:layout_margin="@dimen/defaultViewMediumPadding"
-                    android:id="@+id/signInButton"/>
-            <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/defaultViewMediumPadding"
-                    android:orientation="horizontal">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/don_t_have_a_account"/>
-                <View
-                        android:layout_width="@dimen/defaultViewSmallPadding"
-                        android:layout_height="1dp"/>
-                <TextView
-                        android:id="@+id/tvSignUp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/create_one"
-                        android:onClick="signUp"
-                        android:textColor="@color/primary_dark"/>
-            </LinearLayout>
-        </LinearLayout>
+                    android:layout_centerInParent="true"
+                    android:gravity="center_horizontal"
+                    android:visibility="visible"
+                    android:orientation="vertical">
 
-    </ScrollView>
+                <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/defaultViewMediumPadding">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/accountName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/login_activity_username_label"
+                            android:inputType="textEmailAddress" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/defaultViewMediumPadding">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/accountPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/login_activity_password_label"
+                            android:inputType="textPassword" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                        android:id="@+id/error_msg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/defaultViewMediumPadding"
+                        android:maxLines="2"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/error_color"
+                        android:textStyle="normal"
+                        android:visibility="gone" />
+
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/log_in"
+                        android:layout_margin="@dimen/defaultViewMediumPadding"
+                        android:id="@+id/signInButton"/>
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/defaultViewMediumPadding"
+                        android:orientation="horizontal">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/don_t_have_a_account"/>
+                    <View
+                            android:layout_width="@dimen/defaultViewSmallPadding"
+                            android:layout_height="1dp"/>
+                    <TextView
+                            android:id="@+id/tvSignUp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/create_one"
+                            android:onClick="signUp"
+                            android:textColor="@color/primary_dark"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/llContinueWith"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:layout_above="@id/llXWikiOIDCButton"
+                    android:layout_margin="@dimen/viewDefaultLargeSize"
+                    android:weightSum="3"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:background="#808080"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Or continue with"
+                        android:textStyle="bold"
+                        android:gravity="top|center" />
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:background="#808080"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/llXWikiOIDCButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true">
+
+                <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/logo"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="OpenID Connect"
+                        android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <ProgressBar
+                    android:id="@+id/loading"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
 
 </layout>

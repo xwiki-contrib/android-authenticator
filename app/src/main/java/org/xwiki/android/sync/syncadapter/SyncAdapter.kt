@@ -11,12 +11,10 @@ import android.text.TextUtils
 import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.ContactManager
 import org.xwiki.android.sync.contactdb.setAccountContactsVisibility
-import org.xwiki.android.sync.rest.XWikiHttp
 import org.xwiki.android.sync.utils.ChannelJavaWaiter
 import org.xwiki.android.sync.utils.StringUtils
 import org.xwiki.android.sync.utils.awaitBlocking

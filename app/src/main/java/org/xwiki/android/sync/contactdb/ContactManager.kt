@@ -27,16 +27,16 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.RawContacts
 import android.util.Log
 import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.dataSaverModeEnabled
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.userAccountsRepo
+import org.xwiki.android.sync.utils.getValue
 import retrofit2.HttpException
 import rx.Observable
 import rx.Observer
 import rx.functions.Action1
-import rx.schedulers.Schedulers
 import java.io.IOException
 import java.util.*
 
@@ -62,7 +62,7 @@ class ContactManager(
          *
          * @since 0.4
          */
-        fun updateContacts(
+        suspend fun updateContacts(
             context: Context,
             account: UserAccount,
             observable: Observable<XWikiUserFull>
@@ -111,11 +111,14 @@ class ContactManager(
                         if (batchOperation.size() >= 100) {
                             batchOperation.execute()
                         }
-                        contactManager.updateAvatar(
-                            resolver,
-                            contactManager.lookupRawContact(resolver, xWikiUserFull.id),
-                            xWikiUserFull
-                        )
+
+                        if (!appContext.dataSaverModeEnabled) {
+                            contactManager.updateAvatar(
+                                resolver,
+                                contactManager.lookupRawContact(resolver, xWikiUserFull.id),
+                                xWikiUserFull
+                            )
+                        }
                     }
                 }
             )
@@ -137,6 +140,10 @@ class ContactManager(
         rawId: Long,
         xwikiUser: XWikiUserFull
     ) {
+        if (xwikiUser.avatar.isNullOrEmpty()) {
+            Log.e(TAG, "Avatar url is null or empty")
+            return
+        }
         val gettingAvatarObservable = apiManager.xWikiPhotosManager
             .downloadAvatar(
                 xwikiUser.pageName,

@@ -24,6 +24,14 @@ fun getUserAccountByAccountName(accountName: String): UserAccount? {
     )
 }
 
+fun removeUser (accountID: Long) {
+    appCoroutineScope.async {
+        userAccountsRepo.deleteAccount(accountID)
+    }.awaitBlocking(
+        appCoroutineScope
+    )
+}
+
 fun getUserSyncType(accountId: UserAccountId): Int {
     return getUserAccountById(accountId) ?.syncType ?: SYNC_TYPE_NO_NEED_SYNC
 }

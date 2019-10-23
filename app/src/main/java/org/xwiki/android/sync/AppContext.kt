@@ -19,27 +19,28 @@
  */
 package org.xwiki.android.sync
 
+import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.AllUsersCacheRepository
 import org.xwiki.android.sync.contactdb.abstracts.GroupsCacheRepository
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
-import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsRepository
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOAllUsersCacheRepository
 import org.xwiki.android.sync.contactdb.dao_repositories.DAOGroupsCacheRepository
+import org.xwiki.android.sync.contactdb.dao_repositories.DAOUserAccountsRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.enableDetectingOfAccountsRemoving
-import org.xwiki.android.sync.utils.getArrayList
-import org.xwiki.android.sync.utils.putArrayList
+import org.xwiki.android.sync.utils.*
 import java.util.*
 
 /**
@@ -60,13 +61,40 @@ lateinit var userAccountsCookiesRepo: UserAccountsCookiesRepository
 
 private val apiManagers: MutableMap<UserAccountId, BaseApiManager> = mutableMapOf()
 
-fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
-    BaseApiManager(serverAddress, userAccountId, userAccountsCookiesRepo)
+suspend fun resolveApiManager(serverAddress: String, userAccountId: UserAccountId): BaseApiManager = apiManagers.getOrPut(userAccountId) {
+    val accountName = userAccountsRepo.findByAccountId(userAccountId)?.accountName.toString()
+    BaseApiManager(
+        serverAddress,
+        userAccountId,
+        userAccountsCookiesRepo,
+        accountName
+    )
 }
 
-fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
+suspend fun resolveApiManager(userAccount: UserAccount): BaseApiManager = resolveApiManager(
     userAccount.serverAddress, userAccount.id
 )
+
+fun resolveApiManagerSynchronized(userAccount: UserAccount): BaseApiManager {
+    var answer: BaseApiManager? = null
+    val blockObject = Object()
+    appCoroutineScope.launch {
+        answer = resolveApiManager(userAccount)
+        synchronized(blockObject) {
+            blockObject.notifyAll()
+        }
+    }
+    synchronized(blockObject) {
+        while (true) {
+            answer ?.let { return it }
+            blockObject.wait()
+        }
+    }
+}
+
+var Context.dataSaverModeEnabled: Boolean
+    set(value) = putValue(this, "data_saving", value)
+    get() = getValue(this, "data_saving", false)
 
 private fun initRepos(context: AppContext) {
     val appDatabase = AppDatabase.getInstance(context)

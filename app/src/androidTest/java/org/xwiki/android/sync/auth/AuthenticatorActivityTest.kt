@@ -2,29 +2,34 @@ package org.xwiki.android.sync.auth
 
 import android.accounts.AccountManager
 import android.content.Intent
+import android.util.Log
 import androidx.core.view.get
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import junit.framework.TestCase
+import okhttp3.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.xwiki.android.sync.ACCOUNT_TYPE
-import org.xwiki.android.sync.AUTHTOKEN_TYPE_FULL_ACCESS
-import org.xwiki.android.sync.R
-import org.xwiki.android.sync.appContext
-import org.xwiki.android.sync.utils.idlingResource
+import org.xwiki.android.sync.*
+import java.io.IOException
+import java.net.URL
 
 /**
  * AuthenticatorActivityTest
  */
+
+private const val TEST_USERNAME = "aa700"
+
+private const val TEST_PASSWORD = "a7890"
+
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class AuthenticatorActivityTest : LifecycleObserver {
@@ -33,7 +38,6 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Before
     fun setUp() {
-        IdlingRegistry.getInstance().register(idlingResource)                       // Idling Resource, waits for the asynchronous call to end.
         val i = Intent(appContext, AuthenticatorActivity::class.java)
         val authTokenType = AUTHTOKEN_TYPE_FULL_ACCESS + "android.uid.system"
         i.putExtra(AccountManager.KEY_ACCOUNT_TYPE, ACCOUNT_TYPE)
@@ -48,7 +52,6 @@ class AuthenticatorActivityTest : LifecycleObserver {
         activityScenario.onActivity {
             it.showViewFlipper(0)
         }
-        activityScenario.moveToState(Lifecycle.State.STARTED)
         activityScenario.close()
     }
 
@@ -69,29 +72,35 @@ class AuthenticatorActivityTest : LifecycleObserver {
         }
         onView(withId(R.id.btViewSignInFlipper)).perform(click())
         onView(withId(R.id.accountName))
-            .perform(typeText("TestUser"))      // Test user, for log in
+            .perform(typeText(TEST_USERNAME))      // Test user, for log in
         onView(withId(R.id.accountPassword))
-            .perform(typeText("test1234"))
+            .perform(typeText(TEST_PASSWORD))
         onView(withId(R.id.signInButton)).perform(click())
     }
 
     @Test
-    fun testSignInOnLocalInstance() {
-        activityScenario.onActivity {
-            it.showViewFlipper(0)
-        }
-        onView(withId(R.id.accountServer)).perform(clearText())
-        onView(withId(R.id.accountServer)).perform(typeText("http://10.0.2.2:8080/xwiki"))
-        onView(withId(R.id.btViewSignInFlipper)).perform(click())
-        onView(withId(R.id.accountName))
-            .perform(typeText("TestUser"))      // Test user, for log in
-        onView(withId(R.id.accountPassword))
-            .perform(typeText("test1234"))
-        onView(withId(R.id.signInButton)).perform(click())
+    fun checkOIDCSupport() {
+        activityScenario.moveToState(Lifecycle.State.STARTED)
+
+        val url = URL ("$XWIKI_DEFAULT_SERVER_ADDRESS/oidc/userinfo")
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                TestCase.assertTrue(response.isSuccessful)
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Test", e.localizedMessage)
+            }
+        })
     }
 
     @After
-    fun unregisterIdlingResource() {
-        IdlingRegistry.getInstance().unregister(idlingResource)
+    fun closeActivity() {
+        activityScenario.close()
     }
 }

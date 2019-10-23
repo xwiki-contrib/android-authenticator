@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="first_name">Prénom</string>
     <string name="last_name">Nom</string>
     <string name="user_id">Id utilisateur (Requis)</string>
@@ -9,27 +8,22 @@
     <string name="password">Mot de passe (Requis)</string>
     <string name="confirm_password">Confirmez le mot de passe (Requis)</string>
     <string name="captcha_textview">Entrez le captcha</string>
-
     <string name="login_activity_username_label">Nom d\'utilisateur</string>
     <string name="login_activity_password_label">Mot de passe</string>
     <string name="login_activity_server_label">Serveur</string>
     <string name="login_activity_port_label">Port</string>
     <string name="save">Enregistrer</string>
-
     <string name="title_activity_edit_contact">Éditer le contact</string>
     <string name="title_activity_authorize">Autoriser</string>
     <string name="title_activity_select_groups">Sélectionner les groupes</string>
     <string name="title_activity_setting">Paramètres</string>
-
     <string name="error_invalid_server">L\'adresse du serveur est invalide</string>
     <string name="error_invalid_email">Cette adresse email n\'est pas valide</string>
     <string name="error_invalid_password">Ce mot de passe est trop court</string>
     <string name="error_incorrect_password">Ce mot de passe est incorrect\t</string>
     <string name="error_field_required">Ce champ est requis</string>
-
     <string name="profile_action">Profil XWiki</string>
     <string name="view_profile">Éditer le contact</string>
-
     <string name="authorize_activity_note">Veuillez cliquer pour autoriser l\'application tierce à accéder à votre compte.</string>
     <string name="account_name">Nom du compte</string>
     <string name="cancel">Annuler</string>
@@ -42,13 +36,9 @@
     <string name="about_version">À propos de la version</string>
     <string name="version">Version 1.0</string>
     <string name="complete">Finaliser</string>
-
-
     <string name="sign_in_authenticating">Se connecter…</string>
     <string name="sign_up_authenticating">S\'inscrire…</string>
-
     <string name="view_group_action_label">Montrer les détails du groupe d\'example</string>
-
     <string name="authorize_activity_package_label">Nom du Paquet</string>
     <string name="cantGetAllUsers">Impossible de télécharger tous les utilisateurs, merci d\'essayer à nouveau</string>
     <string name="cantGetGroups">Impossible de télécharger les groupes</string>
@@ -57,7 +47,6 @@
     <string name="signUp">Enregistrement</string>
     <string name="logIn">Connexion</string>
     <string name="pleaseWait">Veuillez patienter</string>
-
     <!--select setting-->
     <string-array name="select_groups_array">
         <item>Tous les utilisateurs</item>
@@ -92,4 +81,5 @@
     <string name="cantSyncContact">Impossible de synchroniser les données de contact avec le serveur. Il sera synchronisé plus tard par le système</string>
     <string name="prohibitedAction">Vérifiez que vous avez les autorisations nécessaires</string>
     <string name="editXWikiContactInfo">Modifier les coordonnées de XWiki</string>
+    <string name="unchangedSettings">Rien à enregistrer: la configuration n\'a pas été modifiée</string>
 </resources>

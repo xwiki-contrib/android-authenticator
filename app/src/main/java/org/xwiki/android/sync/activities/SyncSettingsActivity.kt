@@ -10,20 +10,23 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
-import org.xwiki.android.sync.activities.base.BaseActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
@@ -33,9 +36,7 @@ import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
-import org.xwiki.android.sync.utils.decrement
 import org.xwiki.android.sync.utils.getAppVersionName
-import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -82,7 +83,7 @@ private fun openAppMarket(context: Context) {
     }
 }
 
-class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
+class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     /**
      * DataBinding for accessing layout variables.
@@ -140,6 +141,20 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     private lateinit var context: LifecycleOwner
 
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private var isLoading = false
+
+    private var initialUsersListLoading = true
+
+    private var currentPage = 0
+
+    private var lastVisiblePosition = 0
+
+    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
+
+    private lateinit var dataSavingCheckbox: MenuItem
+
     /**
      * Init all views and other activity objects
      *
@@ -161,20 +176,48 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         if (intent.extras != null && intent.extras.get("account") != null) {
             val intentAccount : Account = intent.extras.get("account") as Account
             currentUserAccountName = intentAccount.name
-            currentUserAccountType = intentAccount.type
         } else {
             currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            currentUserAccountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
         }
 
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         mGroupAdapter = GroupListAdapter(groups, this)
-        mUsersAdapter = UserListAdapter(allUsers)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        mUsersAdapter = UserListAdapter(allUsers, this)
+        layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = mUsersAdapter
+        binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                binding.syncTypeGetErrorContainer.visibility = View.GONE
+
+                when(position) {
+                    0 -> {
+                        if (allUsers.isEmpty() && allUsersAreLoading) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    1 -> {
+                        if (groups.isEmpty()) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    2 -> {
+                        binding.syncTypeGetErrorContainer.visibility = View.GONE
+                    }
+                }
+
+                if (userAccount.syncType == position) {
+                    binding.nextButton.alpha = 0.8F
+                } else {
+                    binding.nextButton.alpha = 1F
+                }
                 chosenSyncType = position
+                initialUsersListLoading = true
+                currentPage = 0
                 updateListView(false)
             }
 
@@ -185,13 +228,98 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
             startActivityForResult(intent, 1000)
         }
         binding.btTryAgain.setOnClickListener {
-            initData()
+            appCoroutineScope.launch {
+                when(chosenSyncType) {
+                    SYNC_TYPE_ALL_USERS -> {loadAllUsers()}
+                    SYNC_TYPE_SELECTED_GROUPS -> {loadSyncGroups()}
+                }
+            }
         }
         binding.versionCheck.setOnClickListener { v -> openAppMarket(v.context) }
 
         binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.sync_setting_view_menu, menu)
+        dataSavingCheckbox = menu!!.findItem(R.id.action_data_saving)
+
+        if (appContext.dataSaverModeEnabled) {
+            dataSavingCheckbox.setChecked(true)
+        } else {
+            dataSavingCheckbox.setChecked(false)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_data_saving -> {
+                if (item.isChecked) {
+                    item.setChecked(false)
+                    appContext.dataSaverModeEnabled = false
+                } else {
+                    item.setChecked(true)
+                    appContext.dataSaverModeEnabled = true
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private val recyclerViewOnScrollListener = object : RecyclerView.OnScrollListener() {
+
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                val totalItemCount = layoutManager.itemCount
+
+                if (!isLoading && layoutManager.findLastCompletelyVisibleItemPosition() >= totalItemCount/2) {
+                    lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+                    loadMoreUsers()
+                }
+            }
+        }
+    }
+
+    // TODO:: Test case for pagination of loading MoreUsers
+    private fun loadMoreUsers () {
+        isLoading = true
+        apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                Action1 {
+                    if (it.objectSummaries.isNotEmpty()) {
+                        currentPage += PAGE_SIZE
+                        allUsers.addAll(it.objectSummaries)
+                        updateListView(true)
+
+                        syncSettingsViewModel.updateAllUsersCache(
+                            allUsers,
+                            userAccount.id
+                        )
+                    }
+                    initialUsersListLoading = false
+                    allUsersAreLoading = false
+                    isLoading = false
+                },
+                Action1 {
+                    allUsersAreLoading = false
+                    isLoading = false
+                    hideProgressBar()
+                }
+            )
+    }
+
+    fun scrollToCurrentPosition() {
+        if (!initialUsersListLoading) {
+            binding.recyclerView.scrollToPosition(lastVisiblePosition - 3)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -204,6 +332,7 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
                     binding.tvSelectedSyncAcc.text = currentUserAccountName
                     binding.tvSelectedSyncType.text = currentUserAccountType
+                    currentPage = 0
                     initData()
                 }
             }
@@ -221,10 +350,10 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         runOnUiThread {
             if (progressBarVisible) {
                 binding.listViewProgressBar.visibility = View.VISIBLE
-                binding.settingsSyncListViewContainer.visibility = View.GONE
+                binding.recyclerView.visibility = View.GONE
             } else {
                 binding.listViewProgressBar.visibility = View.GONE
-                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.VISIBLE
             }
         }
     }
@@ -232,14 +361,15 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
     private fun showProgressBar() {
         runOnUiThread {
             binding.listViewProgressBar.visibility = View.VISIBLE
-            binding.settingsSyncListViewContainer.visibility = View.GONE
+            binding.syncTypeGetErrorContainer.visibility = View.GONE
+            binding.recyclerView.visibility = View.GONE
         }
     }
 
     private fun hideProgressBar() {
         runOnUiThread {
             binding.listViewProgressBar.visibility = View.GONE
-            binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.VISIBLE
         }
     }
 
@@ -249,9 +379,6 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
      * @since 0.4
      */
     private fun initData() {
-        binding.tvSelectedSyncAcc.text = currentUserAccountName
-        binding.tvSelectedSyncType.text = currentUserAccountType
-
         if (!intent.getBooleanExtra("Test", false)) {
             showProgressBar()
         }
@@ -265,78 +392,140 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
             selectedStrings = userAccount.selectedGroupsList as ArrayList<String>
 
             withContext(Dispatchers.Main) {
-                userAccount.syncType.let {
-                    if (it >= 0) {
-                        chosenSyncType = it
-                        binding.selectSpinner.setSelection(it)
-                    }
-                }
+                binding.tvSelectedSyncAcc.text = userAccount.accountName
+                binding.tvSelectedSyncType.text = userAccount.serverAddress
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
-                    SyncSettingsViewModelFactory(application, userAccount.id)
+                    SyncSettingsViewModelFactory (application)
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType
-                chosenSyncType?.let { binding.selectSpinner.setSelection(it) }
             }
-
-            updateSyncList()
+            initSyncList()
         }
     }
 
-    private fun updateSyncList () {
-        updateSyncGroups()
-        updateSyncAllUsers()
+    // TODO:: Test case for both allUsers and SyncGroups
+    private fun initSyncList () {
+        loadSyncGroups()
+        loadAllUsers()
     }
 
-    private fun updateSyncGroups() {
-        val groupsCache = syncSettingsViewModel.getGroupsCache() ?: emptyList()
-
-        if (groupsCache.isEmpty()) {
-            increment()
-            groupsAreLoading = true
-            apiManager.xwikiServicesApi.availableGroups(
-                LIMIT_MAX_SYNC_USERS
-            )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    Action1<CustomSearchResultContainer<XWikiGroup>> { xWikiGroupCustomSearchResultContainer ->
-                        groupsAreLoading = false
+    // Initial loading of all users.
+    private fun loadAllUsers() {
+        allUsersAreLoading = true
+        val users = syncSettingsViewModel.getAllUsersCache(userAccount.id) ?: emptyList()
+        if (users.isEmpty()) {
+            showProgressBar()
+        } else {
+            allUsers.clear()
+            allUsers.addAll(users)
+            updateListView(false)
+        }
+        apiManager.xwikiServicesApi.getAllUsersListByOffset( currentPage, PAGE_SIZE)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { summaries ->
+                    val objectSummary = summaries.objectSummaries
+                    if (objectSummary.isNullOrEmpty()) {
+                        runOnUiThread {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            hideProgressBar()
+                        }
+                    } else {
+                        currentPage = PAGE_SIZE
                         runOnUiThread {
                             binding.syncTypeGetErrorContainer.visibility = View.GONE
                         }
-                        val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                        if (searchResults != null) {
-                            groups.clear()
-                            groups.addAll(searchResults)
-                            syncSettingsViewModel.updateGroupsCache(searchResults)
-                            updateListView(false)
-                        }
-                    },
-                    Action1<Throwable> {
-                        groupsAreLoading = false
-                        runOnUiThread {
-                            Toast.makeText(
-                                this@SyncSettingsActivity,
-                                R.string.cantGetGroups,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        allUsersAreLoading = false
+                        allUsers.clear()
+                        allUsers.addAll(summaries.objectSummaries)
+
+                        syncSettingsViewModel.updateAllUsersCache(
+                            summaries.objectSummaries,
+                            userAccount.id
+                        )
+                        updateListView(true)
+                    }
+                },
+                {
+                    allUsersAreLoading = false
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@SyncSettingsActivity,
+                            R.string.cantGetAllUsers,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (allUsers.size <= 0) {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
-                        hideProgressBar()
-                        decrement()
                     }
-                )
+                    hideProgressBar()
+                }
+            )
+    }
+
+    private fun loadSyncGroups() {
+        val groupsCache = syncSettingsViewModel.getGroupsCache(userAccount.id) ?: emptyList()
+        if (groupsCache.isEmpty()) {
+            showProgressBar()
         } else {
             groups.clear()
             groups.addAll(groupsCache)
             updateListView(false)
         }
+        groupsAreLoading = true
+        apiManager.xwikiServicesApi.availableGroups(
+            LIMIT_MAX_SYNC_USERS
+        )
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { xWikiGroupCustomSearchResultContainer ->
+                    groupsAreLoading = false
+                    val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
+                    hideProgressBar()
+
+                    if (searchResults.isNullOrEmpty()) {
+                        runOnUiThread {
+                            if (chosenSyncType == SYNC_TYPE_SELECTED_GROUPS) {
+                                binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                            }
+                        }
+                    } else {
+                        runOnUiThread {
+                            binding.syncTypeGetErrorContainer.visibility = View.GONE
+                        }
+                        groups.clear()
+                        groups.addAll(searchResults)
+                        syncSettingsViewModel.updateGroupsCache(
+                            searchResults,
+                            userAccount.id
+                        )
+                        updateListView(false)
+                    }
+                },
+                {
+                    groupsAreLoading = false
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@SyncSettingsActivity,
+                            R.string.cantGetGroups,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (groups.size <= 0) {
+                            binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
+                        }
+                    }
+                    hideProgressBar()
+                }
+            )
     }
 
+    // Load all users at once, does not support pagination.
     private fun updateSyncAllUsers() {
-        val users = syncSettingsViewModel.getAllUsersCache() ?: emptyList()
+        val users = syncSettingsViewModel.getAllUsersCache(userAccount.id) ?: emptyList()
         if (users.isEmpty()) {
             allUsersAreLoading = true
             apiManager.xwikiServicesApi.allUsersPreview
@@ -352,10 +541,10 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
                         allUsers.addAll(summaries.objectSummaries)
 
                         syncSettingsViewModel.updateAllUsersCache(
-                            summaries.objectSummaries
+                            summaries.objectSummaries,
+                            userAccount.id
                         )
                         updateListView(true)
-                        decrement()
                     },
                     Action1<Throwable> {
                         allUsersAreLoading = false
@@ -368,7 +557,6 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                         hideProgressBar()
-                        decrement()
                     }
                 )
         } else {
@@ -405,10 +593,10 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
     private fun updateListView(hideProgressBar: Boolean) {
         appCoroutineScope.launch(Dispatchers.Main) {
             if (syncNothing()) {
-                binding.settingsSyncListViewContainer.visibility = View.GONE
+                binding.recyclerView.visibility = View.GONE
                 binding.listViewProgressBar.visibility = View.GONE
             } else {
-                binding.settingsSyncListViewContainer.visibility = View.VISIBLE
+                binding.recyclerView.visibility = View.VISIBLE
                 if (syncGroups()) {
                     binding.recyclerView.adapter = mGroupAdapter
                     mGroupAdapter.refresh(groups, userAccount.selectedGroupsList)
@@ -416,6 +604,7 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
                     binding.recyclerView.adapter = mUsersAdapter
                     mUsersAdapter.refresh(allUsers)
                 }
+                binding.recyclerView.layoutManager?.scrollToPosition(0)
                 mUsersAdapter.refresh(allUsers)
                 if (hideProgressBar) {
                     hideProgressBar()
@@ -430,6 +619,8 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
     fun syncSettingComplete(v: View) {
         val oldSyncType = userAccount.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
+            binding.nextButton.alpha = 0.8F
+            Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -450,17 +641,20 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
         //if has changes, set sync
         if (syncNothing()) {
             userAccount.syncType = SYNC_TYPE_NO_NEED_SYNC
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(false)
             finish()
         } else if (syncAllUsers()) {
             userAccount.syncType = SYNC_TYPE_ALL_USERS
+            userAccount.selectedGroupsList = mutableListOf()
             userAccount.let { syncSettingsViewModel.updateUser(it) }
             setSync(true)
             finish()
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
+                Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -534,10 +728,8 @@ class SyncSettingsActivity : BaseActivity(), GroupsListChangeListener {
 
     override fun onChangeListener() {
         if (compareSelectGroups()) {
-            binding.nextButton.isClickable = false
             binding.nextButton.alpha = 0.8F
         } else {
-            binding.nextButton.isClickable = true
             binding.nextButton.alpha = 1F
         }
     }

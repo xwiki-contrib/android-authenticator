@@ -19,10 +19,7 @@
  */
 package org.xwiki.android.sync.auth;
 
-import android.accounts.AbstractAccountAuthenticator;
-import android.accounts.Account;
-import android.accounts.AccountAuthenticatorResponse;
-import android.accounts.AccountManager;
+import android.accounts.*;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,15 +28,17 @@ import android.util.Log;
 import okhttp3.Credentials;
 import okhttp3.ResponseBody;
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
+import org.xwiki.android.sync.contactdb.UserAccount;
 import retrofit2.Response;
 import rx.functions.Action1;
+
 import java.util.List;
+
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static org.xwiki.android.sync.AppContextKt.*;
 import static org.xwiki.android.sync.ConstantsKt.*;
 import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.*;
-import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserAccountByAccountName;
-import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserServer;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.*;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
 
 /**
@@ -164,8 +163,14 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
                 authToken[0] = null;
                 Log.d("xwiki", TAG + "> re-authenticating with the existing password");
                 final Object sync = new Object();
-                resolveApiManager(
-                        getUserAccountByAccountName(accountName)
+                UserAccount userAccount = getUserAccountByAccountName(accountName);
+
+                if (userAccount == null) {
+                    throw new IllegalStateException("User Account for $accountName must not be null in repo");
+                }
+
+                resolveApiManagerSynchronized(
+                        userAccount
                 ).getXwikiServicesApi().login(
                         Credentials.basic(accountName, accountPassword)
                 ).subscribe(
@@ -210,6 +215,18 @@ public class XWikiAuthenticator extends AbstractAccountAuthenticator {
             result.putString(SERVER_ADDRESS, getUserServer(account.name));
             return result;
         }
+    }
+
+    @Override
+    public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, final Account account) throws NetworkErrorException {
+        UserAccount userAccount =  getUserAccountByAccountName(account.name);
+        if (userAccount != null) {
+            removeUser(userAccount.getId());
+        }
+
+        Bundle result = new Bundle();
+        result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
+        return result;
     }
 
     /**

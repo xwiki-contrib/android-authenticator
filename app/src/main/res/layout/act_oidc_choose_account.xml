@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <androidx.cardview.widget.CardView
+                android:id="@+id/cvOIDCAccountList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                app:cardCornerRadius="@dimen/viewDefaultMediumSize"
+                android:shadowColor="#000000"
+                android:layout_margin="@dimen/viewDefaultLargeSize">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/viewDefaultLargeSize"
+                        android:layout_gravity="center"
+                        android:background="@mipmap/ic_launcher"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Choose an account"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:textStyle="bold"/>
+
+                <ListView
+                        android:id="@+id/lvSelectAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                        android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginEnd="@dimen/viewDefaultLargeSize"
+                        android:layout_marginRight="@dimen/viewDefaultLargeSize"
+                        android:layout_marginTop="@dimen/viewDefaultLargeSize"/>
+
+                <LinearLayout
+                        android:id="@+id/lvAddAnotherAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/viewDefaultMediumSize"
+                        android:paddingBottom="@dimen/viewDefaultMediumSize"
+                        android:textSize="@dimen/textDefaultMediumSize"
+                        android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                        android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginTop="@dimen/viewDefaultSmallSize"
+                        android:layout_marginBottom="@dimen/viewDefaultSmallSize"
+                        android:orientation="horizontal">
+
+                    <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_account_circle_black_24dp"/>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Use another account"
+                            android:textSize="@dimen/textDefaultSmallSize"
+                            android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                            android:layout_marginLeft="@dimen/viewDefaultLargeSize"/>
+
+                </LinearLayout>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/viewDefaultLargeSize"
+                        android:layout_marginLeft="@dimen/viewDefaultLargeSize"
+                        android:layout_marginEnd="@dimen/viewDefaultLargeSize"
+                        android:layout_marginRight="@dimen/viewDefaultLargeSize"
+                        android:layout_marginBottom="@dimen/viewDefaultLargeSize"
+                        android:textSize="@dimen/textDefaultSmallSize"
+                        android:text="To continue, XWiki will share your name, email address and profile picture with the requesting app"
+                />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+                android:id="@+id/tvPleaseWait"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Please wait"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+        <WebView
+                android:id="@+id/webview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:elevation="@dimen/viewDefaultMediumSize"/>
+
+    </RelativeLayout>
+
+</layout>

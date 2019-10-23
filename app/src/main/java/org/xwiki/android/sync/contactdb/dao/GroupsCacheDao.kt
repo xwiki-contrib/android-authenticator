@@ -1,6 +1,9 @@
 package org.xwiki.android.sync.contactdb.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.GROUPS_LIST_TABLE
 import org.xwiki.android.sync.contactdb.GroupsCacheEntity

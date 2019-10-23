@@ -83,6 +83,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
+                                android:singleLine="true"
                                 android:layout_toEndOf="@id/syncAccount"
                                 android:layout_toStartOf="@id/ivEditSyncAcc"
                                 android:layout_below="@id/tvSelectedSyncAcc"
@@ -149,45 +150,37 @@
                             android:layout_centerInParent="true"
                             android:visibility="gone"/>
 
-                    <FrameLayout
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerView"
+                            android:layout_width="match_parent"
+                            android:dividerHeight="1dp"
+                            android:scrollbars="vertical"
+                            android:layout_height="match_parent"/>
+
+                    <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:layout_centerInParent="true"
-                            android:id="@+id/settingsSyncListViewContainer">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recyclerView"
-                                android:layout_width="match_parent"
-                                android:dividerHeight="1dp"
-                                android:scrollbars="vertical"
-                                android:layout_height="wrap_content"/>
-
-                        <LinearLayout
+                            android:gravity="center"
+                            android:id="@+id/syncTypeGetErrorContainer"
+                            android:visibility="gone">
+                        <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="center"
-                                android:id="@+id/syncTypeGetErrorContainer"
-                                android:visibility="gone">
-                            <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:maxWidth="@dimen/syncTypeGetListErrorWidth"
-                                    android:text="@string/syncTypeGetListErrorMessage"
-                                    android:gravity="center"/>
-                            <Button
-                                    android:id="@+id/btTryAgain"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/tryAgain"/>
-                        </LinearLayout>
-
-                    </FrameLayout>
+                                android:maxWidth="@dimen/syncTypeGetListErrorWidth"
+                                android:text="@string/syncTypeGetListErrorMessage"
+                                android:gravity="center"/>
+                        <Button
+                                android:id="@+id/btTryAgain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/tryAgain"/>
+                    </LinearLayout>
 
                 </RelativeLayout>
 
             </LinearLayout>
-
 
             <androidx.appcompat.widget.AppCompatButton
                     android:layout_width="wrap_content"

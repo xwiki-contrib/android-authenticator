@@ -24,11 +24,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import okhttp3.*
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
@@ -37,9 +40,9 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
-import org.xwiki.android.sync.utils.decrement
-import org.xwiki.android.sync.utils.increment
 import rx.android.schedulers.AndroidSchedulers
+import java.io.IOException
+import java.net.URL
 
 /**
  * Tag for logging.
@@ -58,8 +61,10 @@ private val TAG = "SignInViewFlipper"
  * @param contentRootView Root view of this flipper
  */
 
-class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
-    : BaseViewFlipper(activity, contentRootView) {
+class SignInViewFlipper(
+    activity: AuthenticatorActivity,
+    contentRootView: View
+) : BaseViewFlipper(activity, contentRootView) {
 
     /**
      * Typed username.
@@ -75,13 +80,12 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      * Databinding of this flipper
      */
 
-    lateinit var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding
+    var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding =
+        DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
 
     init {
-        binding = DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
         binding.signInButton.setOnClickListener {
             if (checkInput()) {
-                increment()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -89,6 +93,12 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                     signInJob.cancel()
                 }
             }
+        }
+
+        binding.llXWikiOIDCButton.setOnClickListener {
+            binding.loading.visibility = View.VISIBLE
+            binding.llXWikiOIDCButton.visibility = View.INVISIBLE
+            checkOIDCSupport()
         }
     }
 
@@ -107,8 +117,21 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
      * [.accountPassword] was correctly set
      */
     private fun checkInput(): Boolean {
-         return binding.accountPassword.let { field ->
-             accountPassword = field.text.toString()
+        return binding.accountName.let { field ->
+            field.error = null
+            accountName = field.text.toString()
+            when {
+                TextUtils.isEmpty(field.text) -> {
+                    field.requestFocus()
+                    field.error = mContext.getString(R.string.error_field_required)
+                    false
+                } else -> {
+                    field.error = null
+                    true
+                }
+            }
+        } && binding.accountPassword.let { field ->
+            accountPassword = field.text.toString()
             field.error = null
             when {
                 TextUtils.isEmpty(field.text) || field.length() < 5 -> {
@@ -120,23 +143,8 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
                     field.error = null
                     true
                 }
-
             }
-        } && binding.accountName.let { field ->
-             field.error = null
-             accountName = field.text.toString()
-             when {
-                 TextUtils.isEmpty(field.text) -> {
-                     field.requestFocus()
-                     field.error = mContext.getString(R.string.error_field_required)
-                     false
-                 } else -> {
-                             field.error = null
-                             true
-                         }
-
-             }
-         }
+        }
     }
 
     /**
@@ -151,7 +159,7 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         return appCoroutineScope.launch {
             val user = userAccountsRepo.createAccount(
                 UserAccount(
-                    accountName,
+                    "$accountName@temp",
                     mActivity.serverUrl ?: return@launch
                 )
             ) ?: let {
@@ -257,10 +265,45 @@ class SignInViewFlipper(activity: AuthenticatorActivity, contentRootView: View)
         errorTextView.text = error
         Handler().postDelayed({
             errorTextView.visibility = View.GONE
-            decrement()
         },
             2000
         )
     }
 
+    fun checkOIDCSupport() {
+        val url = URL ("${mActivity.serverUrl}/oidc/userinfo")
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                appCoroutineScope.launch (Dispatchers.Main) {
+                    binding.loading.visibility = View.GONE
+                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
+
+                    if (response.code() == 500) {
+                        mActivity.startOIDCAuth()
+                    }
+                    if (response.code() == 404 || response.code() == 401) {
+                        Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                if (e.message.isNullOrEmpty()) {
+                    Log.e(TAG, "No response from the server.")
+                } else {
+                    Log.e(TAG, e.message)
+                }
+                appCoroutineScope.launch (Dispatchers.Main) {
+                    binding.loading.visibility = View.GONE
+                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
+                    Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
 }

@@ -26,11 +26,10 @@ import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
 import retrofit2.Response
 import retrofit2.http.*
 import rx.Observable
-
-import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
 
 /**
  * Interface for interacting with XWiki services
@@ -78,6 +77,16 @@ interface XWikiServices {
     fun availableGroups(
         @Query("number") number: Int?
     ): Observable<CustomSearchResultContainer<XWikiGroup>>
+
+    @GET(
+        ApiEndPoints.REST +
+                ApiEndPoints.WIKIS +
+                "/xwiki/classes/XWiki.XWikiUsers/objects"
+    )
+    fun getAllUsersListByOffset (
+        @Query("start") offset: Int?,
+        @Query("number") limit: Int?
+    ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
 
     /**
      * @since 0.4

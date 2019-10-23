@@ -12,11 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
+import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.bean.MutableInternalXWikiUserInfo
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.contactdb.*
-import org.xwiki.android.sync.rest.XWikiHttp
-import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.userAccountsRepo

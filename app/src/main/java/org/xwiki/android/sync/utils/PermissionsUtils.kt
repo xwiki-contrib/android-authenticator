@@ -25,8 +25,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Util class for helping with permissions

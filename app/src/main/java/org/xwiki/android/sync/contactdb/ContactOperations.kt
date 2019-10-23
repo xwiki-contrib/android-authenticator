@@ -124,7 +124,7 @@ fun XWikiUserFull.rowId(
                 rawContactUri
             )
         }
-    } ?: throw IllegalStateException("Can't get or create row id for user") as Throwable
+    } ?: throw IllegalStateException("Can't get or create row id for user")
 }
 
 /**

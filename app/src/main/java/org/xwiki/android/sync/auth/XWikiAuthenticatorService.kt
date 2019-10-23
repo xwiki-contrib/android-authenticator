@@ -30,10 +30,6 @@ class XWikiAuthenticatorService : Service() {
 
     private var authenticator: XWikiAuthenticator? = null
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onBind(intent: Intent): IBinder? {
         if (authenticator == null) {
             authenticator = XWikiAuthenticator(this)

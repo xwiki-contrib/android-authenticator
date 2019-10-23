@@ -8,7 +8,7 @@
     android:layoutMode="opticalBounds"
     android:minHeight="?attr/actionBarSize"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     android:background="?attr/colorPrimary"
     app:titleTextColor="@color/textPrimary"/>
 

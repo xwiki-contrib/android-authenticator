@@ -20,8 +20,7 @@
 package org.xwiki.android.sync.utils
 
 import android.content.Context
-import java.util.ArrayList
-import java.util.HashSet
+import java.util.*
 
 
 /**
