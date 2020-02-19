@@ -1,2 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="sign_in_authenticating">Zaloguj się…</string>
+    <string name="tryAgain">Spróbuj ponownie</string>
+    <string name="syncTypeGetListErrorMessage">Coś poszło nie tak, gdy próbujemy uzyskać tabelę dla bieżącego typu synchronizacji</string>
+    <string name="synchronizationType">Rodzaj synchronizacji</string>
+    <string name="serverAddress">Adres serwera</string>
+    <string name="userExists">Użytkownik istnieje</string>
+    <string name="error_invalid_email">Niepoprawny E-Mail</string>
+    <string name="pleaseWait">Proszę, czekać</string>
+    <string name="loginError">Niepoprawny adres URL serwera lub poświadczenia</string>
+    <string name="cantGetGroups">Nie mogę uzyskać grup</string>
+    <string name="cantGetAllUsers">Nie można uzyskać wszystkich użytkowników, spróbuj ponownie</string>
+    <string name="complete">Kompletny</string>
+    <string name="version">Wersja 1.0</string>
+    <string name="about_version">O wersji</string>
+    <string name="next">Następny</string>
+    <string name="create_one">Stwórz jeden</string>
+    <string name="don_t_have_a_account">Nie masz konta na XWiki \?</string>
+    <string name="learn_more_dialog">Naucz więcej</string>
+    <string name="login_sub_head">Zaloguj się do swojej instancji XWiki.</string>
+    <string name="grant_permission_button">Autoryzować</string>
+    <string name="cancel">Anuluj</string>
+    <string name="account_name">Nazwa konta</string>
+    <string name="authorize_activity_package_label">Nazwa paczki</string>
+    <string name="authorize_activity_note">"Kliknij, aby zezwolić  aplikacji trzeciej na dostęp do Twojego konta."</string>
+    <string name="view_profile">Edycja kontaktu</string>
+    <string name="profile_action">Profil XWiki</string>
+    <string name="view_group_action_label">Pokaż szczegóły przykładowej grupy</string>
+    <string name="error_field_required">Pole jest wymagane</string>
+    <string name="error_incorrect_password">Hasło jest nieprawidłowe</string>
+    <string name="error_invalid_password">Hasło jest zbyt krótkie</string>
+    <string name="error_invalid_server">Adres serwera jest nieprawidłowy</string>
+    <string name="title_activity_setting">Ustawienia</string>
+    <string name="title_activity_select_groups">Wybierz grupy</string>
+    <string name="title_activity_authorize">Autoryzacja</string>
+    <string name="title_activity_edit_contact">Edycja kontaktu</string>
+    <string name="save">Zapisz</string>
+    <string name="sign_up_authenticating">Zapisz się…</string>
+    <string name="login_activity_port_label">Port</string>
+    <string name="login_activity_server_label">Serwer</string>
+    <string name="login_activity_password_label">Hasło</string>
+    <string name="login_activity_username_label">Użytkownik</string>
+    <string name="captcha_textview">Wpisz captcha</string>
+    <string name="confirm_password">Potwierdź hasło ( Wymagane)</string>
+    <string name="password">Hasło (Wymagane)</string>
+    <string name="email">E-Mail</string>
+    <string name="phone">Numer telefonu</string>
+    <string name="user_id">Id użytkownika (Wymagane)</string>
+    <string name="last_name">Nazwisko</string>
+    <string name="first_name">Imię</string>
+    <string name="logIn">Zaloguj się</string>
+    <string name="signUp">Zapisz się</string>
+    <string name="signIn">Zaloguj się</string>
+</resources>
