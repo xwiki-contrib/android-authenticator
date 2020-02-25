@@ -22,6 +22,12 @@ package org.xwiki.android.sync.utils
 import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
+import android.webkit.WebView
+import android.R
+import androidx.databinding.adapters.SeekBarBindingAdapter.setProgress
+import android.webkit.WebChromeClient
+
+
 
 /**
  * Check url (warning, url must start with "https://" or other protocol if you want not use
@@ -41,6 +47,29 @@ fun openLink(url: String): Intent {
     intent.action = Intent.ACTION_VIEW
     intent.data = Uri.parse(url)
     return intent
+}
+
+fun openLinkInWebView(url: String, webView: WebView)  {
+    var url = url
+    // if protocol isn't defined use http by default
+    if (!TextUtils.isEmpty(url) && !url.contains("://")) {
+        url = "http://$url"
+    }
+
+    webView.loadUrl(url)
+    webView.settings.javaScriptEnabled = true
+
+    /*webView.setWebViewClient(object : WebViewClient() {
+        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+            view.loadUrl(request.url.toString())
+            return false
+        }
+    })*/
+
+    /*val intent = Intent()
+    intent.action = Intent.ACTION_VIEW
+    intent.data = Uri.parse(url)
+    return intent*/
 }
 
 /**
