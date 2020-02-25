@@ -58,18 +58,6 @@ fun openLinkInWebView(url: String, webView: WebView)  {
 
     webView.loadUrl(url)
     webView.settings.javaScriptEnabled = true
-
-    /*webView.setWebViewClient(object : WebViewClient() {
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            view.loadUrl(request.url.toString())
-            return false
-        }
-    })*/
-
-    /*val intent = Intent()
-    intent.action = Intent.ACTION_VIEW
-    intent.data = Uri.parse(url)
-    return intent*/
 }
 
 /**
