@@ -23,6 +23,12 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     dataBinding {
         enabled = true
     }
@@ -82,4 +88,8 @@ dependencies {
 
     // Required by other dependencies
     implementation "com.google.code.findbugs:jsr305:$jsr305_version"
+
+    //chrome tabs
+    implementation "com.android.support:customtabs:28.0.0"
+    implementation "androidx.browser:browser:1.0.0"
 }

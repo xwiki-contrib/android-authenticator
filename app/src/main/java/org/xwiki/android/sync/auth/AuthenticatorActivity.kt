@@ -27,6 +27,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -36,6 +37,8 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
@@ -275,10 +278,15 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     }
 
     fun learnMore(view: View) {
-        val intent = openLink(
-            defaultLearnMoreLink
-        )
-        startActivity(intent)
+
+        val builder = CustomTabsIntent.Builder()
+        // modify toolbar color
+        builder.setToolbarColor(ContextCompat.getColor(applicationContext, R.color.primary))
+        builder.setShowTitle(true)
+        builder.setExitAnimations(this, android.R.anim.fade_in, android.R.anim.fade_out)
+
+        val customTabsIntent = builder.build()
+        customTabsIntent.launchUrl(this, Uri.parse(defaultLearnMoreLink))
     }
 
     /**
@@ -489,9 +497,9 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_NEW_ACCOUNT) {
-            val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
-            if (accessToken.isNullOrEmpty()) {
+        if (requestCode == REQUEST_NEW_ACCOUNT) {
+            val accessToken = data?.extras?.get(ACCESS_TOKEN)?.toString()
+            if(accessToken.isNullOrEmpty()) {
                 Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
             } else {
                 finishLogin(data)
