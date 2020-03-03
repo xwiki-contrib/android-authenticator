@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <RelativeLayout
                 android:layout_width="match_parent"
@@ -47,7 +48,8 @@
                 <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/defaultViewMediumPadding">
+                        android:padding="@dimen/defaultViewMediumPadding"
+                        app:passwordToggleEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/accountPassword"
