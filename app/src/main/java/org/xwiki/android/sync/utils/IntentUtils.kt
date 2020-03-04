@@ -27,8 +27,6 @@ import android.R
 import androidx.databinding.adapters.SeekBarBindingAdapter.setProgress
 import android.webkit.WebChromeClient
 
-
-
 /**
  * Check url (warning, url must start with "https://" or other protocol if you want not use
  * http) and open browser or other application which can open that url.
@@ -51,7 +49,6 @@ fun openLink(url: String): Intent {
 
 fun WebView.openLink(url: String)  {
     var url = url
-    // if protocol isn't defined use http by default
     if (!TextUtils.isEmpty(url) && !url.contains("://")) {
         url = "http://$url"
     }
