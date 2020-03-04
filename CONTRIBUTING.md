@@ -8,7 +8,7 @@ First please go through the [Community Contributions at Xwiki](https://dev.xwiki
 
 # Branch Policy
 
-# Sending pull requests:
+## Sending pull requests:
 
 * Go to the repository on github at https://github.com/xwiki-contrib/android-authenticator
 
@@ -26,35 +26,29 @@ where 'username' is your github username.
 
 You’ll now have a local copy of your version of the original Xwiki repository.
 
-# Change into that project directory (android-authenticator):
+* Change into that project directory (android-authenticator): `$ cd android-authenticator`
 
-`$ cd android-authenticator`
+* Add a connection to the original owner’s repository. `$ git remote add upstream https://github.com/xwiki-contrib/android-authenticator.git`
 
-# Add a connection to the original owner’s repository.
+* To check this remote add set up: `$ git remote -v`
 
-`$ git remote add upstream https://github.com/xwiki-contrib/android-authenticator.git`
-
-# To check this remote add set up:
-
-`$ git remote -v`
-
-# Make changes to files.
+* Make changes to files:
 
 `git add` and `git commit` those changes
 
 `git push` them back to github. These will go to your version of the repository.
 
-# Now Create a PR (Pull Request)
+* Now Create a PR (Pull Request)
 
-* Go to your version of the repository on github.
+  * Go to your version of the repository on github.
 
-* Click the “New pull request” button at the top.
+  * Click the “New pull request” button at the top.
 
-Note that XWiki's repository will be on the left and your repository will be on the right.
+  Note that XWiki's repository will be on the left and your repository will be on the right.
 
-* Click the green button “Create pull request”. Give a succinct and informative title, in the comment field give a short explanation of the changes and click the green button “Create pull request” again.
+  * Click the green button “Create pull request”. Give a succinct and informative title, in the comment field give a short explanation of the changes and click the green button “Create pull request” again.
 
-# Pulling others’ changes
+* Pulling others’ changes
 
 Before you make further changes to the repository, you should check that your version is up to date relative to Xwiki's version.
 
