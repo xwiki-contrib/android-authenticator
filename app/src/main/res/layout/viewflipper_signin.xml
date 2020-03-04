@@ -87,7 +87,7 @@
                             android:text="@string/don_t_have_a_account"/>
                     <View
                             android:layout_width="@dimen/defaultViewSmallPadding"
-                            android:layout_height="1dp"/>
+                            android:layout_height="@dimen/viewVerySmall"/>
                     <TextView
                             android:id="@+id/tvSignUp"
                             android:layout_width="wrap_content"
@@ -126,7 +126,7 @@
 
                 <TextView
                         android:layout_width="0dp"
-                        android:layout_height="1dp"
+                        android:layout_height="@dimen/viewVerySmall"
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:background="#808080"/>
@@ -143,15 +143,15 @@
                     android:layout_alignParentBottom="true">
 
                 <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="@dimen/imageview_36dp"
+                        android:layout_height="@dimen/imageview_36dp"
                         android:layout_gravity="center"
                         android:src="@drawable/logo"/>
 
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/marginMedium"
                         android:text="OpenID Connect"
                         android:layout_gravity="center"/>
 
