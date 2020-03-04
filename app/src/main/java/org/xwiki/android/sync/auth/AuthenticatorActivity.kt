@@ -270,7 +270,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
 
         val regIntent = Intent(this, RegistrationActivity::class.java)
-        regIntent.putExtra("url", url)
+        regIntent.putExtra(URL, url)
         startActivity(regIntent)
     }
 
