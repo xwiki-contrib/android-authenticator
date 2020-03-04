@@ -172,12 +172,13 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             getString(R.string.versionTemplate),
             getAppVersionName(this)
         )
+        val extras = intent.extras
 
-        if (intent.extras != null && intent.extras.get("account") != null) {
-            val intentAccount : Account = intent.extras.get("account") as Account
-            currentUserAccountName = intentAccount.name
+        currentUserAccountName = if (extras ?.get("account") != null) {
+            val intentAccount : Account = extras.get("account") as Account
+            intentAccount.name
         } else {
-            currentUserAccountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?: error("Can't get account name from intent - it is absent")
         }
 
         toolbar = findViewById(R.id.toolbar)

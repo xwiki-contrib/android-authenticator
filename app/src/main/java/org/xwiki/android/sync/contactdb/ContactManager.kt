@@ -227,7 +227,7 @@ class ContactManager(
             AllQuery.PROJECTION,
             AllQuery.SELECTION,
             arrayOf(accountName), null
-        )
+        ) ?: error("Can't get all contacts for $accountName (returned cursor is null)")
         c.use { cursor ->
             while (cursor.moveToNext()) {
                 val serverId = cursor.getString(AllQuery.COLUMN_SERVER_ID)
