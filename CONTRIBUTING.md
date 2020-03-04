@@ -60,6 +60,4 @@ Before you make further changes to the repository, you should check that your ve
 
 This will pull down and merge all of the changes that have been made in the original XWiki repository.
 
-Now push them back to your github repository.
-
-* `$ git push origin master`
+Now push them back to your github repository: `$ git push origin master`
