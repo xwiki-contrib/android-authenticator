@@ -85,6 +85,7 @@ class SignInViewFlipper(
 
     init {
         binding.signInButton.setOnClickListener {
+            mActivity.hideInputMethod()
             if (checkInput()) {
                 val signInJob = submit()
                 mActivity.showProgress(
