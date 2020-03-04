@@ -228,16 +228,14 @@ class ContactManager(
             AllQuery.SELECTION,
             arrayOf(accountName), null
         )
-        try {
-            while (c.moveToNext()) {
-                val serverId = c.getString(AllQuery.COLUMN_SERVER_ID)
+        c.use { cursor ->
+            while (cursor.moveToNext()) {
+                val serverId = cursor.getString(AllQuery.COLUMN_SERVER_ID)
 
-                val rawId = c.getLong(AllQuery.COLUMN_RAW_CONTACT_ID)
+                val rawId = cursor.getLong(AllQuery.COLUMN_RAW_CONTACT_ID)
 
                 allMaps[serverId] = rawId
             }
-        } finally {
-            c?.close()
         }
         return allMaps
     }
@@ -260,12 +258,10 @@ class ContactManager(
             UserIdQuery.SELECTION,
             arrayOf(serverContactId), null
         )
-        try {
-            if (c != null && c.moveToFirst()) {
-                rawContactId = c.getLong(UserIdQuery.COLUMN_RAW_CONTACT_ID)
+        c.use { cursor ->
+            if (cursor != null && cursor.moveToFirst()) {
+                rawContactId = cursor.getLong(UserIdQuery.COLUMN_RAW_CONTACT_ID)
             }
-        } finally {
-            c?.close()
         }
         return rawContactId
     }
