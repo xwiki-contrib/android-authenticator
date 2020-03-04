@@ -82,7 +82,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
     fun checkOIDCSupport() {
         activityScenario.moveToState(Lifecycle.State.STARTED)
 
-        val url = URL ("$XWIKI_DEFAULT_SERVER_ADDRESS/oidc/userinfo")
+        val url = URL ("$XWIKI_DEFAULT_SERVER_ADDRESS/oidc/")
 
         val request = Request.Builder().url(url).build()
 
@@ -90,6 +90,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
+                println(response)
                 TestCase.assertTrue(response.isSuccessful)
             }
 
