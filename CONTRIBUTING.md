@@ -4,60 +4,40 @@ First please go through the [Community Contributions at Xwiki](https://dev.xwiki
 
 # Raising an issue:
  This is an Open Source project and we would be happy to see contributors who report bugs and file feature requests submitting pull requests as well.
- Please report issues here [Issues - xwiki-contrib/android-authenticator](https://jira.xwiki.org/projects/ANDAUTH/issues)
+ Please report issues [here](https://jira.xwiki.org/projects/ANDAUTH/issues).
 
 # Branch Policy
 
 ## Sending pull requests:
 
-* Go to the repository on github at https://github.com/xwiki-contrib/android-authenticator
+### Preparation of your repository
 
-* Click the “Fork” button at the top right.
+Go to the repository on github at https://github.com/xwiki-contrib/android-authenticator and click the `Fork` button at the top right. You’ll now have your own copy of the original Android-Authenticator repository in your github account
 
-* You’ll now have your own copy of the original Android-Authenticator repository in your github account.
+If you are using \*Nix system, you cat use tool `git` for getting your repository:
 
-* Open a terminal/shell.
+`$ git clone https://github.com/YOUR_USERNAME/android-authenticator.git`
 
-* Type
+where `YOUR_USERNAME` is your github username. You’ll now have a local copy of your version of the original Xwiki repository.
 
-`$ git clone https://github.com/xwiki-contrib/android-authenticator.git`
+### Making changes
 
-where 'username' is your github username.
-
-You’ll now have a local copy of your version of the original Xwiki repository.
-
-* Change into that project directory (android-authenticator): `$ cd android-authenticator`
-
-* Add a connection to the original owner’s repository. `$ git remote add upstream https://github.com/xwiki-contrib/android-authenticator.git`
-
+* Open android-authenticator folder. For example, `$ cd android-authenticator`
+* Add a connection to the original owner’s repository: `$ git remote add upstream https://github.com/xwiki-contrib/android-authenticator.git`
 * To check this remote add set up: `$ git remote -v`
+* Make changes to files
 
-* Make changes to files:
+A little git hints:
 
-`git add` and `git commit` those changes
+* Use `git add` inside the project to get changes into index (to make them active for commit). You can use `git add -A` to simply add all changes to index
+* Use `git commit -m "message"` to fix changes with your message. After this action all changes, which was indexed with `git add`, will be fixed and will be able to send to your remote repository
+* Use `git push` to send maked commits into your repository
 
-`git push` them back to github. These will go to your version of the repository.
+Before final creating of pull request, it is strongly recommended to pull changes from remote base (by `$ git pull upstream master --rebase`) (xwiki android app) and check that everything is ok.
 
-* Now Create a PR (Pull Request)
+When all changes are made - create a PR (Pull Request). For this:
 
-  * Go to your version of the repository on github.
-
-  * Click the “New pull request” button at the top.
-
-  Note that XWiki's repository will be on the left and your repository will be on the right.
-
-  * Click the green button “Create pull request”. Give a succinct and informative title, in the comment field give a short explanation of the changes and click the green button “Create pull request” again.
-
-* Pulling others’ changes
-
-Before you make further changes to the repository, you should check that your version is up to date relative to Xwiki's version.
-
-* Go into the directory for the project and type:
-
-* `$ git checkout master`
-
-* `$ git pull upstream master --rebase`
-
-This will pull down and merge all of the changes that have been made in the original XWiki repository.
-
-Now push them back to your github repository: `$ git push origin master`
+* Go to your version of the repository on github.
+* Click the `New pull request` button at the top.
+  Note that XWiki's repository will be on the left and your repository will be on the right
+* Click the green button `Create pull request`. Give a succinct and informative title, in the comment field give a short explanation of the changes and click the green button `Create pull request` again
