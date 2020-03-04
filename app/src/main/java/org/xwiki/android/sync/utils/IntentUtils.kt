@@ -49,15 +49,15 @@ fun openLink(url: String): Intent {
     return intent
 }
 
-fun openLinkInWebView(url: String, webView: WebView)  {
+fun WebView.openLink(url: String)  {
     var url = url
     // if protocol isn't defined use http by default
     if (!TextUtils.isEmpty(url) && !url.contains("://")) {
         url = "http://$url"
     }
 
-    webView.loadUrl(url)
-    webView.settings.javaScriptEnabled = true
+    this.loadUrl(url)
+    this.settings.javaScriptEnabled = true
 }
 
 /**

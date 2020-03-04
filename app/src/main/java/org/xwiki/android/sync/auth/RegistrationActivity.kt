@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.utils.openLinkInWebView
+import org.xwiki.android.sync.utils.openLink
 
 class RegistrationActivity : AppCompatActivity() {
 
@@ -13,8 +13,6 @@ class RegistrationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_registration)
         val webView = findViewById(R.id.webview) as WebView
         val url = intent.getStringExtra("url")
-        val intent = openLinkInWebView(
-                url, webView
-        )
+        val intent = webView.openLink(url)
     }
 }
