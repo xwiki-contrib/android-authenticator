@@ -13,7 +13,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 app:cardCornerRadius="@dimen/viewDefaultMediumSize"
-                android:shadowColor="#000000"
+                android:shadowColor="@color/black"
                 android:layout_margin="@dimen/viewDefaultLargeSize">
 
             <LinearLayout

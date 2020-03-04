@@ -12,14 +12,14 @@
                   android:layout_height="wrap_content"
                   android:text="Accounts"
                   android:textSize="@dimen/textLarge"
-                  android:textColor="#000000"
+                  android:textColor="@color/black"
                   android:layout_marginLeft="@dimen/marginLarge"
                   android:layout_marginStart="@dimen/marginLarge"
                   android:layout_marginTop="@dimen/marginLarge"/>
 
         <TextView android:layout_width="match_parent"
                   android:layout_height="@dimen/textviewVerySmall"
-                  android:background="#81858585"
+                  android:background="@color/greyBackground"
                   android:layout_marginTop="@dimen/marginSmall"
                   android:layout_marginStart="@dimen/marginLarge"
                   android:layout_marginEnd="@dimen/marginLarge"
