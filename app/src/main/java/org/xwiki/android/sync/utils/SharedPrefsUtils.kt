@@ -142,7 +142,7 @@ fun getValue(context: Context, key: String, defValue: Boolean): Boolean {
  */
 fun getValue(context: Context, key: String, defValue: String?): String {
     val sp = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-    return sp.getString(key, defValue)
+    return sp.getString(key, defValue) ?: defValue ?: error("Can't get value for key $key")
 }
 
 /**
