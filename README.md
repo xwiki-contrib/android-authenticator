@@ -4,6 +4,7 @@ The idea of this project is to integrate a wiki instance in Android accounts, ma
 
 * [Documentation](http://extensions.xwiki.org/xwiki/bin/view/Extension/Android+authenticator/)
 * [Issue Tracker](http://jira.xwiki.org/browse/ANDAUTH)
+* [Contributors Guide](https://github.com/xwiki-contrib/android-authenticator/blob/master/CONTRIBUTING.md)
 * License: LGPL 2.1+
 * Requires Android 4.1+
 
