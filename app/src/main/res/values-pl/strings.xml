@@ -52,4 +52,25 @@
     <string name="logIn">Zaloguj się</string>
     <string name="signUp">Zapisz się</string>
     <string name="signIn">Zaloguj się</string>
+    <string name="editXWikiContactInfo">Zedytuj informacje kontaktowe XWiki</string>
+    <string name="prohibitedAction">Sprawdź, czy masz potrzebne uprawnienia</string>
+    <string name="cantSyncContact">Nie można zsynchronizować danych kontaktowych z serwerem. Zostaną zsynchronizowane później przez system</string>
+    <string name="syncContactInfoWithServer">Zsynchronizuj dane kontaktowe z serwerem</string>
+    <string name="success">Sukces</string>
+    <string name="somethingWentWrong">Coś poszło nie tak</string>
+    <string name="checkErrors">Sprawdź błędy</string>
+    <string name="note">Notatka</string>
+    <string name="company">Firma</string>
+    <string name="additionalInfo">Dodatkowe informacje</string>
+    <string name="userContactInfo">Dane kontaktowe użytkownika</string>
+    <string name="address">Adres</string>
+    <string name="country">Kraj</string>
+    <string name="userName">Nazwa użytkownika</string>
+    <string name="signUpOfferMessage">Utwórz konto XWiki, aby korzystać z funkcji takich jak synchronizacja kontaktów i udzielić dane uwierzytelniające dla innych aplikacji na Androida</string>
+    <string name="askToGrantPermissions">Przyznaj uprawnienia w ustawieniach aplikacji</string>
+    <string name="xwikiAccount">Konto XWiki</string>
+    <string name="authenticationError">Błąd uwierzytelniania</string>
+    <string name="haveNoPermission">Nie masz pozwolenia</string>
+    <string name="updateSuccess">Zaktualizowano pomyślnie</string>
+    <string name="versionTemplate" formatted="false">Wersja %s</string>
 </resources>
