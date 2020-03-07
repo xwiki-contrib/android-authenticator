@@ -52,7 +52,7 @@ const val XWIKI_DEFAULT_SERVER_ADDRESS = "https://www.xwiki.org/xwiki"
 
 const val ACCESS_TOKEN = "access_token"
 
-const val URL = "url"
+const val URL_FIELD = "url"
 
 /**
  * Auth token types

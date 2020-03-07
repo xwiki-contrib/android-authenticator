@@ -50,7 +50,7 @@ fun openLink(url: String): Intent {
 fun WebView.openLink(url: String)  {
     var url = url
     if (!TextUtils.isEmpty(url) && !url.contains("://")) {
-        url = "http://$url"
+        url = "https://$url"
     }
 
     this.loadUrl(url)
