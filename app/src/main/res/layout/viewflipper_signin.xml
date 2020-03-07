@@ -113,8 +113,8 @@
                     android:orientation="horizontal">
 
                 <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
+                        android:layout_width="@dimen/zero_height"
+                        android:layout_height="@dimen/viewVerySmall"
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:background="@color/lightGrey"/>
@@ -128,7 +128,7 @@
                         android:gravity="top|center" />
 
                 <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="@dimen/zero_height"
                         android:layout_height="@dimen/viewVerySmall"
                         android:layout_weight="1"
                         android:layout_gravity="center"
