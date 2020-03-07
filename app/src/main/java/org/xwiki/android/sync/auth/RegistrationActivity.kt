@@ -12,7 +12,7 @@ class RegistrationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
-        val webView = findViewById(R.id.webview) as WebView
+        val webView = findViewById<WebView>(R.id.webview)
         val url = intent.getStringExtra(URL_FIELD)
         val intent = webView.openLink(url)
     }
