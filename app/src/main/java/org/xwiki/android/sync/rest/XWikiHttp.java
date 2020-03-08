@@ -23,22 +23,13 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import kotlin.Pair;
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
+
 import org.xwiki.android.sync.bean.ObjectSummary;
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer;
 import org.xwiki.android.sync.bean.XWikiUserFull;
-import retrofit2.HttpException;
-import retrofit2.Response;
-import rx.Observable;
-import rx.Observer;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -47,6 +38,18 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+
+import kotlin.Pair;
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
+import retrofit2.HttpException;
+import retrofit2.Response;
+import rx.Observable;
+import rx.Observer;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 import static org.xwiki.android.sync.AppContextKt.getAppContext;
 import static org.xwiki.android.sync.ConstantsKt.SYNC_TYPE_ALL_USERS;

@@ -23,9 +23,6 @@ import android.content.Intent
 import android.net.Uri
 import android.text.TextUtils
 import android.webkit.WebView
-import android.R
-import androidx.databinding.adapters.SeekBarBindingAdapter.setProgress
-import android.webkit.WebChromeClient
 
 /**
  * Check url (warning, url must start with "https://" or other protocol if you want not use

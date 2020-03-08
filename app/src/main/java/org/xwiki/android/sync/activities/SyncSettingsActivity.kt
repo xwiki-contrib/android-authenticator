@@ -29,7 +29,6 @@ import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
-import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts

@@ -19,26 +19,44 @@
  */
 package org.xwiki.android.sync.auth;
 
-import android.accounts.*;
+import android.accounts.AbstractAccountAuthenticator;
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import okhttp3.Credentials;
-import okhttp3.ResponseBody;
+
 import org.xwiki.android.sync.activities.GrantPermissionActivity;
 import org.xwiki.android.sync.contactdb.UserAccount;
-import retrofit2.Response;
-import rx.functions.Action1;
 
 import java.util.List;
 
+import okhttp3.Credentials;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+import rx.functions.Action1;
+
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static org.xwiki.android.sync.AppContextKt.*;
-import static org.xwiki.android.sync.ConstantsKt.*;
-import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.*;
-import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.*;
+import static org.xwiki.android.sync.AppContextKt.getAppContext;
+import static org.xwiki.android.sync.AppContextKt.isAuthorizedApp;
+import static org.xwiki.android.sync.AppContextKt.resolveApiManagerSynchronized;
+import static org.xwiki.android.sync.ConstantsKt.AUTHTOKEN_TYPE_FULL_ACCESS;
+import static org.xwiki.android.sync.ConstantsKt.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
+import static org.xwiki.android.sync.ConstantsKt.AUTHTOKEN_TYPE_READ_ONLY;
+import static org.xwiki.android.sync.ConstantsKt.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
+import static org.xwiki.android.sync.ConstantsKt.PACKAGE_LIST;
+import static org.xwiki.android.sync.ConstantsKt.SERVER_ADDRESS;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.IS_SETTING_SYNC_TYPE;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.KEY_AUTH_TOKEN_TYPE;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.PARAM_APP_PACKAGENAME;
+import static org.xwiki.android.sync.auth.AuthenticatorActivityKt.PARAM_APP_UID;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserAccountByAccountName;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.getUserServer;
+import static org.xwiki.android.sync.utils.JavaCoroutinesBindingsKt.removeUser;
 import static org.xwiki.android.sync.utils.SharedPrefsUtilsKt.getArrayList;
 
 /**
