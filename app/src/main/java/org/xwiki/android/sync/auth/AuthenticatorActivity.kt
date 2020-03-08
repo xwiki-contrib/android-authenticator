@@ -268,10 +268,10 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         } else {
             url += "/bin/view/XWiki/Registration"
         }
-        val intent = openLink(
-            url
-        )
-        startActivity(intent)
+
+        val regIntent = Intent(this, RegistrationActivity::class.java)
+        regIntent.putExtra(URL_FIELD, url)
+        startActivity(regIntent)
     }
 
     fun learnMore(view: View) {

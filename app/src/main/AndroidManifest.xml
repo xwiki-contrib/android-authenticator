@@ -44,6 +44,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".auth.RegistrationActivity"/>
+
         <activity
             android:name=".activities.GrantPermissionActivity"
             android:noHistory="true"
