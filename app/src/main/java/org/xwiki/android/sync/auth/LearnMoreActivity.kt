@@ -8,8 +8,6 @@ import org.xwiki.android.sync.defaultLearnMoreLink
 import org.xwiki.android.sync.utils.openLink
 import android.webkit.WebViewClient
 
-
-
 class LearnMoreActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
