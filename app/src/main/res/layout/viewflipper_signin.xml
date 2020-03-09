@@ -19,7 +19,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_below="@+id/xwikiLogo"
-                    android:text="Choose the login method"
+                    android:text="@string/chooseLoginMethod"
                     android:textStyle="bold"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -123,7 +123,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Or continue with"
+                        android:text="@string/continueWith"
                         android:textStyle="bold"
                         android:gravity="top|center" />
 
@@ -155,7 +155,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/marginMedium"
-                        android:text="OpenID Connect"
+                        android:text="@string/openIdConnect"
                         android:layout_gravity="center"/>
 
             </LinearLayout>

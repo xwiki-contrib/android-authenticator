@@ -59,7 +59,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/marginMedium"
                                 android:id="@+id/syncAccount"
-                                android:text="Sync Account"
+                                android:text="@string/syncAccount"
                                 android:padding="@dimen/defaultViewSmallPadding"
                                 android:layout_marginStart="@dimen/marginMedium"
                                 android:layout_marginLeft="@dimen/marginMedium"/>

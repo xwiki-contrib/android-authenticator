@@ -15,7 +15,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:gravity="start"
-            android:text="Admin"
+            android:text="@string/admin"
             android:textSize="@dimen/textDefaultMediumSize"
             android:layout_toStartOf="@id/checkbox"
             android:layout_marginStart="@dimen/margin_6dp"
@@ -29,7 +29,7 @@
             android:layout_below="@id/groupName"
             android:layout_marginBottom="@dimen/margin_5dp"
             android:layout_marginTop="@dimen/margin_5dp"
-            android:text="creator:xwiki"
+            android:text="@string/creatorXwiki"
             android:layout_alignStart="@id/groupName"/>
 
     <TextView
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_toStartOf="@id/checkbox"
             android:layout_alignTop="@id/version"
-            android:text="Last update:2015.06.03"
+            android:text="@string/lastUpdateInfo"
             android:layout_marginRight="@dimen/marginMedium"
             android:layout_toLeftOf="@id/checkbox"
             android:layout_marginEnd="@dimen/marginMedium"/>

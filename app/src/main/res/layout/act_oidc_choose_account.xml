@@ -31,7 +31,7 @@
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Choose an account"
+                        android:text="@string/chooseAccount"
                         android:layout_centerHorizontal="true"
                         android:layout_gravity="center"
                         android:textStyle="bold"/>
@@ -67,7 +67,7 @@
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Use another account"
+                            android:text="@string/anotherAccount"
                             android:textSize="@dimen/textDefaultSmallSize"
                             android:layout_marginStart="@dimen/viewDefaultLargeSize"
                             android:layout_marginLeft="@dimen/viewDefaultLargeSize"/>
@@ -83,7 +83,7 @@
                         android:layout_marginRight="@dimen/viewDefaultLargeSize"
                         android:layout_marginBottom="@dimen/viewDefaultLargeSize"
                         android:textSize="@dimen/textDefaultSmallSize"
-                        android:text="To continue, XWiki will share your name, email address and profile picture with the requesting app"
+                        android:text="@string/xwikiCredentialShare"
                 />
 
             </LinearLayout>
@@ -94,7 +94,7 @@
                 android:id="@+id/tvPleaseWait"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Please wait"
+                android:text="@string/pleaseWait"
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 android:textStyle="bold"
