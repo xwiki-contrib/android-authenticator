@@ -9,7 +9,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.webkit.*
+import android.webkit.CookieManager
+import android.webkit.CookieSyncManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -23,18 +24,17 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.*
+import org.json.JSONObject
 import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.databinding.ActOidcChooseAccountBinding
 import org.xwiki.android.sync.utils.AccountClickListener
-import org.xwiki.android.sync.utils.extensions.TAG
-import java.io.IOException
-import android.webkit.CookieSyncManager
-import okhttp3.*
-import org.json.JSONObject
 import org.xwiki.android.sync.utils.OIDCWebViewClient
 import org.xwiki.android.sync.utils.WebViewPageLoadedListener
+import org.xwiki.android.sync.utils.extensions.TAG
+import java.io.IOException
 import java.net.URL
 
 private suspend fun createAuthorizationCodeFlow(serverUrl: String): AuthorizationCodeFlow {

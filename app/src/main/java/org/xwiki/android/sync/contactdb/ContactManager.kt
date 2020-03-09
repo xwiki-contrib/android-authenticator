@@ -32,7 +32,6 @@ import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.dataSaverModeEnabled
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.getValue
 import retrofit2.HttpException
 import rx.Observable
 import rx.Observer

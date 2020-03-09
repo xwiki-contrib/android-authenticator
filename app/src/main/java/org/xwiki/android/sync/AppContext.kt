@@ -19,7 +19,6 @@
  */
 package org.xwiki.android.sync
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
@@ -27,7 +26,6 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.xwiki.android.sync.contactdb.AppDatabase
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.UserAccountId

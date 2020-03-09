@@ -21,12 +21,15 @@ package org.xwiki.android.sync.rest
 
 import android.accounts.Account
 import android.accounts.AccountManager
-import kotlinx.coroutines.launch
-import okhttp3.*
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.xwiki.android.sync.*
+import org.xwiki.android.sync.ACCESS_TOKEN
+import org.xwiki.android.sync.ACCOUNT_TYPE
+import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
+import org.xwiki.android.sync.userAccountsCookiesRepo
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory

@@ -13,7 +13,7 @@ class RegistrationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
         val webView = findViewById<WebView>(R.id.webview)
-        val url = intent.getStringExtra(URL_FIELD)
-        val intent = webView.openLink(url)
+        val url = intent.getStringExtra(URL_FIELD) ?: error("Url was not provided for registration WebView")
+        webView.openLink(url)
     }
 }
