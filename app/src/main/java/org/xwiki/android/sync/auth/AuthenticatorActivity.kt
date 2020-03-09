@@ -275,10 +275,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     }
 
     fun learnMore(view: View) {
-        val intent = openLink(
-            defaultLearnMoreLink
-        )
-        startActivity(intent)
+        val learnMoreIntent = Intent(this, LearnMoreActivity::class.java)
+        startActivity(learnMoreIntent)
     }
 
     /**

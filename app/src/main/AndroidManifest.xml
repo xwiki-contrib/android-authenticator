@@ -46,6 +46,8 @@
 
         <activity android:name=".auth.RegistrationActivity"/>
 
+        <activity android:name=".auth.LearnMoreActivity"/>
+
         <activity
             android:name=".activities.GrantPermissionActivity"
             android:noHistory="true"
