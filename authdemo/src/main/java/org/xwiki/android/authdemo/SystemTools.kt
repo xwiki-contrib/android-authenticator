@@ -81,7 +81,7 @@ object SystemTools {
         val cm = context
             .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val info = cm.activeNetworkInfo
-        return info != null && info.isAvailable
+        return info != null && info.isConnected
     }
 
     fun checkWifi(context: Context): Boolean {
