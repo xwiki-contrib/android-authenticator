@@ -44,7 +44,7 @@ import org.xwiki.android.sync.utils.SystemTools
 import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
-import org.xwiki.android.sync.utils.checkNet
+import org.xwiki.android.sync.utils.hasNetworkConnection
 
 /**
  * Tag for logging.
@@ -87,8 +87,8 @@ class SignInViewFlipper(
 
     init {
         binding.signInButton.setOnClickListener {
-            if(!checkNet(mContext)){
-                showErrorMessage("Check Internet Connection !!!")
+            if(!mContext.hasNetworkConnection()){
+                showErrorMessage(mContext.getString(R.string.error_no_internet))
             }
             else if (checkInput()) {
                 val signInJob = submit()
