@@ -222,7 +222,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         if (position + 1 >= orderOfFlippers.size) {
             finish()
         }
-        showViewFlipper(position + 1)
     }
 
     /**

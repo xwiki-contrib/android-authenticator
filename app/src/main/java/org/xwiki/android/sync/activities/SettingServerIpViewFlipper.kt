@@ -49,7 +49,9 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
     override fun doNext() {
         checkInput().let {
             if (it != null) {
+                val position = mActivity.binding.viewFlipper.displayedChild
                 mActivity.serverUrl = it
+                mActivity.showViewFlipper(position + 1)
             }
         }
     }
@@ -68,8 +70,8 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
         val serverAddress = serverEditText.text.toString()
 
         if (TextUtils.isEmpty(serverAddress)) {
-            serverEditText.error = mContext.getString(R.string.error_field_required)
             serverEditText.requestFocus()
+            serverEditText.error = mContext.getString(R.string.error_field_required)
             return null
         } else {
             try {
