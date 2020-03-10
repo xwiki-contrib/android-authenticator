@@ -489,7 +489,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_NEW_ACCOUNT) {
+        if(requestCode == REQUEST_NEW_ACCOUNT && resultCode != Activity.RESULT_CANCELED) {
             val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
             if (accessToken.isNullOrEmpty()) {
                 Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
