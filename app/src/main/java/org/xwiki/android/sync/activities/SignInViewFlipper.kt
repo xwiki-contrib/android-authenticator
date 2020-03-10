@@ -20,12 +20,14 @@
 package org.xwiki.android.sync.activities
 
 import android.accounts.AccountManager
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.Dispatchers
@@ -91,6 +93,7 @@ class SignInViewFlipper(
                 showErrorMessage(mContext.getString(R.string.error_no_internet))
             }
             else if (checkInput()) {
+            it.hideKeyboard()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -310,5 +313,10 @@ class SignInViewFlipper(
                 }
             }
         })
+    }
+
+    fun View.hideKeyboard() {
+        val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
     }
 }
