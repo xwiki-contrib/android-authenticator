@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Choose the login method"
+            android:text="@string/chooseLoginMethod"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 
@@ -28,7 +28,7 @@
 
             <LinearLayout
                 android:id="@+id/llLoginFields"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero_height"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
@@ -86,7 +86,7 @@
 
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero_height"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/defaultViewMediumPadding"
                 android:layout_weight="1"
@@ -111,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="top|center"
-                    android:text="----   Or continue with   ----"
+                    android:text="@string/continueWithLandsacpe"
                     android:textStyle="bold"
                     android:layout_margin="@dimen/textinput_margin"/>
 
@@ -125,8 +125,8 @@
                     android:gravity="center_horizontal">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="@dimen/imageview_36dp"
+                        android:layout_height="@dimen/imageview_36dp"
                         android:layout_gravity="center"
                         android:src="@drawable/logo" />
 
@@ -134,8 +134,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:text="OpenID Connect" />
+                        android:layout_marginTop="@dimen/marginMedium"
+                        android:text="@string/openIdConnect" />
 
                 </LinearLayout>
 
