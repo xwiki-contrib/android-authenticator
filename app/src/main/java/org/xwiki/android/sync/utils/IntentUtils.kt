@@ -33,9 +33,9 @@ import android.webkit.WebView
  */
 fun openLink(url: String): Intent {
     var url = url
-    // if protocol isn't defined use http by default
+    // if protocol isn't defined use https by default
     if (!TextUtils.isEmpty(url) && !url.contains("://")) {
-        url = "http://$url"
+        url = "https://$url"
     }
 
     val intent = Intent()

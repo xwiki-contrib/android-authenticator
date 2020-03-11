@@ -10,7 +10,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/textDefaultMediumSize"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:layout_marginRight="@dimen/viewDefaultLargeSize"
             android:layout_marginEnd="@dimen/viewDefaultLargeSize"
             android:layout_marginTop="@dimen/viewDefaultMediumSize"/>
