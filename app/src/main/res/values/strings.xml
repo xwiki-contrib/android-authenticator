@@ -54,6 +54,7 @@
     <!-- menu -->
     <string name="save">Save</string>
     <string name="menu_ok" translatable="false">@android:string/ok</string>
+    <string name="dataSaver">Data Saver</string>
 
     <!--Activity label-->
     <string name="title_activity_edit_contact">Edit Contact</string>
@@ -125,6 +126,25 @@
     <string name="prohibitedAction">Check that you have necessary permissions</string>
     <string name="editXWikiContactInfo">Edit XWiki contact info</string>
     <string name="unchangedSettings">Nothing to save: settings was not changed</string>
+
+    <!--choose account-->
+    <string name="chooseAccount">Choose an account</string>
+    <string name="anotherAccount">Use another account</string>
+    <string name="accounts">Accounts</string>
+    <string name="xwikiCredentialShare">To continue, XWiki will share your name, email address and profile picture with the requesting app</string>
+
+    <!--sync settings-->
+    <string name="syncAccount">Sync Account</string>
+
+    <!--list item group-->
+    <string name="lastUpdateInfo">Last update:2015.06.03</string>
+    <string name="creatorXwiki">creator:xwiki</string>
+    <string name="admin">Admin</string>
+
+    <!--viewflipper signin-->
+    <string name="chooseLoginMethod">Choose the login method</string>
+    <string name="continueWith">Or continue with</string>
+    <string name="openIdConnect">OpenID Connect</string>
 
     <!--select setting-->
     <string-array name="select_groups_array">
