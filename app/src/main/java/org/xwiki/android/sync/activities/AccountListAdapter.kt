@@ -4,66 +4,49 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.utils.AccountClickListener
 
-class AccountListAdapter (
+class AccountListAdapter(
     private val mContext: Context,
-    private var availableAccounts : List<UserAccount>,
-    private val listener : AccountClickListener
-) : BaseAdapter()  {
+    private var availableAccounts: List<UserAccount>,
+    private val listener: AccountClickListener
+) : RecyclerView.Adapter<AccountListAdapter.AccountListViewHolder>() {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var view = convertView
-        val viewHolder: AccountListViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountListViewHolder {
 
-        view.let {
-            if (it == null) {
-                val inflater = LayoutInflater.from(mContext)
-                view = inflater.inflate(R.layout.account_list_layout, null)
-                viewHolder = AccountListViewHolder(view!!)
-                it?.tag = viewHolder
-            } else {
-                viewHolder = view?.tag as AccountListViewHolder
-            }
-            val account = getItem(position)
-            viewHolder.tvAccountName.text = account.accountName
-            viewHolder.tvAccountServerAddress.text = account.serverAddress
-
-            viewHolder.llAccountItem.setOnClickListener {
-                listener(account)
-            }
-        }
-
-        return view!!
+        val view = LayoutInflater.from(mContext).inflate(R.layout.account_list_layout, null)
+        return AccountListViewHolder(view)
     }
 
-    override fun getItem(position: Int): UserAccount {
-        return availableAccounts[position]
-    }
-
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    override fun getCount(): Int {
+    override fun getItemCount(): Int {
         return availableAccounts.size
     }
 
-}
+    override fun onBindViewHolder(holder: AccountListViewHolder, position: Int) {
+        val account = availableAccounts.get(position)
+        holder.tvAccountName.text = account.accountName
+        holder.tvAccountServerAddress.text = account.serverAddress
 
-private class AccountListViewHolder (view: View) {
-    val tvAccountName : TextView
-    val tvAccountServerAddress : TextView
-    val llAccountItem : LinearLayout
+        holder.llAccountItem.setOnClickListener {
+            listener(account)
+        }
+    }
 
-    init {
-        tvAccountName = view.findViewById(R.id.tvAccountName)
-        tvAccountServerAddress = view.findViewById(R.id.tvAccountServerAddress)
-        llAccountItem = view.findViewById(R.id.llAccountItem)
+    class AccountListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvAccountName: TextView
+        val tvAccountServerAddress: TextView
+        val llAccountItem: LinearLayout
+
+        init {
+            tvAccountName = view.findViewById(R.id.tvAccountName)
+            tvAccountServerAddress = view.findViewById(R.id.tvAccountServerAddress)
+            llAccountItem = view.findViewById(R.id.llAccountItem)
+        }
     }
 }
+

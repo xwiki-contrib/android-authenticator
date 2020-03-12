@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
@@ -16,7 +17,7 @@ import org.xwiki.android.sync.utils.AccountClickListener
 
 class SelectAccountActivity : BaseActivity(), AccountClickListener {
 
-    lateinit var binding : ActSelectAccountBinding
+    lateinit var binding: ActSelectAccountBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +29,9 @@ class SelectAccountActivity : BaseActivity(), AccountClickListener {
                 userAccountsRepo.getAll(),
                 this@SelectAccountActivity
             )
-            binding.lvAvailableAccounts.adapter = adapter
+            val recyclerView = binding.lvAvailableAccounts
+            recyclerView.layoutManager = LinearLayoutManager(this@SelectAccountActivity)
+            recyclerView.adapter = adapter
         }
     }
 

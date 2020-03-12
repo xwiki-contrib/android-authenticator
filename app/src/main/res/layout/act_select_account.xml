@@ -27,14 +27,14 @@
                   android:layout_marginLeft="@dimen/marginLarge"/>
 
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lvAvailableAccounts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/marginMedium"
                 android:padding="@dimen/paddingMedium">
 
-        </ListView>
+        </androidx.recyclerview.widget.RecyclerView>
 
     </LinearLayout>
 
