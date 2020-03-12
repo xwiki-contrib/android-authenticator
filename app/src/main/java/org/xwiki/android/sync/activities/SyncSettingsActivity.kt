@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,7 @@ import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.getAppVersionName
+import org.xwiki.android.sync.utils.getScreenOrientation
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
@@ -185,7 +187,13 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         mGroupAdapter = GroupListAdapter(groups, this)
         mUsersAdapter = UserListAdapter(allUsers, this)
-        layoutManager = LinearLayoutManager(this)
+        if(getScreenOrientation(this)=="SCREEN_ORIENTATION_LANDSCAPE" ||
+            getScreenOrientation(this)=="SCREEN_ORIENTATION_REVERSE_LANDSCAPE"){
+            layoutManager=  GridLayoutManager(this,2)
+        }
+        else{
+            layoutManager = LinearLayoutManager(this)
+        }
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = mUsersAdapter
         binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
