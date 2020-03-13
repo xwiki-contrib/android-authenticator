@@ -29,9 +29,7 @@ class SelectAccountActivity : BaseActivity(), AccountClickListener {
                 userAccountsRepo.getAll(),
                 this@SelectAccountActivity
             )
-            val recyclerView = binding.lvAvailableAccounts
-            recyclerView.layoutManager = LinearLayoutManager(this@SelectAccountActivity)
-            recyclerView.adapter = adapter
+            binding.lvAvailableAccounts.adapter = adapter
         }
     }
 
