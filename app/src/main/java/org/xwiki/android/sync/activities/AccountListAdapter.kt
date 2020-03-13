@@ -23,9 +23,7 @@ class AccountListAdapter(
         return AccountListViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return availableAccounts.size
-    }
+    override fun getItemCount(): Int = availableAccounts.size
 
     override fun onBindViewHolder(holder: AccountListViewHolder, position: Int) {
         val account = availableAccounts.get(position)

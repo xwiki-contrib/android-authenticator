@@ -17,7 +17,7 @@ import org.xwiki.android.sync.utils.AccountClickListener
 
 class SelectAccountActivity : BaseActivity(), AccountClickListener {
 
-    lateinit var binding: ActSelectAccountBinding
+    lateinit var binding : ActSelectAccountBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
