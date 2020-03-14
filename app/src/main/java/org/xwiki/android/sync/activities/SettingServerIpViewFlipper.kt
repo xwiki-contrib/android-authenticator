@@ -69,21 +69,20 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
         serverEditText.error = null
         val serverAddress = serverEditText.text.toString()
 
-        if (TextUtils.isEmpty(serverAddress)) {
-            serverEditText.requestFocus()
+        return if (TextUtils.isEmpty(serverAddress)) {
             serverEditText.error = mContext.getString(R.string.error_field_required)
-            return null
+            serverEditText.requestFocus()
+            null
         } else {
             try {
                 URL(serverAddress)
-                return serverAddress
+                serverAddress
             } catch (e: MalformedURLException) {
                 Log.e(SettingServerIpViewFlipper::class.java.simpleName, "Wrong url", e)
                 serverEditText.error = mContext.getString(R.string.error_invalid_server)
                 serverEditText.requestFocus()
-                return null
+                null
             }
-
         }
     }
 }
