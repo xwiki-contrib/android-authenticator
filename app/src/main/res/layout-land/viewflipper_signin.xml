@@ -87,59 +87,38 @@
 
             <LinearLayout
                 android:layout_width="@dimen/zero_height"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/defaultViewMediumPadding"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
+                <include
+                    layout="@layout/template_register_line"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/don_t_have_a_account" />
-
-                <TextView
-                    android:id="@+id/tvSignUp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="signUp"
-                    android:text="@string/create_one"
-                    android:textColor="@color/primary_dark"
-                    android:layout_marginTop="@dimen/textinput_margin"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="top|center"
-                    android:text="@string/continueWithLandsacpe"
-                    android:textStyle="bold"
-                    android:layout_margin="@dimen/textinput_margin"/>
+                    android:layout_margin="@dimen/defaultViewMediumPadding" />
 
                 <LinearLayout
-                    android:id="@+id/llXWikiOIDCButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/llXWikiOIDCButtonContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="visible"
-                    android:layout_margin="@dimen/button_margin_top"
-                    android:gravity="center_horizontal">
-
-                    <ImageView
-                        android:layout_width="@dimen/imageview_36dp"
-                        android:layout_height="@dimen/imageview_36dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/logo" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:gravity="center">
+                    <include
+                        android:id="@+id/llContinueWith"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/marginMedium"
-                        android:text="@string/openIdConnect" />
+                        layout="@layout/template_continue_with"
+                        android:gravity="bottom"
+                        android:layout_margin="@dimen/viewDefaultLargeSize"/>
 
+                    <include
+                        android:id="@+id/llXWikiOIDCButtonInclude"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        layout="@layout/template_openid_connect_button"
+                        android:layout_margin="@dimen/button_margin_top" />
                 </LinearLayout>
-
-
             </LinearLayout>
         </LinearLayout>
 
