@@ -42,7 +42,6 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
-import org.xwiki.android.sync.utils.SystemTools
 import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
