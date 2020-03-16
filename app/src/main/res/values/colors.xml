@@ -27,4 +27,7 @@
     <color name="error_color">#e10a0a</color>
     <color name="textPrimary">#FFFFFF</color>
     <color name="dialogButtonText">#e10a0a</color>
+    <color name="black">#000000</color>
+    <color name="greyBackground">#81858585</color>
+    <color name="lightGrey">#808080</color>
 </resources>

@@ -10,15 +10,15 @@
             android:id="@+id/groupName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="10dip"
+            android:layout_marginLeft="@dimen/margin_6dp"
+            android:layout_marginTop="@dimen/margin_10dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:gravity="start"
-            android:text="Admin"
-            android:textSize="18sp"
+            android:text="@string/admin"
+            android:textSize="@dimen/textDefaultMediumSize"
             android:layout_toStartOf="@id/checkbox"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="@dimen/margin_6dp"
             android:layout_toLeftOf="@id/checkbox"/>
 
     <TextView
@@ -27,9 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/groupName"
             android:layout_below="@id/groupName"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dip"
-            android:text="creator:xwiki"
+            android:layout_marginBottom="@dimen/margin_5dp"
+            android:layout_marginTop="@dimen/margin_5dp"
+            android:text="@string/creatorXwiki"
             android:layout_alignStart="@id/groupName"/>
 
     <TextView
@@ -38,10 +38,10 @@
             android:layout_height="wrap_content"
             android:layout_toStartOf="@id/checkbox"
             android:layout_alignTop="@id/version"
-            android:text="Last update:2015.06.03"
-            android:layout_marginRight="8dp"
+            android:text="@string/lastUpdateInfo"
+            android:layout_marginRight="@dimen/marginMedium"
             android:layout_toLeftOf="@id/checkbox"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="@dimen/marginMedium"/>
 
     <CheckBox
             android:id="@+id/checkbox"
@@ -49,9 +49,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="@dimen/margin_5dp"
             android:focusable="false"
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="@dimen/margin_5dp"
             android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
