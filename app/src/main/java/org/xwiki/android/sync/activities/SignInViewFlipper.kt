@@ -32,6 +32,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.xwiki.android.sync.R
@@ -261,20 +262,21 @@ class SignInViewFlipper(
         }
     }
 
+    private var errorMessageShowingJob: Job? = null
     /**
      * Must be called to show user that something went wrong.
      *
      * @param error String which must be shown in error message
      */
     private fun showErrorMessage(error: String) {
-        val errorTextView = binding.errorMsg
+        val errorTextView = binding.errorHolderTextView
         errorTextView.visibility = View.VISIBLE
         errorTextView.text = error
-        Handler().postDelayed({
-            errorTextView.visibility = View.GONE
-        },
-            2000
-        )
+        errorMessageShowingJob ?.cancel()
+        errorMessageShowingJob = appCoroutineScope.launch(Dispatchers.Main) {
+            delay(2000L)
+            errorTextView.visibility = View.INVISIBLE
+        }
     }
 
     fun checkOIDCSupport() {
