@@ -202,7 +202,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:layout_margin="@dimen/marginLarge"
-                android:src="@drawable/ic_save_black_24dp" />
+                android:src="@drawable/ic_save_white_24dp" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
