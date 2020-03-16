@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.base.BaseActivity
