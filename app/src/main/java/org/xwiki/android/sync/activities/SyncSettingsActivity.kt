@@ -199,7 +199,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 binding.syncTypeGetErrorContainer.visibility = View.GONE
 
                 when(position) {
