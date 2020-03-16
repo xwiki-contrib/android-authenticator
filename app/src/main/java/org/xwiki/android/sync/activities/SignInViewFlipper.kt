@@ -28,21 +28,20 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.*
-import org.xwiki.android.sync.R
-import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.*
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
-import org.xwiki.android.sync.resolveApiManager
-import org.xwiki.android.sync.userAccountsRepo
 import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
@@ -90,7 +89,8 @@ class SignInViewFlipper(
     init {
         binding.signInButton.setOnClickListener {
             if(!mContext.hasNetworkConnection()){
-                showErrorMessage(mContext.getString(R.string.error_no_internet))
+//                showErrorMessage(mContext.getString(R.string.error_no_internet))
+                showDialog(mContext.getString(R.string.error),mContext.getString(R.string.error_no_internet))
             }
             else if (checkInput()) {
             it.hideKeyboard()
@@ -320,4 +320,16 @@ class SignInViewFlipper(
         val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
     }
+
+    fun showDialog(title: String, message:String){
+        val builder = AlertDialog.Builder(mContext,R.style.AlertDialogTheme)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(mContext.getString(R.string.ok)){dialog, which ->
+            dialog?.cancel()
+        }
+        builder.show()
+    }
+
 }

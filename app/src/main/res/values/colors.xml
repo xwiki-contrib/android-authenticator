@@ -26,4 +26,5 @@
     <color name="accent">#F57C00</color>
     <color name="error_color">#e10a0a</color>
     <color name="textPrimary">#FFFFFF</color>
+    <color name="dialogButtonText">#e10a0a</color>
 </resources>

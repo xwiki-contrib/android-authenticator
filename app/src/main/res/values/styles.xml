@@ -35,4 +35,8 @@
         <item name="android:background">@drawable/buttons_background</item>
         <item name="android:textColor">@color/textPrimary</item>
     </style>
+
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/dialogButtonText</item>
+    </style>
 </resources>
