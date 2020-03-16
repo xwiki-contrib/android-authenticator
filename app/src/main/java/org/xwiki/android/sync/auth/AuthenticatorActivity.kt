@@ -489,7 +489,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_NEW_ACCOUNT && resultCode != Activity.RESULT_CANCELED) {
+        if(requestCode == REQUEST_NEW_ACCOUNT) {
+            if(resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(this, "Authorization via OIDC was cancelled.", Toast.LENGTH_SHORT).show()
+                return
+            }
             val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
             if (accessToken.isNullOrEmpty()) {
                 Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
