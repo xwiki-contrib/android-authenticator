@@ -46,6 +46,7 @@ import rx.android.schedulers.AndroidSchedulers
 import java.io.IOException
 import java.net.URL
 import org.xwiki.android.sync.utils.hasNetworkConnection
+import org.xwiki.android.sync.utils.showDialog
 
 /**
  * Tag for logging.
@@ -89,8 +90,7 @@ class SignInViewFlipper(
     init {
         binding.signInButton.setOnClickListener {
             if(!mContext.hasNetworkConnection()){
-//                showErrorMessage(mContext.getString(R.string.error_no_internet))
-                showDialog(mContext.getString(R.string.error),mContext.getString(R.string.error_no_internet))
+                mContext.showDialog(mContext.getString(R.string.error),mContext.getString(R.string.error_no_internet))
             }
             else if (checkInput()) {
             it.hideKeyboard()
@@ -319,17 +319,6 @@ class SignInViewFlipper(
     fun View.hideKeyboard() {
         val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    }
-
-    fun showDialog(title: String, message:String){
-        val builder = AlertDialog.Builder(mContext,R.style.AlertDialogTheme)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(mContext.getString(R.string.ok)){dialog, which ->
-            dialog?.cancel()
-        }
-        builder.show()
     }
 
 }

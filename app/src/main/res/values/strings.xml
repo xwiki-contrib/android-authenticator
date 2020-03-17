@@ -127,7 +127,6 @@
     <string name="prohibitedAction">Check that you have necessary permissions</string>
     <string name="editXWikiContactInfo">Edit XWiki contact info</string>
     <string name="unchangedSettings">Nothing to save: settings was not changed</string>
-    <string name="ok">OK</string>
     <string name="error">Error</string>
 
     <!--choose account-->
