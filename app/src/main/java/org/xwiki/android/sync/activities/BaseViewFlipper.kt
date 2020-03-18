@@ -59,8 +59,10 @@ abstract class BaseViewFlipper(protected var mActivity: AuthenticatorActivity, p
 
     /**
      * Must be called when current flipper page must be slided to next.
+     *
+     * @return true if it is possible to go to the next step. Returns false otherwise
      */
-    abstract fun doNext()
+    abstract fun doNext(): Boolean
 
     /**
      * Must be called when current flipper page must be slided to previous.
