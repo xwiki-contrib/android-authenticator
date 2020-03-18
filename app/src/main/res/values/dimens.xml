@@ -48,4 +48,25 @@
     <dimen name="viewDefaultMediumSize">8dp</dimen>
     <dimen name="viewDefaultLargeSize">16dp</dimen>
     <dimen name="viewDefaultExtraLargeSize">32dp</dimen>
+
+    <dimen name="zero_height">0dp</dimen>
+    <dimen name="textviewMinHeightLarge">50dp</dimen>
+    <dimen name="textviewMinWidthLarge">250dp</dimen>
+    <dimen name="marginSmall">4dp</dimen>
+    <dimen name="marginMedium">8dp</dimen>
+    <dimen name="marginLarge">16dp</dimen>
+    <dimen name="paddingSmall">4dp</dimen>
+    <dimen name="paddingMedium">8dp</dimen>
+    <dimen name="paddingLarge">16dp</dimen>
+    <dimen name="textLarge">16sp</dimen>
+    <dimen name="textviewVerySmall">1dp</dimen>
+    <dimen name="viewVerySmall">1dp</dimen>
+    <dimen name="imageview_20dp">20dp</dimen>
+    <dimen name="padding_12dp">12dp</dimen>
+    <dimen name="marginSmallNegative">-4dp</dimen>
+    <dimen name="margin_6dp">6dp</dimen>
+    <dimen name="margin_5dp">5dp</dimen>
+    <dimen name="margin_10dp">10dp</dimen>
+    <dimen name="OIDC_account_list_layout_height">48dp</dimen>
+    <dimen name="imageview_36dp">36dp</dimen>
 </resources>
