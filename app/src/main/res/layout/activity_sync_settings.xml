@@ -35,17 +35,17 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/about_version"
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/marginMedium"
                                 android:padding="@dimen/defaultViewSmallPadding"
-                                android:layout_marginLeft="8dp"/>
+                                android:layout_marginLeft="@dimen/marginMedium"/>
 
                         <Button
                                 android:id="@+id/version_check"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/marginMedium"
                                 android:text="@string/version"
-                                android:layout_marginRight="8dp"/>
+                                android:layout_marginRight="@dimen/marginMedium"/>
 
                     </LinearLayout>
 
@@ -57,24 +57,24 @@
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/marginMedium"
                                 android:id="@+id/syncAccount"
-                                android:text="Sync Account"
+                                android:text="@string/syncAccount"
                                 android:padding="@dimen/defaultViewSmallPadding"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"/>
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"/>
 
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/tvSelectedSyncAcc"
-                                android:textSize="18sp"
-                                android:textColor="#000000"
+                                android:textSize="@dimen/textDefaultMediumSize"
+                                android:textColor="@color/black"
                                 android:layout_toEndOf="@id/syncAccount"
                                 android:layout_toStartOf="@id/ivEditSyncAcc"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"
                                 android:layout_toRightOf="@id/syncAccount"
                                 android:layout_toLeftOf="@id/ivEditSyncAcc"/>
 
@@ -82,29 +82,29 @@
                                 android:id="@+id/tvSelectedSyncType"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="16sp"
+                                android:textSize="@dimen/textLarge"
                                 android:singleLine="true"
                                 android:layout_toEndOf="@id/syncAccount"
                                 android:layout_toStartOf="@id/ivEditSyncAcc"
                                 android:layout_below="@id/tvSelectedSyncAcc"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"
                                 android:layout_toRightOf="@id/syncAccount"
                                 android:layout_toLeftOf="@id/ivEditSyncAcc"/>
 
 
                         <ImageView
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/marginMedium"
                                 android:id="@+id/ivEditSyncAcc"
-                                android:layout_height="20dp"
-                                android:layout_width="20dp"
+                                android:layout_height="@dimen/imageview_20dp"
+                                android:layout_width="@dimen/imageview_20dp"
                                 android:layout_alignParentEnd="true"
-                                android:layout_marginEnd="8dp"
+                                android:layout_marginEnd="@dimen/marginMedium"
                                 android:background="@drawable/ic_edit_black_24dp"
                                 android:layout_alignParentRight="true"
-                                android:padding="12dp"
-                                android:layout_marginRight="8dp"/>
+                                android:padding="@dimen/padding_12dp"
+                                android:layout_marginRight="@dimen/marginMedium"/>
 
                     </RelativeLayout>
 
@@ -115,21 +115,21 @@
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="@dimen/marginMedium"
                                 android:id="@+id/sync_label"
                                 android:text="@string/synchronizationType"
                                 android:padding="@dimen/defaultViewSmallPadding"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"/>
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"/>
 
                         <androidx.appcompat.widget.AppCompatSpinner
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginStart="18dp"
-                                android:layout_marginLeft="18dp"
-                                android:layout_marginEnd="-4dp"
-                                android:layout_marginRight="-4dp"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:layout_marginStart="@dimen/marginLarge"
+                                android:layout_marginLeft="@dimen/marginLarge"
+                                android:layout_marginEnd="@dimen/marginSmallNegative"
+                                android:layout_marginRight="@dimen/marginSmallNegative"
                                 android:id="@+id/select_spinner"
                                 android:entries="@array/select_groups_array"
                                 android:padding="@dimen/defaultViewSmallPadding"/>
@@ -153,7 +153,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerView"
                             android:layout_width="match_parent"
-                            android:dividerHeight="1dp"
+                            android:dividerHeight="@dimen/viewVerySmall"
                             android:scrollbars="vertical"
                             android:layout_height="match_parent"/>
 

@@ -46,13 +46,9 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
     /**
      * Check typed server address and call sign in if all is ok.
      */
-    override fun doNext() {
-        checkInput().let {
-            if (it != null) {
-                mActivity.serverUrl = it
-            }
-        }
-    }
+    override fun doNext() = checkInput() ?.also {
+        mActivity.serverUrl = it
+    } != null
 
     /**
      * Do nothing (Setting server IP is first operation of adding account.
@@ -67,21 +63,20 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
         serverEditText.error = null
         val serverAddress = serverEditText.text.toString()
 
-        if (TextUtils.isEmpty(serverAddress)) {
+        return if (TextUtils.isEmpty(serverAddress)) {
             serverEditText.error = mContext.getString(R.string.error_field_required)
             serverEditText.requestFocus()
-            return null
+            null
         } else {
             try {
                 URL(serverAddress)
-                return serverAddress
+                serverAddress
             } catch (e: MalformedURLException) {
                 Log.e(SettingServerIpViewFlipper::class.java.simpleName, "Wrong url", e)
                 serverEditText.error = mContext.getString(R.string.error_invalid_server)
                 serverEditText.requestFocus()
-                return null
+                null
             }
-
         }
     }
 }

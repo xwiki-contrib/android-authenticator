@@ -25,15 +25,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import okhttp3.*
+import kotlinx.coroutines.*
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
@@ -42,9 +38,10 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
+import org.xwiki.android.sync.utils.checkOIDCSupport
+import org.xwiki.android.sync.utils.extensions.enabled
 import rx.android.schedulers.AndroidSchedulers
-import java.io.IOException
-import java.net.URL
+import kotlin.Exception
 
 /**
  * Tag for logging.
@@ -98,17 +95,33 @@ class SignInViewFlipper(
             }
         }
 
-        binding.llXWikiOIDCButton.setOnClickListener {
-            binding.loading.visibility = View.VISIBLE
-            binding.llXWikiOIDCButton.visibility = View.INVISIBLE
-            checkOIDCSupport()
+        appCoroutineScope.launch {
+            withContext(Dispatchers.Main) {
+                binding.llXWikiOIDCButtonContainer.enabled = false
+            }
+            val oidcSupported = try {
+                mActivity.serverUrl ?.let { checkOIDCSupport(it) } ?: false
+            } catch (e: Exception) {
+                false
+            }
+
+            withContext(Dispatchers.Main) {
+                binding.llXWikiOIDCButtonContainer.enabled = oidcSupported
+                if (oidcSupported) {
+                    binding.llXWikiOIDCButtonInclude.setOnClickListener {
+                        mActivity.startOIDCAuth()
+                    }
+                } else {
+                    Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     /**
      * Calling when user push "login".
      */
-    override fun doNext() {}
+    override fun doNext() = true
 
     /**
      * Return to setting server ip address, calling by pressing "back".
@@ -271,43 +284,6 @@ class SignInViewFlipper(
         },
             2000
         )
-    }
-
-    fun checkOIDCSupport() {
-        val url = URL ("${mActivity.serverUrl}/oidc/userinfo")
-
-        val request = Request.Builder().url(url).build()
-
-        val client = OkHttpClient()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                appCoroutineScope.launch (Dispatchers.Main) {
-                    binding.loading.visibility = View.GONE
-                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
-
-                    if (response.code() == 500) {
-                        mActivity.startOIDCAuth()
-                    }
-                    if (response.code() == 404 || response.code() == 401) {
-                        Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call, e: IOException) {
-                if (e.message.isNullOrEmpty()) {
-                    Log.e(TAG, "No response from the server.")
-                } else {
-                    Log.e(TAG, e.message)
-                }
-                appCoroutineScope.launch (Dispatchers.Main) {
-                    binding.loading.visibility = View.GONE
-                    binding.llXWikiOIDCButton.visibility = View.VISIBLE
-                    Toast.makeText(mContext, "Something went wrong.", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
     }
 
     fun View.hideKeyboard() {
