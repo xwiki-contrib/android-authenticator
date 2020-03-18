@@ -96,7 +96,8 @@
                     layout="@layout/template_register_line"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/defaultViewMediumPadding" />
+                    android:layout_marginTop="@dimen/defaultViewLargePadding"
+                    android:layout_marginBottom="@dimen/defaultViewMediumPadding" />
 
                 <LinearLayout
                     android:id="@+id/llXWikiOIDCButtonContainer"
