@@ -22,8 +22,8 @@ package org.xwiki.android.sync.rest
 import okhttp3.ResponseBody
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SearchResultContainer
-import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
-import org.xwiki.android.sync.bean.SerachResults.CustomSearchResultContainer
+import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
+import org.xwiki.android.sync.bean.SearchResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
