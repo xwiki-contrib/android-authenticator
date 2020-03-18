@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.android.sync.bean.SerachResults
+package org.xwiki.android.sync.bean.SearchResults
 
-class CustomSearchResultContainer<T> {
-    var links: Array<String>? = null
-    var searchResults: List<T>? = null
+open class CustomObjectsSummariesContainer<T> {
+    lateinit var links: Array<String>
+    lateinit var objectSummaries: List<T>
 }

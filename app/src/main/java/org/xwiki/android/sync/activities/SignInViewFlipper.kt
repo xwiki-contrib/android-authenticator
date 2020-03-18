@@ -20,13 +20,10 @@
 package org.xwiki.android.sync.activities
 
 import android.accounts.AccountManager
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.TextUtils
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.*
@@ -40,8 +37,10 @@ import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.checkOIDCSupport
 import org.xwiki.android.sync.utils.extensions.enabled
+import org.xwiki.android.sync.utils.extensions.hideKeyboard
+import org.xwiki.android.sync.utils.hasNetworkConnection
+import org.xwiki.android.sync.utils.showDialog
 import rx.android.schedulers.AndroidSchedulers
-import kotlin.Exception
 
 /**
  * Tag for logging.
@@ -84,8 +83,10 @@ class SignInViewFlipper(
 
     init {
         binding.signInButton.setOnClickListener {
-            it.hideKeyboard()
-            if (checkInput()) {
+            if(!mContext.hasNetworkConnection()){
+                mContext.showDialog(R.string.error_no_internet)
+            } else if (checkInput()) {
+                it.hideKeyboard()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -121,7 +122,7 @@ class SignInViewFlipper(
     /**
      * Calling when user push "login".
      */
-    override fun doNext() {}
+    override fun doNext() = true
 
     /**
      * Return to setting server ip address, calling by pressing "back".
@@ -270,24 +271,20 @@ class SignInViewFlipper(
         }
     }
 
+    private var errorMessageShowingJob: Job? = null
     /**
      * Must be called to show user that something went wrong.
      *
      * @param error String which must be shown in error message
      */
     private fun showErrorMessage(error: String) {
-        val errorTextView = binding.errorMsg
+        val errorTextView = binding.errorHolderTextView
         errorTextView.visibility = View.VISIBLE
         errorTextView.text = error
-        Handler().postDelayed({
-            errorTextView.visibility = View.GONE
-        },
-            2000
-        )
-    }
-
-    fun View.hideKeyboard() {
-        val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
+        errorMessageShowingJob ?.cancel()
+        errorMessageShowingJob = appCoroutineScope.launch(Dispatchers.Main) {
+            delay(2000L)
+            errorTextView.visibility = View.INVISIBLE
+        }
     }
 }

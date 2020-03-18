@@ -66,8 +66,8 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                        android:id="@+id/error_msg"
+                <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/errorHolderTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/defaultViewMediumPadding"
@@ -75,7 +75,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/error_color"
                         android:textStyle="normal"
-                        android:visibility="gone" />
+                        android:visibility="invisible" />
 
                 <Button
                         android:layout_width="wrap_content"
