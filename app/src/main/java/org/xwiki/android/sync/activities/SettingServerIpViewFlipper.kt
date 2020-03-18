@@ -47,12 +47,10 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
      * Check typed server address and call sign in if all is ok.
      */
     override fun doNext() {
-        checkInput().let {
-            if (it != null) {
-                val position = mActivity.binding.viewFlipper.displayedChild
-                mActivity.serverUrl = it
-                mActivity.showViewFlipper(position + 1)
-            }
+        checkInput() ?.also {
+            val position = mActivity.binding.viewFlipper.displayedChild
+            mActivity.serverUrl = it
+            mActivity.showViewFlipper(position + 1)
         }
     }
 
