@@ -144,7 +144,6 @@
     <!--viewflipper signin-->
     <string name="chooseLoginMethod">Choose the login method</string>
     <string name="continueWith">Or continue with</string>
-    <string name="continueWithLandsacpe">---- Or continue with ----</string>
     <string name="openIdConnect">OpenID Connect</string>
 
     <!--select setting-->
