@@ -45,10 +45,6 @@ fun getAppVersionName(context: Context): String {
     }
 }
 
-fun Context.getScreenOrientation(): Int {
-    return resources.configuration.orientation
-}
-
 /**
  * System tools.
  *
