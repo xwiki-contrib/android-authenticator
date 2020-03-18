@@ -20,16 +20,11 @@
 package org.xwiki.android.sync.activities
 
 import android.accounts.AccountManager
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.TextUtils
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.*
 import org.xwiki.android.sync.R
@@ -89,7 +84,7 @@ class SignInViewFlipper(
     init {
         binding.signInButton.setOnClickListener {
             if(!mContext.hasNetworkConnection()){
-                mContext.showDialog(mContext.getString(R.string.error),mContext.getString(R.string.error_no_internet))
+                mContext.showDialog(R.string.error_no_internet)
             } else if (checkInput()) {
                 it.hideKeyboard()
                 val signInJob = submit()
