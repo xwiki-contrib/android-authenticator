@@ -21,6 +21,7 @@ package org.xwiki.android.sync.utils
 
 import android.content.Context
 import android.content.pm.PackageManager.NameNotFoundException
+import android.content.res.Configuration
 import android.view.Surface
 import android.view.WindowManager
 
@@ -44,14 +45,8 @@ fun getAppVersionName(context: Context): String {
     }
 }
 
-fun getScreenOrientation(context: Context): String {
-    val screenOrientation = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.orientation
-    when (screenOrientation) {
-        Surface.ROTATION_0 -> return "SCREEN_ORIENTATION_PORTRAIT"
-        Surface.ROTATION_90 -> return "SCREEN_ORIENTATION_LANDSCAPE"
-        Surface.ROTATION_180 -> return "SCREEN_ORIENTATION_REVERSE_PORTRAIT"
-        else -> return "SCREEN_ORIENTATION_REVERSE_LANDSCAPE"
-    }
+fun Context.getScreenOrientation(): Int {
+    return resources.configuration.orientation
 }
 
 /**

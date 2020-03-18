@@ -153,7 +153,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:dividerHeight="@dimen/viewVerySmall"
-                            android:scrollbars="vertical" />
+                            android:scrollbars="vertical"
+                            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                            app:spanCount="@integer/syncSettingsActivityLandGridSpanCount"/>
 
                         <LinearLayout
                             android:id="@+id/syncTypeGetErrorContainer"

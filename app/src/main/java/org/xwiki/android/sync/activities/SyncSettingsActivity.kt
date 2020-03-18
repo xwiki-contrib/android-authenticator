@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -187,14 +188,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         mGroupAdapter = GroupListAdapter(groups, this)
         mUsersAdapter = UserListAdapter(allUsers, this)
-        if(getScreenOrientation(this)=="SCREEN_ORIENTATION_LANDSCAPE" ||
-            getScreenOrientation(this)=="SCREEN_ORIENTATION_REVERSE_LANDSCAPE"){
-            layoutManager=  GridLayoutManager(this,2)
-        }
-        else{
-            layoutManager = LinearLayoutManager(this)
-        }
-        binding.recyclerView.layoutManager = layoutManager
+        layoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
         binding.recyclerView.adapter = mUsersAdapter
         binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
