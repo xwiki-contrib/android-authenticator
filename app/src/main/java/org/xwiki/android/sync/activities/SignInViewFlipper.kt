@@ -121,7 +121,7 @@ class SignInViewFlipper(
     /**
      * Calling when user push "login".
      */
-    override fun doNext() {}
+    override fun doNext() = true
 
     /**
      * Return to setting server ip address, calling by pressing "back".

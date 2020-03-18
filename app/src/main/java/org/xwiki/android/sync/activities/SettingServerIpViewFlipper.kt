@@ -46,13 +46,9 @@ class SettingServerIpViewFlipper(activity: AuthenticatorActivity, contentRootVie
     /**
      * Check typed server address and call sign in if all is ok.
      */
-    override fun doNext() {
-        checkInput() ?.also {
-            val position = mActivity.binding.viewFlipper.displayedChild
-            mActivity.serverUrl = it
-            mActivity.showViewFlipper(position + 1)
-        }
-    }
+    override fun doNext() = checkInput() ?.also {
+        mActivity.serverUrl = it
+    } != null
 
     /**
      * Do nothing (Setting server IP is first operation of adding account.

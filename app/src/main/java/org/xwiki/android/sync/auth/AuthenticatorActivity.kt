@@ -218,9 +218,12 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     fun doNext(view: View) {
         val position = binding.viewFlipper.displayedChild
         chooseAnimation(true)
-        flippers[position]?.doNext()
-        if (position + 1 >= orderOfFlippers.size) {
-            finish()
+        if (flippers[position] ?.doNext() == true) {
+            if (position + 1 >= orderOfFlippers.size) {
+                finish()
+            } else {
+                showViewFlipper(position + 1)
+            }
         }
     }
 
