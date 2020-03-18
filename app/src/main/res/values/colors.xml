@@ -23,7 +23,7 @@
 <resources>
     <color name="primary">#3E7CBC</color>
     <color name="primary_dark">#2563a3</color>
-    <color name="accent">#F57C00</color>
+    <color name="accent">#448AFF</color>
     <color name="error_color">#e10a0a</color>
     <color name="textPrimary">#FFFFFF</color>
     <color name="dialogButtonText">@color/error_color</color>

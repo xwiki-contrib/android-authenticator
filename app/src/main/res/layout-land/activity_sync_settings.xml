@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/toolbar_layout" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/defaultViewSmallPadding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="@dimen/zero_height"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/zero_height"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/version_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/marginMedium"
+                                    android:layout_marginLeft="@dimen/marginMedium"
+                                    android:layout_marginEnd="@dimen/marginLarge"
+                                    android:layout_marginRight="@dimen/marginLarge"
+                                    android:padding="@dimen/defaultViewSmallPadding"
+                                    android:text="@string/about_version" />
+
+                                <Button
+                                    android:id="@+id/version_check"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="@dimen/marginMedium"
+                                    android:layout_marginRight="@dimen/marginMedium"
+                                    android:text="@string/version" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="@dimen/zero_height"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/sync_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/marginMedium"
+                                    android:layout_marginLeft="@dimen/marginMedium"
+                                    android:layout_marginTop="@dimen/marginMedium"
+                                    android:padding="@dimen/defaultViewSmallPadding"
+                                    android:text="@string/synchronizationType" />
+
+                                <androidx.appcompat.widget.AppCompatSpinner
+                                    android:id="@+id/select_spinner"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/marginLarge"
+                                    android:layout_marginLeft="@dimen/marginLarge"
+                                    android:layout_marginTop="@dimen/marginMedium"
+                                    android:layout_marginEnd="@dimen/marginSmallNegative"
+                                    android:layout_marginRight="@dimen/marginSmallNegative"
+                                    android:entries="@array/select_groups_array"
+                                    android:padding="@dimen/defaultViewSmallPadding" />
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/rvChangeSelectedAccount"
+                            android:layout_width="@dimen/zero_height"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/syncAccount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:padding="@dimen/defaultViewSmallPadding"
+                                android:text="@string/syncAccount" />
+
+                            <TextView
+                                android:id="@+id/tvSelectedSyncAcc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/textDefaultMediumSize" />
+
+                            <TextView
+                                android:id="@+id/tvSelectedSyncType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/marginMedium"
+                                android:layout_marginLeft="@dimen/marginMedium"
+                                android:layout_marginTop="@dimen/marginMedium"
+                                android:singleLine="true"
+                                android:textSize="@dimen/textLarge" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/defaultViewMediumPadding">
+
+                        <ProgressBar
+                            android:id="@+id/list_viewProgressBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:visibility="gone" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:dividerHeight="@dimen/viewVerySmall"
+                            android:scrollbars="vertical"
+                            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                            app:spanCount="@integer/syncSettingsActivityLandGridSpanCount"/>
+
+                        <LinearLayout
+                            android:id="@+id/syncTypeGetErrorContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:maxWidth="@dimen/syncTypeGetListErrorWidth"
+                                android:text="@string/syncTypeGetListErrorMessage" />
+
+                            <Button
+                                android:id="@+id/btTryAgain"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/tryAgain" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/ivEditSyncAcc"
+                android:layout_width="@dimen/imageview_20dp"
+                android:layout_height="@dimen/imageview_20dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="@dimen/marginLarge"
+                android:layout_marginEnd="@dimen/marginLarge"
+                android:layout_marginRight="@dimen/marginLarge"
+                android:layout_marginBottom="@dimen/marginLarge"
+                android:background="@drawable/ic_edit_black_24dp"
+                android:padding="@dimen/padding_12dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/marginLarge"
+                android:src="@drawable/ic_save_white_24dp" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </LinearLayout>
+
+</layout>
