@@ -42,6 +42,7 @@ import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.checkOIDCSupport
 import org.xwiki.android.sync.utils.extensions.enabled
+import org.xwiki.android.sync.utils.extensions.hideKeyboard
 import org.xwiki.android.sync.utils.hasNetworkConnection
 import org.xwiki.android.sync.utils.showDialog
 import rx.android.schedulers.AndroidSchedulers
@@ -89,9 +90,8 @@ class SignInViewFlipper(
         binding.signInButton.setOnClickListener {
             if(!mContext.hasNetworkConnection()){
                 mContext.showDialog(mContext.getString(R.string.error),mContext.getString(R.string.error_no_internet))
-            }
-            else if (checkInput()) {
-            it.hideKeyboard()
+            } else if (checkInput()) {
+                it.hideKeyboard()
                 val signInJob = submit()
                 mActivity.showProgress(
                     mContext.getText(R.string.sign_in_authenticating)
@@ -292,10 +292,4 @@ class SignInViewFlipper(
             errorTextView.visibility = View.INVISIBLE
         }
     }
-
-    fun View.hideKeyboard() {
-        val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    }
-
 }
