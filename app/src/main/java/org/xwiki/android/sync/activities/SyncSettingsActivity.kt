@@ -38,7 +38,6 @@ import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.getAppVersionName
-import org.xwiki.android.sync.utils.getScreenOrientation
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
