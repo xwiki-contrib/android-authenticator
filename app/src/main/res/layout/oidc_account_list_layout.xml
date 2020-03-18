@@ -3,9 +3,9 @@
               android:id="@+id/llOIDCAccountItem"
               android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:paddingTop="8dp"
-              android:paddingBottom="8dp"
-              android:layout_height="48dp">
+              android:paddingTop="@dimen/paddingMedium"
+              android:paddingBottom="@dimen/paddingMedium"
+              android:layout_height="@dimen/OIDC_account_list_layout_height">
 
     <ImageView
             android:layout_width="@dimen/viewDefaultExtraLargeSize"
@@ -22,7 +22,7 @@
                 android:id="@+id/tvOIDCAccountName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
+                android:textColor="@color/black"
                 android:textSize="@dimen/textDefaultSmallSize"
                 android:layout_marginStart="@dimen/viewDefaultLargeSize"
                 android:layout_marginLeft="@dimen/viewDefaultLargeSize"/>
