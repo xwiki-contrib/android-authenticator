@@ -1,0 +1,26 @@
+name: UI-Test
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+
+jobs:
+
+  UItest:
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2 #boots up emulator and perform UI tests
+        with:
+          api-level: 29
+          script: ./gradlew connectedCheck
