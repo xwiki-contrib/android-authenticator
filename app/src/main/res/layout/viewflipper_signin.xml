@@ -5,13 +5,18 @@
 
         <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:padding="@dimen/defaultViewMediumPadding"
                 android:animateLayoutChanges="true"
                 android:gravity="center_horizontal">
 
-            <include layout="@layout/logo" />
+            <include
+                layout="@layout/logo"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="@dimen/defaultViewExtraLargePadding" />
 
             <TextView
                     android:id="@+id/message"
@@ -61,8 +66,8 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                        android:id="@+id/error_msg"
+                <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/errorHolderTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/defaultViewMediumPadding"
@@ -70,7 +75,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/error_color"
                         android:textStyle="normal"
-                        android:visibility="gone" />
+                        android:visibility="invisible" />
 
                 <Button
                         android:layout_width="wrap_content"
@@ -79,85 +84,36 @@
                         android:layout_margin="@dimen/defaultViewMediumPadding"
                         android:id="@+id/signInButton"/>
 
-                <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/defaultViewMediumPadding"
-                        android:orientation="horizontal">
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/don_t_have_a_account"/>
-                    <View
-                            android:layout_width="@dimen/defaultViewSmallPadding"
-                            android:layout_height="@dimen/viewVerySmall"/>
-                    <TextView
-                            android:id="@+id/tvSignUp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/create_one"
-                            android:onClick="signUp"
-                            android:textColor="@color/primary_dark"/>
-                </LinearLayout>
+                <include
+                    layout="@layout/template_register_line"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/defaultViewMediumPadding"/>
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/llXWikiOIDCButtonContainer"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/llLoginFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <include
                     android:id="@+id/llContinueWith"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    layout="@layout/template_continue_with"
                     android:gravity="bottom"
-                    android:layout_above="@id/llXWikiOIDCButton"
-                    android:layout_margin="@dimen/viewDefaultLargeSize"
-                    android:weightSum="3"
-                    android:orientation="horizontal">
+                    android:layout_margin="@dimen/viewDefaultLargeSize"/>
 
-                <TextView
-                        android:layout_width="@dimen/zero_height"
-                        android:layout_height="@dimen/viewVerySmall"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:background="@color/lightGrey"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/continueWith"
-                        android:textStyle="bold"
-                        android:gravity="top|center" />
-
-                <TextView
-                        android:layout_width="@dimen/zero_height"
-                        android:layout_height="@dimen/viewVerySmall"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:background="@color/lightGrey"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                    android:id="@+id/llXWikiOIDCButton"
-                    android:layout_width="wrap_content"
+                <include
+                    android:id="@+id/llXWikiOIDCButtonInclude"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible"
-                    android:layout_centerHorizontal="true"
-                    android:layout_alignParentBottom="true">
-
-                <ImageView
-                        android:layout_width="@dimen/imageview_36dp"
-                        android:layout_height="@dimen/imageview_36dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/logo"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/marginMedium"
-                        android:text="@string/openIdConnect"
-                        android:layout_gravity="center"/>
-
+                    android:layout_width="wrap_content"
+                    layout="@layout/template_openid_connect_button"
+                    android:layout_margin="@dimen/button_margin_top" />
             </LinearLayout>
 
             <ProgressBar

@@ -21,6 +21,7 @@ package org.xwiki.android.sync.utils
 
 import android.content.Context
 import android.content.pm.PackageManager.NameNotFoundException
+import android.net.ConnectivityManager
 
 /**
  * Get from package version name
@@ -40,6 +41,11 @@ fun getAppVersionName(context: Context): String {
     } catch (e: NameNotFoundException) {
         throw RuntimeException(SystemTools::class.java.name + "the application not found")
     }
+}
+
+fun Context.hasNetworkConnection(): Boolean {
+    val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    return cm.activeNetworkInfo?.isConnected ?: false
 }
 
 /**

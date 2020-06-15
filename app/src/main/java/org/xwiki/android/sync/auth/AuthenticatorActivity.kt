@@ -218,11 +218,13 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     fun doNext(view: View) {
         val position = binding.viewFlipper.displayedChild
         chooseAnimation(true)
-        flippers[position]?.doNext()
-        if (position + 1 >= orderOfFlippers.size) {
-            finish()
+        if (flippers[position] ?.doNext() == true) {
+            if (position + 1 >= orderOfFlippers.size) {
+                finish()
+            } else {
+                showViewFlipper(position + 1)
+            }
         }
-        showViewFlipper(position + 1)
     }
 
     /**
@@ -490,6 +492,10 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_NEW_ACCOUNT) {
+            if(resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(this, "Authorization via OIDC was cancelled.", Toast.LENGTH_SHORT).show()
+                return
+            }
             val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
             if (accessToken.isNullOrEmpty()) {
                 Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()

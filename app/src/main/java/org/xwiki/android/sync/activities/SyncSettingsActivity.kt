@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +30,7 @@ import org.xwiki.android.sync.*
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
 import org.xwiki.android.sync.bean.ObjectSummary
-import org.xwiki.android.sync.bean.SerachResults.CustomObjectsSummariesContainer
+import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
@@ -185,13 +187,12 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         mGroupAdapter = GroupListAdapter(groups, this)
         mUsersAdapter = UserListAdapter(allUsers, this)
-        layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.layoutManager = layoutManager
+        layoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
         binding.recyclerView.adapter = mUsersAdapter
         binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 binding.syncTypeGetErrorContainer.visibility = View.GONE
 
                 when(position) {
