@@ -16,6 +16,12 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
+      - name: Make launch script executable
+        run: chmod +x ./launch.sh
+
+      - name: Run launch script
+        run: ./launch.sh
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -24,3 +30,9 @@ jobs:
         with:
           api-level: 29
           script: ./gradlew connectedCheck
+
+      - name: Make stop script executable
+        run: chmod +x ./stop.sh
+
+      - name: Run stop script
+        run: ./stop.sh
