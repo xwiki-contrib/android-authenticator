@@ -28,13 +28,13 @@ class AccountListAdapter(
     override fun onBindViewHolder(holder: AccountListViewHolder, position: Int) {
         val account = availableAccounts.get(position)
 
-        holder.currentAccount(account, listener)
+        holder.setAccount(account, listener)
     }
 
     class AccountListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvAccountName: TextView
-        val tvAccountServerAddress: TextView
-        val llAccountItem: LinearLayout
+        private val tvAccountName: TextView
+        private val tvAccountServerAddress: TextView
+        private val llAccountItem: LinearLayout
 
         init {
             tvAccountName = view.findViewById(R.id.tvAccountName)
@@ -42,7 +42,7 @@ class AccountListAdapter(
             llAccountItem = view.findViewById(R.id.llAccountItem)
         }
 
-        fun currentAccount(account: UserAccount, listener: AccountClickListener) {
+        fun setAccount(account: UserAccount, listener: AccountClickListener) {
             tvAccountName.text = account.accountName
             tvAccountServerAddress.text = account.serverAddress
 
