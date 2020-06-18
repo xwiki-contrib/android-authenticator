@@ -17,37 +17,36 @@ class AccountListAdapter(
     private val listener: AccountClickListener
 ) : RecyclerView.Adapter<AccountListAdapter.AccountListViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountListViewHolder {
-
-        val view = LayoutInflater.from(mContext).inflate(R.layout.account_list_layout, null)
-        return AccountListViewHolder(view)
-    }
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ) = AccountListViewHolder(LayoutInflater.from(mContext), listener)
 
     override fun getItemCount(): Int = availableAccounts.size
 
     override fun onBindViewHolder(holder: AccountListViewHolder, position: Int) {
-        val account = availableAccounts.get(position)
-
-        holder.setAccount(account, listener)
+        holder.account = availableAccounts[position]
     }
 
-    class AccountListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val tvAccountName: TextView
-        private val tvAccountServerAddress: TextView
-        private val llAccountItem: LinearLayout
+    class AccountListViewHolder(
+        layoutInflater: LayoutInflater,
+        listener: AccountClickListener
+    ) : RecyclerView.ViewHolder(
+        layoutInflater.inflate(R.layout.account_list_layout, null)
+    ) {
+        private val tvAccountName: TextView = itemView.findViewById(R.id.tvAccountName)
+        private val tvAccountServerAddress: TextView = itemView.findViewById(R.id.tvAccountServerAddress)
+
+        var account: UserAccount? = null
+            set(value) {
+                field = value
+                tvAccountName.text = account ?.accountName ?: ""
+                tvAccountServerAddress.text = account ?.serverAddress ?: ""
+            }
 
         init {
-            tvAccountName = view.findViewById(R.id.tvAccountName)
-            tvAccountServerAddress = view.findViewById(R.id.tvAccountServerAddress)
-            llAccountItem = view.findViewById(R.id.llAccountItem)
-        }
-
-        fun setAccount(account: UserAccount, listener: AccountClickListener) {
-            tvAccountName.text = account.accountName
-            tvAccountServerAddress.text = account.serverAddress
-
-            llAccountItem.setOnClickListener {
-                listener(account)
+            itemView.findViewById<View>(R.id.llAccountItem).setOnClickListener {
+                account ?.also { listener(it) }
             }
         }
     }
