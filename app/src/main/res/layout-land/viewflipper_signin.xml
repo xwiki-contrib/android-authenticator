@@ -38,7 +38,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding">
+                    android:padding="@dimen/defaultViewSmallPadding">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/accountName"
@@ -52,7 +52,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding"
+                    android:padding="@dimen/defaultViewSmallPadding"
                     app:passwordToggleEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
