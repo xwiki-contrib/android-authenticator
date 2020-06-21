@@ -4,7 +4,7 @@ function assert_success() {
     "${@}"
     local status=${?}
     if [ ${status} -ne 0 ]; then
-        send_notification "### Error ${status} at: ${BASH_LINENO[*]} ###"
+        echo "### Error ${status} at: ${BASH_LINENO[*]} ###"
         exit ${status}
     fi
 }
