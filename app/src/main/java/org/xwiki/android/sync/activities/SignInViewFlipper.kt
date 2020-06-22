@@ -284,7 +284,7 @@ class SignInViewFlipper(
         errorMessageShowingJob ?.cancel()
         errorMessageShowingJob = appCoroutineScope.launch(Dispatchers.Main) {
             delay(2000L)
-            errorTextView.visibility = View.INVISIBLE
+            errorTextView.visibility = View.GONE
         }
     }
 }
