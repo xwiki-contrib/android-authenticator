@@ -16,6 +16,18 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
+      - name: Cache Gradle Caches
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/
+          key: cache-gradle
+
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper/
+          key: cache-gradle-wrapper
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
