@@ -28,10 +28,9 @@ assert_success cd "$filename"
 assert_success chmod +x start_xwiki.sh
 
 assert_success ./start_xwiki.sh &
-assert_success curl --retry 5 --retry-delay 10 "$checkAddress"
 
-echo "XWiki has been started"
+echo "XWiki has been started and curl after 60 seconds"
 
 sleep 60
 
-assert_success curl "$checkAddress"
+assert_success curl --retry 5 --retry-delay 10 "$checkAddress"
