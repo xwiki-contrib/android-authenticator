@@ -290,6 +290,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     // TODO:: Test case for pagination of loading MoreUsers
     private fun loadMoreUsers () {
         isLoading = true
+        showProgressBar2()
         apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
@@ -308,11 +309,12 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     initialUsersListLoading = false
                     allUsersAreLoading = false
                     isLoading = false
+                    hideProgressBar2()
                 },
                 Action1 {
                     allUsersAreLoading = false
                     isLoading = false
-                    hideProgressBar()
+                    hideProgressBar2()
                 }
             )
     }
@@ -366,6 +368,20 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             binding.recyclerView.visibility = View.GONE
         }
     }
+
+    //this progress bar appears when more data is loaded into recycler view
+    private fun showProgressBar2() {
+        runOnUiThread {
+            binding.loadMoreProgressBar.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideProgressBar2() {
+        runOnUiThread {
+            binding.loadMoreProgressBar.visibility = View.GONE
+        }
+    }
+
 
     private fun hideProgressBar() {
         runOnUiThread {

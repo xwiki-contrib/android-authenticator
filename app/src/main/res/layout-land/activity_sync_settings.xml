@@ -198,6 +198,13 @@
                 android:background="@drawable/ic_edit_black_24dp"
                 android:padding="@dimen/padding_12dp" />
 
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loadMoreProgressBar"
+                android:layout_gravity="bottom|center_horizontal"
+                android:visibility="gone"/>
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/nextButton"
                 android:layout_width="wrap_content"
