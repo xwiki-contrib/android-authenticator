@@ -47,7 +47,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
         activityScenario = ActivityScenario.launch(i)
     }
 
-    @Test
+    /*@Test
     fun testServerUrl () {
         activityScenario.onActivity {
             it.showViewFlipper(0)
@@ -63,7 +63,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
         }
         activityScenario.moveToState(Lifecycle.State.STARTED)
         activityScenario.close()
-    }
+    }*/
 
     @Test
     fun testSignIn() {
@@ -78,7 +78,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
         onView(withId(R.id.signInButton)).perform(click())
     }
 
-    @Test
+    /*@Test
     fun checkOIDCSupport() {
         activityScenario.moveToState(Lifecycle.State.STARTED)
 
@@ -98,7 +98,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
                 Log.e("Test", e.localizedMessage)
             }
         })
-    }
+    }*/
 
     @After
     fun closeActivity() {
