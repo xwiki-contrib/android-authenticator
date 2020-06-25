@@ -77,14 +77,16 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/errorHolderTextView"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/defaultViewMediumPadding"
+                    android:padding="@dimen/defaultViewSmallPadding"
                     android:maxLines="2"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/error_color"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
                     android:textStyle="normal"
-                    android:visibility="gone" />
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/signInButton"
