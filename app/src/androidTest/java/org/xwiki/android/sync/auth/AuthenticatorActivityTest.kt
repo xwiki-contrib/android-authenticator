@@ -74,7 +74,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
         onView(withId(R.id.accountName))
             .perform(typeText(TEST_USERNAME))      // Test user, for log in
         onView(withId(R.id.accountPassword))
-            .perform(typeText(TEST_PASSWORD))
+            .perform(typeText(TEST_PASSWORD), closeSoftKeyboard())
         onView(withId(R.id.signInButton)).perform(click())
     }
 
