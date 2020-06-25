@@ -40,7 +40,7 @@ jobs:
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2 #boots up emulator and perform UI tests
         with:
-          api-level: 29
+          api-level: 28
           script: ./gradlew connectedCheck
 
       - name: Make stop script executable
