@@ -75,7 +75,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/error_color"
                         android:textStyle="normal"
-                        android:visibility="gone"/>
+                        android:visibility="invisible"/>
 
                 <Button
                         android:layout_width="wrap_content"
