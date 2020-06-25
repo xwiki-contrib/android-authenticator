@@ -98,6 +98,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
                 Log.e("Test", e.localizedMessage)
             }
         })
+        assert(false) { "Here it will be failed specially" }
     }
 
     @After
