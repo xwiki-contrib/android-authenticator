@@ -22,6 +22,18 @@ jobs:
       - name: Run launch script
         run: ./launch.sh
 
+      - name: Cache Gradle Caches
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/
+          key: cache-gradle
+
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/wrapper/
+          key: cache-gradle-wrapper
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -32,7 +44,9 @@ jobs:
           script: ./gradlew connectedCheck
 
       - name: Make stop script executable
+        if: always()
         run: chmod +x ./stop.sh
 
       - name: Run stop script
+        if: always()
         run: ./stop.sh
