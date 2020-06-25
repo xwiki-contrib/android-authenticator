@@ -4,7 +4,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:gravity="center_horizontal"
         android:orientation="vertical"
@@ -23,22 +23,22 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/llLoginFields"
                 android:layout_width="@dimen/zero_height"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
                 android:visibility="visible">
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/signInButton"
-                    android:layout_alignParentTop="true">
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -72,29 +72,28 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/errorHolderTextView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/defaultViewMediumPadding"
-                            android:maxLines="2"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textColor="@color/error_color"
-                            android:textStyle="normal"
-                            android:visibility="gone" />
                     </LinearLayout>
                 </ScrollView>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/errorHolderTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/defaultViewMediumPadding"
+                    android:maxLines="2"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/error_color"
+                    android:textStyle="normal"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/signInButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
                     android:layout_margin="@dimen/defaultViewMediumPadding"
                     android:text="@string/log_in" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
 
             <LinearLayout
