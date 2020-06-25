@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -20,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
@@ -290,7 +288,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     // TODO:: Test case for pagination of loading MoreUsers
     private fun loadMoreUsers () {
         isLoading = true
-        showProgressBar2()
+        showLoadMoreProgressBar()
         apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
@@ -309,12 +307,12 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     initialUsersListLoading = false
                     allUsersAreLoading = false
                     isLoading = false
-                    hideProgressBar2()
+                    hideLoadMoreProgressBar()
                 },
                 Action1 {
                     allUsersAreLoading = false
                     isLoading = false
-                    hideProgressBar2()
+                    hideLoadMoreProgressBar()
                 }
             )
     }
@@ -370,15 +368,15 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     }
 
     //this progress bar appears when more data is loaded into recycler view
-    private fun showProgressBar2() {
+    private fun showLoadMoreProgressBar() {
         runOnUiThread {
             binding.loadMoreProgressBar.visibility = View.VISIBLE
         }
     }
 
-    private fun hideProgressBar2() {
+    private fun hideLoadMoreProgressBar() {
         runOnUiThread {
-            binding.loadMoreProgressBar.visibility = View.GONE
+            binding.loadMoreProgressBar.visibility = View.INVISIBLE
         }
     }
 

@@ -146,7 +146,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:visibility="gone" />
+                            android:visibility="gone"
+                            />
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerView"
@@ -154,8 +155,19 @@
                             android:layout_height="match_parent"
                             android:dividerHeight="@dimen/viewVerySmall"
                             android:scrollbars="vertical"
+                            android:layout_above="@+id/loadMoreProgressBar"
                             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                             app:spanCount="@integer/syncSettingsActivityLandGridSpanCount"/>
+
+                        <ProgressBar
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/loadMoreProgressBar"
+                            android:layout_centerHorizontal="true"
+                            android:layout_alignParentBottom="true"
+                            android:visibility="invisible"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:indeterminateOnly="true"/>
 
                         <LinearLayout
                             android:id="@+id/syncTypeGetErrorContainer"
@@ -182,6 +194,12 @@
 
                     </RelativeLayout>
 
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
                 </LinearLayout>
 
             </RelativeLayout>
@@ -197,13 +215,6 @@
                 android:layout_marginBottom="@dimen/marginLarge"
                 android:background="@drawable/ic_edit_black_24dp"
                 android:padding="@dimen/padding_12dp" />
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/loadMoreProgressBar"
-                android:layout_gravity="bottom|center_horizontal"
-                android:visibility="gone"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/nextButton"
