@@ -49,6 +49,7 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Test
     fun testServerUrl () {
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
         activityScenario.use { _ ->
             activityScenario.onActivity {
                 it.showViewFlipper(0)
@@ -58,16 +59,17 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Test
     fun testSignUp() {
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
         activityScenario.onActivity {
             it.showViewFlipper(1)
             it.signUp(it.binding.viewFlipper[1])
         }
-        activityScenario.moveToState(Lifecycle.State.STARTED)
         activityScenario.close()
     }
 
     @Test
     fun testSignIn() {
+        activityScenario.moveToState(Lifecycle.State.RESUMED)
         activityScenario.onActivity {
             it.showViewFlipper(0)
         }

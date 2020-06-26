@@ -41,7 +41,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2 #boots up emulator and perform UI tests
         with:
           api-level: 29
-          script: ./gradlew clean assemble && adb shell input keyevent 82 && ./gradlew connectedCheck
+          script: ./gradlew clean connectedCheck
 
 #      - name: Make stop script executable
 #        run: chmod +x ./stop.sh
