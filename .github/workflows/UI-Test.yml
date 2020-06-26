@@ -31,11 +31,11 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Make launch script executable
-        run: chmod +x ./launch.sh
-
-      - name: Run launch script
-        run: ./launch.sh
+#      - name: Make launch script executable
+#        run: chmod +x ./launch.sh
+#
+#      - name: Run launch script
+#        run: ./launch.sh
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2 #boots up emulator and perform UI tests

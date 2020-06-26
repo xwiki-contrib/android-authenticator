@@ -49,10 +49,11 @@ class AuthenticatorActivityTest : LifecycleObserver {
 
     @Test
     fun testServerUrl () {
-        activityScenario.onActivity {
-            it.showViewFlipper(0)
+        activityScenario.use { _ ->
+            activityScenario.onActivity {
+                it.showViewFlipper(0)
+            }
         }
-        activityScenario.close()
     }
 
     @Test
