@@ -156,12 +156,23 @@
                             android:visibility="gone"/>
 
                     <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/recyclerView"
-                            android:layout_width="match_parent"
-                            android:dividerHeight="@dimen/viewVerySmall"
-                            android:scrollbars="vertical"
-                            android:layout_height="match_parent"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:dividerHeight="@dimen/viewVerySmall"
+                        android:scrollbars="vertical"
+                        android:layout_height="match_parent"
+                        android:layout_above="@+id/loadMoreProgressBar"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/loadMoreProgressBar"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentBottom="true"
+                        android:visibility="invisible"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:indeterminateOnly="true"/>
 
                     <LinearLayout
                             android:layout_width="wrap_content"
