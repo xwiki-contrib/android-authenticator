@@ -43,8 +43,8 @@ jobs:
           api-level: 29
           script: adb shell input keyevent 82 && ./gradlew clean connectedCheck
 
-      - name: Make stop script executable
-        run: chmod +x ./stop.sh
-
-      - name: Run stop script
-        run: ./stop.sh
+#      - name: Make stop script executable
+#        run: chmod +x ./stop.sh
+#
+#      - name: Run stop script
+#        run: ./stop.sh
