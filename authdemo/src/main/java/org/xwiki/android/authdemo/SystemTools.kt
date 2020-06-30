@@ -23,22 +23,17 @@ import android.Manifest
 import android.app.ActivityManager
 import android.app.ActivityManager.MemoryInfo
 import android.app.ActivityManager.RunningAppProcessInfo
-import android.app.ActivityManager.RunningServiceInfo
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
-import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
-
 import java.io.File
 import java.security.MessageDigest
 

@@ -1,20 +1,18 @@
 package org.xwiki.android.authdemo
 
-import android.accounts.*
+import android.accounts.Account
+import android.accounts.AccountManager
+import android.accounts.AuthenticatorException
+import android.accounts.OperationCanceledException
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -22,7 +20,6 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import org.xwiki.android.authdemo.databinding.ActivityMainBinding
-
 import java.io.IOException
 
 private val STATE_DIALOG = "state_dialog"
