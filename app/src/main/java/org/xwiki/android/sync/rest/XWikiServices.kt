@@ -26,7 +26,10 @@ import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SearchResults.CustomSearchResultContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.bean.notification.Notification
+import org.xwiki.android.sync.bean.notification.NotificationsContainer
 import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import rx.Observable
@@ -83,7 +86,7 @@ interface XWikiServices {
                 ApiEndPoints.WIKIS +
                 "/xwiki/classes/XWiki.XWikiUsers/objects"
     )
-    fun getAllUsersListByOffset (
+    fun getAllUsersListByOffset(
         @Query("start") offset: Int?,
         @Query("number") limit: Int?
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
@@ -155,4 +158,22 @@ interface XWikiServices {
         @Path("space") space: String,
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
+
+    @Headers("Content-Type: application/json")
+    @GET("rest/notifications?userId=xwiki%3AXWiki.somenath1435&useUserPreferences=true")
+    fun getNofity(@Header("Authorization") basicAuth: String): Observable<NotificationsContainer<Notification>>
+
+    @Headers("Content-Type: application/json")
+    @GET("rest/notifications?userId=xwiki%3AXWiki.somenath1435&useUserPreferences=true")
+    fun getNotify(): Observable<NotificationsContainer<Notification>>
+
+
+//    fun getNofity(): Observable<NotificationsContainer<Notification>>
+
+//    @GET("rest/notifications?userId={username}&useUserPreferences=true")
+//    fun getNofity(
+//        @Header("Authorization") basicAuth: String,
+//        @Path("username") username: String
+//    ): Observable<NotificationsContainer<Notification>>
+
 }

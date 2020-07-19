@@ -1,12 +1,11 @@
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.xwiki.android.sync">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -23,20 +22,21 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
 
-
-
     <application
         android:name=".AppContext"
-        android:allowBackup="true" android:label="@string/app_name"
+        android:allowBackup="true"
+        android:appComponentFactory="androidx"
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:theme="@style/BaseAppTheme"
-        tools:replace="android:appComponentFactory"
         android:usesCleartextTraffic="true"
-        android:appComponentFactory="androidx">
+        tools:replace="android:appComponentFactory">
 
-        <activity android:name=".auth.AuthenticatorActivity"
-            android:label="@string/login_label"
-            android:excludeFromRecents="true" android:exported="true" >
+        <activity
+            android:name=".auth.AuthenticatorActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/login_label">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -44,19 +44,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".auth.RegistrationActivity"/>
+        <activity android:name=".activities.Notifications.NotificationsActivity" />
+
+        <activity android:name=".auth.RegistrationActivity" />
 
         <activity
             android:name=".activities.GrantPermissionActivity"
-            android:noHistory="true"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:label="@string/title_activity_authorize">
-        </activity>
+            android:label="@string/title_activity_authorize"
+            android:noHistory="true"></activity>
         <activity
             android:name=".activities.EditContact.EditContactActivity"
-            android:noHistory="true"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:noHistory="true">
             <intent-filter>
                 <data android:mimeType="vnd.android.cursor.item/vnd.xwikiedit.profile" />
                 <action android:name="android.intent.action.VIEW" />
@@ -64,17 +65,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.SyncSettingsActivity"/>
+        <activity android:name=".activities.SyncSettingsActivity" />
 
-        <activity android:name=".activities.SelectAccountActivity"/>
+        <activity android:name=".activities.SelectAccountActivity" />
 
-        <activity android:name=".activities.OIDC.OIDCActivity"
-                  android:launchMode="singleInstance">
+        <activity
+            android:name=".activities.OIDC.OIDCActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="xwiki" android:host="oidc"/>
+
+                <data
+                    android:host="oidc"
+                    android:scheme="xwiki" />
             </intent-filter>
         </activity>
 
@@ -89,7 +95,8 @@
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-            <meta-data android:name="android.accounts.AccountAuthenticator"
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
 
