@@ -160,11 +160,7 @@ interface XWikiServices {
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
 
     @Headers("Content-Type: application/json")
-    @GET("rest/notifications?userId=xwiki%3AXWiki.somenath1435&useUserPreferences=true")
-    fun getNofity(@Header("Authorization") basicAuth: String): Observable<NotificationsContainer<Notification>>
-
-    @Headers("Content-Type: application/json")
-    @GET("rest/notifications?userId=xwiki%3AXWiki.somenath1435&useUserPreferences=true")
+    @GET("rest/notifications?useUserPreferences=true")
     fun getNotify(): Observable<NotificationsContainer<Notification>>
 
 

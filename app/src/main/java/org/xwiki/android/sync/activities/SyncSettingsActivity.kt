@@ -786,7 +786,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     }
 
     fun storeNotifications() {
-        apiManager.xwikiServicesApi.getNofity(Credentials.basic("somenath1435", "password"))
+        apiManager.xwikiServicesApi.getNotify()
 //            apiManager.xwikiServicesApi.getNotify()
             .subscribeOn(Schedulers.newThread())
             .subscribe(
