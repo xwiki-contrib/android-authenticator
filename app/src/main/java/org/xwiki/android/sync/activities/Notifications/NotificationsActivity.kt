@@ -1,23 +1,18 @@
 package org.xwiki.android.sync.activities.Notifications
 
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.Credentials
 import org.xwiki.android.sync.R
-import org.xwiki.android.sync.activities.SyncSettingsActivity
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.rest.XWikiServices
 import org.xwiki.android.sync.userAccountsRepo
-import rx.Scheduler
-import rx.schedulers.Schedulers
-import java.net.URLEncoder
 
 class NotificationsActivity : AppCompatActivity() {
 
@@ -31,46 +26,47 @@ class NotificationsActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView_notifications)
         adapter = NotificationsAdapter()
         recyclerView.adapter = adapter
-//        initApi()
-        loadNotifications()
-    }
+        val extras = intent.extras
 
-    fun initApi() {
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setCancelable(false)
+        progressDialog.setMessage("Loading Notifications")
+
+        val currentUserAccountName = if (extras?.get("account") != null) {
+            val intentAccount: Account = extras.get("account") as Account
+            intentAccount.name
+        } else {
+            intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                ?: error("Can't get account name from intent - it is absent")
+        }
         appCoroutineScope.launch {
             val userAccount =
-                userAccountsRepo.findByAccountName("somenath1435") ?: return@launch
+                userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
             apiManager = resolveApiManager(userAccount)
-            loadNotifications()
-        }
-    }
-
-    fun loadNotifications() {
-
-        adapter.setNotificationList(SyncSettingsActivity().getNotificationsList())
-
-//        val progressDialog = ProgressDialog(this)
-//        progressDialog.setCancelable(false)
-//        progressDialog.setMessage("Loading Notifications")
-//        progressDialog.show()
-
-//        val username: String = URLEncoder.encode("xwiki:XWiki.somenath1435","utf-8")
-//        appCoroutineScope.launch {
-//                        apiManager.xwikiServicesApi.getNofity(Credentials.basic("somenath1435", "password"))
+            runOnUiThread { progressDialog.show() }
+            val userId = "xwiki" + ":" + "XWiki" + "." + currentUserAccountName
 //            apiManager.xwikiServicesApi.getNotify()
-//                .subscribeOn(Schedulers.newThread())
-//                .subscribe(
-//                    {
-//                        progressDialog.dismiss()
-//                        adapter.setNotificationList(it.notifications)
-//                        it.notifications.forEach {
-//                            Log.e("Nofity", it.document.toString() + it.type.toString())
-//                        }
-//                    },
-//                    {
-//                        progressDialog.dismiss()
-//                        Log.e("Error", it.message)
-//                    }
-//                )
-//        }
+            apiManager.xwikiServicesApi.getNotify(userId,true)
+                .subscribe(
+                    {
+                        runOnUiThread {
+                            progressDialog.dismiss()
+                            adapter.setNotificationList(it.notifications)
+                        }
+                        it.notifications.forEach {
+                            Log.e(
+                                "NotificationActivity",
+                                it.document.toString() + it.type.toString()
+                            )
+                        }
+                    },
+                    {
+                        runOnUiThread {
+                            progressDialog.dismiss()
+                        }
+                        Log.e("Error", it.message)
+                    }
+                )
+        }
     }
 }

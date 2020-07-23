@@ -23,23 +23,17 @@ import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.work.*
 import kotlinx.coroutines.*
-import okhttp3.Credentials
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.auth.AuthenticatorActivity
 import org.xwiki.android.sync.auth.PARAM_USER_PASS
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.deleteAccount
-import org.xwiki.android.sync.notifications.NotificationWorker
 import org.xwiki.android.sync.resolveApiManager
-import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import org.xwiki.android.sync.utils.checkOIDCSupport
 import org.xwiki.android.sync.utils.extensions.enabled
@@ -47,13 +41,7 @@ import org.xwiki.android.sync.utils.extensions.hideKeyboard
 import org.xwiki.android.sync.utils.hasNetworkConnection
 import org.xwiki.android.sync.utils.showDialog
 import org.xwiki.android.sync.utils.tempName
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
-import rx.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 /**
  * Tag for logging.
@@ -93,9 +81,6 @@ class SignInViewFlipper(
 
     var binding: org.xwiki.android.sync.databinding.ViewflipperSigninBinding =
         DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
-
-    private lateinit var apiManager: BaseApiManager
-    private lateinit var userAccount: UserAccount
 
     init {
         binding.signInButton.setOnClickListener {
@@ -207,25 +192,6 @@ class SignInViewFlipper(
 
             val apiManager = resolveApiManager(user)
 
-//            val request = apiManager.xwikiServicesApi.getNotifications()
-//            request.enqueue(object : Callback<NotificationsBody> {
-//                override fun onFailure(call: Call<NotificationsBody>, t: Throwable) {
-//                    Log.e("Retrofit Failed ", t.stackTrace.toString())
-//                }
-//
-//                override fun onResponse(
-//                    call: Call<NotificationsBody>,
-//                    response: Response<NotificationsBody>
-//                ) {
-//                    Log.e("Retrofit response Body ", response.body().toString())
-//                    Log.e("Retrofit response Body ", call.toString())
-//                    Log.e("Retrofit response Body ", call.isExecuted.toString())
-//                    Log.e("Retrofit response ", response.toString())
-//                    Log.e("Retrofit response doc", response.body()?.notifications!![0].document)
-//                    Log.e("Retrofit response type", response.body()?.notifications!![0].type)
-//                }
-//            })
-
             apiManager.xWikiHttp.login(
                 userName,
                 userPass
@@ -253,21 +219,6 @@ class SignInViewFlipper(
                         }
                     }
                 )
-
-//            apiManager.xwikiServicesApi.getNofity(Credentials.basic(userName, userPass))
-            apiManager.xwikiServicesApi.getNotify()
-                .subscribe(
-                    {
-                        it.notifications.forEach {
-                            Log.e("Nofity", it.document.toString() + it.type.toString())
-                        }
-                    },
-                    {
-                        Log.e("Error", it.message)
-                    }
-                )
-
-//            callNotificationWorker()
         }
     }
 
@@ -344,22 +295,4 @@ class SignInViewFlipper(
         }
     }
 
-//    fun callNotificationWorker() {
-//
-//        val constraints = Constraints.Builder()
-//            .setRequiredNetworkType(NetworkType.CONNECTED)
-//            .build()
-//
-//        val request: PeriodicWorkRequest.Builder =
-//            PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
-//                .setConstraints(constraints)
-//
-//        val workRequest: PeriodicWorkRequest = request.build()
-//
-//        Log.e("WM", "to be enqueued")
-//        WorkManager.getInstance(mContext)
-//            .enqueueUniquePeriodicWork("uniqueTag", ExistingPeriodicWorkPolicy.REPLACE, workRequest)
-//        Log.e("WM", "enqueued")
-//
-//    }
 }

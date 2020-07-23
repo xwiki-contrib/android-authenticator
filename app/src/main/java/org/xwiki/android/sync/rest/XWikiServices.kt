@@ -158,18 +158,11 @@ interface XWikiServices {
         @Path("space") space: String,
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
-
-    @Headers("Content-Type: application/json")
-    @GET("rest/notifications?useUserPreferences=true")
-    fun getNotify(): Observable<NotificationsContainer<Notification>>
-
-
-//    fun getNofity(): Observable<NotificationsContainer<Notification>>
-
-//    @GET("rest/notifications?userId={username}&useUserPreferences=true")
-//    fun getNofity(
-//        @Header("Authorization") basicAuth: String,
-//        @Path("username") username: String
-//    ): Observable<NotificationsContainer<Notification>>
+    
+    @GET("rest/notifications")
+    fun getNotify(
+        @Query("userId") userId: Any,
+        @Query("useUserPreferences") pref: Any
+    ): Observable<NotificationsContainer<Notification>>
 
 }

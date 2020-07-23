@@ -23,21 +23,22 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Credentials
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.R
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
 import org.xwiki.android.sync.activities.Notifications.NotificationsActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.bean.notification.Notification
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
+import org.xwiki.android.sync.notifications.NotificationWorker
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.getAppVersionName
@@ -45,6 +46,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -161,8 +163,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
     private lateinit var dataSavingCheckbox: MenuItem
 
-    private var notifications: List<Notification> = listOf()
-
     /**
      * Init all views and other activity objects
      *
@@ -233,7 +233,6 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 initialUsersListLoading = true
                 currentPage = 0
                 updateListView(false)
-                storeNotifications()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -259,6 +258,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
+
+        callNotificationWorker()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -286,9 +287,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 }
                 true
             }
-            R.id.action_notiifcations -> {
+            R.id.action_notifications -> {
                 if (this.hasNetworkConnection()) {
                     val intent = Intent(this, NotificationsActivity::class.java)
+                    intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, currentUserAccountName)
                     startActivity(intent)
                 } else
                     Toast.makeText(
@@ -785,33 +787,33 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
-    fun storeNotifications() {
-        apiManager.xwikiServicesApi.getNotify()
-//            apiManager.xwikiServicesApi.getNotify()
-            .subscribeOn(Schedulers.newThread())
-            .subscribe(
-                {
-                    //                        progressDialog.dismiss()
-//                    adapter.setNotificationList(it.notifications)
-                    notifications = it.notifications
-
-                    it.notifications.forEach {
-                        Log.e("Nofity", it.document.toString() + it.type.toString())
-                    }
-                },
-                {
-                    //                        progressDialog.dismiss()
-                    Log.e("Error", it.message)
-                }
-            )
-    }
-
-    public fun getNotificationsList(): List<Notification> {
-        return notifications
-    }
-
     fun Context.hasNetworkConnection(): Boolean {
         val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.activeNetworkInfo?.isConnected ?: false
+    }
+
+    private fun callNotificationWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresCharging(false)
+            .build()
+
+        val workData = Data.Builder().putString("username", currentUserAccountName).build()
+
+        val request: PeriodicWorkRequest.Builder =
+            PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .setInputData(workData)
+        val workRequest: PeriodicWorkRequest = request.build()
+
+        Log.e("WM", "to be enqueued")
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniquePeriodicWork(
+                "XwikiNotificationTag",
+                ExistingPeriodicWorkPolicy.KEEP,
+                workRequest
+            )
+        Log.e("WM", "enqueued")
+
     }
 }
