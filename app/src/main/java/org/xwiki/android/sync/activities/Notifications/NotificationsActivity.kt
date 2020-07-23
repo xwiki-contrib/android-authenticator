@@ -45,7 +45,7 @@ class NotificationsActivity : AppCompatActivity() {
             apiManager = resolveApiManager(userAccount)
             runOnUiThread { progressDialog.show() }
             val userId = "xwiki" + ":" + "XWiki" + "." + currentUserAccountName
-//            apiManager.xwikiServicesApi.getNotify()
+
             apiManager.xwikiServicesApi.getNotify(userId,true)
                 .subscribe(
                     {

@@ -186,8 +186,6 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         isTestRunning = intent.getBooleanExtra("Test", false)
         addNewAccount = intent.getBooleanExtra(ADD_NEW_ACCOUNT, false)
 
-//        callNotificationWorker()
-
         showViewFlipper(position)
     }
 
@@ -520,23 +518,4 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         }
     }
 
-//    fun callNotificationWorker() {
-//
-//        val constraints = Constraints.Builder()
-//            .setRequiredNetworkType(NetworkType.CONNECTED)
-//            .setRequiresCharging(false)
-//            .build()
-//
-//        val request: PeriodicWorkRequest.Builder =
-//            PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
-//                .setConstraints(constraints)
-//
-//        val workRequest: PeriodicWorkRequest = request.build()
-//
-//        Log.e("WM", "to be enqueued")
-//        WorkManager.getInstance(applicationContext)
-//            .enqueueUniquePeriodicWork("uniqueTag", ExistingPeriodicWorkPolicy.KEEP, workRequest)
-//        Log.e("WM", "enqueued")
-//
-//    }
 }

@@ -29,7 +29,6 @@ import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.bean.notification.Notification
 import org.xwiki.android.sync.bean.notification.NotificationsContainer
 import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import rx.Observable
@@ -158,7 +157,7 @@ interface XWikiServices {
         @Path("space") space: String,
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
-    
+
     @GET("rest/notifications")
     fun getNotify(
         @Query("userId") userId: Any,
