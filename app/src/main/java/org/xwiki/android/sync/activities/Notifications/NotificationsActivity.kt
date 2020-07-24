@@ -3,8 +3,11 @@ package org.xwiki.android.sync.activities.Notifications
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.ProgressDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
@@ -28,6 +31,9 @@ class NotificationsActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         val extras = intent.extras
 
+        val emptyNotifications = findViewById<TextView>(R.id.empty_notification_textview)
+        emptyNotifications.visibility = View.GONE
+
         val progressDialog = ProgressDialog(this)
         progressDialog.setCancelable(false)
         progressDialog.setMessage("Loading Notifications")
@@ -46,12 +52,15 @@ class NotificationsActivity : AppCompatActivity() {
             runOnUiThread { progressDialog.show() }
             val userId = "xwiki" + ":" + "XWiki" + "." + currentUserAccountName
 
-            apiManager.xwikiServicesApi.getNotify(userId,true)
+            apiManager.xwikiServicesApi.getNotify(userId, true)
                 .subscribe(
                     {
                         runOnUiThread {
                             progressDialog.dismiss()
-                            adapter.setNotificationList(it.notifications)
+                            if (it.notifications.isNullOrEmpty())
+                                emptyNotifications.visibility = View.VISIBLE
+                            else
+                                adapter.setNotificationList(it.notifications)
                         }
                         it.notifications.forEach {
                             Log.e(
@@ -63,6 +72,7 @@ class NotificationsActivity : AppCompatActivity() {
                     {
                         runOnUiThread {
                             progressDialog.dismiss()
+                            emptyNotifications.visibility = View.VISIBLE
                         }
                         Log.e("Error", it.message)
                     }

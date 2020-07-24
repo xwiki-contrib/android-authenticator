@@ -37,10 +37,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import androidx.work.*
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.*
-import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.BaseViewFlipper
 import org.xwiki.android.sync.activities.OIDC.OIDCActivity
 import org.xwiki.android.sync.activities.SettingServerIpViewFlipper
@@ -50,14 +48,12 @@ import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import org.xwiki.android.sync.contactdb.shared_prefs_repositories.SharedPreferencesUserAccountsCookiesRepository
 import org.xwiki.android.sync.databinding.ActAuthenticatorBinding
-import org.xwiki.android.sync.notifications.NotificationWorker
 import org.xwiki.android.sync.utils.PermissionsUtils
 import org.xwiki.android.sync.utils.openLink
 import org.xwiki.android.sync.utils.removeKeyValue
 import rx.Subscription
 import java.lang.reflect.InvocationTargetException
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Tag which will be used for logging
@@ -97,7 +93,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     /**
      * DataBinding for accessing layout variables.
      */
-    lateinit var binding: ActAuthenticatorBinding
+    lateinit var binding : ActAuthenticatorBinding
 
     /**
      * Will be used for managing of user account.
@@ -165,10 +161,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             builder =
-                AlertDialog.Builder(
-                    this@AuthenticatorActivity,
-                    android.R.style.Theme_DeviceDefault_Light_Dialog_Alert
-                )
+                AlertDialog.Builder(this@AuthenticatorActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
         } else {
             builder = AlertDialog.Builder(this@AuthenticatorActivity)
         }
@@ -225,7 +218,7 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
     fun doNext(view: View) {
         val position = binding.viewFlipper.displayedChild
         chooseAnimation(true)
-        if (flippers[position]?.doNext() == true) {
+        if (flippers[position] ?.doNext() == true) {
             if (position + 1 >= orderOfFlippers.size) {
                 finish()
             } else {
@@ -380,15 +373,11 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         val cookie = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN)
         val accessToken = intent.getStringExtra(ACCESS_TOKEN)
 
-        val userAccountsCookiesRepo: UserAccountsCookiesRepository =
-            SharedPreferencesUserAccountsCookiesRepository(appContext)
+        val userAccountsCookiesRepo: UserAccountsCookiesRepository = SharedPreferencesUserAccountsCookiesRepository(appContext)
 
         // Creating the account on the device and setting the auth token we got
         // (Not setting the auth token will cause another call to the server to authenticate the user)
-        Log.d(
-            TAG,
-            "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-        )
+        Log.d(TAG, "finishLogin > addAccountExplicitly" + " " + intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE))
         val account = Account(accountName, ACCOUNT_TYPE)
         mAccountManager.addAccountExplicitly(account, accountPassword, null)
         mAccountManager.setUserData(account, AccountManager.KEY_USERDATA, accountName)
@@ -504,14 +493,12 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_NEW_ACCOUNT) {
             if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this, "Authorization via OIDC was cancelled.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Authorization via OIDC was cancelled.", Toast.LENGTH_SHORT).show()
                 return
             }
-            val accessToken = data?.extras?.get(ACCESS_TOKEN)?.toString()
+            val accessToken = data ?.extras ?.get(ACCESS_TOKEN) ?.toString()
             if (accessToken.isNullOrEmpty()) {
-                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show()
             } else {
                 finishLogin(data)
             }

@@ -71,10 +71,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                 .subscribe(
                     {
                         it.notifications.forEach {
-                            Log.e(
-                                "NotificationActivity",
-                                it.document.toString() + it.type.toString()
-                            )
+                            Log.e("NotificationActivity", it.document.toString() + it.type.toString())
                             createNotification(it.type.toString(), it.document.toString(), username)
                         }
                     },

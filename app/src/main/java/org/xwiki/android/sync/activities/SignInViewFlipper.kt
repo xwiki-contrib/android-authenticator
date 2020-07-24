@@ -79,12 +79,12 @@ class SignInViewFlipper(
      * Databinding of this flipper
      */
 
-    var binding: org.xwiki.android.sync.databinding.ViewflipperSigninBinding =
+    var binding : org.xwiki.android.sync.databinding.ViewflipperSigninBinding =
         DataBindingUtil.setContentView(mActivity, R.layout.viewflipper_signin)
 
     init {
         binding.signInButton.setOnClickListener {
-            if (!mContext.hasNetworkConnection()) {
+            if(!mContext.hasNetworkConnection()){
                 mContext.showDialog(R.string.error_no_internet)
             } else if (checkInput()) {
                 it.hideKeyboard()
@@ -102,7 +102,7 @@ class SignInViewFlipper(
                 binding.llXWikiOIDCButtonContainer.enabled = false
             }
             val oidcSupported = try {
-                mActivity.serverUrl?.let { checkOIDCSupport(it) } ?: false
+                mActivity.serverUrl ?.let { checkOIDCSupport(it) } ?: false
             } catch (e: Exception) {
                 false
             }
@@ -114,11 +114,7 @@ class SignInViewFlipper(
                         mActivity.startOIDCAuth()
                     }
                 } else {
-                    Toast.makeText(
-                        mContext,
-                        "OIDC is not supported in your instance",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(mContext, "OIDC is not supported in your instance", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -147,8 +143,7 @@ class SignInViewFlipper(
                     field.requestFocus()
                     field.error = mContext.getString(R.string.error_field_required)
                     false
-                }
-                else -> {
+                } else -> {
                     field.error = null
                     true
                 }
@@ -191,7 +186,6 @@ class SignInViewFlipper(
             }
 
             val apiManager = resolveApiManager(user)
-
             apiManager.xWikiHttp.login(
                 userName,
                 userPass
@@ -288,11 +282,10 @@ class SignInViewFlipper(
         val errorTextView = binding.errorHolderTextView
         errorTextView.visibility = View.VISIBLE
         errorTextView.text = error
-        errorMessageShowingJob?.cancel()
+        errorMessageShowingJob ?.cancel()
         errorMessageShowingJob = appCoroutineScope.launch(Dispatchers.Main) {
             delay(2000L)
             errorTextView.visibility = View.INVISIBLE
         }
     }
-
 }

@@ -85,7 +85,7 @@ interface XWikiServices {
                 ApiEndPoints.WIKIS +
                 "/xwiki/classes/XWiki.XWikiUsers/objects"
     )
-    fun getAllUsersListByOffset(
+    fun getAllUsersListByOffset (
         @Query("start") offset: Int?,
         @Query("number") limit: Int?
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>

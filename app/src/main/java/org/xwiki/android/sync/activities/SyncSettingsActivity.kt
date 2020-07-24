@@ -60,8 +60,7 @@ private val TAG = SyncSettingsActivity::class.java.simpleName
  * @param context Context to know where from to open market
  */
 private fun openAppMarket(context: Context) {
-    val rateIntent =
-        Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.packageName))
+    val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.packageName))
     var marketFound = false
     // find all applications able to handle our rateIntent
     val otherApps = context.packageManager.queryIntentActivities(rateIntent, 0)
@@ -73,8 +72,7 @@ private fun openAppMarket(context: Context) {
                 otherAppActivity.applicationInfo.packageName,
                 otherAppActivity.name
             )
-            rateIntent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            rateIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             rateIntent.component = componentName
             context.startActivity(rateIntent)
             marketFound = true
@@ -96,7 +94,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     /**
      * DataBinding for accessing layout variables.
      */
-    lateinit var binding: ActivitySyncSettingsBinding
+    lateinit var binding : ActivitySyncSettingsBinding
 
     /**
      * Adapter for groups
@@ -135,11 +133,11 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     @Volatile
     private var allUsersAreLoading: Boolean = false
 
-    private lateinit var currentUserAccountName: String
+    private lateinit var currentUserAccountName : String
 
-    private lateinit var currentUserAccountType: String
+    private lateinit var currentUserAccountType : String
 
-    private lateinit var userAccount: UserAccount
+    private lateinit var userAccount : UserAccount
 
     private lateinit var syncSettingsViewModel: SyncSettingsViewModel
 
@@ -182,12 +180,11 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         )
         val extras = intent.extras
 
-        currentUserAccountName = if (extras?.get("account") != null) {
-            val intentAccount: Account = extras.get("account") as Account
+        currentUserAccountName = if (extras ?.get("account") != null) {
+            val intentAccount : Account = extras.get("account") as Account
             intentAccount.name
         } else {
-            intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-                ?: error("Can't get account name from intent - it is absent")
+            intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME) ?: error("Can't get account name from intent - it is absent")
         }
 
         toolbar = findViewById(R.id.toolbar)
@@ -200,15 +197,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         binding.recyclerView.addOnScrollListener(recyclerViewOnScrollListener)
 
         binding.selectSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 binding.syncTypeGetErrorContainer.visibility = View.GONE
 
-                when (position) {
+                when(position) {
                     0 -> {
                         if (allUsers.isEmpty() && allUsersAreLoading) {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
@@ -238,18 +230,14 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         binding.rvChangeSelectedAccount.setOnClickListener {
-            val intent: Intent = Intent(this, SelectAccountActivity::class.java)
+            val intent : Intent = Intent(this, SelectAccountActivity::class.java)
             startActivityForResult(intent, 1000)
         }
         binding.btTryAgain.setOnClickListener {
             appCoroutineScope.launch {
-                when (chosenSyncType) {
-                    SYNC_TYPE_ALL_USERS -> {
-                        loadAllUsers()
-                    }
-                    SYNC_TYPE_SELECTED_GROUPS -> {
-                        loadSyncGroups()
-                    }
+                when(chosenSyncType) {
+                    SYNC_TYPE_ALL_USERS -> {loadAllUsers()}
+                    SYNC_TYPE_SELECTED_GROUPS -> {loadSyncGroups()}
                 }
             }
         }
@@ -293,11 +281,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, currentUserAccountName)
                     startActivity(intent)
                 } else
-                    Toast.makeText(
-                        applicationContext,
-                        R.string.error_no_internet,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(applicationContext, R.string.error_no_internet, Toast.LENGTH_SHORT).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -311,7 +295,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 val totalItemCount = layoutManager.itemCount
 
-                if (!isLoading && layoutManager.findLastCompletelyVisibleItemPosition() >= totalItemCount / 2) {
+                if (!isLoading && layoutManager.findLastCompletelyVisibleItemPosition() >= totalItemCount/2) {
                     lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
                     loadMoreUsers()
                 }
@@ -320,7 +304,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     }
 
     // TODO:: Test case for pagination of loading MoreUsers
-    private fun loadMoreUsers() {
+    private fun loadMoreUsers () {
         isLoading = true
         showLoadMoreProgressBar()
         apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
@@ -381,8 +365,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
      * @since 0.4.2
      */
     private fun refreshProgressBar() {
-        val progressBarVisible =
-            syncGroups() && groupsAreLoading || syncAllUsers() && allUsersAreLoading
+        val progressBarVisible = syncGroups() && groupsAreLoading || syncAllUsers() && allUsersAreLoading
         runOnUiThread {
             if (progressBarVisible) {
                 binding.listViewProgressBar.visibility = View.VISIBLE
@@ -434,8 +417,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
 
         appCoroutineScope.launch {
-            userAccount =
-                userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
+            userAccount = userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
             chosenSyncType = userAccount.syncType
             apiManager = resolveApiManager(userAccount)
 
@@ -447,7 +429,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 binding.tvSelectedSyncType.text = userAccount.serverAddress
                 syncSettingsViewModel = ViewModelProviders.of(
                     this@SyncSettingsActivity,
-                    SyncSettingsViewModelFactory(application)
+                    SyncSettingsViewModelFactory (application)
                 ).get(SyncSettingsViewModel::class.java)
 
                 chosenSyncType = userAccount.syncType
@@ -457,7 +439,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     }
 
     // TODO:: Test case for both allUsers and SyncGroups
-    private fun initSyncList() {
+    private fun initSyncList () {
         loadSyncGroups()
         loadAllUsers()
     }
@@ -473,7 +455,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             allUsers.addAll(users)
             updateListView(false)
         }
-        apiManager.xwikiServicesApi.getAllUsersListByOffset(currentPage, PAGE_SIZE)
+        apiManager.xwikiServicesApi.getAllUsersListByOffset( currentPage, PAGE_SIZE)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -671,8 +653,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         val oldSyncType = userAccount.syncType
         if (oldSyncType == chosenSyncType && !syncGroups()) {
             binding.nextButton.alpha = 0.8F
-            Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -706,8 +687,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         } else if (syncGroups()) {
             //compare to see if there are some changes.
             if (oldSyncType == chosenSyncType && compareSelectGroups()) {
-                Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Nothing has changed since your last sync", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -732,7 +712,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     private fun setSync(syncEnabled: Boolean) {
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-        var account: Account = availableAccounts[0]
+        var account : Account = availableAccounts[0]
         for (acc in availableAccounts) {
             if (acc.name.equals(currentUserAccountName)) {
                 account = acc
@@ -808,11 +788,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         Log.e("WM", "to be enqueued")
         WorkManager.getInstance(applicationContext)
-            .enqueueUniquePeriodicWork(
-                "XwikiNotificationTag",
-                ExistingPeriodicWorkPolicy.KEEP,
-                workRequest
-            )
+            .enqueueUniquePeriodicWork("XwikiNotificationTag", ExistingPeriodicWorkPolicy.KEEP, workRequest)
         Log.e("WM", "enqueued")
 
     }
