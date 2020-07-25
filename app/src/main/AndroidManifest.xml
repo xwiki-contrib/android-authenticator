@@ -71,7 +71,7 @@
         <activity android:name=".activities.SelectAccountActivity"/>
 
         <activity android:name=".activities.OIDC.OIDCActivity"
-            android:launchMode="singleInstance">
+                  android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

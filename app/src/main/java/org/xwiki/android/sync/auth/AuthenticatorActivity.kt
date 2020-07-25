@@ -491,8 +491,8 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_NEW_ACCOUNT) {
-            if (resultCode == Activity.RESULT_CANCELED) {
+        if(requestCode == REQUEST_NEW_ACCOUNT) {
+            if(resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(this, "Authorization via OIDC was cancelled.", Toast.LENGTH_SHORT).show()
                 return
             }
@@ -504,5 +504,4 @@ class AuthenticatorActivity : AccountAuthenticatorActivity() {
             }
         }
     }
-
 }
