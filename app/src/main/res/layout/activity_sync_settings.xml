@@ -148,12 +148,30 @@
                         android:layout_height="match_parent"
                         android:padding="@dimen/defaultViewMediumPadding">
 
-                    <ProgressBar
-                            android:layout_width="wrap_content"
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/shimmer_sync_users">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:id="@+id/list_viewProgressBar"
-                            android:layout_centerInParent="true"
-                            android:visibility="gone"/>
+                            android:orientation="vertical">
+
+                            <!-- Add 10 shimmer placeholder-->
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+                            <include layout="@layout/shimmer_list_item_group"/>
+
+                        </LinearLayout>
+                    </com.facebook.shimmer.ShimmerFrameLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerView"
@@ -162,7 +180,8 @@
                         android:scrollbars="vertical"
                         android:layout_height="match_parent"
                         android:layout_above="@+id/loadMoreProgressBar"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:visibility="gone"/>
 
                     <ProgressBar
                         android:layout_width="match_parent"

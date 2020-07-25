@@ -82,4 +82,7 @@ dependencies {
 
     // Required by other dependencies
     implementation "com.google.code.findbugs:jsr305:$jsr305_version"
+
+    //Shimmer Effect
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 }

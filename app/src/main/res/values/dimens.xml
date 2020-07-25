@@ -69,4 +69,6 @@
     <dimen name="margin_10dp">10dp</dimen>
     <dimen name="OIDC_account_list_layout_height">48dp</dimen>
     <dimen name="imageview_36dp">36dp</dimen>
+    <dimen name="shimmer_user_version">100dp</dimen>
+    <dimen name="shimmer_last_updated_time">150dp</dimen>
 </resources>
