@@ -152,25 +152,15 @@
                                 android:orientation="vertical">
 
                                 <!-- Add 10 shimmer placeholder-->
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
-
                                 <include layout="@layout/shimmer_list_item_group"/>
 
                             </LinearLayout>
