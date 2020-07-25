@@ -30,4 +30,5 @@
     <color name="black">#000000</color>
     <color name="greyBackground">#81858585</color>
     <color name="lightGrey">#808080</color>
+    <color name="shimmerBackground">#DDDDDD</color>
 </resources>

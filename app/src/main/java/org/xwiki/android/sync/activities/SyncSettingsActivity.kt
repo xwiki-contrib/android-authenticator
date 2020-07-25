@@ -350,18 +350,21 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         val progressBarVisible = syncGroups() && groupsAreLoading || syncAllUsers() && allUsersAreLoading
         runOnUiThread {
             if (progressBarVisible) {
-                binding.listViewProgressBar.visibility = View.VISIBLE
+                binding.shimmerSyncUsers.visibility=View.VISIBLE
+                binding.shimmerSyncUsers.startShimmer()
                 binding.recyclerView.visibility = View.GONE
             } else {
-                binding.listViewProgressBar.visibility = View.GONE
+                binding.shimmerSyncUsers.stopShimmer()
+                binding.shimmerSyncUsers.visibility=View.GONE
                 binding.recyclerView.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun showProgressBar() {
-        runOnUiThread {
-            binding.listViewProgressBar.visibility = View.VISIBLE
+    private fun showShimmer() {
+        runOnUiThread{
+            binding.shimmerSyncUsers.visibility=View.VISIBLE
+            binding.shimmerSyncUsers.startShimmer()
             binding.syncTypeGetErrorContainer.visibility = View.GONE
             binding.recyclerView.visibility = View.GONE
         }
@@ -380,10 +383,10 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
-
-    private fun hideProgressBar() {
+    private fun hideShimmer() {
         runOnUiThread {
-            binding.listViewProgressBar.visibility = View.GONE
+            binding.shimmerSyncUsers.stopShimmer()
+            binding.shimmerSyncUsers.visibility=View.GONE
             binding.recyclerView.visibility = View.VISIBLE
         }
     }
@@ -395,7 +398,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
      */
     private fun initData() {
         if (!intent.getBooleanExtra("Test", false)) {
-            showProgressBar()
+            showShimmer()
         }
 
         appCoroutineScope.launch {
@@ -431,7 +434,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         allUsersAreLoading = true
         val users = syncSettingsViewModel.getAllUsersCache(userAccount.id) ?: emptyList()
         if (users.isEmpty()) {
-            showProgressBar()
+            showShimmer()
         } else {
             allUsers.clear()
             allUsers.addAll(users)
@@ -446,7 +449,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     if (objectSummary.isNullOrEmpty()) {
                         runOnUiThread {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
-                            hideProgressBar()
+                            hideShimmer()
                         }
                     } else {
                         currentPage = PAGE_SIZE
@@ -476,7 +479,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                     }
-                    hideProgressBar()
+                    hideShimmer()
                 }
             )
     }
@@ -484,7 +487,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
     private fun loadSyncGroups() {
         val groupsCache = syncSettingsViewModel.getGroupsCache(userAccount.id) ?: emptyList()
         if (groupsCache.isEmpty()) {
-            showProgressBar()
+            showShimmer()
         } else {
             groups.clear()
             groups.addAll(groupsCache)
@@ -500,7 +503,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 { xWikiGroupCustomSearchResultContainer ->
                     groupsAreLoading = false
                     val searchResults = xWikiGroupCustomSearchResultContainer.searchResults
-                    hideProgressBar()
+                    hideShimmer()
 
                     if (searchResults.isNullOrEmpty()) {
                         runOnUiThread {
@@ -533,7 +536,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
                     }
-                    hideProgressBar()
+                    hideShimmer()
                 }
             )
     }
@@ -571,7 +574,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                             ).show()
                             binding.syncTypeGetErrorContainer.visibility = View.VISIBLE
                         }
-                        hideProgressBar()
+                        hideShimmer()
                     }
                 )
         } else {
@@ -609,7 +612,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         appCoroutineScope.launch(Dispatchers.Main) {
             if (syncNothing()) {
                 binding.recyclerView.visibility = View.GONE
-                binding.listViewProgressBar.visibility = View.GONE
+                binding.shimmerSyncUsers.stopShimmer()
+                binding.shimmerSyncUsers.visibility=View.GONE
             } else {
                 binding.recyclerView.visibility = View.VISIBLE
                 if (syncGroups()) {
@@ -622,7 +626,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 binding.recyclerView.layoutManager?.scrollToPosition(0)
                 mUsersAdapter.refresh(allUsers)
                 if (hideProgressBar) {
-                    hideProgressBar()
+                    hideShimmer()
                 }
             }
         }
@@ -747,5 +751,15 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         } else {
             binding.nextButton.alpha = 1F
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.shimmerSyncUsers.startShimmer()
+    }
+
+    override fun onPause() {
+        binding.shimmerSyncUsers.stopShimmer()
+        super.onPause()
     }
 }
