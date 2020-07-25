@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/toolbar_layout" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginLarge"
+            android:layout_marginLeft="@dimen/marginLarge"
+            android:layout_marginTop="@dimen/marginLarge"
+            android:text="@string/accounts"
+            android:textColor="@color/black"
+            android:textSize="@dimen/textLarge" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/textviewVerySmall"
+            android:layout_marginStart="@dimen/marginLarge"
+            android:layout_marginLeft="@dimen/marginLarge"
+            android:layout_marginTop="@dimen/marginSmall"
+            android:layout_marginEnd="@dimen/marginLarge"
+            android:layout_marginRight="@dimen/marginLarge"
+            android:background="@color/greyBackground" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lvAvailableAccounts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/marginMedium"
+            android:padding="@dimen/paddingMedium"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="@integer/selectAccountActivityLandGridSpanCount">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </LinearLayout>
+
+</layout>
