@@ -1,5 +1,7 @@
 package org.xwiki.android.sync.activities.Notifications
 
+import android.os.Build
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +26,13 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.ViewHolde
     override fun getItemCount(): Int = notificationList.size
 
     override fun onBindViewHolder(holder: NotificationsAdapter.ViewHolder, position: Int) {
-        holder.title.text = "Document= " + notificationList[position].document
-        holder.type.text = "Type= " + notificationList[position].type
+//        holder.title.text = "Document= " + notificationList[position].document
+//        holder.type.text = "Type= " + notificationList[position].type
+        val htmlStr = notificationList[position].html
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            holder.html.setText(Html.fromHtml(htmlStr, Html.FROM_HTML_MODE_COMPACT))
+        }
+        else holder.html.setText(Html.fromHtml(htmlStr))
     }
 
     fun setNotificationList(list: List<Notification>) {
@@ -36,5 +43,6 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.ViewHolde
     class ViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         val title: TextView = item.findViewById(R.id.notification_title)
         val type: TextView = item.findViewById(R.id.notification_type)
+        val html : TextView = item.findViewById(R.id.notification_html)
     }
 }
