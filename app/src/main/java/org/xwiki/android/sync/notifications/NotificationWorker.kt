@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.Notifications.NotificationsActivity
 import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import java.util.Random
@@ -22,6 +24,7 @@ import java.util.Random
 class NotificationWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
     override fun doWork(): Result {
+        Log.e("Notification Worker", "Started")
         return try {
             val username = inputData.getString("username")
             if (!username.isNullOrEmpty())
@@ -33,7 +36,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private fun createNotification(title: String, description: String, username: String?) {
+    private fun createNotification(title: String, description: String, link: String) {
 
         var notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -49,8 +52,9 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
             .setContentText(description)
             .setStyle(NotificationCompat.BigTextStyle().bigText(description))
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent(applicationContext,username))
-            .addAction(R.mipmap.ic_launcher,"View",pendingIntent(applicationContext,username))
+            .setContentIntent(browserIntent(applicationContext, link))
+            .addAction(R.mipmap.ic_launcher, "View", browserIntent(applicationContext, link))
+            .setAutoCancel(true)
 
         val random = Random()
         
@@ -58,6 +62,13 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
 
     }
 
+    private fun browserIntent(context: Context, link: String): PendingIntent {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setData(Uri.parse(link))
+        return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    // this intent opens notification activity
     private fun pendingIntent(context: Context, username: String?): PendingIntent {
         val intent = Intent(context, NotificationsActivity::class.java)
         intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, username)
@@ -74,8 +85,35 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                 .subscribe(
                     {
                         it.notifications.forEach {
-                            Log.e("NotificationActivity", it.document.toString() + it.type.toString())
-                            createNotification(it.type.toString(), it.document.toString(), username)
+                            Log.e(
+                                "NotificationActivity",
+                                it.document.toString() + it.type.toString()
+                            )
+
+                            val splittedDocument = XWikiUserFull.splitDocument(it.document)
+                            val link = "https://www.xwiki.org/xwiki" + "/rest" + splittedDocument
+                            //splitted document = \wikis\{wikiName}]\spaces\{spaceName}\pages\{pageName}
+
+                            Log.e("NotificationActivity", link)
+
+                            var url: String? = null
+
+                            apiManager.xwikiServicesApi.getPageDetails(link)
+                                .subscribe(
+                                    {
+                                        Log.e("XwikiAbsoluteUrl", it.xwikiAbsoluteUrl + "")
+                                        if (!it.xwikiAbsoluteUrl.isNullOrEmpty()) {
+                                            url = it.xwikiAbsoluteUrl.toString()
+                                        }
+                                    },
+                                    {
+                                        it.printStackTrace()
+                                    }
+                                )
+
+                            if (!url.isNullOrEmpty())
+                                createNotification(it.type.toString(), it.document.toString(), url.toString())
+
                         }
                     },
                     {
