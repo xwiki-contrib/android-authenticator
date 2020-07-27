@@ -31,7 +31,7 @@ class NotificationsActivity : AppCompatActivity() {
         if (toolbar != null)
             setSupportActionBar(toolbar)
         recyclerView = findViewById(R.id.recyclerView_notifications)
-        adapter = NotificationsAdapter()
+        adapter = NotificationsAdapter(applicationContext)
         recyclerView.adapter = adapter
         val extras = intent.extras
 
@@ -53,6 +53,7 @@ class NotificationsActivity : AppCompatActivity() {
             val userAccount =
                 userAccountsRepo.findByAccountName(currentUserAccountName) ?: return@launch
             apiManager = resolveApiManager(userAccount)
+            adapter.setApiManager(apiManager)
             runOnUiThread { progressDialog.show() }
             val userId = "xwiki" + ":" + "XWiki" + "." + currentUserAccountName
 

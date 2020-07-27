@@ -236,4 +236,29 @@ public class XWikiUserFull {
             return null;
         }
     }
+
+    public static String splitDocument(String document) {
+        String str = "";
+        int pos1 = document.indexOf(":");
+        int pos2 = document.lastIndexOf(".");
+        String wiki = document.substring(0,pos1);
+        String spaces="";
+        String space="";
+        String page= document.substring(pos2+1);
+        for(int i=pos1+1;i<=pos2;i++)
+        {
+            if(document.charAt(i)=='.')
+            {
+                spaces = spaces + "/spaces/" + space;
+                space="";
+            }
+            else
+            {
+                space = space + document.charAt(i);
+            }
+        }
+
+        str = str + "/wikis/" + wiki + spaces + "/pages/" + page;
+        return  str;
+    }
 }

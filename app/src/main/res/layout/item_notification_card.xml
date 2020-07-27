@@ -4,23 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/notification_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/textDefaultMediumSize"
-        android:visibility="gone"
-        tools:text="Title" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/notification_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/textDefaultMediumSize"
-        android:visibility="gone"
-        tools:text="Description OR Type" />
+    android:orientation="vertical"
+    android:id="@+id/notification_linear_layout">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/notification_html"

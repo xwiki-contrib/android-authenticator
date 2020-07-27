@@ -1,18 +1,42 @@
 package org.xwiki.android.sync.activities.Notifications
 
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import org.xwiki.android.sync.NotificationWebviewActivity
 import org.xwiki.android.sync.R
+import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.auth.XWikiAuthenticator
+import org.xwiki.android.sync.auth.XWikiAuthenticatorService
+import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.bean.notification.Notification
+import org.xwiki.android.sync.rest.BaseApiManager
+import org.xwiki.android.sync.utils.StringUtils
 
-class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
+class NotificationsAdapter(context: Context) :
+    RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
 
     private var notificationList: List<Notification> = listOf()
+
+    private lateinit var context: Context
+
+    private lateinit var apiManager: BaseApiManager
+
+    init {
+        this.context = context
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -31,8 +55,17 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.ViewHolde
         val htmlStr = notificationList[position].html
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             holder.html.setText(Html.fromHtml(htmlStr, Html.FROM_HTML_MODE_COMPACT))
+        } else holder.html.setText(Html.fromHtml(htmlStr))
+
+        holder.ll.setOnClickListener {
+            val doc = notificationList[position].document
+            if (!doc.isNullOrEmpty()) {
+                Log.e("NotificationAdapter", doc)
+                if (!doc.isNullOrEmpty()) {
+                    getPageDetails(doc, it)
+                }
+            }
         }
-        else holder.html.setText(Html.fromHtml(htmlStr))
     }
 
     fun setNotificationList(list: List<Notification>) {
@@ -41,8 +74,36 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.ViewHolde
     }
 
     class ViewHolder(item: View) : RecyclerView.ViewHolder(item) {
-        val title: TextView = item.findViewById(R.id.notification_title)
-        val type: TextView = item.findViewById(R.id.notification_type)
-        val html : TextView = item.findViewById(R.id.notification_html)
+        val html: TextView = item.findViewById(R.id.notification_html)
+        val ll: LinearLayout = item.findViewById(R.id.notification_linear_layout)
+    }
+
+    fun setApiManager(baseApiManager: BaseApiManager) {
+        this.apiManager = baseApiManager
+    }
+
+    fun getPageDetails(document: String, view: View) {
+        val splittedDocument = XWikiUserFull.splitDocument(document)
+        Log.e("Splitted Document", splittedDocument)
+
+        val url = "https://www.xwiki.org/xwiki" + "/rest" + splittedDocument
+        //splitted document = \wikis\{wikiName}]\spaces\{spaceName}\pages\{pageName}
+
+        appCoroutineScope.launch {
+            apiManager.xwikiServicesApi.getPageDetails(url)
+                .subscribe(
+                    {
+                        Log.e("XwikiAbsoluteUrl", it.xwikiAbsoluteUrl+"")
+                        if (!it.xwikiAbsoluteUrl.isNullOrEmpty()) {
+                            val intent = Intent(context, NotificationWebviewActivity::class.java)
+                            intent.putExtra("notification_url", it.xwikiAbsoluteUrl)
+                            view.context.startActivity(intent)
+                        }
+                    },
+                    {
+                        it.printStackTrace()
+                    }
+                )
+        }
     }
 }
