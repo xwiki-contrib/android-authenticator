@@ -17,6 +17,7 @@ import org.xwiki.android.sync.activities.Notifications.NotificationsActivity
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
+import java.util.Random
 
 class NotificationWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
@@ -51,7 +52,9 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
             .setContentIntent(pendingIntent(applicationContext,username))
             .addAction(R.mipmap.ic_launcher,"View",pendingIntent(applicationContext,username))
 
-        notificationManager.notify(1, notificationBuilder.build())
+        val random = Random()
+        
+        notificationManager.notify(random.nextInt(100000), notificationBuilder.build())
 
     }
 
