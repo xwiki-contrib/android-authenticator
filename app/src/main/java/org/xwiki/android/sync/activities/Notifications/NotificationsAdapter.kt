@@ -1,6 +1,5 @@
 package org.xwiki.android.sync.activities.Notifications
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -11,37 +10,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.xwiki.android.sync.NotificationWebviewActivity
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
-import org.xwiki.android.sync.auth.XWikiAuthenticator
-import org.xwiki.android.sync.auth.XWikiAuthenticatorService
 import org.xwiki.android.sync.bean.XWikiUserFull
 import org.xwiki.android.sync.bean.notification.Notification
 import org.xwiki.android.sync.rest.BaseApiManager
-import org.xwiki.android.sync.utils.StringUtils
 
-class NotificationsAdapter(context: Context) :
-    RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
+class NotificationsAdapter(
+    private val context: Context
+) : RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
 
     private var notificationList: List<Notification> = listOf()
 
-    private lateinit var context: Context
-
     private lateinit var apiManager: BaseApiManager
-
-    init {
-        this.context = context
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): NotificationsAdapter.ViewHolder {
+    ): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_notification_card, parent, false)
         return ViewHolder(view)
@@ -49,9 +37,7 @@ class NotificationsAdapter(context: Context) :
 
     override fun getItemCount(): Int = notificationList.size
 
-    override fun onBindViewHolder(holder: NotificationsAdapter.ViewHolder, position: Int) {
-//        holder.title.text = "Document= " + notificationList[position].document
-//        holder.type.text = "Type= " + notificationList[position].type
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val htmlStr = notificationList[position].html
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             holder.html.setText(Html.fromHtml(htmlStr, Html.FROM_HTML_MODE_COMPACT))
@@ -86,19 +72,12 @@ class NotificationsAdapter(context: Context) :
         val splittedDocument = XWikiUserFull.splitDocument(document)
         Log.e("Splitted Document", splittedDocument)
 
-        val url = "https://www.xwiki.org/xwiki" + "/rest" + splittedDocument
-        //splitted document = \wikis\{wikiName}]\spaces\{spaceName}\pages\{pageName}
-
         appCoroutineScope.launch {
-            apiManager.xwikiServicesApi.getPageDetails(url)
+            apiManager.xwikiServicesApi.getPageDetails(splittedDocument)
                 .subscribe(
                     {
                         Log.e("XwikiAbsoluteUrl", it.xwikiAbsoluteUrl+"")
-                        if (!it.xwikiAbsoluteUrl.isNullOrEmpty()) {
-                            val intent = Intent(context, NotificationWebviewActivity::class.java)
-                            intent.putExtra("notification_url", it.xwikiAbsoluteUrl)
-                            view.context.startActivity(intent)
-                        }
+                        context.startNotificationWebViewActivity(it.xwikiAbsoluteUrl ?: return@subscribe)
                     },
                     {
                         it.printStackTrace()

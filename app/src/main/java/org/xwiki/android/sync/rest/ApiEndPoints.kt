@@ -37,5 +37,6 @@ object ApiEndPoints {
     const val SPACES = "spaces"
     const val PAGES = "pages"
     const val XWIKI_OBJECTS = "objects/XWiki.XWikiUsers/0"
+    const val NOTIFICATIONS = "notifications"
 
 }

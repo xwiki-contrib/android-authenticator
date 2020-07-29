@@ -155,13 +155,15 @@ interface XWikiServices {
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
 
-    @GET("rest/notifications")
+    @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
     fun getNotify(
         @Query("userId") userId: Any,
         @Query("useUserPreferences") pref: Any
     ): Observable<NotificationsContainer<Notification>>
 
-    @GET
-    fun getPageDetails(@Url url: String): Observable<PageDetails>
+    @GET(ApiEndPoints.REST + "{xwikiPageLink}")
+    fun getPageDetails(
+        @Path("xwikiPageLink") xwikiPageLink: String
+    ): Observable<PageDetails>
 
 }
