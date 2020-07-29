@@ -767,10 +767,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                 .setInputData(workData)
         val workRequest: PeriodicWorkRequest = request.build()
 
-        Log.e("WM", "to be enqueued")
         WorkManager.getInstance(applicationContext)
             .enqueueUniquePeriodicWork("XwikiNotificationTag", ExistingPeriodicWorkPolicy.KEEP, workRequest)
-        Log.e("WM", "enqueued")
 
     }
     override fun onResume() {

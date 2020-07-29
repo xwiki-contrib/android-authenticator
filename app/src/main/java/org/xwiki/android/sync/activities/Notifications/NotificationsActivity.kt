@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import org.xwiki.android.sync.R
 import org.xwiki.android.sync.appCoroutineScope
+import org.xwiki.android.sync.bean.notification.Notification
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.userAccountsRepo
@@ -57,21 +58,47 @@ class NotificationsActivity : AppCompatActivity() {
             runOnUiThread { progressDialog.show() }
             val userId = "xwiki" + ":" + "XWiki" + "." + currentUserAccountName
 
-            apiManager.xwikiServicesApi.getNotify(userId, true)
+            apiManager.xwikiServicesApi.getNotify(userId, true, true)
                 .subscribe(
                     {
-                        runOnUiThread {
-                            progressDialog.dismiss()
-                            if (it.notifications.isNullOrEmpty())
-                                emptyNotifications.visibility = View.VISIBLE
-                            else
-                                adapter.setNotificationList(it.notifications)
+                        var notificationList: List<Notification>? = null
+                        if(!it.notifications.isNullOrEmpty()) notificationList=it.notifications
+                        else if (it.asyncId != null) {
+                            do {
+                                var id = it.asyncId
+                                if (id != null) {
+                                    apiManager.xwikiServicesApi.getNotifyAsync(userId, true, true, id)
+                                        .subscribe(
+                                            {
+                                                Log.e("AsyncId", it.asyncId.toString())
+                                                Log.e("AsyncId", it.notifications.toString())
+                                                id = it.asyncId
+                                                notificationList = it.notifications
+                                            },
+                                            {
+                                                it.printStackTrace()
+                                            }
+                                        )
+                                }
+                            } while (id != null)
                         }
-                        it.notifications.forEach {
-                            Log.e(
-                                "NotificationActivity",
-                                it.document.toString() + it.type.toString()
-                            )
+
+                        Log.e("FinalList", notificationList.toString())
+                        val notifications = notificationList
+                        if (!notifications.isNullOrEmpty()) {
+                            runOnUiThread {
+                                progressDialog.dismiss()
+                                if (notifications.isNullOrEmpty())
+                                    emptyNotifications.visibility = View.VISIBLE
+                                else
+                                    adapter.setNotificationList(notifications)
+                            }
+                            notifications.forEach {
+                                Log.e(
+                                    "NotificationActivity",
+                                    it.document.toString() + it.type.toString()
+                                )
+                            }
                         }
                     },
                     {

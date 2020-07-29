@@ -158,12 +158,21 @@ interface XWikiServices {
     @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
     fun getNotify(
         @Query("userId") userId: Any,
-        @Query("useUserPreferences") pref: Any
+        @Query("useUserPreferences") pref: Any,
+        @Query("async") async: Any
+    ): Observable<NotificationsContainer<Notification>>
+
+    @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
+    fun getNotifyAsync(
+        @Query("userId") userId: Any,
+        @Query("useUserPreferences") pref: Any,
+        @Query("async") async: Any,
+        @Query("asyncId") asyncId: Int
     ): Observable<NotificationsContainer<Notification>>
 
     @GET(ApiEndPoints.REST + "{xwikiPageLink}")
     fun getPageDetails(
-        @Path("xwikiPageLink") xwikiPageLink: String
+        @Path("xwikiPageLink",encoded = true) xwikiPageLink: String
     ): Observable<PageDetails>
 
 }

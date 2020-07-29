@@ -17,6 +17,7 @@ import org.xwiki.android.sync.R
 import org.xwiki.android.sync.activities.Notifications.NotificationsActivity
 import org.xwiki.android.sync.appCoroutineScope
 import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.bean.notification.Notification
 import org.xwiki.android.sync.resolveApiManager
 import org.xwiki.android.sync.userAccountsRepo
 import java.util.Random
@@ -81,29 +82,60 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                 userAccountsRepo.findByAccountName(username) ?: return@launch
             val apiManager = resolveApiManager(userAccount)
             val userId = "xwiki" + ":" + "XWiki" + "." + username
-            apiManager.xwikiServicesApi.getNotify(userId, true)
+            apiManager.xwikiServicesApi.getNotify(userId, true, true)
                 .subscribe(
                     {
-                        it.notifications.forEach {
+
+                        var notificationList: List<Notification>? = null
+                        if (!it.notifications.isNullOrEmpty()) notificationList = it.notifications
+                        else if (it.asyncId != null) {
+                            do {
+                                var id = it.asyncId
+                                if (id != null) {
+                                    apiManager.xwikiServicesApi.getNotifyAsync(
+                                        userId,
+                                        true,
+                                        true,
+                                        id
+                                    )
+                                        .subscribe(
+                                            {
+                                                Log.e("AsyncId", it.asyncId.toString())
+                                                Log.e("AsyncId", it.notifications.toString())
+                                                id = it.asyncId
+                                                notificationList = it.notifications
+                                            },
+                                            {
+                                                it.printStackTrace()
+                                            }
+                                        )
+                                }
+                            } while (id != null)
+                        }
+
+                        Log.e("FinalList", notificationList.toString())
+
+
+                        notificationList?.forEach {
                             Log.e(
-                                "NotificationActivity",
+                                "NotificationWorker",
                                 it.document.toString() + it.type.toString()
                             )
 
                             val splittedDocument = XWikiUserFull.splitDocument(it.document)
-                            val link = "https://www.xwiki.org/xwiki" + "/rest" + splittedDocument
-                            //splitted document = \wikis\{wikiName}]\spaces\{spaceName}\pages\{pageName}
 
-                            Log.e("NotificationActivity", link)
+                            Log.e("NotificationWorker", splittedDocument)
 
                             var url: String? = null
+                            var title: String? = null
 
-                            apiManager.xwikiServicesApi.getPageDetails(link)
+                            apiManager.xwikiServicesApi.getPageDetails(splittedDocument)
                                 .subscribe(
                                     {
                                         Log.e("XwikiAbsoluteUrl", it.xwikiAbsoluteUrl + "")
                                         if (!it.xwikiAbsoluteUrl.isNullOrEmpty()) {
                                             url = it.xwikiAbsoluteUrl.toString()
+                                            title = it.title.toString()
                                         }
                                     },
                                     {
@@ -112,7 +144,8 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                                 )
 
                             if (!url.isNullOrEmpty())
-                                createNotification(it.type.toString(), it.document.toString(), url.toString())
+                                createNotification(it.type.toString(), title.toString(), url.toString()
+                                )
 
                         }
                     },
