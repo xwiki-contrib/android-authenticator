@@ -11,6 +11,7 @@ import org.xwiki.android.sync.utils.openLink
 private const val notificationUrlField = "notification_url"
 
 fun Context.startNotificationWebViewActivity(url: String) = Intent(this, NotificationWebviewActivity::class.java).also {
+    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     it.putExtra(notificationUrlField, url)
     startActivity(it)
 }

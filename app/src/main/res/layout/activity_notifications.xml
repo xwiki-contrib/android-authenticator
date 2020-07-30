@@ -12,7 +12,14 @@
         android:layout_height="wrap_content"
         android:background="@color/primary"
         app:title="Notifications"
-        app:titleTextColor="@color/textPrimary"/>
+        app:titleTextColor="@color/textPrimary" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginLarge"
+        android:gravity="center_horizontal"
+        android:text="@string/experimental_feature" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/empty_notification_textview"

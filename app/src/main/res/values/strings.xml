@@ -129,6 +129,7 @@
     <string name="unchangedSettings">Nothing to save: settings was not changed</string>
     <string name="error">Error</string>
     <string name="empty_notifications">No Notifications Found</string>
+    <string name="experimental_feature">This page is currently in experimental stage </string>
 
     <!--choose account-->
     <string name="chooseAccount">Choose an account</string>

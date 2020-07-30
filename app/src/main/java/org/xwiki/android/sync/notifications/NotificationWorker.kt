@@ -54,7 +54,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
             .setStyle(NotificationCompat.BigTextStyle().bigText(description))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(browserIntent(applicationContext, link))
-            .addAction(R.mipmap.ic_launcher, "View", browserIntent(applicationContext, link))
+            .addAction(R.mipmap.ic_launcher, "Open", browserIntent(applicationContext, link))
             .setAutoCancel(true)
 
         val random = Random()
@@ -101,7 +101,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                                         .subscribe(
                                             {
                                                 Log.e("AsyncId", it.asyncId.toString())
-                                                Log.e("AsyncId", it.notifications.toString())
+                                                Log.e("Notifications", it.notifications.toString())
                                                 id = it.asyncId
                                                 notificationList = it.notifications
                                             },
@@ -144,8 +144,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) :
                                 )
 
                             if (!url.isNullOrEmpty())
-                                createNotification(it.type.toString(), title.toString(), url.toString()
-                                )
+                                createNotification(it.type.toString(), title.toString(), url.toString())
 
                         }
                     },

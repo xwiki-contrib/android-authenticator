@@ -70,6 +70,8 @@
 
         <activity android:name=".activities.SelectAccountActivity"/>
 
+        <activity android:name=".activities.Notifications.NotificationWebviewActivity" />
+
         <activity android:name=".activities.OIDC.OIDCActivity"
                   android:launchMode="singleInstance">
             <intent-filter>
