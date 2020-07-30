@@ -155,6 +155,9 @@ interface XWikiServices {
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
 
+    /**
+     * @since 1.2
+     */
     @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
     fun getNotify(
         @Query("userId") userId: Any,
@@ -162,6 +165,9 @@ interface XWikiServices {
         @Query("async") async: Any
     ): Observable<NotificationsContainer<Notification>>
 
+    /**
+     * @since 1.2
+     */
     @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
     fun getNotifyAsync(
         @Query("userId") userId: Any,
@@ -170,6 +176,9 @@ interface XWikiServices {
         @Query("asyncId") asyncId: Int
     ): Observable<NotificationsContainer<Notification>>
 
+    /**
+     * @since 1.2
+     */
     @GET(ApiEndPoints.REST + "{xwikiPageLink}")
     fun getPageDetails(
         @Path("xwikiPageLink",encoded = true) xwikiPageLink: String
