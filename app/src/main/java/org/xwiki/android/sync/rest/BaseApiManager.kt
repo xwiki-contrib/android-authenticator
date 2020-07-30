@@ -30,6 +30,7 @@ import org.xwiki.android.sync.appContext
 import org.xwiki.android.sync.contactdb.UserAccountId
 import org.xwiki.android.sync.contactdb.abstracts.UserAccountsCookiesRepository
 import org.xwiki.android.sync.userAccountsCookiesRepo
+import org.xwiki.android.sync.utils.destructTempName
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -81,6 +82,8 @@ class BaseApiManager(
     init {
         var baseUrl = baseURL
 
+        val accountName = accountName.destructTempName
+
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
@@ -92,6 +95,11 @@ class BaseApiManager(
 
         val okHttpClient = if (cookie.isNullOrEmpty()) {
             OkHttpClient.Builder()
+                .authenticator { route, response ->
+                    val actualPassword = am.getUserData(account,AccountManager.KEY_PASSWORD) ?: return@authenticator null
+                    val credential = Credentials.basic(accountName, actualPassword)
+                    return@authenticator response.request().newBuilder().header("Authorization", credential).build()
+                }
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
@@ -101,9 +109,6 @@ class BaseApiManager(
         } else {
             OkHttpClient.Builder()
                 .authenticator { route, response ->
-                    if (response.request().header("Authorization") != null) {
-                        return@authenticator null
-                    }
                     val credential = Credentials.basic(accountName, accountPassword)
                     return@authenticator response.request().newBuilder().header("Authorization", credential).build()
                 }

@@ -20,12 +20,11 @@
 package org.xwiki.android.sync.rest
 
 import okhttp3.ResponseBody
-import org.xwiki.android.sync.bean.ObjectSummary
-import org.xwiki.android.sync.bean.SearchResultContainer
+import org.xwiki.android.sync.bean.*
 import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.SearchResults.CustomSearchResultContainer
-import org.xwiki.android.sync.bean.XWikiGroup
-import org.xwiki.android.sync.bean.XWikiUserFull
+import org.xwiki.android.sync.bean.notification.Notification
+import org.xwiki.android.sync.bean.notification.NotificationsContainer
 import org.xwiki.android.sync.rest.ApiEndPoints.SPACES
 import retrofit2.Response
 import retrofit2.http.*
@@ -155,4 +154,34 @@ interface XWikiServices {
         @Path("space") space: String,
         @Path("name") name: String
     ): Observable<CustomObjectsSummariesContainer<ObjectSummary>>
+
+    /**
+     * @since 1.2
+     */
+    @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
+    fun getNotify(
+        @Query("userId") userId: Any,
+        @Query("useUserPreferences") pref: Any,
+        @Query("async") async: Any
+    ): Observable<NotificationsContainer<Notification>>
+
+    /**
+     * @since 1.2
+     */
+    @GET(ApiEndPoints.REST + ApiEndPoints.NOTIFICATIONS)
+    fun getNotifyAsync(
+        @Query("userId") userId: Any,
+        @Query("useUserPreferences") pref: Any,
+        @Query("async") async: Any,
+        @Query("asyncId") asyncId: Int
+    ): Observable<NotificationsContainer<Notification>>
+
+    /**
+     * @since 1.2
+     */
+    @GET(ApiEndPoints.REST + "{xwikiPageLink}")
+    fun getPageDetails(
+        @Path("xwikiPageLink",encoded = true) xwikiPageLink: String
+    ): Observable<PageDetails>
+
 }

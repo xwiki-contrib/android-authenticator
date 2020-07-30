@@ -40,6 +40,7 @@ import org.xwiki.android.sync.utils.extensions.enabled
 import org.xwiki.android.sync.utils.extensions.hideKeyboard
 import org.xwiki.android.sync.utils.hasNetworkConnection
 import org.xwiki.android.sync.utils.showDialog
+import org.xwiki.android.sync.utils.tempName
 import rx.android.schedulers.AndroidSchedulers
 
 /**
@@ -176,7 +177,7 @@ class SignInViewFlipper(
         return appCoroutineScope.launch {
             val user = userAccountsRepo.createAccount(
                 UserAccount(
-                    "$accountName@temp",
+                    accountName.tempName,
                     mActivity.serverUrl ?: return@launch
                 )
             ) ?: let {
@@ -192,8 +193,8 @@ class SignInViewFlipper(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { authtoken ->
-                        mActivity.hideProgress()
                         if (authtoken == null) {
+                            mActivity.hideProgress()
                             showErrorMessage(mContext.getString(R.string.loginError))
                         } else {
                             signedIn(

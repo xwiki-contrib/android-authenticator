@@ -83,6 +83,10 @@ dependencies {
     // Required by other dependencies
     implementation "com.google.code.findbugs:jsr305:$jsr305_version"
 
+    //Work Manager with Coroutines
+    implementation "androidx.work:work-runtime-ktx:2.3.4"
+
     //Shimmer Effect
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
 }

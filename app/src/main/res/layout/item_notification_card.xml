@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/notification_linear_layout">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/notification_html"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/paddingMedium"
+        android:textSize="@dimen/textDefaultSmallSize"
+        tools:text="Html will be displayed here" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="@dimen/marginMedium"
+        android:background="@color/black" />
+
+
+</LinearLayout>

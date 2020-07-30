@@ -7,9 +7,11 @@ import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -21,18 +23,22 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.xwiki.android.sync.*
+import org.xwiki.android.sync.R
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModel
 import org.xwiki.android.sync.ViewModel.SyncSettingsViewModelFactory
+import org.xwiki.android.sync.activities.Notifications.NotificationsActivity
 import org.xwiki.android.sync.bean.ObjectSummary
 import org.xwiki.android.sync.bean.SearchResults.CustomObjectsSummariesContainer
 import org.xwiki.android.sync.bean.XWikiGroup
 import org.xwiki.android.sync.contactdb.UserAccount
 import org.xwiki.android.sync.contactdb.clearOldAccountContacts
 import org.xwiki.android.sync.databinding.ActivitySyncSettingsBinding
+import org.xwiki.android.sync.notifications.NotificationWorker
 import org.xwiki.android.sync.rest.BaseApiManager
 import org.xwiki.android.sync.utils.GroupsListChangeListener
 import org.xwiki.android.sync.utils.getAppVersionName
@@ -40,6 +46,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
 import rx.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -223,7 +230,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         binding.rvChangeSelectedAccount.setOnClickListener {
-            val intent : Intent = Intent (this, SelectAccountActivity::class.java)
+            val intent : Intent = Intent(this, SelectAccountActivity::class.java)
             startActivityForResult(intent, 1000)
         }
         binding.btTryAgain.setOnClickListener {
@@ -239,6 +246,8 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         binding.nextButton.setOnClickListener { syncSettingComplete(it) }
 
         initData()
+
+        callNotificationWorker()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -264,6 +273,15 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
                     item.setChecked(true)
                     appContext.dataSaverModeEnabled = true
                 }
+                true
+            }
+            R.id.action_notifications -> {
+                if (this.hasNetworkConnection()) {
+                    val intent = Intent(this, NotificationsActivity::class.java)
+                    intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, currentUserAccountName)
+                    startActivity(intent)
+                } else
+                    Toast.makeText(applicationContext, R.string.error_no_internet, Toast.LENGTH_SHORT).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -622,7 +640,7 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
 
         val mAccountManager = AccountManager.get(applicationContext)
         val availableAccounts = mAccountManager.getAccountsByType(ACCOUNT_TYPE)
-        var account : Account = availableAccounts[0]
+        var account: Account = availableAccounts[0]
         for (acc in availableAccounts) {
             if (acc.name.equals(currentUserAccountName)) {
                 account = acc
@@ -730,6 +748,29 @@ class SyncSettingsActivity : AppCompatActivity(), GroupsListChangeListener {
         }
     }
 
+    fun Context.hasNetworkConnection(): Boolean {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo?.isConnected ?: false
+    }
+
+    private fun callNotificationWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresCharging(false)
+            .build()
+
+        val workData = Data.Builder().putString("username", currentUserAccountName).build()
+
+        val request: PeriodicWorkRequest.Builder =
+            PeriodicWorkRequest.Builder(NotificationWorker::class.java, 15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .setInputData(workData)
+        val workRequest: PeriodicWorkRequest = request.build()
+
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniquePeriodicWork("XwikiNotificationTag", ExistingPeriodicWorkPolicy.KEEP, workRequest)
+
+    }
     override fun onResume() {
         super.onResume()
         binding.shimmerSyncUsers.startShimmer()
