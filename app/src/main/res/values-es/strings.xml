@@ -21,7 +21,7 @@
     <string name="somethingWentWrong">Algo fue mal</string>
     <string name="checkErrors">Errores de comprobación</string>
     <string name="wrongPhone">El número de teléfono debe ser similar a +123-(456)-789</string>
-    <string name="wrongEmail">La dirección de correo electrónico tiene que ser similar a cuenta@email-ejemplo.prueba</string>
+    <string name="wrongEmail">La dirección de correo electrónico tiene que ser similar a cuenta@correoelectronico-ejemplo.prueba</string>
     <string name="note">Nota</string>
     <string name="company">Empresa</string>
     <string name="additionalInfo">Información adicional</string>
