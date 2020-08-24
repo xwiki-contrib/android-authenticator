@@ -90,4 +90,6 @@
     <string name="logIn">Iniciar sesión</string>
     <string name="signUp">Registrarse</string>
     <string name="signIn">Iniciar sesión</string>
+    <string name="experimental_feature">Esta página está en estado experimental</string>
+    <string name="empty_notifications">No se ha encontrado ninguna notificación</string>
 </resources>
