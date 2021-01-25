@@ -1,5 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<resources><string name="first_name">Имя</string>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_name">Имя</string>
     <string name="last_name">Фамилия</string>
     <string name="user_id">ID пользователя (обязательно)</string>
     <string name="phone">Телефон</string>
@@ -7,30 +8,24 @@
     <string name="password">Пароль (обязательно)</string>
     <string name="confirm_password">Подтвердите пароль (обязательно)</string>
     <string name="captcha_textview">Введите код с картинки</string>
-
     <string name="login_activity_username_label">Имя пользователя</string>
     <string name="login_activity_password_label">Пароль</string>
     <string name="login_activity_server_label">Сервер</string>
     <string name="login_activity_port_label">Порт</string>
     <string name="sign_in_authenticating">Вход…</string>
     <string name="sign_up_authenticating">Регистрация…</string>
-
     <string name="save">Сохранить</string>
-
     <string name="title_activity_edit_contact">Редактировать контакт</string>
     <string name="title_activity_authorize">Авторизация</string>
     <string name="title_activity_select_groups">Выберите группы</string>
     <string name="title_activity_setting">Настройки</string>
-
     <string name="error_invalid_server">Неверный адрес сервера</string>
     <string name="error_invalid_password">Пароль слишком короткий</string>
     <string name="error_incorrect_password">Неверный пароль</string>
     <string name="error_field_required">Это поле обязательно</string>
-
     <string name="view_group_action_label">Подробнее о группе</string>
     <string name="profile_action">XWiki профиль</string>
     <string name="view_profile">Редактировать контакт</string>
-
     <string name="authorize_activity_note">Авторизуйтесь через другие приложения.</string>
     <string name="authorize_activity_package_label">Имя пакета</string>
     <string name="account_name">Имя аккаунта</string>
@@ -52,7 +47,6 @@
     <string name="logIn">Войти</string>
     <string name="pleaseWait">Пожалуйста, подождите</string>
     <string name="error_invalid_email">Неверный E-Mail</string>
-
     <!--select setting-->
     <string-array name="select_groups_array">
         <item>Все пользователи</item>
@@ -87,7 +81,18 @@
     <string name="askToGrantPermissions">Пожалуйста, дайте разрешение в настройках приложения</string>
     <string name="signUpOfferMessage">Создайте учетную запись XWiki, чтобы использовать такие функции, как синхронизация контактов и предоставление учетных данных для других приложений Android</string>
     <string name="country">Страна</string>
-<string name="unchangedSettings">Нечего сохранять: настройки не были изменены</string>
-
-
-    </resources>
+    <string name="unchangedSettings">Нечего сохранять: настройки не были изменены</string>
+    <string name="openIdConnect">OpenID</string>
+    <string name="continueWith">Или продолжить с</string>
+    <string name="chooseLoginMethod">Выберите способ входа</string>
+    <string name="lastUpdateInfo">Последнее обновление: 2015.06.03</string>
+    <string name="syncAccount">Синхронизировать аккаунты</string>
+    <string name="xwikiCredentialShare">Чтобы продолжить, XWiki поделится вашим именем, адресом электронной почты и изображением профиля с запрашивающим приложением</string>
+    <string name="accounts">Аккаунты</string>
+    <string name="anotherAccount">Использовать другой аккаунт</string>
+    <string name="chooseAccount">Выберите аккаунт</string>
+    <string name="experimental_feature">Эта страница в настоящее время находится на экспериментальной стадии</string>
+    <string name="empty_notifications">Уведомления не найдены</string>
+    <string name="error">Ошибка</string>
+    <string name="error_no_internet">Пожалуйста проверьте интернет-соединение</string>
+</resources>
