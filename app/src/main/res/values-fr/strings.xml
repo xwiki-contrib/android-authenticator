@@ -82,4 +82,18 @@
     <string name="prohibitedAction">Vérifiez que vous avez les autorisations nécessaires</string>
     <string name="editXWikiContactInfo">Modifier les coordonnées de XWiki</string>
     <string name="unchangedSettings">Rien à enregistrer: la configuration n\'a pas été modifiée</string>
+    <string name="openIdConnect">Connexion OpenID</string>
+    <string name="continueWith">Ou continuer avec</string>
+    <string name="chooseLoginMethod">Choisir la méthode d\'authentification</string>
+    <string name="admin">Administrateur</string>
+    <string name="creatorXwiki">créateur : xwiki</string>
+    <string name="lastUpdateInfo">Dernière mise à jour : 03/06/2015</string>
+    <string name="syncAccount">Synchroniser le compte</string>
+    <string name="accounts">Comptes</string>
+    <string name="anotherAccount">Utiliser un autre compte</string>
+    <string name="chooseAccount">Choisissez un compte</string>
+    <string name="experimental_feature">Cette page est actuellement en phase expérimentale</string>
+    <string name="empty_notifications">Aucune notification trouvée</string>
+    <string name="error">Erreur</string>
+    <string name="error_no_internet">Veuillez vérifier votre connexion internet</string>
 </resources>
