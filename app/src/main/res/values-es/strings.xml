@@ -29,7 +29,7 @@
     <string name="address">Dirección</string>
     <string name="country">País</string>
     <string name="userName">Nombre del usuario</string>
-    <string name="signUpOfferMessage">"Crear un cuenta XWiki para disfrutar de funcionalidades como sincronización de contactos y  suministro de credenciales para otras aplicaciones Android"</string>
+    <string name="signUpOfferMessage">Crear un cuenta XWiki para disfrutar de funcionalidades como sincronización de contactos y suministro de credenciales para otras aplicaciones Android</string>
     <string name="askToGrantPermissions">Por favor, otorga el permiso en la configuración de la app</string>
     <string name="xwikiAccount">Cuenta XWiki</string>
     <string name="authenticationError">Error de autenticación</string>
