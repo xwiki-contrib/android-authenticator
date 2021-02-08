@@ -7,6 +7,3 @@ The idea of this project is to integrate a wiki instance in Android accounts, ma
 * [Contributors Guide](https://github.com/xwiki-contrib/android-authenticator/blob/master/CONTRIBUTING.md)
 * License: LGPL 2.1+
 * Requires Android 4.1+
-
-## Status
-[![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib_android-authenticator)](http://ci.xwiki.org/job/Contrib_android-authenticator/)
