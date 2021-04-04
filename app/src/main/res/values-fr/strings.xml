@@ -96,4 +96,5 @@
     <string name="empty_notifications">Aucune notification trouvée</string>
     <string name="error">Erreur</string>
     <string name="error_no_internet">Veuillez vérifier votre connexion internet</string>
+    <string name="xwikiCredentialShare">Pour continuer, XWiki va partager votre nom, adresse e-mail et image de profil avec l\'application demandée</string>
 </resources>
