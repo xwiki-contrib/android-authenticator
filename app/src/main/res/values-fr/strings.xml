@@ -97,4 +97,5 @@
     <string name="error">Erreur</string>
     <string name="error_no_internet">Veuillez vérifier votre connexion internet</string>
     <string name="xwikiCredentialShare">Si vous poursuivez, XWiki va partager votre nom, adresse e-mail et image de profil avec l\'application tierce.</string>
+    <string name="dataSaver">Enregistreur de données</string>
 </resources>
