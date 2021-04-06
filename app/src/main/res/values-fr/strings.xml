@@ -57,7 +57,7 @@
     <string name="serverAddress">Adresse du serveur</string>
     <string name="synchronizationType">Type de synchronisation</string>
     <string name="syncTypeGetListErrorMessage">Une erreur s\'est produite lorsque nous avons essayé d\'obtenir la liste du type de synchronisation actuel</string>
-    <string name="tryAgain">"Réessayer "</string>
+    <string name="tryAgain">Réessayer</string>
     <string name="versionTemplate" formatted="false">Version %s</string>
     <string name="updateSuccess">Mettre à jour</string>
     <string name="haveNoPermission">Vous n\'avez aucune permission</string>
@@ -81,7 +81,7 @@
     <string name="cantSyncContact">Impossible de synchroniser les données de contact avec le serveur. Il sera synchronisé plus tard par le système</string>
     <string name="prohibitedAction">Vérifiez que vous avez les autorisations nécessaires</string>
     <string name="editXWikiContactInfo">Modifier les coordonnées de XWiki</string>
-    <string name="unchangedSettings">Rien à enregistrer: la configuration n\'a pas été modifiée</string>
+    <string name="unchangedSettings">Rien à enregistrer : la configuration n\'a pas été modifiée</string>
     <string name="openIdConnect">Connexion OpenID</string>
     <string name="continueWith">Ou continuer avec</string>
     <string name="chooseLoginMethod">Choisir la méthode d\'authentification</string>
@@ -96,4 +96,6 @@
     <string name="empty_notifications">Aucune notification trouvée</string>
     <string name="error">Erreur</string>
     <string name="error_no_internet">Veuillez vérifier votre connexion internet</string>
+    <string name="xwikiCredentialShare">Si vous poursuivez, XWiki va partager votre nom, adresse e-mail et image de profil avec l\'application tierce.</string>
+    <string name="dataSaver">Enregistreur de données</string>
 </resources>
