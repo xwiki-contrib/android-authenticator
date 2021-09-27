@@ -86,4 +86,5 @@
     <string name="logIn">Einloggen</string>
     <string name="signUp">Registrieren</string>
     <string name="signIn">Anmelden</string>
+    <string name="profile_action">XWiki Profil</string>
 </resources>
