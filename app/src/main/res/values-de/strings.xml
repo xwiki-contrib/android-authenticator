@@ -87,4 +87,9 @@
     <string name="signUp">Registrieren</string>
     <string name="signIn">Anmelden</string>
     <string name="profile_action">XWiki Profil</string>
+    <string name="dataSaver">Datensparmodus</string>
+    <string name="view_group_action_label">Gruppendetails anzeigen</string>
+    <string name="don_t_have_a_account">Sie haben kein XWiki-Konto\?</string>
+    <string name="creatorXwiki">creator:xwiki</string>
+    <string name="admin">Administrator</string>
 </resources>
