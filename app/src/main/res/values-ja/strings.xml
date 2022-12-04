@@ -49,4 +49,8 @@
     <string name="title_activity_select_groups">グループを選択</string>
     <string name="error_field_required">このフィールドは必須です</string>
     <string name="authorize_activity_note">クリックして、サードパーティーアプリにあなたのアカウントへのアクセスを承認してください。</string>
+    <string name="loginError">サーバーのURLまたは認証情報が正しくありません</string>
+    <string name="pleaseWait">お待ちください</string>
+    <string name="error_invalid_email">Eメールアドレスが正しくありません</string>
+    <string name="userExists">ユーザーは存在します</string>
 </resources>
