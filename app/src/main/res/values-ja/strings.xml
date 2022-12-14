@@ -60,7 +60,7 @@
     <string name="syncTypeGetListErrorMessage">現在の同期の種類の表を取得する際にエラーが発生しました</string>
     <string name="tryAgain">もう一度やり直す</string>
     <string name="versionTemplate" formatted="false">バージョン%s</string>
-    <string name="updateSuccess">正常にアップデートしました</string>
+    <string name="updateSuccess">正常に更新しました</string>
     <string name="haveNoPermission">権限がありません</string>
     <string name="authenticationError">認証エラー</string>
     <string name="xwikiAccount">XWikiのアカウント</string>
