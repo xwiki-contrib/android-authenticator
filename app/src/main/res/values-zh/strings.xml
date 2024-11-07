@@ -55,4 +55,6 @@
     <string name="chooseLoginMethod">选择登录方式</string>
     <string name="error_incorrect_password">此密码不正确</string>
     <string name="cantGetAllUsers">无法获取所有用户，请重试</string>
+    <string name="login_activity_server_label">服务器</string>
+    <string name="login_activity_port_label">端口</string>
 </resources>
