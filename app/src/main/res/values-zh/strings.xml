@@ -57,4 +57,9 @@
     <string name="cantGetAllUsers">无法获取所有用户，请重试</string>
     <string name="login_activity_server_label">服务器</string>
     <string name="login_activity_port_label">端口</string>
+    <string name="title_activity_authorize">授权</string>
+    <string name="view_group_action_label">显示示例组详细信息</string>
+    <string name="title_activity_select_groups">选择群组</string>
+    <string name="dataSaver">数据节省器</string>
+    <string name="title_activity_edit_contact">编辑联系人</string>
 </resources>
