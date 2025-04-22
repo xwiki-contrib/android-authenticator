@@ -47,7 +47,7 @@
     <string name="prohibitedAction">检查您是否具有必要的权限</string>
     <string name="experimental_feature">此页面目前处于实验阶段</string>
     <string name="anotherAccount">使用其他帐户</string>
-    <string name="first_name">姓氏</string>
+    <string name="first_name">名字</string>
     <string name="error_invalid_email">无效的电子邮件</string>
     <string name="don_t_have_a_account">还没有 XWiki 帐户？</string>
     <string name="complete">完成</string>
