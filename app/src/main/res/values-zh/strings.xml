@@ -62,4 +62,34 @@
     <string name="title_activity_select_groups">选择群组</string>
     <string name="dataSaver">数据节省器</string>
     <string name="title_activity_edit_contact">编辑联系人</string>
+    <string name="account_name">账户名</string>
+    <string name="pleaseWait">请等待</string>
+    <string name="admin">Admin管理员</string>
+    <string name="accounts">账户</string>
+    <string name="versionTemplate" formatted="false">版本 %s</string>
+    <string name="synchronizationType">同步类型</string>
+    <string name="checkErrors">检查错误</string>
+    <string name="openIdConnect">连接OpenID账户</string>
+    <string name="authorize_activity_package_label">包名称</string>
+    <string name="version">版本 1.0</string>
+    <string name="cantSyncContact">无法与服务器同步联系人数据。系统稍后会自动同步</string>
+    <string name="grant_permission_button">授权</string>
+    <string name="syncAccount">同步账号</string>
+    <string name="editXWikiContactInfo">编辑XWiki联系信息</string>
+    <string name="syncTypeGetListErrorMessage">在尝试获取当前同步类型的表格时出了点问题</string>
+    <string name="signUpOfferMessage">创建 XWiki 账户以享受如联系人同步等功能，并为其他安卓应用提供凭据</string>
+    <string name="xwikiCredentialShare">为了继续，XWiki 将与请求的应用程序共享您的姓名、电子邮件地址和账户头像</string>
+    <string name="creatorXwiki">创建者：xwiki</string>
+    <string name="additionalInfo">附加信息</string>
+    <string name="empty_notifications">未找到通知</string>
+    <string name="continueWith">或者继续使用</string>
+    <string name="note">备注</string>
+    <string name="profile_action">XWiki个人资料</string>
+    <string name="about_version">关于版本</string>
+    <string name="userExists">用户已存在</string>
+    <string name="view_profile">编辑联系方式</string>
+    <string name="askToGrantPermissions">请在应用设置中授予相关权限</string>
+    <string name="userContactInfo">用户联系信息</string>
+    <string name="syncContactInfoWithServer">将联系信息与服务器同步</string>
+    <string name="lastUpdateInfo">最后更新：2015.06.03</string>
 </resources>
