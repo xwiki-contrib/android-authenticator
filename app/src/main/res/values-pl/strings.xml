@@ -16,14 +16,14 @@
     <string name="about_version">O wersji</string>
     <string name="next">Następny</string>
     <string name="create_one">Stwórz jeden</string>
-    <string name="don_t_have_a_account">Nie masz konta na XWiki \?</string>
-    <string name="learn_more_dialog">Naucz więcej</string>
+    <string name="don_t_have_a_account">Nie masz konta na XWiki?</string>
+    <string name="learn_more_dialog">Dowiedz się więcej</string>
     <string name="login_sub_head">Zaloguj się do swojej instancji XWiki.</string>
-    <string name="grant_permission_button">Autoryzować</string>
+    <string name="grant_permission_button">Autoryzuj</string>
     <string name="cancel">Anuluj</string>
-    <string name="account_name">Nazwa konta</string>
+    <string name="account_name">Nazwa Konta</string>
     <string name="authorize_activity_package_label">Nazwa paczki</string>
-    <string name="authorize_activity_note">"Kliknij, aby zezwolić  aplikacji trzeciej na dostęp do Twojego konta."</string>
+    <string name="authorize_activity_note">Kliknij, aby zezwolić aplikacji trzeciej na dostęp do Twojego konta.</string>
     <string name="view_profile">Edycja kontaktu</string>
     <string name="profile_action">Profil XWiki</string>
     <string name="view_group_action_label">Pokaż szczegóły przykładowej grupy</string>
@@ -70,7 +70,26 @@
     <string name="askToGrantPermissions">Przyznaj uprawnienia w ustawieniach aplikacji</string>
     <string name="xwikiAccount">Konto XWiki</string>
     <string name="authenticationError">Błąd uwierzytelniania</string>
-    <string name="haveNoPermission">Nie masz pozwolenia</string>
+    <string name="haveNoPermission">Nie masz uprawnień</string>
     <string name="updateSuccess">Zaktualizowano pomyślnie</string>
     <string name="versionTemplate" formatted="false">Wersja %s</string>
+    <string name="admin">Admin</string>
+    <string name="accounts">Konta</string>
+    <string name="openIdConnect">Połączenie OpenID</string>
+    <string name="dataSaver">Oszczędzanie danych</string>
+    <string name="chooseAccount">Wybierz konto</string>
+    <string name="syncAccount">Synchronizacja konta</string>
+    <string name="anotherAccount">Użyj innego konta</string>
+    <string name="error">Błąd</string>
+    <string name="creatorXwiki">kreator:xwiki</string>
+    <string name="chooseLoginMethod">Wybierz metodę logowania</string>
+    <string name="lastUpdateInfo">Ostatnia aktualizacja:2015.06.03</string>
+    <string name="continueWith">Lub kontynuuj z</string>
+    <string name="error_no_internet">Sprawdź połączenie internetowe</string>
+    <string name="wrongEmail">E-mail musi wyglądać tak, jak ten@przykladowy-email.pl</string>
+    <string name="wrongPhone">Telefon musi wyglądać tak: +48-(700)-800-900</string>
+    <string name="unchangedSettings">Nic do zapisania: ustawienia nie zostały zmienione</string>
+    <string name="empty_notifications">Nie znaleziono powiadomień</string>
+    <string name="experimental_feature">Ta strona jest obecnie w fazie eksperymentalnej</string>
+    <string name="xwikiCredentialShare">Aby kontynuować, XWiki udostępni Twoje imię i nazwisko, adres e-mail i zdjęcie profilowe aplikacji żądającej</string>
 </resources>
