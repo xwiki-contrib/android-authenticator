@@ -3,7 +3,7 @@
     <string name="signIn">登录</string>
     <string name="login_activity_username_label">用户名</string>
     <string name="password">密码</string>
-    <string name="user_id">用户ID</string>
+    <string name="user_id">用户ID（必填）</string>
     <string name="email">邮箱</string>
     <string name="confirm_password">确认密码</string>
     <string name="phone">手机号</string>
